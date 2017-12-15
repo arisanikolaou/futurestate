@@ -1,0 +1,37 @@
+source https://nuget.org/api/v2
+
+nuget FSharp.Core redirects: force
+
+group App
+  source https://nuget.org/api/v2
+
+  nuget Autofac
+  nuget Magnum
+  nuget NLog
+  nuget Dapper.FluentMap.Dommel
+  nuget EmitMapper
+  nuget ManyConsole
+  nuget Humanizer
+  nuget FluentValidation
+  nuget CsvHelper 
+
+group Db
+  source https://nuget.org/api/v2
+
+  nuget Microsoft.SqlServer.DacFx.x64
+
+group Build
+  source https://nuget.org/api/v2
+
+  nuget SourceLink.Fake
+  nuget FAKE
+  nuget FSharp.Formatting
+
+
+group Test
+  source https://nuget.org/api/v2
+
+  nuget NUnit ~> 2
+  nuget NUnit.Runners ~> 2
+  nuget TestStack.BDDfy
+  nuget FluentAssertions

@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[_Version](
+	[Version] [varchar](100) NOT NULL,
+	[DateModified] [smalldatetime] NOT NULL,
+ CONSTRAINT [PK__Version] PRIMARY KEY CLUSTERED 
+(
+	[Version] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+

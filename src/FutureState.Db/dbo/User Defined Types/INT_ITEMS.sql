@@ -1,0 +1,4 @@
+﻿CREATE TYPE [dbo].[INT_ITEMS] AS TABLE (
+    [Item] INT NOT NULL,
+    PRIMARY KEY CLUSTERED ([Item] ASC));
+

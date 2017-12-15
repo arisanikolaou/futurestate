@@ -1,0 +1,4 @@
+﻿CREATE TYPE [dbo].[BIT_ITEMS] AS TABLE (
+    [Item] BIT NOT NULL,
+    PRIMARY KEY CLUSTERED ([Item] ASC));
+

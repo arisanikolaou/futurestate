@@ -1,0 +1,4 @@
+﻿CREATE TYPE [dbo].[DATE_ITEMS] AS TABLE (
+    [Item] DATE NOT NULL,
+    PRIMARY KEY CLUSTERED ([Item] ASC));
+
