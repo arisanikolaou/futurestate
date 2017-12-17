@@ -162,6 +162,9 @@ publish/
 *.nuget.targets
 packages
 
+# Build tools
+tools
+
 # Microsoft Azure Build Output
 csx/
 *.build.csdef
