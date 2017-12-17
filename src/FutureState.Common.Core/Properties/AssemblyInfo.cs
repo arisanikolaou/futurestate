@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 [assembly: AssemblyTitleAttribute("FutureState.Common")]
 [assembly: AssemblyProductAttribute("FutureState")]

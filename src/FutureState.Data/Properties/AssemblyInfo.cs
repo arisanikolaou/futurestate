@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 [assembly: AssemblyTitle("FutureState.Data")]
 [assembly: AssemblyProduct("FutureState")]

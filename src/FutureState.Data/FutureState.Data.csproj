@@ -140,7 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Example.nuspec" />
+    <None Include="FutureState.Data.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

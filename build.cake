@@ -25,7 +25,7 @@ var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var solutionVersion = "0.0.1.1";
+var solutionVersion = "0.1.0.0";
 
 // nuget get
 var nugetServer = "https://www.nuget.org";

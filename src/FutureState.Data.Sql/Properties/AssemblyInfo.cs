@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 [assembly: AssemblyTitleAttribute("FutureState.Data.Sql")]
 [assembly: AssemblyProductAttribute("FutureState")]

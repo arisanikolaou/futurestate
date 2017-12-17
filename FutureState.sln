@@ -4,9 +4,10 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7200B5EC-BD79-4C0F-BA39-F2A45B36AC17}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "..solution items", "..solution items", "{7361E831-AC07-4A8B-B70B-944F98050F50}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution items", ".solution items", "{7361E831-AC07-4A8B-B70B-944F98050F50}"
 	ProjectSection(SolutionItems) = preProject
 		src\AssemblyInfoCommon.cs = src\AssemblyInfoCommon.cs
+		build.cake = build.cake
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -17,8 +18,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Data", "src\FutureState.Data\FutureState.Data.csproj", "{58B0D3C2-E786-40BD-B5F7-04B32F0AA241}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Data.Sql", "src\FutureState.Data.Sql\FutureState.Data.Sql.csproj", "{6B003A23-1002-47EC-A5F5-56E66EE91476}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "db", "db", "{D64376FE-52DB-4914-AC7A-F612E8367F1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Autofac", "src\FutureState.Autofac\FutureState.Autofac.csproj", "{FC833DDB-232B-4A4C-8A40-EFD017FFC601}"
 EndProject
