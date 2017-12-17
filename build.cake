@@ -25,11 +25,11 @@ var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var solutionVersion = "0.1.0.0";
+var solutionVersion = Argument("VERSION", "0.1.0.0");
 
 // nuget get
 var nugetServer = "https://www.nuget.org";
-var apiKey = "f25792c2-aff3-42e1-a482-49e3eda9c5fc"; // to be provided
+var apiKey = Argument("NUGET_APIKEY", "");
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
