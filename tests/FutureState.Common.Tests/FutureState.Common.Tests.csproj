@@ -51,8 +51,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Story.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="DurableActionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

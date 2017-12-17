@@ -1,6 +1,10 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using Dapper;
 using Dapper.Extensions.Linq.Core.Configuration;
+using FutureState.Data.Sql.Mappings;
 
 namespace FutureState.Data.Sql
 { 
@@ -16,11 +20,6 @@ namespace FutureState.Data.Sql
 
         public bool IsOpen => _connection.State == ConnectionState.Open;
 
-        /// <summary>
-        ///     Creates a new instance.
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="config"></param>
         internal Session(SqlConnection connection, IDapperConfiguration config)
         {
             _connection = connection;

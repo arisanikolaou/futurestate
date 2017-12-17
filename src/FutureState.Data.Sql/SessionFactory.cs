@@ -1,5 +1,9 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using Dapper;
 using Dapper.Extensions.Linq.Core.Configuration;
+using FutureState.Data.Sql.Mappings;
 
 namespace FutureState.Data.Sql
 {

@@ -246,3 +246,4 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 /src/FutureState.Db/FutureState.Db.jfm
+/build/TestResults.xml

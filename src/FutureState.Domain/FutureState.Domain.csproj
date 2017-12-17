@@ -166,7 +166,7 @@
         <Reference Include="FluentValidation">
           <HintPath>..\..\packages\app\FluentValidation\lib\Net45\FluentValidation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -175,7 +175,7 @@
         <Reference Include="FluentValidation">
           <HintPath>..\..\packages\app\FluentValidation\lib\portable-net40+sl50+wp80+win8+wpa81\FluentValidation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -184,7 +184,7 @@
         <Reference Include="FluentValidation">
           <HintPath>..\..\packages\app\FluentValidation\lib\portable-net45+wp80+win8+wpa81\FluentValidation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -193,7 +193,7 @@
         <Reference Include="FluentValidation">
           <HintPath>..\..\packages\app\FluentValidation\lib\uap10.0\FluentValidation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -204,7 +204,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\MonoAndroid10\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -213,7 +213,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\Xamarin.iOS10\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -222,7 +222,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\net35\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -231,7 +231,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\net40\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -241,7 +241,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\sl4\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -250,7 +250,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\sl5\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>
@@ -259,7 +259,7 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\wp8\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
+          
         </Reference>
       </ItemGroup>
     </When>

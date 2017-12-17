@@ -98,6 +98,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AssemblyInfoCommon.cs">
+      <Link>Properties\AssemblyInfoCommon.cs</Link>
+    </Compile>
+    <Compile Include="AppClassMapProvider.cs" />
     <Compile Include="Dapper.Extensions.Linq.Core\Attributes\SchemaAttribute.cs" />
     <Compile Include="Dapper.Extensions.Linq.Core\Builder\IEntityBuilder.cs" />
     <Compile Include="Dapper.Extensions.Linq.Core\Builder\IQueryBuilder.cs" />
@@ -151,7 +155,6 @@
     <Compile Include="Dapper.Extensions.Linq\Predicates\Sort.cs" />
     <Compile Include="Dapper.Extensions.Linq\ReflectionHelper.cs" />
     <Compile Include="EntityQueryBuilder.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Mappings\CustomEntityMap.cs" />
     <Compile Include="Mappings\ListItemTypeHandler.cs" />
     <Compile Include="Mappings\CustomTypeMap.cs" />
@@ -225,18 +228,19 @@
     <Compile Include="Dapper.FastCRUD\SqlStatements\ThreeEntitiesRelationshipSqlStatements.cs" />
     <Compile Include="Dapper.FastCRUD\SqlStatements\TwoEntitiesRelationshipSqlStatements.cs" />
     <Compile Include="Dapper.FastCRUD\Validations\Requires.cs" />
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionFactory.cs" />
     <Content Include="Sql.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Example.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FutureState.Common.Core\FutureState.Common.Core.csproj">
+    <ProjectReference Include="..\FutureState.Common.Core\FutureState.Common.csproj">
       <Project>{3ba5fb45-d642-43de-8629-37aa3d7ce5bd}</Project>
-      <Name>FutureState.Common.Core</Name>
+      <Name>FutureState.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\FutureState.Data\FutureState.Data.csproj">
       <Project>{58b0d3c2-e786-40bd-b5f7-04b32f0aa241}</Project>
@@ -255,16 +259,13 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5'">
       <ItemGroup>
         <Reference Include="Dapper">
           <HintPath>..\..\packages\app\Dapper\lib\net45\Dapper.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -274,7 +275,6 @@
         <Reference Include="Dapper">
           <HintPath>..\..\packages\app\Dapper\lib\netstandard1.3\Dapper.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -285,7 +285,6 @@
         <Reference Include="Dapper.FluentMap">
           <HintPath>..\..\packages\app\Dapper.FluentMap\lib\net40\Dapper.FluentMap.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -295,7 +294,6 @@
         <Reference Include="Dapper.FluentMap">
           <HintPath>..\..\packages\app\Dapper.FluentMap\lib\netstandard1.3\Dapper.FluentMap.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -306,7 +304,6 @@
         <Reference Include="Dapper.FluentMap.Dommel">
           <HintPath>..\..\packages\app\Dapper.FluentMap.Dommel\lib\net45\Dapper.FluentMap.Dommel.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -316,7 +313,6 @@
         <Reference Include="Dapper.FluentMap.Dommel">
           <HintPath>..\..\packages\app\Dapper.FluentMap.Dommel\lib\netstandard1.3\Dapper.FluentMap.Dommel.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -327,7 +323,6 @@
         <Reference Include="Dommel">
           <HintPath>..\..\packages\app\Dommel\lib\net45\Dommel.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -337,7 +332,6 @@
         <Reference Include="Dommel">
           <HintPath>..\..\packages\app\Dommel\lib\netstandard1.3\Dommel.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -351,7 +345,6 @@
         <Reference Include="Magnum">
           <HintPath>..\..\packages\app\Magnum\lib\NET35\Magnum.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -363,7 +356,6 @@
         <Reference Include="Microsoft.CSharp">
           <HintPath>..\..\packages\app\Microsoft.CSharp\ref\netstandard1.0\Microsoft.CSharp.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -372,7 +364,6 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
       <ItemGroup>
         <Reference Include="mscorlib">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -381,7 +372,6 @@
         <Reference Include="Microsoft.Win32.Primitives">
           <HintPath>..\..\packages\app\Microsoft.Win32.Primitives\ref\netstandard1.3\Microsoft.Win32.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -392,7 +382,6 @@
         <Reference Include="Newtonsoft.Json">
           <HintPath>..\..\packages\app\Newtonsoft.Json\lib\net20\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -401,7 +390,6 @@
         <Reference Include="Newtonsoft.Json">
           <HintPath>..\..\packages\app\Newtonsoft.Json\lib\net35\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -410,7 +398,6 @@
         <Reference Include="Newtonsoft.Json">
           <HintPath>..\..\packages\app\Newtonsoft.Json\lib\net40\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -420,7 +407,6 @@
         <Reference Include="Newtonsoft.Json">
           <HintPath>..\..\packages\app\Newtonsoft.Json\lib\netstandard1.0\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -429,7 +415,6 @@
         <Reference Include="Newtonsoft.Json">
           <HintPath>..\..\packages\app\Newtonsoft.Json\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -438,7 +423,6 @@
         <Reference Include="Newtonsoft.Json">
           <HintPath>..\..\packages\app\Newtonsoft.Json\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -449,7 +433,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\MonoAndroid10\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -458,7 +441,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\Xamarin.iOS10\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -467,7 +449,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\net35\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -476,7 +457,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\net40\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -486,7 +466,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\sl4\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -495,7 +474,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\sl5\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -504,7 +482,6 @@
         <Reference Include="NLog">
           <HintPath>..\..\packages\app\NLog\lib\wp8\NLog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -516,7 +493,6 @@
         <Reference Include="System.AppContext">
           <HintPath>..\..\packages\app\System.AppContext\lib\net463\System.AppContext.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -525,7 +501,6 @@
         <Reference Include="System.AppContext">
           <HintPath>..\..\packages\app\System.AppContext\ref\netstandard1.3\System.AppContext.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -534,7 +509,6 @@
         <Reference Include="System.AppContext">
           <HintPath>..\..\packages\app\System.AppContext\lib\netstandard1.6\System.AppContext.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -543,7 +517,6 @@
         <Reference Include="System.AppContext">
           <HintPath>..\..\packages\app\System.AppContext\ref\netstandard1.6\System.AppContext.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -557,7 +530,6 @@
         <Reference Include="System.Collections">
           <HintPath>..\..\packages\app\System.Collections\ref\netstandard1.3\System.Collections.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -568,7 +540,6 @@
         <Reference Include="System.Collections.Concurrent">
           <HintPath>..\..\packages\app\System.Collections.Concurrent\lib\netstandard1.3\System.Collections.Concurrent.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -577,7 +548,6 @@
         <Reference Include="System.Collections.Concurrent">
           <HintPath>..\..\packages\app\System.Collections.Concurrent\ref\netstandard1.3\System.Collections.Concurrent.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -589,7 +559,6 @@
         <Reference Include="System.Collections.NonGeneric">
           <HintPath>..\..\packages\app\System.Collections.NonGeneric\lib\netstandard1.3\System.Collections.NonGeneric.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -598,7 +567,6 @@
         <Reference Include="System.Collections.NonGeneric">
           <HintPath>..\..\packages\app\System.Collections.NonGeneric\ref\netstandard1.3\System.Collections.NonGeneric.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -609,7 +577,6 @@
         <Reference Include="System.ComponentModel">
           <HintPath>..\..\packages\app\System.ComponentModel\ref\netstandard1.0\System.ComponentModel.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -618,7 +585,6 @@
         <Reference Include="System.ComponentModel">
           <HintPath>..\..\packages\app\System.ComponentModel\lib\netstandard1.3\System.ComponentModel.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -630,7 +596,6 @@
         <Reference Include="System.ComponentModel.Annotations">
           <HintPath>..\..\packages\app\System.ComponentModel.Annotations\ref\netstandard1.3\System.ComponentModel.Annotations.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -639,7 +604,6 @@
         <Reference Include="System.ComponentModel.Annotations">
           <HintPath>..\..\packages\app\System.ComponentModel.Annotations\lib\netstandard1.4\System.ComponentModel.Annotations.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -648,7 +612,6 @@
         <Reference Include="System.ComponentModel.Annotations">
           <HintPath>..\..\packages\app\System.ComponentModel.Annotations\ref\netstandard1.4\System.ComponentModel.Annotations.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -660,7 +623,6 @@
         <Reference Include="System.Console">
           <HintPath>..\..\packages\app\System.Console\ref\netstandard1.3\System.Console.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -669,7 +631,6 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.1'">
       <ItemGroup>
         <Reference Include="mscorlib">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -681,7 +642,6 @@
         <Reference Include="System.Data.Common">
           <HintPath>..\..\packages\app\System.Data.Common\lib\netstandard1.2\System.Data.Common.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -690,7 +650,6 @@
         <Reference Include="System.Data.Common">
           <HintPath>..\..\packages\app\System.Data.Common\ref\netstandard1.2\System.Data.Common.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -699,7 +658,6 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3')">
       <ItemGroup>
         <Reference Include="mscorlib">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -710,7 +668,6 @@
         <Reference Include="System.Data.SqlClient">
           <HintPath>..\..\packages\app\System.Data.SqlClient\lib\net451\System.Data.SqlClient.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -720,7 +677,6 @@
         <Reference Include="System.Data.SqlClient">
           <HintPath>..\..\packages\app\System.Data.SqlClient\ref\netstandard1.3\System.Data.SqlClient.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -731,7 +687,6 @@
         <Reference Include="System.Diagnostics.Debug">
           <HintPath>..\..\packages\app\System.Diagnostics.Debug\ref\netstandard1.3\System.Diagnostics.Debug.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -743,7 +698,6 @@
         <Reference Include="System.Diagnostics.DiagnosticSource">
           <HintPath>..\..\packages\app\System.Diagnostics.DiagnosticSource\lib\netstandard1.1\System.Diagnostics.DiagnosticSource.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -752,7 +706,6 @@
         <Reference Include="System.Diagnostics.DiagnosticSource">
           <HintPath>..\..\packages\app\System.Diagnostics.DiagnosticSource\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -763,7 +716,6 @@
         <Reference Include="System.Diagnostics.Tools">
           <HintPath>..\..\packages\app\System.Diagnostics.Tools\ref\netstandard1.0\System.Diagnostics.Tools.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -774,7 +726,6 @@
         <Reference Include="System.Diagnostics.Tracing">
           <HintPath>..\..\packages\app\System.Diagnostics.Tracing\lib\net462\System.Diagnostics.Tracing.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -783,7 +734,6 @@
         <Reference Include="System.Diagnostics.Tracing">
           <HintPath>..\..\packages\app\System.Diagnostics.Tracing\ref\netstandard1.3\System.Diagnostics.Tracing.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -792,7 +742,6 @@
         <Reference Include="System.Diagnostics.Tracing">
           <HintPath>..\..\packages\app\System.Diagnostics.Tracing\ref\netstandard1.5\System.Diagnostics.Tracing.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -803,7 +752,6 @@
         <Reference Include="System.Dynamic.Runtime">
           <HintPath>..\..\packages\app\System.Dynamic.Runtime\lib\netstandard1.3\System.Dynamic.Runtime.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -812,7 +760,6 @@
         <Reference Include="System.Dynamic.Runtime">
           <HintPath>..\..\packages\app\System.Dynamic.Runtime\ref\netstandard1.3\System.Dynamic.Runtime.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -823,7 +770,6 @@
         <Reference Include="System.Globalization">
           <HintPath>..\..\packages\app\System.Globalization\ref\netstandard1.3\System.Globalization.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -835,7 +781,6 @@
         <Reference Include="System.Globalization.Calendars">
           <HintPath>..\..\packages\app\System.Globalization.Calendars\ref\netstandard1.3\System.Globalization.Calendars.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -847,7 +792,6 @@
         <Reference Include="System.Globalization.Extensions">
           <HintPath>..\..\packages\app\System.Globalization.Extensions\ref\netstandard1.3\System.Globalization.Extensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -858,7 +802,6 @@
         <Reference Include="System.IO">
           <HintPath>..\..\packages\app\System.IO\lib\net462\System.IO.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -867,7 +810,6 @@
         <Reference Include="System.IO">
           <HintPath>..\..\packages\app\System.IO\ref\netstandard1.3\System.IO.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -876,7 +818,6 @@
         <Reference Include="System.IO">
           <HintPath>..\..\packages\app\System.IO\ref\netstandard1.5\System.IO.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -885,21 +826,18 @@
     <When Condition="$(TargetFrameworkIdentifier) == 'MonoAndroid' And ($(TargetFrameworkVersion) == 'v7.0' Or $(TargetFrameworkVersion) == 'v7.1')">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'MonoTouch'">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3')">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -908,7 +846,6 @@
         <Reference Include="System.IO.Compression">
           <HintPath>..\..\packages\app\System.IO.Compression\lib\net46\System.IO.Compression.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -917,35 +854,30 @@
         <Reference Include="System.IO.Compression">
           <HintPath>..\..\packages\app\System.IO.Compression\ref\netstandard1.3\System.IO.Compression.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'Xamarin.Mac'">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'Xamarin.tvOS'">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == 'Xamarin.watchOS'">
       <ItemGroup>
         <Reference Include="System.IO.Compression">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -954,7 +886,6 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
       <ItemGroup>
         <Reference Include="System.IO.Compression.FileSystem">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -963,7 +894,6 @@
         <Reference Include="System.IO.Compression.ZipFile">
           <HintPath>..\..\packages\app\System.IO.Compression.ZipFile\lib\netstandard1.3\System.IO.Compression.ZipFile.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -972,7 +902,6 @@
         <Reference Include="System.IO.Compression.ZipFile">
           <HintPath>..\..\packages\app\System.IO.Compression.ZipFile\ref\netstandard1.3\System.IO.Compression.ZipFile.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -984,7 +913,6 @@
         <Reference Include="System.IO.FileSystem">
           <HintPath>..\..\packages\app\System.IO.FileSystem\ref\netstandard1.3\System.IO.FileSystem.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -996,7 +924,6 @@
         <Reference Include="System.IO.FileSystem.Primitives">
           <HintPath>..\..\packages\app\System.IO.FileSystem.Primitives\lib\netstandard1.3\System.IO.FileSystem.Primitives.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1005,7 +932,6 @@
         <Reference Include="System.IO.FileSystem.Primitives">
           <HintPath>..\..\packages\app\System.IO.FileSystem.Primitives\ref\netstandard1.3\System.IO.FileSystem.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1017,7 +943,6 @@
         <Reference Include="System.IO.Pipes">
           <HintPath>..\..\packages\app\System.IO.Pipes\ref\netstandard1.3\System.IO.Pipes.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1028,7 +953,6 @@
         <Reference Include="System.Linq">
           <HintPath>..\..\packages\app\System.Linq\lib\net463\System.Linq.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1037,7 +961,6 @@
         <Reference Include="System.Linq">
           <HintPath>..\..\packages\app\System.Linq\ref\netstandard1.0\System.Linq.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1046,7 +969,6 @@
         <Reference Include="System.Linq">
           <HintPath>..\..\packages\app\System.Linq\lib\netstandard1.6\System.Linq.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1055,7 +977,6 @@
         <Reference Include="System.Linq">
           <HintPath>..\..\packages\app\System.Linq\ref\netstandard1.6\System.Linq.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1066,7 +987,6 @@
         <Reference Include="System.Linq.Expressions">
           <HintPath>..\..\packages\app\System.Linq.Expressions\lib\net463\System.Linq.Expressions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1075,7 +995,6 @@
         <Reference Include="System.Linq.Expressions">
           <HintPath>..\..\packages\app\System.Linq.Expressions\ref\netstandard1.3\System.Linq.Expressions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1084,7 +1003,6 @@
         <Reference Include="System.Linq.Expressions">
           <HintPath>..\..\packages\app\System.Linq.Expressions\lib\netstandard1.6\System.Linq.Expressions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1093,7 +1011,6 @@
         <Reference Include="System.Linq.Expressions">
           <HintPath>..\..\packages\app\System.Linq.Expressions\ref\netstandard1.6\System.Linq.Expressions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1104,7 +1021,6 @@
         <Reference Include="System.Net.Http">
           <HintPath>..\..\packages\app\System.Net.Http\ref\netstandard1.3\System.Net.Http.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1116,7 +1032,6 @@
         <Reference Include="System.Net.NameResolution">
           <HintPath>..\..\packages\app\System.Net.NameResolution\ref\netstandard1.3\System.Net.NameResolution.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1127,7 +1042,6 @@
         <Reference Include="System.Net.Primitives">
           <HintPath>..\..\packages\app\System.Net.Primitives\ref\netstandard1.3\System.Net.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1139,7 +1053,6 @@
         <Reference Include="System.Net.Security">
           <HintPath>..\..\packages\app\System.Net.Security\ref\netstandard1.3\System.Net.Security.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1151,7 +1064,6 @@
         <Reference Include="System.Net.Sockets">
           <HintPath>..\..\packages\app\System.Net.Sockets\ref\netstandard1.3\System.Net.Sockets.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1162,7 +1074,6 @@
         <Reference Include="System.ObjectModel">
           <HintPath>..\..\packages\app\System.ObjectModel\lib\netstandard1.3\System.ObjectModel.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1171,7 +1082,6 @@
         <Reference Include="System.ObjectModel">
           <HintPath>..\..\packages\app\System.ObjectModel\ref\netstandard1.3\System.ObjectModel.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1182,7 +1092,6 @@
         <Reference Include="System.Reflection">
           <HintPath>..\..\packages\app\System.Reflection\lib\net462\System.Reflection.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1191,7 +1100,6 @@
         <Reference Include="System.Reflection">
           <HintPath>..\..\packages\app\System.Reflection\ref\netstandard1.3\System.Reflection.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1200,7 +1108,6 @@
         <Reference Include="System.Reflection">
           <HintPath>..\..\packages\app\System.Reflection\ref\netstandard1.5\System.Reflection.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1211,7 +1118,6 @@
         <Reference Include="System.Reflection.Emit">
           <HintPath>..\..\packages\app\System.Reflection.Emit\ref\netstandard1.1\System.Reflection.Emit.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1220,7 +1126,6 @@
         <Reference Include="System.Reflection.Emit">
           <HintPath>..\..\packages\app\System.Reflection.Emit\lib\netstandard1.3\System.Reflection.Emit.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1231,7 +1136,6 @@
         <Reference Include="System.Reflection.Emit.ILGeneration">
           <HintPath>..\..\packages\app\System.Reflection.Emit.ILGeneration\ref\netstandard1.0\System.Reflection.Emit.ILGeneration.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1240,7 +1144,6 @@
         <Reference Include="System.Reflection.Emit.ILGeneration">
           <HintPath>..\..\packages\app\System.Reflection.Emit.ILGeneration\lib\netstandard1.3\System.Reflection.Emit.ILGeneration.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1251,7 +1154,6 @@
         <Reference Include="System.Reflection.Emit.Lightweight">
           <HintPath>..\..\packages\app\System.Reflection.Emit.Lightweight\ref\netstandard1.0\System.Reflection.Emit.Lightweight.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1260,7 +1162,6 @@
         <Reference Include="System.Reflection.Emit.Lightweight">
           <HintPath>..\..\packages\app\System.Reflection.Emit.Lightweight\lib\netstandard1.3\System.Reflection.Emit.Lightweight.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1271,7 +1172,6 @@
         <Reference Include="System.Reflection.Extensions">
           <HintPath>..\..\packages\app\System.Reflection.Extensions\ref\netstandard1.0\System.Reflection.Extensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1282,7 +1182,6 @@
         <Reference Include="System.Reflection.Primitives">
           <HintPath>..\..\packages\app\System.Reflection.Primitives\ref\netstandard1.0\System.Reflection.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1294,7 +1193,6 @@
         <Reference Include="System.Reflection.TypeExtensions">
           <HintPath>..\..\packages\app\System.Reflection.TypeExtensions\lib\net462\System.Reflection.TypeExtensions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1303,7 +1201,6 @@
         <Reference Include="System.Reflection.TypeExtensions">
           <HintPath>..\..\packages\app\System.Reflection.TypeExtensions\ref\netstandard1.3\System.Reflection.TypeExtensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1312,7 +1209,6 @@
         <Reference Include="System.Reflection.TypeExtensions">
           <HintPath>..\..\packages\app\System.Reflection.TypeExtensions\lib\netstandard1.5\System.Reflection.TypeExtensions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1321,7 +1217,6 @@
         <Reference Include="System.Reflection.TypeExtensions">
           <HintPath>..\..\packages\app\System.Reflection.TypeExtensions\ref\netstandard1.5\System.Reflection.TypeExtensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1332,7 +1227,6 @@
         <Reference Include="System.Resources.ResourceManager">
           <HintPath>..\..\packages\app\System.Resources.ResourceManager\ref\netstandard1.0\System.Resources.ResourceManager.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1341,19 +1235,16 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
       <ItemGroup>
         <Reference Include="System.ComponentModel.Composition">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
       <ItemGroup>
         <Reference Include="System.ComponentModel.Composition">
-          <Paket>True</Paket>
         </Reference>
         <Reference Include="System.Runtime">
           <HintPath>..\..\packages\app\System.Runtime\lib\net462\System.Runtime.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1362,7 +1253,6 @@
         <Reference Include="System.Runtime">
           <HintPath>..\..\packages\app\System.Runtime\ref\netstandard1.3\System.Runtime.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1371,7 +1261,6 @@
         <Reference Include="System.Runtime">
           <HintPath>..\..\packages\app\System.Runtime\ref\netstandard1.5\System.Runtime.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1382,7 +1271,6 @@
         <Reference Include="System.Runtime.Extensions">
           <HintPath>..\..\packages\app\System.Runtime.Extensions\lib\net462\System.Runtime.Extensions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1391,7 +1279,6 @@
         <Reference Include="System.Runtime.Extensions">
           <HintPath>..\..\packages\app\System.Runtime.Extensions\ref\netstandard1.3\System.Runtime.Extensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1400,7 +1287,6 @@
         <Reference Include="System.Runtime.Extensions">
           <HintPath>..\..\packages\app\System.Runtime.Extensions\ref\netstandard1.5\System.Runtime.Extensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1411,7 +1297,6 @@
         <Reference Include="System.Runtime.Handles">
           <HintPath>..\..\packages\app\System.Runtime.Handles\ref\netstandard1.3\System.Runtime.Handles.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1422,7 +1307,6 @@
         <Reference Include="System.Runtime.InteropServices">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices\lib\net462\System.Runtime.InteropServices.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1431,7 +1315,6 @@
         <Reference Include="System.Runtime.InteropServices">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices\lib\net463\System.Runtime.InteropServices.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1440,7 +1323,6 @@
         <Reference Include="System.Runtime.InteropServices">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices\ref\netcoreapp1.1\System.Runtime.InteropServices.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1449,7 +1331,6 @@
         <Reference Include="System.Runtime.InteropServices">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices\ref\netstandard1.3\System.Runtime.InteropServices.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1458,7 +1339,6 @@
         <Reference Include="System.Runtime.InteropServices">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices\ref\netstandard1.5\System.Runtime.InteropServices.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1469,7 +1349,6 @@
         <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices.RuntimeInformation\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1478,7 +1357,6 @@
         <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices.RuntimeInformation\lib\netstandard1.1\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1487,7 +1365,6 @@
         <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices.RuntimeInformation\ref\netstandard1.1\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1496,7 +1373,6 @@
         <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
           <HintPath>..\..\packages\app\System.Runtime.InteropServices.RuntimeInformation\lib\wpa81\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1507,7 +1383,6 @@
         <Reference Include="System.Runtime.Numerics">
           <HintPath>..\..\packages\app\System.Runtime.Numerics\ref\netstandard1.1\System.Runtime.Numerics.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1516,7 +1391,6 @@
         <Reference Include="System.Runtime.Numerics">
           <HintPath>..\..\packages\app\System.Runtime.Numerics\lib\netstandard1.3\System.Runtime.Numerics.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1525,19 +1399,16 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3')">
       <ItemGroup>
         <Reference Include="System.Runtime.Serialization">
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
       <ItemGroup>
         <Reference Include="System.Runtime.Serialization">
-          <Paket>True</Paket>
         </Reference>
         <Reference Include="System.Runtime.Serialization.Primitives">
           <HintPath>..\..\packages\app\System.Runtime.Serialization.Primitives\lib\net46\System.Runtime.Serialization.Primitives.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1546,7 +1417,6 @@
         <Reference Include="System.Runtime.Serialization.Primitives">
           <HintPath>..\..\packages\app\System.Runtime.Serialization.Primitives\ref\netstandard1.0\System.Runtime.Serialization.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1555,7 +1425,6 @@
         <Reference Include="System.Runtime.Serialization.Primitives">
           <HintPath>..\..\packages\app\System.Runtime.Serialization.Primitives\lib\netstandard1.3\System.Runtime.Serialization.Primitives.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1564,7 +1433,6 @@
         <Reference Include="System.Runtime.Serialization.Primitives">
           <HintPath>..\..\packages\app\System.Runtime.Serialization.Primitives\ref\netstandard1.3\System.Runtime.Serialization.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1576,7 +1444,6 @@
         <Reference Include="System.Security.Claims">
           <HintPath>..\..\packages\app\System.Security.Claims\lib\netstandard1.3\System.Security.Claims.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1585,7 +1452,6 @@
         <Reference Include="System.Security.Claims">
           <HintPath>..\..\packages\app\System.Security.Claims\ref\netstandard1.3\System.Security.Claims.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1596,7 +1462,6 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\lib\net46\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1606,7 +1471,6 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1615,7 +1479,6 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\ref\netstandard1.3\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1624,7 +1487,6 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\ref\netstandard1.4\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1633,7 +1495,6 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\ref\netstandard1.6\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1644,7 +1505,6 @@
         <Reference Include="System.Security.Cryptography.Cng">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Cng\lib\net46\System.Security.Cryptography.Cng.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1654,7 +1514,6 @@
         <Reference Include="System.Security.Cryptography.Cng">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Cng\lib\net463\System.Security.Cryptography.Cng.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1663,7 +1522,6 @@
         <Reference Include="System.Security.Cryptography.Cng">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Cng\ref\netstandard1.6\System.Security.Cryptography.Cng.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1675,7 +1533,6 @@
         <Reference Include="System.Security.Cryptography.Csp">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Csp\ref\netstandard1.3\System.Security.Cryptography.Csp.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1687,7 +1544,6 @@
         <Reference Include="System.Security.Cryptography.Encoding">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Encoding\ref\netstandard1.3\System.Security.Cryptography.Encoding.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1698,7 +1554,6 @@
         <Reference Include="System.Security.Cryptography.OpenSsl">
           <HintPath>..\..\packages\app\System.Security.Cryptography.OpenSsl\lib\netstandard1.6\System.Security.Cryptography.OpenSsl.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1707,7 +1562,6 @@
         <Reference Include="System.Security.Cryptography.OpenSsl">
           <HintPath>..\..\packages\app\System.Security.Cryptography.OpenSsl\ref\netstandard1.6\System.Security.Cryptography.OpenSsl.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1719,7 +1573,6 @@
         <Reference Include="System.Security.Cryptography.Primitives">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Primitives\lib\netstandard1.3\System.Security.Cryptography.Primitives.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1728,7 +1581,6 @@
         <Reference Include="System.Security.Cryptography.Primitives">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Primitives\ref\netstandard1.3\System.Security.Cryptography.Primitives.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1739,7 +1591,6 @@
         <Reference Include="System.Security.Cryptography.X509Certificates">
           <HintPath>..\..\packages\app\System.Security.Cryptography.X509Certificates\lib\net46\System.Security.Cryptography.X509Certificates.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1749,7 +1600,6 @@
         <Reference Include="System.Security.Cryptography.X509Certificates">
           <HintPath>..\..\packages\app\System.Security.Cryptography.X509Certificates\ref\netstandard1.3\System.Security.Cryptography.X509Certificates.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1758,7 +1608,6 @@
         <Reference Include="System.Security.Cryptography.X509Certificates">
           <HintPath>..\..\packages\app\System.Security.Cryptography.X509Certificates\ref\netstandard1.4\System.Security.Cryptography.X509Certificates.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1769,7 +1618,6 @@
         <Reference Include="System.Security.Principal">
           <HintPath>..\..\packages\app\System.Security.Principal\lib\netstandard1.0\System.Security.Principal.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1778,7 +1626,6 @@
         <Reference Include="System.Security.Principal">
           <HintPath>..\..\packages\app\System.Security.Principal\ref\netstandard1.0\System.Security.Principal.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1790,7 +1637,6 @@
         <Reference Include="System.Security.Principal.Windows">
           <HintPath>..\..\packages\app\System.Security.Principal.Windows\ref\netstandard1.3\System.Security.Principal.Windows.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1801,7 +1647,6 @@
         <Reference Include="System.Text.Encoding">
           <HintPath>..\..\packages\app\System.Text.Encoding\ref\netstandard1.3\System.Text.Encoding.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1813,7 +1658,6 @@
         <Reference Include="System.Text.Encoding.CodePages">
           <HintPath>..\..\packages\app\System.Text.Encoding.CodePages\ref\netstandard1.3\System.Text.Encoding.CodePages.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1824,7 +1668,6 @@
         <Reference Include="System.Text.Encoding.Extensions">
           <HintPath>..\..\packages\app\System.Text.Encoding.Extensions\ref\netstandard1.3\System.Text.Encoding.Extensions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1835,7 +1678,6 @@
         <Reference Include="System.Text.RegularExpressions">
           <HintPath>..\..\packages\app\System.Text.RegularExpressions\lib\net463\System.Text.RegularExpressions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1844,7 +1686,6 @@
         <Reference Include="System.Text.RegularExpressions">
           <HintPath>..\..\packages\app\System.Text.RegularExpressions\ref\netcoreapp1.1\System.Text.RegularExpressions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1853,7 +1694,6 @@
         <Reference Include="System.Text.RegularExpressions">
           <HintPath>..\..\packages\app\System.Text.RegularExpressions\ref\netstandard1.3\System.Text.RegularExpressions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1862,7 +1702,6 @@
         <Reference Include="System.Text.RegularExpressions">
           <HintPath>..\..\packages\app\System.Text.RegularExpressions\lib\netstandard1.6\System.Text.RegularExpressions.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1871,7 +1710,6 @@
         <Reference Include="System.Text.RegularExpressions">
           <HintPath>..\..\packages\app\System.Text.RegularExpressions\ref\netstandard1.6\System.Text.RegularExpressions.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1882,7 +1720,6 @@
         <Reference Include="System.Threading">
           <HintPath>..\..\packages\app\System.Threading\lib\netstandard1.3\System.Threading.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1891,7 +1728,6 @@
         <Reference Include="System.Threading">
           <HintPath>..\..\packages\app\System.Threading\ref\netstandard1.3\System.Threading.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1903,7 +1739,6 @@
         <Reference Include="System.Threading.Overlapped">
           <HintPath>..\..\packages\app\System.Threading.Overlapped\ref\netstandard1.3\System.Threading.Overlapped.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1914,7 +1749,6 @@
         <Reference Include="System.Threading.Tasks">
           <HintPath>..\..\packages\app\System.Threading.Tasks\ref\netstandard1.3\System.Threading.Tasks.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1929,7 +1763,6 @@
         <Reference Include="System.Threading.Thread">
           <HintPath>..\..\packages\app\System.Threading.Thread\lib\netstandard1.3\System.Threading.Thread.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1938,7 +1771,6 @@
         <Reference Include="System.Threading.Thread">
           <HintPath>..\..\packages\app\System.Threading.Thread\ref\netstandard1.3\System.Threading.Thread.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1950,7 +1782,6 @@
         <Reference Include="System.Threading.ThreadPool">
           <HintPath>..\..\packages\app\System.Threading.ThreadPool\lib\netstandard1.3\System.Threading.ThreadPool.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1959,7 +1790,6 @@
         <Reference Include="System.Threading.ThreadPool">
           <HintPath>..\..\packages\app\System.Threading.ThreadPool\ref\netstandard1.3\System.Threading.ThreadPool.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1970,7 +1800,6 @@
         <Reference Include="System.Threading.Timer">
           <HintPath>..\..\packages\app\System.Threading.Timer\ref\netstandard1.2\System.Threading.Timer.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1981,7 +1810,6 @@
         <Reference Include="System.Xml.ReaderWriter">
           <HintPath>..\..\packages\app\System.Xml.ReaderWriter\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1990,7 +1818,6 @@
         <Reference Include="System.Xml.ReaderWriter">
           <HintPath>..\..\packages\app\System.Xml.ReaderWriter\lib\netstandard1.3\System.Xml.ReaderWriter.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1999,7 +1826,6 @@
         <Reference Include="System.Xml.ReaderWriter">
           <HintPath>..\..\packages\app\System.Xml.ReaderWriter\ref\netstandard1.3\System.Xml.ReaderWriter.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -2010,7 +1836,6 @@
         <Reference Include="System.Xml.XDocument">
           <HintPath>..\..\packages\app\System.Xml.XDocument\lib\netstandard1.3\System.Xml.XDocument.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -2019,7 +1844,6 @@
         <Reference Include="System.Xml.XDocument">
           <HintPath>..\..\packages\app\System.Xml.XDocument\ref\netstandard1.3\System.Xml.XDocument.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -2031,7 +1855,6 @@
         <Reference Include="System.Xml.XmlDocument">
           <HintPath>..\..\packages\app\System.Xml.XmlDocument\lib\netstandard1.3\System.Xml.XmlDocument.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -2040,7 +1863,6 @@
         <Reference Include="System.Xml.XmlDocument">
           <HintPath>..\..\packages\app\System.Xml.XmlDocument\ref\netstandard1.3\System.Xml.XmlDocument.dll</HintPath>
           <Private>False</Private>
-          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>

@@ -18,6 +18,7 @@ namespace FutureState.Data.Sql.Mappings
         }
 
         public string ColumnName { get; }
+
         public FieldInfo Field => member as FieldInfo;
 
         public Type MemberType
@@ -28,7 +29,7 @@ namespace FutureState.Data.Sql.Mappings
                 {
                     case MemberTypes.Field: return ((FieldInfo)member).FieldType;
                     case MemberTypes.Property: return ((PropertyInfo)member).PropertyType;
-                    default: throw new NotSupportedException();
+                    default: throw new NotSupportedException($"Member type {member.MemberType} is not supported.");
                 }
             }
         }

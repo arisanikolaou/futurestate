@@ -51,8 +51,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Story.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="MemberMapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +100,12 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.3.1\lib\net452\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FutureState.Data.Sql\FutureState.Data.Sql.csproj">
+      <Project>{6B003A23-1002-47EC-A5F5-56E66EE91476}</Project>
+      <Name>FutureState.Data.Sql</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

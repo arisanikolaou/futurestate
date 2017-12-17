@@ -58,6 +58,7 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="AppDomainUtil.cs" />
+    <Compile Include="Reflection\AppTypeScanner.cs" />
     <Compile Include="SplitList.cs" />
     <Compile Include="Data\SeqGuid.cs" />
     <Compile Include="DomainEvents.cs" />
@@ -119,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="FutureState.Common.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
