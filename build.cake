@@ -27,11 +27,7 @@ var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
 var defaultVersion = "0.1.2";
-
-Information("Check");
-var solutionVersion = ArgumentOrEnvironmentVariable("version", "version", defaultVersion);
-
-Information(solutionVersion);
+var solutionVersion = ArgumentOrEnvironmentVariable("BUILD_VERSION", "BUILD_VERSION", defaultVersion);
 
 // nuget get
 var nugetServer = "https://www.nuget.org";
