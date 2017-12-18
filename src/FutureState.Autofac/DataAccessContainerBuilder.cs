@@ -1,8 +1,10 @@
-using Autofac;
-using FutureState.Data.Providers;
 using System;
+using Autofac;
+using FutureState.Autofac.Data;
+using FutureState.Data;
+using FutureState.Data.Providers;
 
-namespace FutureState.Data.Autofac
+namespace FutureState.Autofac
 {
     /// <summary>
     ///     Helps build an autofac container with registrations for a linqreader, repository and unit of work registrations for

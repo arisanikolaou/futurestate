@@ -3,13 +3,13 @@ using System.Linq;
 using Autofac;
 using Dapper.Extensions.Linq.Core.Mapper;
 using FutureState.Data;
-using NLog;
+using FutureState.Data.Sql;
+using FutureState.Reflection;
 using FutureState.Services;
 using FutureState.Specifications;
-using FutureState.Reflection;
-using FutureState.Data.Sql;
+using NLog;
 
-namespace FutureState.App
+namespace FutureState.Autofac
 {
     /// <summary>
     ///     Helps construct a given autofac container using the types discovered in a given type scanner instance.

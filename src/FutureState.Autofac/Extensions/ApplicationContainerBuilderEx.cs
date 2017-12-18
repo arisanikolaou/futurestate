@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using FutureState.Reflection;
 
-namespace FutureState.App
+namespace FutureState.Autofac.Extensions
 {
     public static class ApplicationContainerBuilderEx
     {

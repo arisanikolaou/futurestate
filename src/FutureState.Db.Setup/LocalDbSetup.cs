@@ -1,7 +1,7 @@
-using NLog;
 using System;
 using System.Data.SqlClient;
 using System.IO;
+using NLog;
 
 namespace FutureState.Db.Setup
 {
@@ -10,37 +10,37 @@ namespace FutureState.Db.Setup
     /// </summary>
     public class LocalDbSetup
     {
-        static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
         // todo: pull from machine config file
         public const string LocalDbServerName = @"(localdb)\MSSQLLocalDB";
 
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         // connection string to local db
-        static readonly string connectionString = $@"Data Source={LocalDbServerName};Initial Catalog=master;Integrated Security=True";
+        private static readonly string ConnectionString =
+            $@"Data Source={LocalDbServerName};Initial Catalog=master;Integrated Security=True";
 
-        static readonly object _syncLock = new object();
-        DbInfo _dbInfo;
-        readonly string _dbFileName;
-        readonly string _logFileName;
-        readonly string _dbName;
-
-        public DbInfo DbInfo => _dbInfo;
+        private static readonly object _syncLock = new object();
+        private readonly string _dbFileName;
+        private readonly string _dbName;
+        private readonly string _logFileName;
 
         /// <summary>
         ///     Creates a new instance to setup a database in a given directory with a given name.
         /// </summary>
         public LocalDbSetup(string dataBaseDir, string dbName)
         {
-            string mdfFilename = dbName + ".mdf";
+            var mdfFilename = dbName + ".mdf";
 
-            this._dbName = dbName;
-            this._dbFileName = Path.Combine(dataBaseDir, mdfFilename);
-            this._logFileName = Path.Combine(dataBaseDir, $"{dbName}_log.ldf");
+            _dbName = dbName;
+            _dbFileName = Path.Combine(dataBaseDir, mdfFilename);
+            _logFileName = Path.Combine(dataBaseDir, $"{dbName}_log.ldf");
 
             // Create Data Directory If It Doesn't Already Exist.
             if (!Directory.Exists(dataBaseDir))
                 Directory.CreateDirectory(dataBaseDir);
         }
+
+        public DbInfo DbInfo { get; private set; }
 
         /// <summary>
         ///     Gets or creates a database with the instance's configuration settings.
@@ -74,7 +74,7 @@ namespace FutureState.Db.Setup
                 File.SetAttributes(_dbFileName, FileAttributes.Normal);
                 File.SetAttributes(_logFileName, FileAttributes.Normal);
 
-                this._dbInfo = new DbInfo(_dbName, _dbFileName, _logFileName);
+                DbInfo = new DbInfo(_dbName, _dbFileName, _logFileName);
             }
         }
 
@@ -85,11 +85,11 @@ namespace FutureState.Db.Setup
         {
             lock (_syncLock)
             {
-                using (var connection = new SqlConnection(connectionString))
+                using (var connection = new SqlConnection(ConnectionString))
                 {
                     connection.Open();
 
-                    SqlCommand cmd = connection.CreateCommand();
+                    var cmd = connection.CreateCommand();
 
                     TryDetachDatabase(dbName);
 
@@ -106,7 +106,7 @@ namespace FutureState.Db.Setup
         /// </summary>
         public bool TryDetachDatabase()
         {
-            return TryDetachDatabase(this._dbName);
+            return TryDetachDatabase(_dbName);
         }
 
         /// <summary>
@@ -120,13 +120,13 @@ namespace FutureState.Db.Setup
             {
                 lock (_syncLock)
                 {
-                    using (var connection = new SqlConnection(connectionString))
+                    using (var connection = new SqlConnection(ConnectionString))
                     {
                         connection.Open();
 
                         // don't detach if it already exists
                         {
-                            SqlCommand cmd = connection.CreateCommand();
+                            var cmd = connection.CreateCommand();
                             cmd.CommandText = $"select count(*) from sysdatabases where name = '{dbName}'";
                             if ((int) cmd.ExecuteScalar() == 0)
                                 return true;
@@ -134,7 +134,7 @@ namespace FutureState.Db.Setup
 
                         // take offline
                         {
-                            SqlCommand cmd = connection.CreateCommand();
+                            var cmd = connection.CreateCommand();
                             cmd.CommandText = $"alter database [{dbName}] set offline with rollback immediate";
                             cmd.ExecuteNonQuery();
                         }
@@ -142,7 +142,7 @@ namespace FutureState.Db.Setup
 
                         // detach
                         {
-                            SqlCommand cmd = connection.CreateCommand();
+                            var cmd = connection.CreateCommand();
                             cmd.CommandText = $"exec sp_detach_db '{dbName}'";
                             cmd.ExecuteNonQuery();
                         }
@@ -151,7 +151,7 @@ namespace FutureState.Db.Setup
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex);
 

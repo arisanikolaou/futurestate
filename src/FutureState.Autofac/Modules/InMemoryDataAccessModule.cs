@@ -1,11 +1,13 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using Autofac;
+using FutureState.Autofac.Data;
+using FutureState.Data;
+using FutureState.Data.KeyBinders;
 using FutureState.Data.Keys;
 using FutureState.Data.Providers;
-using System;
-using System.Collections.Generic;
-using FutureState.Data.KeyBinders;
 
-namespace FutureState.Data.Autofac
+namespace FutureState.Autofac.Modules
 {
     /// <summary>
     ///     Registers in memory repositories, readers and units of work.

@@ -1,8 +1,9 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
+using FutureState.Data;
 using FutureState.Data.Keys;
-using System;
 
-namespace FutureState.Data.Autofac
+namespace FutureState.Autofac.Data
 {
     /// <summary>
     ///     Extension methods to resolve data access objects such as linq readers and repositories.

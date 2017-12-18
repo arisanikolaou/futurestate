@@ -1,11 +1,12 @@
 ﻿using System;
 using Autofac;
 using FutureState.ComponentModel;
+using FutureState.Data;
+using FutureState.Data.Keys;
 using FutureState.Data.Providers;
 using FutureState.Specifications;
-using FutureState.Data.Keys;
 
-namespace FutureState.Data.Autofac.Services
+namespace FutureState.Autofac.Modules
 {
     /// <summary>
     ///     Regigsters the basic modules required to support the data access architecture.

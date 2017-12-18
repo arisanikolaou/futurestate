@@ -1,6 +1,7 @@
 ﻿using Autofac;
+using FutureState.Data;
 
-namespace FutureState.Data.Autofac
+namespace FutureState.Autofac.Data
 {
     /// <summary>
     ///     Extension methods to autofac's container builder.
