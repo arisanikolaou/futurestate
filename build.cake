@@ -213,7 +213,7 @@ Task("Run-Unit-Tests")
         });
 
 
-    XUnit2(string.Format("./tests/**/bin/{0}/*XUnit.Tests.dll", configuration), new XUnit2Settings {
+    XUnit2(string.Format("./tests/**/bin/{0}/*Tests.dll", configuration), new XUnit2Settings {
         XmlReport = true,
         OutputDirectory = buildDir
     });
