@@ -37,6 +37,8 @@ var apiKey = ArgumentOrEnvironmentVariable("NUGET_APIKEY", "NUGET_APIKEY","");
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
+Information("Starting build: " + solutionVersion);
+
 Task("Clean-Outputs")
 	.Does(() => 
 	{
