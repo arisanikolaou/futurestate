@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7200B5EC-BD7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution items", ".solution items", "{7361E831-AC07-4A8B-B70B-944F98050F50}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
 		src\AssemblyInfoCommon.cs = src\AssemblyInfoCommon.cs
 		build.cake = build.cake
 		README.md = README.md

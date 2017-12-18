@@ -1,5 +1,6 @@
 #addin nuget:?package=Cake.Sonar
 #addin "Cake.FileHelpers"
+#addin nuget:?package=Cake.ArgumentHelpers
 #addin nuget:?package=Cake.SemVer
 #addin nuget:?package=semver&version=2.0.4
 #addin "Cake.XdtTransform"
@@ -29,7 +30,7 @@ var solutionVersion = Argument("VERSION", "0.1.0.0");
 
 // nuget get
 var nugetServer = "https://www.nuget.org";
-var apiKey = Argument("NUGET_APIKEY", "");
+var apiKey = ArgumentOrEnvironmentVariable("NUGET_APIKEY", "NUGET_APIKEY","");
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -222,11 +223,15 @@ Task("Run-Unit-Tests")
 Task("Publish-Packages")
 	.IsDependentOn("Packages")
 	.DoesForEach(GetFiles(nugetDirname + "/*.nupkg"), (package)=> {
+
+		Information("API Key: " + apiKey);
+
 		// Push the package.
 		NuGetPush(package, new NuGetPushSettings {
 			Source = nugetServer,
 			ApiKey = apiKey
 		});
+		
 	});
 
 
