@@ -1,5 +1,5 @@
 version: 0.3.{build}
 image: Visual Studio 2015
 build_script:
-- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages -ScriptArgs '-VERSION="0.3.{build}"'
+- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages -ScriptArgs '-VERSION=0.3.{build}'
 test: on
