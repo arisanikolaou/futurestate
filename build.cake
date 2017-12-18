@@ -26,7 +26,7 @@ var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var solutionVersion = Argument("VERSION", "0.1.0.0");
+var solutionVersion = Argument("VERSION", "0.1.2.0");
 
 // nuget get
 var nugetServer = "https://www.nuget.org";
@@ -224,14 +224,12 @@ Task("Publish-Packages")
 	.IsDependentOn("Packages")
 	.DoesForEach(GetFiles(nugetDirname + "/*.nupkg"), (package)=> {
 
-		Information("API Key: " + apiKey);
-
 		// Push the package.
 		NuGetPush(package, new NuGetPushSettings {
 			Source = nugetServer,
 			ApiKey = apiKey
 		});
-		
+
 	});
 
 
