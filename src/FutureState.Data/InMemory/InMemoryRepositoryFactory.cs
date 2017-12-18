@@ -1,17 +1,17 @@
-using FutureState.Data.Keys;
 using System;
 using System.Collections.Concurrent;
 using FutureState.Data.KeyBinders;
+using FutureState.Data.Keys;
 
 namespace FutureState.Data
 {
     /// <summary>
-    /// A factory that creates in-memory databases for entities of any given type that are
-    /// all responsible for generating their own global unique identififers.
+    ///     A factory that creates in-memory databases for entities of any given type that are
+    ///     all responsible for generating their own global unique identififers.
     /// </summary>
     public class InMemoryRepositoryFactory : IRepositoryFactory
     {
-        readonly ConcurrentDictionary<Type, object> _repositories;
+        private readonly ConcurrentDictionary<Type, object> _repositories;
 
         public InMemoryRepositoryFactory()
         {

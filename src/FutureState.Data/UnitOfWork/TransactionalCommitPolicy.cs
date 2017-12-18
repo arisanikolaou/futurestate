@@ -3,12 +3,12 @@
 namespace FutureState.Data
 {
     /// <summary>
-    /// A policy of relying on an underlying data session to manage database transactions.
+    ///     A policy of relying on an underlying data session to manage database transactions.
     /// </summary>
     public class TransactionalCommitPolicy : ICommitPolicy
     {
         /// <summary>
-        /// Commits any active transactions associated with a given session.
+        ///     Commits any active transactions associated with a given session.
         /// </summary>
         /// <param name="session">The session to evaluate.</param>
         /// <param name="id"></param>
@@ -21,8 +21,8 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Relies on the session to create a database transaction if and only if pending changes
-        /// is greater than 1.
+        ///     Relies on the session to create a database transaction if and only if pending changes
+        ///     is greater than 1.
         /// </summary>
         /// <param name="session">The underlying session.</param>
         /// <param name="pendingChanges">The number of pending actions to make.</param>
@@ -31,14 +31,12 @@ namespace FutureState.Data
         {
             // don't guard input to avoid taxing performance
             if (pendingChanges > 0)
-            {
                 session.BeginTran();
-            }
         }
 
         /// <summary>
-        /// Executes any actions appropriate to respond to general exceptions
-        /// committing values to an underlying data store.
+        ///     Executes any actions appropriate to respond to general exceptions
+        ///     committing values to an underlying data store.
         /// </summary>
         public void OnException(ISession session, Exception ex, string id)
         {

@@ -7,21 +7,21 @@ using FutureState.Reflection;
 namespace FutureState.Data.KeyBinders
 {
     /// <summary>
-    /// Generic all purpose binder that uses reflection to determine an entity's primary key.
+    ///     Generic all purpose binder that uses reflection to determine an entity's primary key.
     /// </summary>
     /// <typeparam name="TEntity">The entity to bind the id value to.</typeparam>
     /// <typeparam name="TKey">The type of key to use.</typeparam>
     /// <remarks>
-    /// Looking for:
-    /// PrimaryKeyAttribute || KeyAttribute
+    ///     Looking for:
+    ///     PrimaryKeyAttribute || KeyAttribute
     /// </remarks>
     public class AttributeKeyBinder<TEntity, TKey> : IEntityKeyBinder<TEntity, TKey>
     {
         // ReSharper disable once StaticFieldInGenericType
-        static readonly PropertyGetterDelegate GetterFn;
+        private static readonly PropertyGetterDelegate GetterFn;
 
         // ReSharper disable once StaticFieldInGenericType
-        static readonly PropertySetterDelegate SetterFn;
+        private static readonly PropertySetterDelegate SetterFn;
 
         static AttributeKeyBinder()
         {
@@ -31,10 +31,8 @@ namespace FutureState.Data.KeyBinders
                 .FirstOrDefault(m => m.GetCustomAttributes(true).Any(n => n is KeyAttribute));
 
             if (pk == null)
-            {
                 throw new InvalidOperationException(
                     $"Unable to resolve the primary key field of entity {typeof(TEntity).Name} to build its getter and setter functions.");
-            }
 
             GetterFn = pk.GetPropertyGetterFn();
             SetterFn = pk.GetPropertySetterFn();
@@ -44,7 +42,7 @@ namespace FutureState.Data.KeyBinders
         {
             try
             {
-                return (TKey)GetterFn(entity); //don't check for null entity to avoid perf penalty
+                return (TKey) GetterFn(entity); //don't check for null entity to avoid perf penalty
             }
             catch (NullReferenceException)
             {

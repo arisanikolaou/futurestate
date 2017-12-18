@@ -3,15 +3,15 @@
 namespace FutureState.Data.KeyBinders
 {
     /// <summary>
-    /// ExpressionKeyBinder uses supplied functions to access primary key of the entity.
+    ///     ExpressionKeyBinder uses supplied functions to access primary key of the entity.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TKey">The entity's key type.</typeparam>
     public class ExpressionKeyBinder<TEntity, TKey> : IEntityKeyBinder<TEntity, TKey>
     {
-        readonly Func<TEntity, TKey> _getter;
+        private readonly Func<TEntity, TKey> _getter;
 
-        readonly Action<TEntity, TKey> _setter;
+        private readonly Action<TEntity, TKey> _setter;
 
         /// <summary>
         ///     Creates a new instance using a given getter and setter.

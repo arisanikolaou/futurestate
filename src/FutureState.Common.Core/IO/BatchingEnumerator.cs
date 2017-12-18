@@ -9,7 +9,7 @@ using System.Linq;
 namespace FutureState.IO
 {
     /// <summary>
-    /// Splits a set into equal weighted chunks/buckets or batches.
+    ///     Splits a set into equal weighted chunks/buckets or batches.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class BatchingEnumerator<TEntity> : IBatchingEnumerator<TEntity>
@@ -21,7 +21,7 @@ namespace FutureState.IO
         private int _currentPage;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="items"></param>
         /// <param name="batchSize">Size if  each batch which must be greater than one.</param>
@@ -29,9 +29,8 @@ namespace FutureState.IO
         {
             Guard.ArgumentNotNull(items, nameof(items));
             if (batchSize <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(batchSize), @"Parameter 'batchSize' must be greater than zero.");
-            }
+                throw new ArgumentOutOfRangeException(nameof(batchSize),
+                    @"Parameter 'batchSize' must be greater than zero.");
 
             _items = items;
             BatchSize = batchSize;
@@ -40,7 +39,7 @@ namespace FutureState.IO
         }
 
         /// <summary>
-        /// The configured batch size.
+        ///     The configured batch size.
         /// </summary>
         public int BatchSize { get; }
 
@@ -65,9 +64,7 @@ namespace FutureState.IO
             var sourceArray = source.ToArray();
 
             for (var i = 0; i < itemsCount && i < size; i++)
-            {
                 yield return sourceArray[i];
-            }
         }
 
         private void CalcCurrent(int page)
@@ -92,9 +89,8 @@ namespace FutureState.IO
             Guard.ArgumentNotNull(keys, nameof(keys));
             Guard.ArgumentNotNull(getEntities, nameof(getEntities));
             if (batchSize <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(batchSize), @"Parameter 'batchSize' must be greater than zero.");
-            }
+                throw new ArgumentOutOfRangeException(nameof(batchSize),
+                    @"Parameter 'batchSize' must be greater than zero.");
 
             _slices = keys.Slice(batchSize).ToList();
             _currentSlice = 0;

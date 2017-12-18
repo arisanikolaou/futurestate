@@ -15,7 +15,7 @@ namespace FutureState.Data
     }
 
     /// <summary>
-    /// Deletes a set of records by a given predicate.
+    ///     Deletes a set of records by a given predicate.
     /// </summary>
     /// <typeparam name="T">The entity type.</typeparam>
     /// <typeparam name="TK">The entity's key type.</typeparam>
@@ -26,7 +26,7 @@ namespace FutureState.Data
     }
 
     /// <summary>
-    /// Deletes a set of guid keyed entities by a given predicate.
+    ///     Deletes a set of guid keyed entities by a given predicate.
     /// </summary>
     /// <typeparam name="T">The entity type.</typeparam>
     public interface IBulkDeleter<T> : IBulkDeleter<T, Guid> //do not delete 'redundant' key

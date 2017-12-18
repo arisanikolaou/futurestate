@@ -1,7 +1,4 @@
-﻿using FluentAssertions;
-using FutureState;
-using FutureState.Specifications;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
@@ -12,31 +9,31 @@ namespace FutureState.Specifications.Tests
     [Collection("DataAnnotationSpecProviderStory")]
     public class DataAnnotationSpecProviderStory
     {
-        private DataAnnotationsSpecProvider<TestEntity> _subject;
-        private TestEntity _invalidEntity;
         private Error[] _errorsOnValidEntity;
+        private TestEntity _invalidEntity;
+        private DataAnnotationsSpecProvider<TestEntity> _subject;
 
-        void GivenADataAnotationProvider()
+        private void GivenADataAnotationProvider()
         {
             _subject = new DataAnnotationsSpecProvider<TestEntity>();
         }
 
-        void WhenValidatingAnInvalidEntity()
+        private void WhenValidatingAnInvalidEntity()
         {
             _invalidEntity = new TestEntity();
 
-            _errorsOnValidEntity = _subject.GetSpecifications().ToErrors(_invalidEntity).ToArray(); 
+            _errorsOnValidEntity = _subject.GetSpecifications().ToErrors(_invalidEntity).ToArray();
         }
 
-        void AndWhenValidatingAValidEntity()
+        private void AndWhenValidatingAValidEntity()
         {
-            _invalidEntity = new TestEntity() { Name = "Name" };
+            _invalidEntity = new TestEntity {Name = "Name"};
 
             _errorsOnValidEntity = _subject.GetSpecifications().ToErrors(_invalidEntity).ToArray();
         }
 
 
-        void ShouldReportErrorsAsAppropriate()
+        private void ShouldReportErrorsAsAppropriate()
         {
             Assert.Single(_errorsOnValidEntity);
             Assert.Empty(_errorsOnValidEntity);

@@ -1,45 +1,45 @@
-﻿using EmitMapper;
-using FutureState.Data.Keys;
-using FutureState.Data.KeyBinders;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using EmitMapper;
+using FutureState.Data.KeyBinders;
+using FutureState.Data.Keys;
+using NLog;
 
 namespace FutureState.Data
 {
     /// <summary>
-    /// An in memory repository for a small set of objects.
+    ///     An in memory repository for a small set of objects.
     /// </summary>
     /// <typeparam name="TEntity">The entity to store.</typeparam>
     /// <typeparam name="TKey">The entity's primary key type.</typeparam>
     public class InMemoryRepository<TEntity, TKey> :
-        IRepositoryLinq<TEntity, TKey>, 
+        IRepositoryLinq<TEntity, TKey>,
         IBulkLinqReader<TEntity, TKey>,
         IBulkRepository<TEntity, TKey>
     {
         // ReSharper disable once StaticMemberInGenericType
-        static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        readonly IEntityIdProvider<TEntity, TKey> _idGenerator;
+        private readonly IEntityIdProvider<TEntity, TKey> _idGenerator;
 
-        readonly ConcurrentDictionary<TKey, TEntity> _items;
+        private readonly ConcurrentDictionary<TKey, TEntity> _items;
 
-        readonly IEntityKeyBinder<TEntity, TKey> _keyBinder;
+        private readonly IEntityKeyBinder<TEntity, TKey> _keyBinder;
 
-        readonly ObjectMapperManager _mapper;
+        private readonly ObjectMapperManager _mapper;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="idGenerator">Required. A function to return the value of the entity's primary key.</param>
         /// <param name="keyBinder">The binder of the entity's id.</param>
         /// <param name="items">Required. The list of entities to pre-populate the current instance with.</param>
         /// <param name="mapper">Object mapper manager instance</param>
         public InMemoryRepository(
-            IEntityIdProvider<TEntity,TKey> idGenerator,
+            IEntityIdProvider<TEntity, TKey> idGenerator,
             IEntityKeyBinder<TEntity, TKey> keyBinder,
             IEnumerable<TEntity> items,
             ObjectMapperManager mapper)
@@ -58,7 +58,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="idGenerator">Required. A function to return the value of the entity's primary key.</param>
         /// <param name="keyBinder">The binder for the entity id.</param>
@@ -72,7 +72,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Creates a new instance using AssignedGenerator and ExpressionKeyBinder.
+        ///     Creates a new instance using AssignedGenerator and ExpressionKeyBinder.
         /// </summary>
         /// <param name="getKey">Required. A function to return the value of the entity's primary key.</param>
         /// <param name="items">default items collection</param>
@@ -85,7 +85,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="getKey">Required. A function to return the value of the entity's primary key.</param>
         public InMemoryRepository(Func<TEntity, TKey> getKey)
@@ -94,7 +94,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Creates a new instance for all entities that support the IEntity interface.
+        ///     Creates a new instance for all entities that support the IEntity interface.
         /// </summary>
         public InMemoryRepository()
             : this(GetGetIdFunc(), Enumerable.Empty<TEntity>())
@@ -130,10 +130,7 @@ namespace FutureState.Data
                 //queryArg will never be null
 
                 if (!topDistinctEntities.Any(existing => match(existing, queryArg)))
-                {
-                    //if doesn't exist in top list add to be distinct
                     topDistinctEntities.Add(entity);
-                }
             }
 
             return topDistinctEntities
@@ -146,9 +143,7 @@ namespace FutureState.Data
             var entity = default(TEntity);
 
             foreach (var id in ids)
-            {
                 _items.TryRemove(id, out entity);
-            }
         }
 
         public void SaveOrUpdate(IEnumerable<TEntity> entities)
@@ -164,7 +159,7 @@ namespace FutureState.Data
         // ReSharper disable once IdentifierTypo
 
         /// <summary>
-        /// Inserts the specified entity into the underlying repository.
+        ///     Inserts the specified entity into the underlying repository.
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <exception cref="System.InvalidOperationException">Specified entity already exists.</exception>
@@ -177,9 +172,7 @@ namespace FutureState.Data
             var key = _keyBinder.Get(entity);
 
             if (!_items.TryAdd(key, entity))
-            {
                 throw new InvalidOperationException($"Specified entity already exists with the key {key}.");
-            }
         }
 
         public void Update(TEntity entity)
@@ -190,16 +183,12 @@ namespace FutureState.Data
             TEntity existing;
 
             if (!_items.TryGetValue(key, out existing))
-            {
                 throw new ArgumentOutOfRangeException(
                     nameof(entity),
                     $"Item with the key {key} doesn't exist.");
-            }
 
             if (!_items.TryUpdate(key, entity, existing))
-            {
                 throw new InvalidOperationException("Unable to update the entity.");
-            }
         }
 
         public void Update(IEnumerable<TEntity> entities)
@@ -207,19 +196,14 @@ namespace FutureState.Data
             Guard.ArgumentNotNull(entities, "items");
 
             foreach (var item in entities)
-            {
                 Update(item);
-            }
         }
 
         public void DeleteById(TKey key)
         {
             TEntity item;
             if (!_items.TryRemove(key, out item))
-            {
-                // don't raise error
                 _logger.Trace(@"Item {0} has been deleted or does not exist.", key);
-            }
         }
 
         public void Delete(TEntity item)
@@ -243,9 +227,7 @@ namespace FutureState.Data
             TEntity existing;
 
             if (!_items.TryGetValue(key, out existing))
-            {
                 _logger.Trace("Item with key {0} doesn't exist.", key);
-            }
 
             return existing;
         }
@@ -263,13 +245,13 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Finds a set of entities based on a given set of descriptors and an expression.
+        ///     Finds a set of entities based on a given set of descriptors and an expression.
         /// </summary>
         /// <typeparam name="TQueryArg">
-        /// A descriptor type which must be decorated with an Alias attribute: [Alias("#descriptors")]
-        /// Internally, this type is defined as a table, thus it must define a primary key,
-        /// the Id property with the AutoIncrement attriubte can be used in this occasion.
-        /// Preferably, it should define a composite unique key for faster performance.
+        ///     A descriptor type which must be decorated with an Alias attribute: [Alias("#descriptors")]
+        ///     Internally, this type is defined as a table, thus it must define a primary key,
+        ///     the Id property with the AutoIncrement attriubte can be used in this occasion.
+        ///     Preferably, it should define a composite unique key for faster performance.
         /// </typeparam>
         /// <param name="queryArgs">A set of descriptors.</param>
         /// <param name="matchExpression">An expression on how to use descriptors.</param>
@@ -328,7 +310,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Gets the number of items in the collection.
+        ///     Gets the number of items in the collection.
         /// </summary>
         public long Count()
         {
@@ -336,7 +318,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Gets the number of objects in the underlying collection matching the given predicate.
+        ///     Gets the number of objects in the underlying collection matching the given predicate.
         /// </summary>
         public long Count(Expression<Func<TEntity, bool>> predicate)
         {
@@ -355,12 +337,10 @@ namespace FutureState.Data
             {
                 _idGenerator.Provide(entity);
 
-                TKey key = _keyBinder.Get(entity);
+                var key = _keyBinder.Get(entity);
 
                 if (!_items.TryAdd(key, entity))
-                {
                     throw new InvalidOperationException($"Specified entity '{entity}' already exists.");
-                }
             }
         }
 
@@ -378,7 +358,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Deletes a set of records by a given predicate.
+        ///     Deletes a set of records by a given predicate.
         /// </summary>
         /// <param name="predicate">An expression on how to delete.</param>
         public void Delete(Expression<Func<TEntity, bool>> predicate)
@@ -388,7 +368,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Resets the repository by clearing all underlying items.
+        ///     Resets the repository by clearing all underlying items.
         /// </summary>
         public void Clear()
         {
@@ -398,9 +378,7 @@ namespace FutureState.Data
         public static Func<TEntity, TKey> GetGetIdFunc()
         {
             if (typeof(IEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
-            {
-                return item => ((IEntity<TKey>)item).Id;
-            }
+                return item => ((IEntity<TKey>) item).Id;
 
             throw new NotSupportedException(
                 $"Entity {typeof(TEntity).Name} is not supported by the default constructor of 'InMemoryRepository' as it does not implement {typeof(IEntity<>).Name}.");
@@ -454,9 +432,7 @@ namespace FutureState.Data
             public IPageRequest<TEntity> SetPageNumber(int page)
             {
                 if (page < 1)
-                {
                     throw new ArgumentException("pages are counted from 1", nameof(page));
-                }
 
                 _page = page;
                 return this;
@@ -465,9 +441,7 @@ namespace FutureState.Data
             public IPageRequest<TEntity> SetPageSize(int size)
             {
                 if (size < 1)
-                {
                     throw new ArgumentException("size should be at least 1", nameof(size));
-                }
 
                 _size = size;
                 return this;
@@ -476,9 +450,7 @@ namespace FutureState.Data
             public IEnumerable<TEntity> Process(IEnumerable<TEntity> source)
             {
                 if (_order == null)
-                {
                     throw new InvalidOperationException("Order has to be set.");
-                }
 
                 return _order(source.Where(_filter))
                     .Skip(_size * (_page - 1))

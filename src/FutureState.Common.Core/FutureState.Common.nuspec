@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<package >
+
+<package>
   <metadata>
     <id>FutureState.Common</id>
     <version>$version$</version>

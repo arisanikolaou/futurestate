@@ -20,16 +20,19 @@ namespace Dapper.FastCrud.SqlBuilders
 
         // statement formatter that would treat the C identifier as TC
         private readonly SqlStatementFormatter _forcedTableResolutionStatementFormatter;
+
         private readonly Lazy<string> _fullInsertStatement;
         private readonly Lazy<string> _fullSingleDeleteStatement;
         private readonly Lazy<string> _fullSingleSelectStatement;
         private readonly Lazy<string> _fullSingleUpdateStatement;
         private readonly Lazy<string> _noAliasColumnEnumerationForSelect;
+
         private readonly Lazy<string> _noAliasKeyColumnEnumeration;
         //private static readonly RelationshipOrderComparer _relationshipOrderComparer = new RelationshipOrderComparer();
 
         //private readonly ConcurrentDictionary<IStatementSqlBuilder, EntityRelationship> _entityRelationships;
         private readonly Lazy<string> _noAliasKeysWhereClause;
+
         private readonly Lazy<string> _noAliasTableName;
         private readonly Lazy<string> _noAliasUpdateClause;
         private readonly Lazy<string> _noConditionFullBatchDeleteStatement;
@@ -117,10 +120,13 @@ namespace Dapper.FastCrud.SqlBuilders
 
         public EntityDescriptor EntityDescriptor { get; }
         public EntityMapping EntityMapping { get; }
+
         public PropertyMapping[] SelectProperties { get; }
+
         //public Dictionary<Type, PropertyMapping[]> ParentChildRelationshipProperties { get; }
         //public Dictionary<Type, PropertyMapping[]> ChildParentRelationshipProperties { get; }
         public PropertyMapping[] KeyProperties { get; }
+
         public PropertyMapping[] InsertProperties { get; }
         public PropertyMapping[] UpdateProperties { get; }
         public PropertyMapping[] InsertKeyDatabaseGeneratedProperties { get; }
@@ -279,7 +285,8 @@ namespace Dapper.FastCrud.SqlBuilders
         ///     AS clause will be added
         /// </param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetColumnName(PropertyMapping propMapping, string tableAlias, bool performColumnAliasNormalization)
+        public string GetColumnName(PropertyMapping propMapping, string tableAlias,
+            bool performColumnAliasNormalization)
         {
             var sqlTableAlias = tableAlias == null ? string.Empty : $"{GetDelimitedIdentifier(tableAlias)}.";
             var sqlColumnAlias = performColumnAliasNormalization &&
@@ -417,7 +424,10 @@ namespace Dapper.FastCrud.SqlBuilders
             Requires.NotNull(joinInstructions, nameof(joinInstructions));
             var allSqlJoinInstructions =
                 new[]
-                        {new StatementSqlBuilderJoinInstruction(this, SqlJoinType.LeftOuterJoin, whereClause, orderClause)}
+                    {
+                        new StatementSqlBuilderJoinInstruction(this, SqlJoinType.LeftOuterJoin, whereClause,
+                            orderClause)
+                    }
                     .Concat(joinInstructions).ToArray();
             Requires.Argument(allSqlJoinInstructions.Length > 1, nameof(joinInstructions),
                 "Unable to create a full JOIN statement when no extra SQL builders were provided");
@@ -468,7 +478,8 @@ namespace Dapper.FastCrud.SqlBuilders
                         selectClauseBuilder.Append(',');
 
                     selectClauseBuilder.Append(
-                        secondEntitySqlBuilder.ConstructColumnEnumerationForSelect(secondEntitySqlBuilder.GetTableName()));
+                        secondEntitySqlBuilder.ConstructColumnEnumerationForSelect(
+                            secondEntitySqlBuilder.GetTableName()));
                 }
 
                 // add the split on expression
@@ -571,7 +582,8 @@ namespace Dapper.FastCrud.SqlBuilders
 
             if (selectClauseBuilder != null)
                 selectClause = selectClauseBuilder.ToString();
-            fullStatement = ConstructFullSelectStatementInternal(selectClause, fromClauseBuilder.ToString(), whereClause,
+            fullStatement = ConstructFullSelectStatementInternal(selectClause, fromClauseBuilder.ToString(),
+                whereClause,
                 orderClause, skipRowsCount, limitRowsCount, true);
         }
 

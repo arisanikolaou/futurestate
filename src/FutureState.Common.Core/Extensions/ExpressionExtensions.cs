@@ -12,7 +12,7 @@ namespace FutureState
     public static class ExpressionExtensions
     {
         /// <summary>
-        /// Combines two expressions with AND logic (return true if expression 1 is true AND expression 2 is true).
+        ///     Combines two expressions with AND logic (return true if expression 1 is true AND expression 2 is true).
         /// </summary>
         /// <typeparam name="T">The type of object being examined in both expressions.</typeparam>
         /// <param name="expr1">The first expression.</param>
@@ -38,16 +38,12 @@ namespace FutureState
             // extract from unary expression
             var unaryExpression = currentExpression as UnaryExpression;
             if (unaryExpression != null)
-            {
                 currentExpression = unaryExpression.Operand;
-            }
 
             // by this point the expression should be member expression
             var memberExpression = currentExpression as MemberExpression;
             if (memberExpression == null)
-            {
                 throw new ArgumentException("MemberExpression cannot be acquired.", nameof(property));
-            }
 
             // return the acquired member info from the member expression
             return memberExpression.Member;
@@ -56,22 +52,22 @@ namespace FutureState
         public static string GetParameterName(this Expression<Func<object>> property)
         {
             // get its name
-            return ((MemberExpression)property.Body).Member.Name;
+            return ((MemberExpression) property.Body).Member.Name;
         }
 
         public static string GetPropertyName<T>(this Expression<Func<T, object>> property)
         {
             // get member expression if it is inside unary expression
             var memberExpression = property.Body is UnaryExpression
-                ? ((UnaryExpression)property.Body).Operand
+                ? ((UnaryExpression) property.Body).Operand
                 : property.Body;
 
             // get its name
-            return ((MemberExpression)memberExpression).Member.Name;
+            return ((MemberExpression) memberExpression).Member.Name;
         }
 
         /// <summary>
-        /// Combines two expressions with OR logic (return true if expression 1 is true OR expression 2 is true).
+        ///     Combines two expressions with OR logic (return true if expression 1 is true OR expression 2 is true).
         /// </summary>
         /// <typeparam name="T">The type of object being examined in both expressions.</typeparam>
         /// <param name="expr1">The first expression.</param>

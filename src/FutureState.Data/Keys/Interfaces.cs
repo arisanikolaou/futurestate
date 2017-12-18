@@ -7,7 +7,6 @@ namespace FutureState.Data.Keys
     /// </summary>
     public interface IKeyGetter
     {
-        
     }
 
     /// <summary>
@@ -23,7 +22,7 @@ namespace FutureState.Data.Keys
     /// </summary>
     public class KeyGetter<TKey> : IKeyGetter<TKey>
     {
-        readonly Func<TKey> _getGet;
+        private readonly Func<TKey> _getGet;
 
         public KeyGetter(Func<TKey> getGet)
         {
@@ -43,7 +42,6 @@ namespace FutureState.Data.Keys
     /// </summary>
     public interface IEntityIdProvider
     {
-
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
-﻿using FutureState.Reflection;
-using System;
+﻿using System;
 using System.Linq;
+using FutureState.Reflection;
 using Xunit;
 
 namespace FutureState.App.Tests

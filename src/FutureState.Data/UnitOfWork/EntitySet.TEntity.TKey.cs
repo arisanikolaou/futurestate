@@ -9,19 +9,9 @@ namespace FutureState.Data
     /// <typeparam name="TKey">The entity's key type.</typeparam>
     public class EntitySet<TEntity, TKey>
     {
+        private readonly EntitySetWriter<TEntity, TKey> _entitySetWriter;
+        private readonly Func<ISession, IRepository<TEntity, TKey>> _getRepository;
         protected readonly DataSessionManager _unitOfWork;
-        readonly Func<ISession, IRepository<TEntity, TKey>> _getRepository;
-        readonly EntitySetWriter<TEntity, TKey> _entitySetWriter;
-
-        /// <summary>
-        ///     Exposes methods to update the entities.
-        /// </summary>
-        public IWriter<TEntity, TKey> Writer => _entitySetWriter;
-
-        /// <summary>
-        ///     Exposes implementations to read the set of entities.
-        /// </summary>
-        public IReader<TEntity, TKey> Reader => _getRepository.Invoke(_unitOfWork.Session);
 
         /// <summary>
         ///     Creates a new instance.
@@ -32,7 +22,7 @@ namespace FutureState.Data
             UnitOfWork unitOfWork,
             Func<ISession, IRepository<TEntity, TKey>> getRepository)
         {
-            Guard.ArgumentNotNull(unitOfWork,nameof(unitOfWork));
+            Guard.ArgumentNotNull(unitOfWork, nameof(unitOfWork));
             Guard.ArgumentNotNull(getRepository, nameof(getRepository));
 
             _getRepository = getRepository;
@@ -41,5 +31,15 @@ namespace FutureState.Data
 
             _unitOfWork = unitOfWork;
         }
+
+        /// <summary>
+        ///     Exposes methods to update the entities.
+        /// </summary>
+        public IWriter<TEntity, TKey> Writer => _entitySetWriter;
+
+        /// <summary>
+        ///     Exposes implementations to read the set of entities.
+        /// </summary>
+        public IReader<TEntity, TKey> Reader => _getRepository.Invoke(_unitOfWork.Session);
     }
 }

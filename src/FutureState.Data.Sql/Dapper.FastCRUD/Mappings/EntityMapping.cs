@@ -117,8 +117,8 @@ namespace Dapper.FastCrud.Mappings
             var propNamesMappingsToRemove = new List<string>(_propertyMappings.Count);
             propNamesMappingsToRemove.AddRange(from propMapping in PropertyMappings
                 where
-                exclude && !paramNames.Contains(propMapping.Value.PropertyName) ||
-                !exclude && paramNames.Contains(propMapping.Value.PropertyName)
+                    exclude && !paramNames.Contains(propMapping.Value.PropertyName) ||
+                    !exclude && paramNames.Contains(propMapping.Value.PropertyName)
                 select propMapping.Key);
 
             foreach (var propName in propNamesMappingsToRemove)
@@ -196,7 +196,8 @@ namespace Dapper.FastCrud.Mappings
                             ? null
                             : TypeDescriptor.GetProperties(EntityType)
                                 .OfType<PropertyDescriptor>()
-                                .SingleOrDefault(propDescriptor => propDescriptor.Name == referencingEntityPropertyName);
+                                .SingleOrDefault(propDescriptor =>
+                                    propDescriptor.Name == referencingEntityPropertyName);
 
 
                         return new EntityMappingRelationship(groupedRelMappings.Key,

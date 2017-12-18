@@ -14,27 +14,27 @@ namespace FutureState.Autofac.Modules
     /// </summary>
     public class InMemoryDataAccessModule : Module
     {
-        readonly IList<Action<ContainerBuilder>> _builderConfigurators = new List<Action<ContainerBuilder>>();
+        private readonly IList<Action<ContainerBuilder>> _builderConfigurators = new List<Action<ContainerBuilder>>();
 
         /// <summary>
-        /// Registers functions to resolve a given in memory irepository, ireader and ilinqreader implementation for a given
-        /// entity type and entity type key.
+        ///     Registers functions to resolve a given in memory irepository, ireader and ilinqreader implementation for a given
+        ///     entity type and entity type key.
         /// </summary>
-        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IEntityIdProvider<TEntity,TKey> idGenerator)
+        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IEntityIdProvider<TEntity, TKey> idGenerator)
             where TEntity : class, new()
         {
             //register repository functions
             Action<ContainerBuilder> buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                    {
-                        var cc = m.Resolve<IComponentContext>();
+                        (m, q) =>
+                        {
+                            var cc = m.Resolve<IComponentContext>();
 
-                        var fun = cc.GetRepository<TEntity, TKey>(idGenerator);
+                            var fun = cc.GetRepository(idGenerator);
 
-                        return fun;
-                    })
+                            return fun;
+                        })
                     .As(typeof(Func<ISession, IRepository<TEntity, TKey>>))
                     .SingleInstance();
             };
@@ -45,14 +45,14 @@ namespace FutureState.Autofac.Modules
             buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                    {
-                        var cc = m.Resolve<IComponentContext>();
+                        (m, q) =>
+                        {
+                            var cc = m.Resolve<IComponentContext>();
 
-                        var fun = cc.GetReader<TEntity, TKey>(idGenerator);
+                            var fun = cc.GetReader(idGenerator);
 
-                        return fun;
-                    })
+                            return fun;
+                        })
                     .As(typeof(Func<ISession, IReader<TEntity, TKey>>))
                     .SingleInstance();
             };
@@ -63,14 +63,14 @@ namespace FutureState.Autofac.Modules
             buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                    {
-                        var cc = m.Resolve<IComponentContext>();
+                        (m, q) =>
+                        {
+                            var cc = m.Resolve<IComponentContext>();
 
-                        var fun = cc.GetReader<TEntity, TKey>(idGenerator);
+                            var fun = cc.GetReader(idGenerator);
 
-                        return fun;
-                    })
+                            return fun;
+                        })
                     .As(typeof(Func<ISession, ILinqReader<TEntity, TKey>>))
                     .SingleInstance();
             };
@@ -83,9 +83,9 @@ namespace FutureState.Autofac.Modules
             buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                        new InMemoryRepository<TEntity, TKey>(idGenerator, new AttributeKeyBinder<TEntity, TKey>(),
-                            new TEntity[0]))
+                        (m, q) =>
+                            new InMemoryRepository<TEntity, TKey>(idGenerator, new AttributeKeyBinder<TEntity, TKey>(),
+                                new TEntity[0]))
                     .AsSelf()
                     .As<IRepositoryLinq<TEntity, TKey>>()
                     .As<IGetter<TEntity, TKey>>()
@@ -106,8 +106,8 @@ namespace FutureState.Autofac.Modules
 
 
         /// <summary>
-        /// Registers a single instance in memory repository for any given entity type and an in memory session into a given
-        /// container.
+        ///     Registers a single instance in memory repository for any given entity type and an in memory session into a given
+        ///     container.
         /// </summary>
         protected override void Load(ContainerBuilder builder)
         {

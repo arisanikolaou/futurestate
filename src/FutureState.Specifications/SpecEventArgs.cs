@@ -34,9 +34,7 @@ namespace FutureState.Specifications
                     m =>
                     {
                         if (!condition.Compile().Invoke(m))
-                        {
                             return new SpecResult(detailedMessage?.Invoke(m));
-                        }
 
                         return SpecResult.Success;
                     },

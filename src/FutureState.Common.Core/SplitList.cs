@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FutureState
 {
     public class SplitList<TEntity>
-            where TEntity : IEquatable<TEntity>
+        where TEntity : IEquatable<TEntity>
     {
         public List<TEntity> Existing { get; set; } = new List<TEntity>();
         public List<TEntity> New { get; set; } = new List<TEntity>();
@@ -12,14 +12,13 @@ namespace FutureState
         public void Process(
             IEnumerable<TEntity> existingList,
             IEnumerable<TEntity> sourceList,
-            Action<TEntity,TEntity> handleExisting)
+            Action<TEntity, TEntity> handleExisting)
         {
             foreach (var source in sourceList)
             {
-                bool isNew = true;
+                var isNew = true;
 
                 foreach (var existingItem in existingList)
-                {
                     if (source.Equals(existingItem))
                     {
                         handleExisting(source, existingItem);
@@ -27,7 +26,6 @@ namespace FutureState
                         isNew = false;
                         break;
                     }
-                }
 
                 if (isNew)
                     New.Add(source);

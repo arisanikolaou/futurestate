@@ -12,19 +12,19 @@ namespace FutureState.ComponentModel
     //an - made thread safer
 
     /// <summary>
-    /// A generic message pipe to send message of type TDomainEvent within a given application domain.
+    ///     A generic message pipe to send message of type TDomainEvent within a given application domain.
     /// </summary>
     /// <remarks>
-    /// The object is thread friendly.
+    ///     The object is thread friendly.
     /// </remarks>
     public class MessagePipe : IMessagePipe, IDisposable
     {
-        readonly HashSet<IMessageConsumer> _subscriptions;
+        private readonly HashSet<IMessageConsumer> _subscriptions;
 
-        readonly object _syncLock = new object();
+        private readonly object _syncLock = new object();
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         public MessagePipe()
         {
@@ -32,16 +32,19 @@ namespace FutureState.ComponentModel
         }
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         public void Dispose()
         {
             //lock subscriptions
-            lock (_syncLock) _subscriptions.Clear();
+            lock (_syncLock)
+            {
+                _subscriptions.Clear();
+            }
         }
 
         /// <summary>
-        /// Asynchronously sends a message of type TDomainEvent to any subscribed consumers.
+        ///     Asynchronously sends a message of type TDomainEvent to any subscribed consumers.
         /// </summary>
         public virtual async Task SendAsync<TDomainEvent>(TDomainEvent message)
             where TDomainEvent : IDomainEvent
@@ -56,7 +59,7 @@ namespace FutureState.ComponentModel
         }
 
         /// <summary>
-        /// Registers a new consumer of the given message.
+        ///     Registers a new consumer of the given message.
         /// </summary>
         /// <param name="consumer">The consumer.</param>
         public MessagePipe Subscribe<TDomainEvent>(IMessageConsumer<TDomainEvent> consumer)
@@ -65,13 +68,15 @@ namespace FutureState.ComponentModel
             Guard.ArgumentNotNull(consumer, nameof(consumer));
 
             lock (_syncLock)
+            {
                 _subscriptions.Add(consumer);
+            }
 
             return this;
         }
 
         /// <summary>
-        /// Registers a new consumer of the given message.
+        ///     Registers a new consumer of the given message.
         /// </summary>
         /// <param name="consumer">The consumer or owner of the event.</param>
         /// <param name="action">The action to execute.</param>
@@ -82,13 +87,15 @@ namespace FutureState.ComponentModel
             Guard.ArgumentNotNull(action, nameof(action));
 
             lock (_syncLock)
+            {
                 _subscriptions.Add(new MessageConsumer<TDomainEvent>(action, consumer));
+            }
 
             return this;
         }
 
         /// <summary>
-        /// Unregisters the consumer from the internal list.
+        ///     Unregisters the consumer from the internal list.
         /// </summary>
         /// <param name="consumer">The consumer.</param>
         /// <returns>True if the consumer was registered and removed.</returns>
@@ -112,7 +119,7 @@ namespace FutureState.ComponentModel
         }
 
         /// <summary>
-        /// Unregisters the consumer from the internal list.
+        ///     Unregisters the consumer from the internal list.
         /// </summary>
         /// <param name="consumer">The consumer.</param>
         /// <returns>True if the consumer was registered and removed.</returns>
@@ -138,7 +145,7 @@ namespace FutureState.ComponentModel
         }
 
         /// <summary>
-        /// Unsubscribes all messages owned by the given consumer.
+        ///     Unsubscribes all messages owned by the given consumer.
         /// </summary>
         public bool UnSubscribeAll(object consumer)
         {
@@ -157,7 +164,7 @@ namespace FutureState.ComponentModel
         }
 
         /// <summary>
-        /// Gets a list of all subscribers for messages of type TDomainEvent.
+        ///     Gets a list of all subscribers for messages of type TDomainEvent.
         /// </summary>
         protected List<IMessageConsumer<TDomainEvent>> GetSubscribers<TDomainEvent>()
             where TDomainEvent : IDomainEvent
@@ -212,33 +219,29 @@ namespace FutureState.ComponentModel
             public object Owner { get; }
 
             /// <summary>
-            /// Determines whether the specified object is equal to the current object.
+            ///     Determines whether the specified object is equal to the current object.
             /// </summary>
             /// <returns>
-            /// true if the specified object  is equal to the current object; otherwise, false.
+            ///     true if the specified object  is equal to the current object; otherwise, false.
             /// </returns>
             /// <param name="obj">The object to compare with the current object. </param>
             public override bool Equals(object obj)
             {
                 if (ReferenceEquals(obj, null))
-                {
                     return false;
-                }
 
                 var consumer = obj as MessageConsumer<TDomainEvent>;
                 if (consumer != null)
-                {
                     return consumer.GetHashCode() == _hashCode;
-                }
 
                 return ReferenceEquals(this, obj);
             }
 
             /// <summary>
-            /// Serves as the default hash function.
+            ///     Serves as the default hash function.
             /// </summary>
             /// <returns>
-            /// A hash code for the current object.
+            ///     A hash code for the current object.
             /// </returns>
             public override int GetHashCode()
             {

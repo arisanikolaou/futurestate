@@ -39,8 +39,8 @@ namespace FutureState.Autofac.Modules
                 .SingleInstance()
                 .PreserveExistingDefaults();
 
-            long current = 0;//TODO: optimize
-            builder.Register(m => new KeyGetter<string>((current ++).ToString))
+            long current = 0; //TODO: optimize
+            builder.Register(m => new KeyGetter<string>(current++.ToString))
                 .As(typeof(IKeyGetter<string>))
                 .SingleInstance()
                 .PreserveExistingDefaults();

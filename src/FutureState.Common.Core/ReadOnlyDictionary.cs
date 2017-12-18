@@ -33,9 +33,9 @@ namespace FutureState
 
         TValue IDictionary<TKey, TValue>.this[TKey key]
         {
-            get { return this[key]; }
+            get => this[key];
 
-            set { throw ReadOnlyException(); }
+            set => throw ReadOnlyException();
         }
 
         public ICollection<TKey> Keys => _dictionary.Keys;

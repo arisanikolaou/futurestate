@@ -17,15 +17,13 @@ namespace FutureState
             new ConcurrentDictionary<Type, PropertyInfo[]>();
 
         /// <summary>
-        /// Converts an object's state to a read only dictionary based on the values provided
-        /// in their public properties.
+        ///     Converts an object's state to a read only dictionary based on the values provided
+        ///     in their public properties.
         /// </summary>
         public static ReadOnlyDictionary<string, object> ToReadOnlyDict<TValue>(this TValue value)
         {
             if (value == null)
-            {
                 return new ReadOnlyDictionary<string, object>();
-            }
 
             PropertyInfo[] props;
 
@@ -60,9 +58,7 @@ namespace FutureState
 
                     // prefer cloneable implementation
                     if (clonedInstance != null)
-                    {
                         propertyValue = clonedInstance.Clone();
-                    }
 
                     // otherwise null
                     hashSet.Add(propertyInfo.Name, propertyValue);

@@ -27,7 +27,7 @@ namespace FutureState
             var dynamicMethod = new DynamicMethod(
                 name,
                 typeof(object),
-                new[] { typeof(object), typeof(object[]) },
+                new[] {typeof(object), typeof(object[])},
                 methodInfo.DeclaringType);
 
             var generator = dynamicMethod.GetILGenerator();
@@ -53,13 +53,9 @@ namespace FutureState
                 // cast or unbox parameter as needed
                 var parameterType = parameters[i].ParameterType;
                 if (parameterType.IsClass)
-                {
                     generator.Emit(OpCodes.Castclass, parameterType);
-                }
                 else
-                {
                     generator.Emit(OpCodes.Unbox_Any, parameterType);
-                }
             }
 
             // call method
@@ -75,9 +71,7 @@ namespace FutureState
             {
                 // box value if needed
                 if (methodInfo.ReturnType.IsValueType)
-                {
                     generator.Emit(OpCodes.Box, methodInfo.ReturnType);
-                }
             }
 
             // store to the local var
@@ -88,7 +82,7 @@ namespace FutureState
             generator.Emit(OpCodes.Ret);
 
             // return delegate
-            return (DynamicInvoker)dynamicMethod.CreateDelegate(typeof(DynamicInvoker));
+            return (DynamicInvoker) dynamicMethod.CreateDelegate(typeof(DynamicInvoker));
         }
 
         public static DynamicInvoker GenericMethodInvokerMethod(Type type, string methodName, Type[] typeArguments)
@@ -119,7 +113,6 @@ namespace FutureState
                 // search for it in all the type methods
                 var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
                 foreach (var method in methods)
-                {
                     if (method.Name == methodName)
                     {
                         // create the generic method
@@ -130,23 +123,18 @@ namespace FutureState
                         if (parameters.Length == parameterTypes.Length)
                         {
                             for (var i = 0; i < parameters.Length; i++)
-                            {
                                 if (parameters[i].ParameterType != parameterTypes[i])
                                 {
                                 }
-                            }
 
                             // if we'r here, we got the rigth method
                             methodInfo = genericMethod;
                             break;
                         }
                     }
-                }
 
                 if (null == methodInfo)
-                {
                     throw new InvalidOperationException("Method not found");
-                }
             }
         }
     }

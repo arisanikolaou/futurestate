@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace FutureState.Reflection
 {
-    using System.Linq.Expressions;
-    using System.Reflection;
-
     public delegate void PropertySetterDelegate(object instance, object value);
 
     public delegate object PropertyGetterDelegate(object instance);
@@ -50,16 +49,18 @@ namespace FutureState.Reflection
             try
             {
                 var oInstanceParam = Expression.Parameter(typeof(object), "oInstanceParam");
-                var instanceParam = Expression.Convert(oInstanceParam, propertyInfo.ReflectedType); //propertyInfo.DeclaringType doesn't work on Proxy types
+                var instanceParam =
+                    Expression.Convert(oInstanceParam,
+                        propertyInfo.ReflectedType); //propertyInfo.DeclaringType doesn't work on Proxy types
 
                 var exprCallPropertyGetFn = Expression.Call(instanceParam, getMethodInfo);
                 var oExprCallPropertyGetFn = Expression.Convert(exprCallPropertyGetFn, typeof(object));
 
                 var propertyGetFn = Expression.Lambda<PropertyGetterDelegate>
-                    (
-                        oExprCallPropertyGetFn,
-                        oInstanceParam
-                    ).Compile();
+                (
+                    oExprCallPropertyGetFn,
+                    oInstanceParam
+                ).Compile();
 
                 return propertyGetFn;
             }

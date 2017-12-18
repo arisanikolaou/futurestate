@@ -1,5 +1,4 @@
-﻿using FutureState.Extensions;
-using System;
+﻿using System;
 
 namespace FutureState.Specifications
 {
@@ -15,14 +14,10 @@ namespace FutureState.Specifications
             Func<object, bool> isSatisfied)
         {
             if (getValueForKey == null)
-            {
                 throw new ArgumentNullException(nameof(getValueForKey));
-            }
 
             if (isSatisfied == null)
-            {
                 throw new ArgumentNullException(nameof(isSatisfied));
-            }
 
             _getValueForKey = getValueForKey;
             _isSatisfied = isSatisfied;
@@ -30,17 +25,17 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Gets a description of the specification.
+        ///     Gets a description of the specification.
         /// </summary>
         public string Description => "Value matching specification for key " + Key;
 
         /// <summary>
-        /// Gets a key or code to identifier the specification.
+        ///     Gets a key or code to identifier the specification.
         /// </summary>
         public string Key { get; }
 
         /// <summary>
-        /// Gets whether the specification is met by the given entity.
+        ///     Gets whether the specification is met by the given entity.
         /// </summary>
         public SpecResult Evaluate(T entity)
         {
@@ -51,10 +46,10 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Returns a string that represents the current object.
+        ///     Returns a string that represents the current object.
         /// </summary>
         /// <returns>
-        /// A string that represents the current object.
+        ///     A string that represents the current object.
         /// </returns>
         public override string ToString()
         {

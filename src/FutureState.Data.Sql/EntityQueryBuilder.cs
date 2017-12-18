@@ -13,8 +13,8 @@ namespace FutureState.Data.Sql
     /// <typeparam name="TEntity">The entity type to query for.</typeparam>
     public class EntityQueryBuilder<TEntity> where TEntity : class
     {
-        readonly DapperImplementor _dapperImplementation;
-        readonly DapperSession _dapperSession;
+        private readonly DapperImplementor _dapperImplementation;
+        private readonly DapperSession _dapperSession;
 
         public EntityQueryBuilder(ISession session)
         {

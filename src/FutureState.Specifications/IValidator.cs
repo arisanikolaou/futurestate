@@ -1,12 +1,12 @@
 ﻿namespace FutureState.Specifications
 {
     /// <summary>
-    /// Generic validator for a given boxed object.
+    ///     Generic validator for a given boxed object.
     /// </summary>
     public interface IValidator
     {
         /// <summary>
-        /// The error message generated after validating the last object passed to the Validate method.
+        ///     The error message generated after validating the last object passed to the Validate method.
         /// </summary>
         string ErrorMessage { get; }
 

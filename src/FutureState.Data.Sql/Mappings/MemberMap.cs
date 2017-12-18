@@ -9,12 +9,12 @@ namespace FutureState.Data.Sql.Mappings
     /// </summary>
     public class MemberMap : SqlMapper.IMemberMap
     {
-        readonly MemberInfo member;
+        private readonly MemberInfo member;
 
         public MemberMap(MemberInfo member, string columnName)
         {
             this.member = member;
-            this.ColumnName = columnName;
+            ColumnName = columnName;
         }
 
         public string ColumnName { get; }
@@ -27,12 +27,13 @@ namespace FutureState.Data.Sql.Mappings
             {
                 switch (member.MemberType)
                 {
-                    case MemberTypes.Field: return ((FieldInfo)member).FieldType;
-                    case MemberTypes.Property: return ((PropertyInfo)member).PropertyType;
+                    case MemberTypes.Field: return ((FieldInfo) member).FieldType;
+                    case MemberTypes.Property: return ((PropertyInfo) member).PropertyType;
                     default: throw new NotSupportedException($"Member type {member.MemberType} is not supported.");
                 }
             }
         }
+
         public ParameterInfo Parameter => null;
         public PropertyInfo Property => member as PropertyInfo;
     }

@@ -29,10 +29,7 @@
                 var entityMember = entityMap.GetMember(propDescriptor.Name);
                 var propMapping = SetPropertyInternal(propDescriptor);
                 if (entityMember != null)
-                {
-                    //awlays override with dapper type mappings
                     propMapping.DatabaseColumnName = entityMember.ColumnName;
-                }
 
                 currentConventions.ConfigureEntityPropertyMapping(propMapping);
             }

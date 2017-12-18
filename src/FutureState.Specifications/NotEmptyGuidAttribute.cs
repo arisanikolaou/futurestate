@@ -6,7 +6,7 @@ namespace FutureState.Specifications
     // an - made field name mandatory
 
     /// <summary>
-    /// Used to validate string values. Use required to validate other object values.
+    ///     Used to validate string values. Use required to validate other object values.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public sealed class NotEmptyGuidAttribute : ValidationAttribute
@@ -14,7 +14,7 @@ namespace FutureState.Specifications
         private readonly string _fieldName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotEmptyGuidAttribute" /> class.
+        ///     Initializes a new instance of the <see cref="NotEmptyGuidAttribute" /> class.
         /// </summary>
         /// <param name="fieldDisplayName">Display name of the field.</param>
         public NotEmptyGuidAttribute(string fieldDisplayName)
@@ -26,7 +26,7 @@ namespace FutureState.Specifications
         {
             var val = Convert.ToString(value);
 
-            Guid guid = Guid.Empty;
+            var guid = Guid.Empty;
 
             if (!Guid.TryParse(val, out guid))
             {

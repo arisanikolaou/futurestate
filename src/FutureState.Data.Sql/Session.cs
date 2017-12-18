@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using Dapper;
 using Dapper.Extensions.Linq.Core.Configuration;
-using FutureState.Data.Sql.Mappings;
 
 namespace FutureState.Data.Sql
-{ 
+{
     /// <summary>
     ///     A managed sql connection.
     /// </summary>
     public class Session : ISession
     {
-        readonly SqlConnection _connection;
-        Transacton _transction;
-
-        public IDapperConfiguration Configuration { get; }
-
-        public bool IsOpen => _connection.State == ConnectionState.Open;
+        private readonly SqlConnection _connection;
+        private Transacton _transction;
 
         internal Session(SqlConnection connection, IDapperConfiguration config)
         {
@@ -30,10 +22,9 @@ namespace FutureState.Data.Sql
             Configuration = config;
         }
 
-        /// <summary>
-        ///     Gets the underlying sql connection.
-        /// </summary>
-        public SqlConnection GetConnection() => _connection;
+        public IDapperConfiguration Configuration { get; }
+
+        public bool IsOpen => _connection.State == ConnectionState.Open;
 
         /// <summary>
         ///     Begins a new transaction.
@@ -62,6 +53,14 @@ namespace FutureState.Data.Sql
         public ITransaction GetCurrentTran()
         {
             return _transction;
+        }
+
+        /// <summary>
+        ///     Gets the underlying sql connection.
+        /// </summary>
+        public SqlConnection GetConnection()
+        {
+            return _connection;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="message">The main error message.</param>
         /// <param name="errors">The collection of errors.</param>
@@ -41,14 +41,11 @@ namespace FutureState
             : base(info, context)
         {
             if (info != null)
-            {
-                // reserved for future use
                 Errors = info.GetValue(nameof(Errors), typeof(Error[])) as Error[];
-            }
         }
 
         /// <summary>
-        /// Gets the list of business rules associated with the current instance.
+        ///     Gets the list of business rules associated with the current instance.
         /// </summary>
         public Error[] Errors { get; }
 
@@ -60,10 +57,7 @@ namespace FutureState
             base.GetObjectData(info, context);
 
             if (info != null)
-            {
-                // reserved for future use
                 info.AddValue(nameof(Errors), Errors);
-            }
         }
     }
 }

@@ -1,20 +1,20 @@
 ﻿#region
 
+using System;
+using System.Linq;
 using EmitMapper;
 using EmitMapper.MappingConfiguration;
 using FutureState.ComponentModel;
-using System;
-using System.Linq;
 
 #endregion
 
 namespace FutureState.Reflection
 {
     /// <summary>
-    /// Common utility methods for copying data between structs and classes.
+    ///     Common utility methods for copying data between structs and classes.
     /// </summary>
     /// <remarks>
-    /// Adds some responsibilities ontop of a normal object mapping operation.
+    ///     Adds some responsibilities ontop of a normal object mapping operation.
     /// </remarks>
     public static class DefaultMapper
     {
@@ -24,7 +24,7 @@ namespace FutureState.Reflection
         // the idea of having state in extension methods is problematic !
         public static IMapper Default
         {
-            get { return _default; }
+            get => _default;
             set // since it is static property - overriding it can be problematic !! Consider redesign.
             {
                 Guard.ArgumentNotNull(value, nameof(Default));
@@ -80,12 +80,12 @@ namespace FutureState.Reflection
         {
             if (source != null && sources.Any())
             {
-                var dest = (T)mapper.Map(source, typeof(T), typeof(T));
+                var dest = (T) mapper.Map(source, typeof(T), typeof(T));
 
                 foreach (var src in sources.Where(s => s != null))
                 {
                     var sourceType = src.GetType();
-                    dest = (T)mapper.Map(src, sourceType, typeof(T), dest);
+                    dest = (T) mapper.Map(src, sourceType, typeof(T), dest);
                 }
 
                 return dest;
@@ -99,35 +99,27 @@ namespace FutureState.Reflection
         private static TTo MapStructToInner<TTo>(object source, TTo? dst, IMapper mapper) where TTo : struct
         {
             if (source == null)
-            {
                 return default(TTo);
-            }
 
             // type override for a destination type
             var actualType = typeof(TTo);
             if (dst.HasValue)
-            {
                 actualType = dst.Value.GetType();
-            }
 
-            return (TTo)mapper.Map(source, source.GetType(), actualType, dst.HasValue ? (object)dst.Value : null);
+            return (TTo) mapper.Map(source, source.GetType(), actualType, dst.HasValue ? (object) dst.Value : null);
         }
 
         private static TTo MapToInner<TTo>(object source, TTo dst, IMapper mapper) where TTo : class
         {
             if (source == null)
-            {
                 return default(TTo);
-            }
 
             // type override for a destination type
             var actualType = typeof(TTo);
             if (dst != null)
-            {
                 actualType = dst.GetType();
-            }
 
-            return (TTo)mapper.Map(source, source.GetType(), actualType, dst);
+            return (TTo) mapper.Map(source, source.GetType(), actualType, dst);
         }
 
         public class EmitMapperImpl : IMapper

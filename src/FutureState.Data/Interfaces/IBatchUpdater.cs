@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Something that can insert,update and delete entities into a repository in batches.
+    ///     Something that can insert,update and delete entities into a repository in batches.
     /// </summary>
     /// <typeparam name="TEntity">The entity type to insert.</typeparam>
     public interface IBatchUpdater<in TEntity>
@@ -15,7 +15,7 @@ namespace FutureState.Data
         BatchUpdateResult LastUpdateResult { get; }
 
         /// <summary>
-        /// Updates a batch of entities in one transaction.
+        ///     Updates a batch of entities in one transaction.
         /// </summary>
         void Update(IEnumerable<TEntity> entity);
     }

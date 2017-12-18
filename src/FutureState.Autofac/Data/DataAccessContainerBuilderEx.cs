@@ -11,7 +11,8 @@ namespace FutureState.Autofac.Data
         /// <summary>
         ///     Registers a generic linq reader for a given entity and its key in the container.
         /// </summary>
-        public static DataAccessContainerBuilder<TEntity, TKey> RegisterLinqReader<TEntity, TKey>(this ContainerBuilder builder)
+        public static DataAccessContainerBuilder<TEntity, TKey> RegisterLinqReader<TEntity, TKey>(
+            this ContainerBuilder builder)
             where TEntity : class, IEntity<TKey>, new()
         {
             var containerBuilder = new DataAccessContainerBuilder<TEntity, TKey>(builder);
@@ -24,7 +25,8 @@ namespace FutureState.Autofac.Data
         /// <summary>
         ///     Registers a new unit of work for a given entity and its key type in the container.
         /// </summary>
-        public static DataAccessContainerBuilder<TEntity, TKey> RegisterUoW<TEntity, TKey>(this ContainerBuilder builder) where TEntity : class, IEntity<TKey>, new()
+        public static DataAccessContainerBuilder<TEntity, TKey>
+            RegisterUoW<TEntity, TKey>(this ContainerBuilder builder) where TEntity : class, IEntity<TKey>, new()
         {
             var containerBuilder = new DataAccessContainerBuilder<TEntity, TKey>(builder);
 
@@ -41,7 +43,8 @@ namespace FutureState.Autofac.Data
         /// <param name="builder"></param>
         /// <param name="name">The data model or partition id.</param>
         /// <returns></returns>
-        public static DataAccessContainerBuilder<TEntity, TKey> RegisterUoW<TEntity, TKey>(this ContainerBuilder builder, string name) where TEntity : class, IEntity<TKey>, new()
+        public static DataAccessContainerBuilder<TEntity, TKey> RegisterUoW<TEntity, TKey>(
+            this ContainerBuilder builder, string name) where TEntity : class, IEntity<TKey>, new()
         {
             var containerBuilder = new DataAccessContainerBuilder<TEntity, TKey>(builder);
 

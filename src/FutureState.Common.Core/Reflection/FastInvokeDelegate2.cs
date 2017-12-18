@@ -10,18 +10,18 @@ namespace FutureState
     //originally taken from http://www.codeproject.com/Articles/37788/Fast-Asynchronous-Delegates-in-NET
 
     /// <summary>
-    /// Delegate used to implement async programming model leveraging the new TPL library.
+    ///     Delegate used to implement async programming model leveraging the new TPL library.
     /// </summary>
     public delegate TResult FastInvokeDelegate<out TResult>();
 
     /// <summary>
-    /// Extensions methods to FastInvokeDelegate to support async programming model.
+    ///     Extensions methods to FastInvokeDelegate to support async programming model.
     /// </summary>
     public static class FastInvokeDelegateEx
     {
         /// <summary>
-        /// Begins an async operation represented by a delegate passing in state and completing the operation calling a given
-        /// callback method.
+        ///     Begins an async operation represented by a delegate passing in state and completing the operation calling a given
+        ///     callback method.
         /// </summary>
         public static IAsyncResult BeginInvokeFast<TResult>(this FastInvokeDelegate<TResult> del, object state,
             AsyncCallback callback)
@@ -30,17 +30,15 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Completes an async operation.
+        ///     Completes an async operation.
         /// </summary>
         public static TResult EndInvokeFast<TResult>(this FastInvokeDelegate<TResult> del, IAsyncResult asyncResult)
         {
             var result = asyncResult as FastInvokeAsyncResult<TResult>;
 
             if (result == null)
-            {
                 throw new InvalidOperationException(
                     $"The async result was not the expected type: {typeof(FastInvokeAsyncResult<TResult>).FullName} but {asyncResult.GetType().FullName}");
-            }
 
             return result.End();
         }
@@ -75,9 +73,7 @@ namespace FutureState
                 get
                 {
                     if (_asyncWaitHandleNeeded == 1)
-                    {
                         return _asyncWaitHandle;
-                    }
                     _asyncWaitHandleNeeded = 1;
                     _asyncWaitHandle = new ManualResetEvent(_isCompleted == 1);
 
@@ -98,9 +94,7 @@ namespace FutureState
                 }
 
                 if (_exception != null)
-                {
                     throw _exception;
-                }
                 return m_result;
             }
 
@@ -121,13 +115,9 @@ namespace FutureState
                         {
                             _isCompleted = 1;
                             if (_asyncWaitHandleNeeded == 1)
-                            {
                                 _asyncWaitHandle.Set();
-                            }
                             if (_callback != null)
-                            {
                                 _callback(this);
-                            }
                         }
                     });
             }

@@ -31,7 +31,7 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public PropertyMappingRelationship ChildParentRelationship
         {
-            get { return _childParentRelationship; }
+            get => _childParentRelationship;
             set
             {
                 ValidateState();
@@ -49,7 +49,7 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public bool IsPrimaryKey
         {
-            get { return (Options & PropertyMappingOptions.KeyProperty) == PropertyMappingOptions.KeyProperty; }
+            get => (Options & PropertyMappingOptions.KeyProperty) == PropertyMappingOptions.KeyProperty;
             set
             {
                 ValidateState();
@@ -71,11 +71,8 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public bool IsRefreshedOnInserts
         {
-            get
-            {
-                return (Options & PropertyMappingOptions.RefreshPropertyOnInserts) ==
-                       PropertyMappingOptions.RefreshPropertyOnInserts;
-            }
+            get => (Options & PropertyMappingOptions.RefreshPropertyOnInserts) ==
+                   PropertyMappingOptions.RefreshPropertyOnInserts;
             set
             {
                 ValidateState();
@@ -92,11 +89,8 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public bool IsRefreshedOnUpdates
         {
-            get
-            {
-                return (Options & PropertyMappingOptions.RefreshPropertyOnUpdates) ==
-                       PropertyMappingOptions.RefreshPropertyOnUpdates;
-            }
+            get => (Options & PropertyMappingOptions.RefreshPropertyOnUpdates) ==
+                   PropertyMappingOptions.RefreshPropertyOnUpdates;
             set
             {
                 ValidateState();
@@ -113,11 +107,8 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public bool IsExcludedFromInserts
         {
-            get
-            {
-                return (Options & PropertyMappingOptions.ExcludedFromInserts) ==
-                       PropertyMappingOptions.ExcludedFromInserts;
-            }
+            get => (Options & PropertyMappingOptions.ExcludedFromInserts) ==
+                   PropertyMappingOptions.ExcludedFromInserts;
             set
             {
                 ValidateState();
@@ -134,11 +125,8 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public bool IsExcludedFromUpdates
         {
-            get
-            {
-                return (Options & PropertyMappingOptions.ExcludedFromUpdates) ==
-                       PropertyMappingOptions.ExcludedFromUpdates;
-            }
+            get => (Options & PropertyMappingOptions.ExcludedFromUpdates) ==
+                   PropertyMappingOptions.ExcludedFromUpdates;
             set
             {
                 ValidateState();
@@ -155,7 +143,7 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public string DatabaseColumnName
         {
-            get { return _databaseColumnName; }
+            get => _databaseColumnName;
             set
             {
                 ValidateState();
@@ -185,7 +173,7 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public int ColumnOrder
         {
-            get { return _columnOrder; }
+            get => _columnOrder;
             set
             {
                 ValidateState();
@@ -215,7 +203,8 @@ namespace Dapper.FastCrud.Mappings
         ///     The name of the property on the current entity that would hold the
         ///     referenced entity when instructed to do so in a JOIN statement.
         /// </param>
-        internal PropertyMapping SetChildParentRelationship(Type relatedEntityType, string referencingEntityPropertyName)
+        internal PropertyMapping SetChildParentRelationship(Type relatedEntityType,
+            string referencingEntityPropertyName)
         {
             ChildParentRelationship = new PropertyMappingRelationship(relatedEntityType, referencingEntityPropertyName);
             return this;

@@ -10,36 +10,34 @@ using System.Linq.Expressions;
 namespace FutureState.Specifications
 {
     /// <summary>
-    /// Generic abstract base class to accumulate rules/specs for a given entity or service.
+    ///     Generic abstract base class to accumulate rules/specs for a given entity or service.
     /// </summary>
     /// <remarks>
-    /// Will automatically accumulate all specifications from an entity.
+    ///     Will automatically accumulate all specifications from an entity.
     /// </remarks>
     /// <typeparam name="TEntityOrService">
-    /// The entity or service to validate.
+    ///     The entity or service to validate.
     /// </typeparam>
     public class SpecProvider<TEntityOrService> : IProvideSpecifications<TEntityOrService>
     {
         protected readonly ConcurrentBag<ISpecification<TEntityOrService>> _specs;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SpecProvider{TEntityOrService}" /> class.
+        ///     Initializes a new instance of the <see cref="SpecProvider{TEntityOrService}" /> class.
         /// </summary>
         public SpecProvider()
         {
             _specs = new ConcurrentBag<ISpecification<TEntityOrService>>();
 
             foreach (var spec in new DataAnnotationsSpecProvider<TEntityOrService>().GetSpecifications())
-            {
                 _specs.Add(spec);
-            }
         }
 
         /// <summary>
-        /// Gets the current list of specifications aggregated into the current instance.
+        ///     Gets the current list of specifications aggregated into the current instance.
         /// </summary>
         /// <returns>
-        /// List of one or more specifications.
+        ///     List of one or more specifications.
         /// </returns>
         public IEnumerable<ISpecification<TEntityOrService>> GetSpecifications()
         {
@@ -53,9 +51,7 @@ namespace FutureState.Specifications
 
                 // only add
                 foreach (var spec in args.Specs)
-                {
                     _specs.Add(spec);
-                }
             }
 
             // return results
@@ -63,7 +59,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Raised to discover specifications.
+        ///     Raised to discover specifications.
         /// </summary>
         public static event EventHandler<SpecEventArgs<TEntityOrService>> ResolveSpecifications;
 
@@ -84,25 +80,23 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Aggregates the specifications/rules from another spec provider into the current instance.
+        ///     Aggregates the specifications/rules from another spec provider into the current instance.
         /// </summary>
         /// <param name="specProvider">
-        /// The other specification provider for the entity or service.
+        ///     The other specification provider for the entity or service.
         /// </param>
         public SpecProvider<TEntityOrService> Add(IProvideSpecifications<TEntityOrService> specProvider)
         {
             Guard.ArgumentNotNull(specProvider, nameof(specProvider));
 
             foreach (var spec in specProvider.GetSpecifications())
-            {
                 _specs.Add(spec);
-            }
 
             return this;
         }
 
         /// <summary>
-        /// Adds a specification/rule using a given expression.
+        ///     Adds a specification/rule using a given expression.
         /// </summary>
         /// <param name="condition">The expression to test that must be satisfied.</param>
         /// <param name="detailedMessage">The error message to display to the caller (user or system)</param>
@@ -126,9 +120,7 @@ namespace FutureState.Specifications
                 {
                     // ReSharper disable once ConvertIfStatementToReturnStatement
                     if (!specValidator.Invoke(m))
-                    {
                         return new SpecResult(detailedMessage?.Invoke(m));
-                    }
 
                     return SpecResult.Success;
                 },
@@ -141,7 +133,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Adds a specification/rule using a given expression.
+        ///     Adds a specification/rule using a given expression.
         /// </summary>
         /// <param name="condition">The expression to test that must be satisfied.</param>
         /// <param name="key">The field key.</param>
@@ -160,9 +152,7 @@ namespace FutureState.Specifications
                     m =>
                     {
                         if (!condition.Compile().Invoke(m))
-                        {
                             return new SpecResult(specDescription);
-                        }
 
                         return SpecResult.Success;
                     },

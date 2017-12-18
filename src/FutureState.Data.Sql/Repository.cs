@@ -192,7 +192,8 @@ namespace FutureState.Data.Sql
         public long Count()
         {
             return
-                Convert.ToInt64(_connection.ExecuteScalar($"Select Count(*) From [{_tableName}]", null, GetCurrentTran()));
+                Convert.ToInt64(_connection.ExecuteScalar($"Select Count(*) From [{_tableName}]", null,
+                    GetCurrentTran()));
         }
 
         public IEnumerable<TEntity> GetByIds(IEnumerable<TKey> ids)

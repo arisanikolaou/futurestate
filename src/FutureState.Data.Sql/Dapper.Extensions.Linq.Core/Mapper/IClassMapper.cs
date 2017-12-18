@@ -4,7 +4,7 @@ using Dapper.FluentMap.Dommel.Mapping;
 
 namespace Dapper.Extensions.Linq.Core.Mapper
 {
-    public interface IClassMapper<T> :  IClassMapper where T : class
+    public interface IClassMapper<T> : IClassMapper where T : class
     {
     }
 

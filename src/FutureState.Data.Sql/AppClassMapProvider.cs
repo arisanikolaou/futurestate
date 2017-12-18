@@ -1,18 +1,18 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Dapper;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.FluentMap;
 using Dapper.FluentMap.Configuration;
 using FutureState.Data.Sql.Mappings;
 using FutureState.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FutureState.Data.Sql
 {
     public class AppClassMapProvider
     {
-        private AppTypeScanner _scanner;
+        private readonly AppTypeScanner _scanner;
 
         static AppClassMapProvider()
         {
@@ -26,8 +26,9 @@ namespace FutureState.Data.Sql
 
         public AppClassMapProvider(AppTypeScanner scanner)
         {
-            this._scanner = scanner;
+            _scanner = scanner;
         }
+
         /// <summary>
         ///     Initialize all default entity mappers to support sql data queries.
         /// </summary>
@@ -66,19 +67,19 @@ namespace FutureState.Data.Sql
                 // add specialized class mapper firs
                 foreach (var type in customClassMappers)
                 {
-                    IClassMapper newCustomEntityMap = Activator.CreateInstance(type.Value) as IClassMapper;
+                    var newCustomEntityMap = Activator.CreateInstance(type.Value) as IClassMapper;
 
                     var entityProperty = type.Value.GetProperty("EntityType");
                     if (entityProperty == null)
                         throw new InvalidOperationException("Property 'EntityType' does not exist.");
 
-                    Type entityType = entityProperty.GetValue(newCustomEntityMap, new object[0]) as Type;
+                    var entityType = entityProperty.GetValue(newCustomEntityMap, new object[0]) as Type;
                     classMappers.Add(newCustomEntityMap);
 
                     // invoke generic method
                     var generic = method.MakeGenericMethod(entityType);
 
-                    generic.Invoke(config, new[] { newCustomEntityMap });
+                    generic.Invoke(config, new[] {newCustomEntityMap});
                 }
 
                 // interogate container for entity maps and update
@@ -102,7 +103,7 @@ namespace FutureState.Data.Sql
                         // invoke generic method
                         var generic = method.MakeGenericMethod(actualType);
 
-                        generic.Invoke(config, new object[] { newCustomEntityMap });
+                        generic.Invoke(config, new object[] {newCustomEntityMap});
                     }
                     catch (Exception ex)
                     {

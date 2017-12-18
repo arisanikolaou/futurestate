@@ -37,10 +37,7 @@ namespace Hyper.ComponentModel
         public static void Add(Type type)
         {
             if (_presentTypes.Contains(type.FullName))
-            {
-                // not thread safe but we should be ok (added by alex)
                 return;
-            }
 
             _presentTypes.Add(type.FullName);
 
@@ -71,7 +68,6 @@ namespace Hyper.ComponentModel
                 ICustomTypeDescriptor descriptor;
 
                 if (!descriptors.TryGetValue(objectType, out descriptor))
-                {
                     try
                     {
                         descriptor = BuildDescriptor(objectType);
@@ -80,7 +76,6 @@ namespace Hyper.ComponentModel
                     {
                         return base.GetTypeDescriptor(objectType, instance);
                     }
-                }
 
                 return descriptor;
             }

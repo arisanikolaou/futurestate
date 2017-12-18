@@ -5,21 +5,21 @@
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
-    public class EntityHandler<TEntity,TKey>
+    public class EntityHandler<TEntity, TKey>
     {
         public EntityHandler(
             IActiveHandler<TEntity> activateHandler,
             IAddHandler<TEntity> addHandler,
             IRemoveHandler<TKey> removeHandler)
         {
-            this.ActivateHandler = activateHandler;
-            this.AddHandler = addHandler;
-            this.RemoveHandler = removeHandler;
+            ActivateHandler = activateHandler;
+            AddHandler = addHandler;
+            RemoveHandler = removeHandler;
         }
 
-        public IAddHandler<TEntity> AddHandler { get; private set; }
-        public IRemoveHandler<TKey> RemoveHandler { get; private set; }
-        public IActiveHandler<TEntity> ActivateHandler { get; private set; }
+        public IAddHandler<TEntity> AddHandler { get; }
+        public IRemoveHandler<TKey> RemoveHandler { get; }
+        public IActiveHandler<TEntity> ActivateHandler { get; }
     }
 
     public interface IRemoveHandler<TKey>

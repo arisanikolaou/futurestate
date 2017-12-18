@@ -7,12 +7,12 @@ using System;
 namespace FutureState
 {
     /// <summary>
-    /// Helps manage different application domains.
+    ///     Helps manage different application domains.
     /// </summary>
     public static class AppDomainUtil
     {
         /// <summary>
-        /// Creates a simple domain.
+        ///     Creates a simple domain.
         /// </summary>
         /// <param name="domainName"></param>
         /// <returns></returns>
@@ -25,8 +25,8 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Executes a method in a separate AppDomain.  This should serve as a simple replacement
-        /// of running code in a separate process via a console app.
+        ///     Executes a method in a separate AppDomain.  This should serve as a simple replacement
+        ///     of running code in a separate process via a console app.
         /// </summary>
         public static T Run<T>(Func<T> func)
         {
@@ -36,7 +36,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Runs a function in a separate application domain.
+        ///     Runs a function in a separate application domain.
         /// </summary>
         public static T Run<T>(this AppDomain domain, Func<T> func)
         {
@@ -51,7 +51,7 @@ namespace FutureState
                         AppDomain.CurrentDomain.SetData("result", funcToInvoke());
                     });
 
-                return (T)domain.GetData("result");
+                return (T) domain.GetData("result");
             }
             finally
             {
@@ -60,11 +60,11 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Executes a method in a separate AppDomain.  This should serve as a simple replacement
-        /// of running code in a separate process via a console app.
+        ///     Executes a method in a separate AppDomain.  This should serve as a simple replacement
+        ///     of running code in a separate process via a console app.
         /// </summary>
         /// <remarks>
-        /// Type T must be a serializeable or marshal by reference object.
+        ///     Type T must be a serializeable or marshal by reference object.
         /// </remarks>
         public static void Run<T>(string domainName, Action<T> action)
         {
@@ -79,8 +79,8 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Executes a method in a separate AppDomain.  This should serve as a simple replacement
-        /// of running code in a separate process via a console app.
+        ///     Executes a method in a separate AppDomain.  This should serve as a simple replacement
+        ///     of running code in a separate process via a console app.
         /// </summary>
         public static void Run<T>(this AppDomain domain, Action<T> action)
         {
@@ -88,7 +88,7 @@ namespace FutureState
 
             try
             {
-                var instance = (T)domain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
+                var instance = (T) domain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
 
                 action?.Invoke(instance);
             }
@@ -99,12 +99,12 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Executes a method in a separate AppDomain.  This should serve as a simple replacement
-        /// of running code in a separate process via a console app.
+        ///     Executes a method in a separate AppDomain.  This should serve as a simple replacement
+        ///     of running code in a separate process via a console app.
         /// </summary>
         public static void Run(Action func)
         {
-            Run(new ActionDelegateWrapper { _func = func }.Invoke);
+            Run(new ActionDelegateWrapper {_func = func}.Invoke);
         }
 
         private static AppDomainSetup GetDefaultAppDomainSetup()

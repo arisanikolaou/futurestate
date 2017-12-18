@@ -20,9 +20,7 @@ namespace FutureState
                 i++;
 
                 if (header.Equals(item, StringComparison.OrdinalIgnoreCase))
-                {
                     return i;
-                }
             }
 
             return -1;
@@ -35,18 +33,14 @@ namespace FutureState
                 var contains = false;
 
                 foreach (var actualField in actualFields)
-                {
                     if (string.Equals(actualField, expectedField, StringComparison.OrdinalIgnoreCase))
                     {
                         contains = true;
                         break;
                     }
-                }
 
                 if (!contains)
-                {
                     return false;
-                }
             }
 
             return true;

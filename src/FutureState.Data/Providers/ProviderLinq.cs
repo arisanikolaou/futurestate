@@ -1,15 +1,15 @@
-﻿using FutureState.Specifications;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using FutureState.ComponentModel;
-using System.Linq.Expressions;
 using FutureState.Data.Keys;
-using NLog;
-using System.Threading;
 using FutureState.Services;
+using FutureState.Specifications;
+using NLog;
 
 namespace FutureState.Data.Providers
 {
@@ -26,24 +26,24 @@ namespace FutureState.Data.Providers
 
         //default specs used to validate keys
 #pragma warning disable RECS0108 // Warns about static fields in generic types
-        static readonly IList<ISpecification<TEntity>> _defaultSpecs;
+        private static readonly IList<ISpecification<TEntity>> _defaultSpecs;
 
-        readonly IList<ISpecification<TEntity>> _specs;
+        private readonly IList<ISpecification<TEntity>> _specs;
 
-        readonly IEntityIdProvider<TEntity, TKey> _idProvider;
+        private readonly IEntityIdProvider<TEntity, TKey> _idProvider;
 
         // processes crud actions
-        readonly Stack<Action<TKey>> _onBeforeDelete;
-        readonly Stack<Action<TEntity>> _onBeforeInsert;
-        readonly Stack<Action<TEntity>> _onInitialize;
+        private readonly Stack<Action<TKey>> _onBeforeDelete;
+
+        private readonly Stack<Action<TEntity>> _onBeforeInsert;
+        private readonly Stack<Action<TEntity>> _onInitialize;
 
         // where to dispatch domain events
-        readonly IMessagePipe _messagePipe;
 
         /// <summary>
         ///     Gets the message pipe used by the current instance to communicate domain events.
         /// </summary>
-        public IMessagePipe MessagePipe => _messagePipe;
+        public IMessagePipe MessagePipe { get; }
 
         static ProviderLinq()
         {
@@ -54,12 +54,15 @@ namespace FutureState.Data.Providers
         protected internal IUnitOfWorkLinq<TEntity, TKey> Db { get; }
 
         /// <summary>
-        /// Creates a new generic service to add/update valid entities and/or remove them from the application.
+        ///     Creates a new generic service to add/update valid entities and/or remove them from the application.
         /// </summary>
         /// <param name="messagePipe">Message pipe to dispatch domain events.</param>
         /// <param name="db">The data store to use to persist the entity.</param>
         /// <param name="idProvider">Function to get a new key for a given entity.</param>
-        /// <param name="specProvider">The custom rule provider to use to validate entities added/updated to the service. By default service will use data annotations to build business rules to validate the object.</param>
+        /// <param name="specProvider">
+        ///     The custom rule provider to use to validate entities added/updated to the service. By
+        ///     default service will use data annotations to build business rules to validate the object.
+        /// </param>
         /// <param name="handler">A handler to use to process entities being added/removed or activated through the provider.</param>
         public ProviderLinq(
             IUnitOfWorkLinq<TEntity, TKey> db,
@@ -73,7 +76,7 @@ namespace FutureState.Data.Providers
 
             Db = db;
 
-            _messagePipe = messagePipe ?? new NoOpMessagePipe();
+            MessagePipe = messagePipe ?? new NoOpMessagePipe();
             _idProvider = idProvider;
 
             // wrap processors
@@ -110,7 +113,7 @@ namespace FutureState.Data.Providers
         {
             return _idProvider;
         }
-        
+
         // gets the user in the current thread/app context
         public virtual string GetCurrentUser()
         {
@@ -148,7 +151,7 @@ namespace FutureState.Data.Providers
         }
 
 
-        class NoOpMessagePipe : IMessagePipe
+        private class NoOpMessagePipe : IMessagePipe
         {
             public Task SendAsync<T>(T message) where T : IDomainEvent
             {
@@ -162,7 +165,9 @@ namespace FutureState.Data.Providers
         public TEntity GetById(TKey key)
         {
             using (Db.Open())
+            {
                 return GetById(key, Db);
+            }
         }
 
         /// <summary>
@@ -185,13 +190,16 @@ namespace FutureState.Data.Providers
         public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> whereClause)
         {
             using (Db.Open())
+            {
                 return Where(whereClause, Db);
+            }
         }
 
         /// <summary>
         ///     Selects a set of entities by a given expression.
         /// </summary>
-        public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> whereClause, IUnitOfWorkLinq<TEntity, TKey> db)
+        public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> whereClause,
+            IUnitOfWorkLinq<TEntity, TKey> db)
         {
             Guard.ArgumentNotNull(whereClause, nameof(whereClause));
 
@@ -211,7 +219,9 @@ namespace FutureState.Data.Providers
         public virtual IEnumerable<TEntity> GetAll()
         {
             using (Db.Open())
+            {
                 return GetAll(Db);
+            }
         }
 
         /// <summary>
@@ -226,18 +236,20 @@ namespace FutureState.Data.Providers
         }
 
         /// <summary>
-        /// Gets a set of entities by a set of keys against an open unit of work.
+        ///     Gets a set of entities by a set of keys against an open unit of work.
         /// </summary>
         public IEnumerable<TEntity> GetByIds(IEnumerable<TKey> keys)
         {
             Guard.ArgumentNotNull(keys, nameof(keys));
 
             using (Db.Open())
+            {
                 return GetByIds(keys, Db); //convert to hashset to make unique
+            }
         }
 
         /// <summary>
-        /// Gets a set of entities by a set of keys against an open unit of work.
+        ///     Gets a set of entities by a set of keys against an open unit of work.
         /// </summary>
         public IEnumerable<TEntity> GetByIds(IEnumerable<TKey> keys, IUnitOfWorkLinq<TEntity, TKey> db)
         {
@@ -288,12 +300,11 @@ namespace FutureState.Data.Providers
         {
             Guard.ArgumentNotNull(entity, nameof(entity));
 
-            Add(new[] { entity });
+            Add(new[] {entity});
         }
 
         protected virtual void OnAfterItemAdded(TEntity entity)
         {
-
         }
 
         protected virtual void OnBeforeAdd(TEntity entity)
@@ -302,7 +313,7 @@ namespace FutureState.Data.Providers
         }
 
         /// <summary>
-        /// Adds a number of entities to the system and commits the changes.
+        ///     Adds a number of entities to the system and commits the changes.
         /// </summary>
         /// <param name="entities">The entities to add.</param>
         public void Add(IEnumerable<TEntity> entities)
@@ -320,10 +331,7 @@ namespace FutureState.Data.Providers
             }
 
             // bind to current service
-            entitiesAsArray.Each(m =>
-            {
-                Initialize(m);
-            });
+            entitiesAsArray.Each(m => { Initialize(m); });
         }
 
         /// <summary>
@@ -351,10 +359,7 @@ namespace FutureState.Data.Providers
             }
 
             // bind to current service
-            entitiesAsArray.Each(m =>
-            {
-                Initialize(m);
-            });
+            entitiesAsArray.Each(m => { Initialize(m); });
         }
 
         /// <summary>
@@ -401,11 +406,11 @@ namespace FutureState.Data.Providers
         protected virtual void OnAfterItemUpdated(TEntity entity)
         {
             // todo
-            _messagePipe.SendAsync(new ItemUpdated<TEntity>(entity));
+            MessagePipe.SendAsync(new ItemUpdated<TEntity>(entity));
         }
 
         /// <summary>
-        /// Adds a number of entities to the system.
+        ///     Adds a number of entities to the system.
         /// </summary>
         /// <param name="entities">The entities to add.</param>
         /// <param name="db">The unit of work to operate against.</param>
@@ -415,7 +420,7 @@ namespace FutureState.Data.Providers
             Guard.ArgumentNotNull(db, nameof(db));
 
             //avoid multiple enumerations
-            TEntity[] entitiesAsArray = entities.ToArray();
+            var entitiesAsArray = entities.ToArray();
 
             entitiesAsArray.Each(OnBeforeAdd);
 
@@ -425,21 +430,19 @@ namespace FutureState.Data.Providers
             entitiesAsArray.Each(entity =>
             {
                 if (entity.Id.Equals(default(TKey)))
-                {
                     _idProvider.Provide(entity); //assign next key
-                }
             });
 
             Db.EntitySet.Writer.Insert(entitiesAsArray);
 
             // send domain events
             entitiesAsArray.Each(entity =>
-            {
-                _messagePipe.SendAsync(new ItemAdded<TEntity>(entity));
+                {
+                    MessagePipe.SendAsync(new ItemAdded<TEntity>(entity));
 
-                // notify item add
-                OnAfterItemAdded(entity);
-            }
+                    // notify item add
+                    OnAfterItemAdded(entity);
+                }
             );
         }
 
@@ -475,7 +478,7 @@ namespace FutureState.Data.Providers
         /// </summary>
         public void DemandValid(TEntity entity)
         {
-            DemandValid(new[] { entity });
+            DemandValid(new[] {entity});
         }
 
         /// <summary>
@@ -491,7 +494,7 @@ namespace FutureState.Data.Providers
                 Db.Commit();
             }
 
-            this.OnAfterItemUpdated(entity);
+            OnAfterItemUpdated(entity);
         }
 
         /// <summary>
@@ -514,17 +517,16 @@ namespace FutureState.Data.Providers
 
             db.EntitySet.Writer.Update(entity);
 
-            _messagePipe
+            MessagePipe
                 .SendAsync(new ItemUpdated<TEntity>(entity));
         }
 
         protected virtual void OnBeforeUpdate(TEntity entity)
         {
-
         }
 
         /// <summary>
-        /// Deletes an entity by its key and commits the changes.
+        ///     Deletes an entity by its key and commits the changes.
         /// </summary>
         /// <param name="key">The id of the entity to delete.</param>
         public void RemoveById(TKey key)
@@ -573,7 +575,7 @@ namespace FutureState.Data.Providers
         }
 
         /// <summary>
-        /// Deletes an entity by its key.
+        ///     Deletes an entity by its key.
         /// </summary>
         /// <param name="key">The id of the entity to delete.</param>
         /// <param name="db">The unit of work instance to work against.</param>
@@ -588,12 +590,11 @@ namespace FutureState.Data.Providers
 
             OnBeforeDeleteCommit(db, key);
 
-            _messagePipe.SendAsync(new ItemDeleted<TEntity, TKey>(key));
+            MessagePipe.SendAsync(new ItemDeleted<TEntity, TKey>(key));
         }
 
         protected virtual void OnBeforeDeleteCommit(IUnitOfWorkLinq<TEntity, TKey> db, TKey key)
         {
-
         }
 
         /// <summary>

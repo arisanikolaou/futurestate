@@ -10,9 +10,7 @@ namespace FutureState
         public static TInput Do<TInput>(this TInput obj, Action<TInput> action) where TInput : class
         {
             if (obj == null)
-            {
                 return default(TInput);
-            }
 
             action?.Invoke(obj);
 
@@ -45,14 +43,10 @@ namespace FutureState
         public static TInput If<TInput>(this TInput obj, Func<TInput, bool> evaluator) where TInput : class
         {
             if (obj == null)
-            {
                 return default(TInput);
-            }
 
             if (!evaluator(obj))
-            {
                 return default(TInput);
-            }
 
             return obj;
         }
@@ -61,9 +55,7 @@ namespace FutureState
             TResult failureValue) where TInput : class
         {
             if (obj == null)
-            {
                 return failureValue;
-            }
 
             return evaluator(obj);
         }
@@ -77,14 +69,10 @@ namespace FutureState
         public static TInput Unless<TInput>(this TInput obj, Func<TInput, bool> evaluator) where TInput : class
         {
             if (obj == null)
-            {
                 return default(TInput);
-            }
 
             if (!evaluator(obj))
-            {
                 return obj;
-            }
 
             return default(TInput);
         }
@@ -94,9 +82,7 @@ namespace FutureState
             where TResult : class
         {
             if (obj == null)
-            {
                 return default(TResult);
-            }
 
             return evaluator?.Invoke(obj);
         }
@@ -108,23 +94,17 @@ namespace FutureState
             flags |= isPrivate ? BindingFlags.NonPublic : BindingFlags.Public;
             flags |= isStatic ? BindingFlags.Static : BindingFlags.Instance;
             if (ignoreCase)
-            {
                 flags |= BindingFlags.IgnoreCase;
-            }
 
             var memberInfo = type.GetMember(name, flags).SingleOrDefault();
 
             var field = memberInfo as FieldInfo;
             if (field != null)
-            {
                 return field.GetValue(o);
-            }
 
             var property = memberInfo as PropertyInfo;
             if (property != null)
-            {
                 return property.GetValue(o);
-            }
 
             throw new InvalidDataException("Invalid property name");
         }

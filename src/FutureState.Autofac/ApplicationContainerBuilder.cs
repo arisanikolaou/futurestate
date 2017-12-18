@@ -16,7 +16,7 @@ namespace FutureState.Autofac
     /// </summary>
     public class ApplicationContainerBuilder
     {
-        readonly static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly ContainerBuilder cb;
         private readonly AppTypeScanner scanner;
@@ -42,7 +42,7 @@ namespace FutureState.Autofac
         /// </summary>
         public ApplicationContainerBuilder RegisterClassMappers()
         {
-            var provider = new AppClassMapProvider(this.scanner);
+            var provider = new AppClassMapProvider(scanner);
 
             foreach (var classMapper in provider.GetClassMappers())
                 cb.Register(m => classMapper)
@@ -56,7 +56,7 @@ namespace FutureState.Autofac
 
         /// <summary>
         ///     Registers all units of work discovered in the application space within a given autofac
-        /// container builder.
+        ///     container builder.
         /// </summary>
         public ApplicationContainerBuilder RegisterUnitsOfWork()
         {
@@ -77,9 +77,8 @@ namespace FutureState.Autofac
                 foreach (var interfaceType in type.GetInterfaces())
                     if (interfaceType.AssemblyQualifiedName != null)
                         registration.As(interfaceType);
-                    else
-                        if(_logger.IsDebugEnabled)
-                            _logger.Debug($"Type has invalid interface map: {type.FullName}");
+                    else if (_logger.IsDebugEnabled)
+                        _logger.Debug($"Type has invalid interface map: {type.FullName}");
             }
 
             return this;
@@ -109,23 +108,22 @@ namespace FutureState.Autofac
         {
             // will return all non abstract public types
             var dataQueryTypesLazy = scanner.GetFilteredTypes(
-                    m => m.IsClass && !m.IsAbstract && m.GetInterfaces().Any(c => c.FullName == typeof(TInterfaceType).FullName))
-                    .Where(m => !m.Value.GetGenericArguments().Any())
-                    .ToCollection();
+                    m => m.IsClass && !m.IsAbstract &&
+                         m.GetInterfaces().Any(c => c.FullName == typeof(TInterfaceType).FullName))
+                .Where(m => !m.Value.GetGenericArguments().Any())
+                .ToCollection();
 
             foreach (var dataQueryLazy in dataQueryTypesLazy)
-            {
                 cb.RegisterType(dataQueryLazy.Value)
                     .AsSelf()
                     .AsImplementedInterfaces();
-            }
 
             return this;
         }
 
         /// <summary>
         ///     Registers all specialized data queries discovered in the application space within a given
-        /// autofac container builder.
+        ///     autofac container builder.
         /// </summary>
         public ApplicationContainerBuilder RegisterSpecializedQueries()
         {
@@ -137,7 +135,8 @@ namespace FutureState.Autofac
 
             var method = typeof(ApplicationContainerBuilder).GetMethod("RegisterDataQuery");
             if (method == null)
-                throw new InvalidOperationException($"Method 'RegisterDataQuery' not found on class: {typeof(ApplicationContainerBuilder).FullName}");
+                throw new InvalidOperationException(
+                    $"Method 'RegisterDataQuery' not found on class: {typeof(ApplicationContainerBuilder).FullName}");
 
             foreach (var dataQueryLazy in dataQueryTypesLazy)
             {
@@ -148,7 +147,7 @@ namespace FutureState.Autofac
 
                 // register self
                 var genericMethod = method.MakeGenericMethod(dataQueryLazy.Value);
-                genericMethod.Invoke(this, new object[0] {  });
+                genericMethod.Invoke(this, new object[0] { });
 
                 // register on each interface type deriving from IDataQuery
                 var specializedQueryInterfaces =
@@ -171,16 +170,16 @@ namespace FutureState.Autofac
             where TDataQuery : IDataQuery
         {
             cb.Register(m =>
-            {
-                var cntx = m.Resolve<IComponentContext>();
+                {
+                    var cntx = m.Resolve<IComponentContext>();
 
-                var func =
-                    new Func<ISession, TDataQuery>(
-                        session => cntx.Resolve<TDataQuery>(new TypedParameter(typeof(ISession), session)));
+                    var func =
+                        new Func<ISession, TDataQuery>(
+                            session => cntx.Resolve<TDataQuery>(new TypedParameter(typeof(ISession), session)));
 
-                return func;
-            }).As<Func<ISession, TDataQuery>>()
-            .PreserveExistingDefaults();
+                    return func;
+                }).As<Func<ISession, TDataQuery>>()
+                .PreserveExistingDefaults();
 
             return this;
         }

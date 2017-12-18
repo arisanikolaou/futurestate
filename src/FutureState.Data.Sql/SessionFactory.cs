@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using Dapper;
+﻿using System.Data.SqlClient;
 using Dapper.Extensions.Linq.Core.Configuration;
-using FutureState.Data.Sql.Mappings;
 
 namespace FutureState.Data.Sql
 {
@@ -12,10 +8,7 @@ namespace FutureState.Data.Sql
     /// </summary>
     public class SessionFactory : ISessionFactory
     {
-        readonly string _conString;
-
-        public string Id { get; set; }
-        public IDapperConfiguration Configuration { get; }
+        private readonly string _conString;
 
         /// <summary>
         ///     Creates a new session factory.
@@ -30,6 +23,10 @@ namespace FutureState.Data.Sql
             _conString = conString;
             Configuration = configuration;
         }
+
+        public IDapperConfiguration Configuration { get; }
+
+        public string Id { get; set; }
 
         /// <summary>
         ///     Opens/creates a new session.

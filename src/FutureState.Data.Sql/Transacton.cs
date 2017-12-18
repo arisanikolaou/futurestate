@@ -7,9 +7,14 @@ namespace FutureState.Data.Sql
     /// </summary>
     public class Transacton : ITransaction
     {
-        readonly IDbTransaction _transaction;
+        internal Transacton(IDbConnection connection)
+        {
+            UnderlyingTransaction = connection.BeginTransaction();
 
-        public IDbTransaction UnderlyingTransaction => _transaction;
+            IsPending = true;
+        }
+
+        public IDbTransaction UnderlyingTransaction { get; }
 
         public void Dispose()
         {
@@ -21,15 +26,8 @@ namespace FutureState.Data.Sql
             }
             finally
             {
-                _transaction.Dispose();
+                UnderlyingTransaction.Dispose();
             }
-        }
-
-        internal Transacton(IDbConnection connection)
-        {
-            _transaction = connection.BeginTransaction();
-
-            IsPending = true;
         }
 
         public bool IsPending { get; private set; }
@@ -41,7 +39,7 @@ namespace FutureState.Data.Sql
         {
             try
             {
-                _transaction.Commit();
+                UnderlyingTransaction.Commit();
             }
             finally
             {
@@ -56,7 +54,7 @@ namespace FutureState.Data.Sql
         {
             try
             {
-                _transaction.Rollback();
+                UnderlyingTransaction.Rollback();
             }
             finally
             {

@@ -7,8 +7,8 @@ namespace FutureState.Data.Keys
     /// </summary>
     public class EntityIdProvider<TEntity, TKey> : IEntityIdProvider<TEntity, TKey>
     {
-        readonly IEntityKeyBinder<TEntity, TKey> _keyBinder;
-        readonly IKeyGetter<TKey> _getKey;
+        private readonly IKeyGetter<TKey> _getKey;
+        private readonly IEntityKeyBinder<TEntity, TKey> _keyBinder;
 
         public EntityIdProvider(IKeyGetter<TKey> keyGetter, IEntityKeyBinder<TEntity, TKey> keyBinder)
         {
@@ -22,7 +22,7 @@ namespace FutureState.Data.Keys
 
         public void Provide(TEntity entity)
         {
-            TKey key = _getKey.GetNew();
+            var key = _getKey.GetNew();
             _keyBinder.Set(entity, key);
         }
 
@@ -31,5 +31,5 @@ namespace FutureState.Data.Keys
         {
             return _keyBinder.Get(entity);
         }
-    };
+    }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.IO;
 using NLog;
 
 namespace FutureState.Reflection
@@ -13,15 +13,10 @@ namespace FutureState.Reflection
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        // only types associated with this base namespace are processed
-        public string AssemblyFilterPrefix { get; private set; } = "FutureState";
+        private readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
 
 
-        string _basePath;
-
-        readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
-
-        internal IList<Type> GetReflectedTypes() { return _reflectionOnlyTypesGet.Value; }
+        private readonly string _basePath;
 
         static AppTypeScanner()
         {
@@ -39,6 +34,14 @@ namespace FutureState.Reflection
             AssemblyFilterPrefix = assemblyScanPrefix ?? "FutureState";
         }
 
+        // only types associated with this base namespace are processed
+        public string AssemblyFilterPrefix { get; } = "FutureState";
+
+        internal IList<Type> GetReflectedTypes()
+        {
+            return _reflectionOnlyTypesGet.Value;
+        }
+
         /// <summary>
         ///     Gets all public types domain in the application domain.
         /// </summary>
@@ -47,11 +50,11 @@ namespace FutureState.Reflection
             return _reflectionOnlyTypesGet.Value;
         }
 
-        IList<Type> BuildReflectedTypes()
+        private IList<Type> BuildReflectedTypes()
         {
             // discover by convention all units of work, all queries and all entity maps
             DirectoryInfo appBinDirectory;
-            if(_basePath == null)
+            if (_basePath == null)
             {
                 var appDirectory = Assembly.GetCallingAssembly()?.Location;
                 appBinDirectory = new DirectoryInfo(Path.GetDirectoryName(appDirectory));
@@ -83,11 +86,11 @@ namespace FutureState.Reflection
         /// </summary>
         /// <param name="filter">Additional filtering criteria.</param>
         /// <returns></returns>
-        public  IList<Lazy<Type>> GetFilteredTypes(Func<Type, bool> filter)
+        public IList<Lazy<Type>> GetFilteredTypes(Func<Type, bool> filter)
         {
             Guard.ArgumentNotNull(filter, nameof(filter));
 
-            IList<Type> reflectedTypes = GetReflectedTypes();
+            var reflectedTypes = GetReflectedTypes();
 
             var returnTypes = new List<Lazy<Type>>();
 

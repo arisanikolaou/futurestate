@@ -16,7 +16,7 @@ namespace FutureState.Specifications
         private readonly PropertyInfo[] _properties;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         public DataAnnotationsSpecProvider(Type type)
         {

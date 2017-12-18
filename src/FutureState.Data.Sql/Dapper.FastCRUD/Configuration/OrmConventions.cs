@@ -79,7 +79,8 @@ namespace Dapper.FastCrud.Configuration
         public virtual string GetTableName(Type entityType)
         {
             TableAttribute tableNameAttribute;
-            if ((tableNameAttribute = GetEntityAttributes(entityType).OfType<TableAttribute>().FirstOrDefault()) != null)
+            if ((tableNameAttribute = GetEntityAttributes(entityType).OfType<TableAttribute>().FirstOrDefault()) !=
+                null)
                 return tableNameAttribute.Name;
 
             var entityTypeName = entityType.Name;
@@ -132,7 +133,7 @@ namespace Dapper.FastCrud.Configuration
                     !propDesc.Attributes.OfType<NotMappedAttribute>().Any()
                     && !propDesc.IsReadOnly
                     && propDesc.Attributes.OfType<EditableAttribute>().All(editableAttr => editableAttr.AllowEdit));
-                    //&& IsSimpleSqlType(propDesc.PropertyType));
+            //&& IsSimpleSqlType(propDesc.PropertyType));
         }
 
         /// <summary>

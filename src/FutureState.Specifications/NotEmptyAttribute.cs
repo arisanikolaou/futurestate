@@ -10,7 +10,7 @@ namespace FutureState.Specifications
     // an - made field name mandatory
 
     /// <summary>
-    /// Used to validate string values. Use required to validate other object values.
+    ///     Used to validate string values. Use required to validate other object values.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public sealed class NotEmptyAttribute : ValidationAttribute
@@ -18,7 +18,7 @@ namespace FutureState.Specifications
         private readonly string _fieldName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotEmptyAttribute" /> class.
+        ///     Initializes a new instance of the <see cref="NotEmptyAttribute" /> class.
         /// </summary>
         /// <param name="fieldDisplayName">Display name of the field.</param>
         public NotEmptyAttribute(string fieldDisplayName)
