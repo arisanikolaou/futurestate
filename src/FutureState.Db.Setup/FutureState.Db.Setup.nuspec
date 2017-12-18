@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0"?>
 <package >
   <metadata>
-    <id>FutureState.Data</id>
+    <id>FutureState.Db.Setup</id>
     <version>$version$</version>
     <title>FutureState.Data</title>
     <authors>Aris Nikolaou</authors>
     <owners>Aris Nikolaou</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>FutureState.Data</description>
+    <description>FutureState.Db.Setup</description>
     <releaseNotes>
       ## Version 0.1 ##
     </releaseNotes>

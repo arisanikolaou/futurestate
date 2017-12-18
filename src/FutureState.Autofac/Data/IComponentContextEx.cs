@@ -4,6 +4,9 @@ using System;
 
 namespace FutureState.Data.Autofac
 {
+    /// <summary>
+    ///     Extension methods to resolve data access objects such as linq readers and repositories.
+    /// </summary>
     public static class IComponentContextEx
     {
         public static Func<ISession, ILinqReader<TEntity, TKey>> GetReader<TEntity, TKey>(this IComponentContext ctx, IEntityIdProvider<TEntity, TKey> idGenerator)
