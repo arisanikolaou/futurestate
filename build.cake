@@ -10,6 +10,7 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 #tool "xunit.runner.console"
 #tool nuget:?package=MSBuild.SonarQube.Runner.Tool
+#tool "nuget:?package=GitVersion.CommandLine"
 #tool nuget:?package=Codecov
 
 
@@ -17,17 +18,17 @@
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Default");
+var target = Argument<string>("target", "Default");
 var configurationName = "Release";
-var configuration = Argument("configuration", configurationName);
+var configuration = Argument<string>("configuration", configurationName);
 var solutionFile = GetFiles("./*.sln").First();
 var solution = new Lazy<SolutionParserResult>(() => ParseSolution(solutionFile));
 var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var defaultVersion = "0.1.2";
-var solutionVersion = ArgumentOrEnvironmentVariable("BUILD_VERSION", "BUILD_VERSION", defaultVersion);
+var defaultVersion = "0.2.0";
+var solutionVersion = Argument<string>("BUILD_VERSION",defaultVersion);
 
 // nuget get
 var nugetServer = "https://www.nuget.org";
@@ -56,12 +57,28 @@ Task("Clean")
             .SetVerbosity(Verbosity.Minimal));
 });
 
+Task("UpdateAssemblyInfo")
+    .Does(() =>
+{
+    var versionInfo = GitVersion(new GitVersionSettings {
+        UpdateAssemblyInfo = true,
+	    OutputType = GitVersionOutput.BuildServer
+    });
+
+	Information(versionInfo);
+});
+
 Task("SetVersion")
-   .Does(() => {
+	.IsDependentOn("UpdateAssemblyInfo")
+    .Does(() => {
 	   	Information("Updating assembly details.");
 	   
-       	ReplaceRegexInFiles("./src/**/**/AssemblyInfo.cs", 
+       	ReplaceRegexInFiles("./src/**/**/AssemblyInfo*.cs", 
                            "(?<=AssemblyVersion\\(\")(.+?)(?=\"\\))", 
+                           solutionVersion);
+
+		ReplaceRegexInFiles("./src/**/**/AssemblyInfo*.cs", 
+                           "(?<=AssemblyFileVersion\\(\")(.+?)(?=\"\\))", 
                            solutionVersion);
    });
 
@@ -81,7 +98,7 @@ Task("Build")
 	// assume git
 	var lastCommit = GitLogTip("./");
 
-	Information(@"Last commit {0}
+	Information(@"Building from commit {0}
 		Short message: {1}
 		Author:        {2}
 		Authored:      {3:yyyy-MM-dd HH:mm:ss}

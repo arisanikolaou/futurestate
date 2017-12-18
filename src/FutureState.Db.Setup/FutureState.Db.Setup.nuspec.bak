@@ -15,5 +15,9 @@
     <copyright></copyright>
     <tags></tags>
     <dependencies />
+    <files>
+      <file src="bin\Release\*.dll" target="lib" />
+      <file src="bin\Release\*.pdb" target="lib" />
+    </files>
   </metadata>
 </package>

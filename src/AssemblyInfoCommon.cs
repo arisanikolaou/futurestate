@@ -7,5 +7,5 @@ using System.Reflection;
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]
 #elif RELEASE
-[assembly: AssemblyConfigurationAttribute("Release")]
+[assembly: AssemblyConfiguration("Release")]
 #endif
