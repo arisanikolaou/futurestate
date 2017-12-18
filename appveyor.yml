@@ -1,5 +1,21 @@
 version: 0.3.{build}
+
 image: Visual Studio 2015
+
+services:
+  - mssql2014           # start SQL Server 2014 Express
+
+# enable patching of AssemblyInfo.* files
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "2.2.{build}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+  
+test: off
+
 build_script:
-- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages -ScriptArgs '-VERSION=0.3.{build}'
-test: on
+- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages -ScriptArgs '-VERSION={version}'
+
+
