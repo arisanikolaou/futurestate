@@ -7,7 +7,7 @@ namespace FutureState.Db.Setup
 {
     public class FsDatabaseInstaller
     {
-        private const string modelDbName = "FSModel";
+        private const string ModelDbName = "FSModel";
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private static LocalDbSetup _modelDbSetup;
@@ -17,10 +17,10 @@ namespace FutureState.Db.Setup
         /// </summary>
         public static void CreateModel(string deploymentDir, string dacPacFile = "FutureState.Db.dacpac")
         {
-            _modelDbSetup = CreateUpgrade(modelDbName, deploymentDir, dacPacFile);
+            _modelDbSetup = CreateUpgrade(ModelDbName, deploymentDir, dacPacFile);
 
             // detatch database so that it can be copied
-            LocalDbSetup.TryDetachDatabase(modelDbName);
+            LocalDbSetup.TryDetachDatabase(ModelDbName);
         }
 
         /// <summary>
@@ -89,9 +89,6 @@ namespace FutureState.Db.Setup
             File.Copy(_modelDbSetup.DbInfo.DbFileName, fileName, true);
             File.Copy(_modelDbSetup.DbInfo.LogFileName, logFileName, true);
 
-            var attributes = File.GetAttributes(fileName);
-            var logAttributes = File.GetAttributes(logFileName);
-
             File.SetAttributes(fileName, FileAttributes.Normal); // overwrite read-only attributes
             File.SetAttributes(logFileName, FileAttributes.Normal); // overwrite read-only attribute
 
@@ -130,11 +127,6 @@ namespace FutureState.Db.Setup
                 return new DbInfo(dbName, fileName, logFileName);
 
             return CreateDb(dataDir, dbName);
-        }
-
-        private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
-        {
-            return attributes & ~attributesToRemove;
         }
     }
 }

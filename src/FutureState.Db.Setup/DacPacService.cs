@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Dac;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using Microsoft.SqlServer.Dac;
 
 namespace FutureState.Db.Setup
 {
