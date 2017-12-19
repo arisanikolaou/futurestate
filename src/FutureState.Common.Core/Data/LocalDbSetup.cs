@@ -3,16 +3,22 @@ using System.Data.SqlClient;
 using System.IO;
 using NLog;
 
-namespace FutureState.Db.Setup
+namespace FutureState.Data
 {
     /// <summary>
     ///     Simplifies the setup of a local ms-sql database on a given host.
     /// </summary>
     public class LocalDbSetup
     {
+        // todo: pull from machine config file
+        public const string LocalDbServerName = @"(localdb)\MSSQLLocalDB";
+
         // ReSharper disable once InconsistentNaming
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        // connection string to local db
+        private static readonly string ConnectionString =
+            $@"Data Source={LocalDbServerName};Initial Catalog=master;Integrated Security=True";
 
         // ReSharper disable once InconsistentNaming
         private static readonly object _syncLock = new object();
@@ -24,8 +30,6 @@ namespace FutureState.Db.Setup
         /// <summary>
         ///     Creates a new instance to setup a database in a given directory with a given name.
         /// </summary>
-        /// <param name="dataBaseDir">The database to construct the database.</param>
-        /// <param name="dbName">The name of the database to create.</param>
         public LocalDbSetup(string dataBaseDir, string dbName)
         {
             var mdfFilename = dbName + ".mdf";
@@ -38,13 +42,6 @@ namespace FutureState.Db.Setup
             if (!Directory.Exists(dataBaseDir))
                 Directory.CreateDirectory(dataBaseDir);
         }
-
-        // todo: pull from machine config file
-        public static string LocalDbServerName { get; set; } = @"(localdb)\MSSQLLocalDB";
-
-        // connection string to local db
-        private string ConnectionString =>
-            $@"Data Source={LocalDbServerName};Initial Catalog=master;Integrated Security=True";
 
         public DbInfo DbInfo { get; private set; }
 
@@ -87,7 +84,7 @@ namespace FutureState.Db.Setup
         /// <summary>
         ///     Creates a database with a given name and the given databae file path.
         /// </summary>
-        internal bool CreateDatabase(string dbName, string dbFileName)
+        internal static bool CreateDatabase(string dbName, string dbFileName)
         {
             lock (_syncLock)
             {
@@ -112,10 +109,7 @@ namespace FutureState.Db.Setup
         /// </summary>
         public bool TryDetachDatabase()
         {
-            lock (_syncLock)
-            {
-                return TryDetachDatabase(_dbName);
-            }
+            return TryDetachDatabase(_dbName);
         }
 
         /// <summary>
@@ -123,7 +117,7 @@ namespace FutureState.Db.Setup
         /// </summary>
         /// <param name="dbName">The name of the database to detach.</param>
         /// <returns>True if the database has been detached or does not exist.</returns>
-        public bool TryDetachDatabase(string dbName)
+        public static bool TryDetachDatabase(string dbName)
         {
             try
             {
@@ -162,7 +156,7 @@ namespace FutureState.Db.Setup
             }
             catch (Exception ex)
             {
-                if (_logger.IsErrorEnabled)
+                if(_logger.IsErrorEnabled)
                     _logger.Error(ex);
 
                 return false;

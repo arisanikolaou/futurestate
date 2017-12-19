@@ -3,10 +3,10 @@ using Autofac;
 using FutureState.Data;
 using FutureState.Data.Keys;
 
-namespace FutureState.Autofac.Data
+namespace FutureState.Autofac
 {
     /// <summary>
-    ///     Extension methods to resolve data access objects such as linq readers and repositories.
+    ///     Extension methods to resolve data access objects such as linq readers and repositories from a component context.
     /// </summary>
     public static class IComponentContextEx
     {

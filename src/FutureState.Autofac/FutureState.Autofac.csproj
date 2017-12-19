@@ -120,11 +120,12 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="ApplicationContainerBuilder.cs" />
-    <Compile Include="Data\IComponentContextEx.cs" />
+    <Compile Include="Extensions\IComponentContextEx.cs" />
     <Compile Include="Extensions\ApplicationContainerBuilderEx.cs" />
     <Compile Include="DataAccessContainerBuilder.cs" />
-    <Compile Include="Data\DataAccessContainerBuilderEx.cs" />
+    <Compile Include="Extensions\DataAccessContainerBuilderEx.cs" />
     <Compile Include="Modules\InMemoryDataAccessModule.cs" />
+    <Compile Include="Modules\SqlDataModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\GenericDataServiceModule.cs" />
   </ItemGroup>

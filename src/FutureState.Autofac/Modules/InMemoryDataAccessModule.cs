@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using FutureState.Autofac.Data;
 using FutureState.Data;
 using FutureState.Data.KeyBinders;
 using FutureState.Data.Keys;
@@ -144,10 +143,6 @@ namespace FutureState.Autofac.Modules
 
             builder.RegisterGeneric(typeof(EntityIdProvider<,>))
                 .As(typeof(IEntityIdProvider<,>));
-
-            // guid generator
-            builder.Register(m => new KeyGetter<Guid>(SeqGuid.Create))
-                .As(typeof(IKeyGetter<Guid>)).PreserveExistingDefaults().SingleInstance();
 
             //in memory repositories
             builder.RegisterGeneric(typeof(InMemoryRepository<>))

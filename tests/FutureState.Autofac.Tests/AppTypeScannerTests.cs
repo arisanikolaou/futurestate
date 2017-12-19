@@ -3,9 +3,9 @@ using System.Linq;
 using FutureState.Reflection;
 using Xunit;
 
-namespace FutureState.App.Tests
+namespace FutureState.Autofac.Tests
 {
-    public class ApplicationTests
+    public class AppTypeScannerTests
     {
         [Fact]
         public void ApplicationCanScanDomainTypes()
@@ -13,7 +13,7 @@ namespace FutureState.App.Tests
             var subject = new AppTypeScanner(Environment.CurrentDirectory);
             var domainTypes = subject.GetAppDomainTypes().Select(m => m.Name).ToList();
 
-            Assert.False(domainTypes.Count() == 0);
+            Assert.False(domainTypes.Count == 0);
 
             Assert.Contains(typeof(PublicTestType).Name, domainTypes);
             Assert.DoesNotContain(typeof(PublicTestType2).Name, domainTypes);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using NLog;
 
 namespace FutureState.Reflection
 {
@@ -11,8 +10,6 @@ namespace FutureState.Reflection
 
     public class AppTypeScanner
     {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
         private readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
 
 
@@ -35,7 +32,7 @@ namespace FutureState.Reflection
         }
 
         // only types associated with this base namespace are processed
-        public string AssemblyFilterPrefix { get; } = "FutureState";
+        public string AssemblyFilterPrefix { get; }
 
         internal IList<Type> GetReflectedTypes()
         {
@@ -57,7 +54,7 @@ namespace FutureState.Reflection
             if (_basePath == null)
             {
                 var appDirectory = Assembly.GetCallingAssembly()?.Location;
-                appBinDirectory = new DirectoryInfo(Path.GetDirectoryName(appDirectory));
+                appBinDirectory = new DirectoryInfo(Path.GetDirectoryName(appDirectory) ?? throw new InvalidOperationException());
             }
             else
             {
@@ -81,12 +78,27 @@ namespace FutureState.Reflection
         }
 
         /// <summary>
-        ///     Gets a filtered list of public types that are not abstract that belong to the application
-        ///     scope.
+        ///     Gets all types implementing a given interface.
         /// </summary>
-        /// <param name="filter">Additional filtering criteria.</param>
-        /// <returns></returns>
-        public IList<Lazy<Type>> GetFilteredTypes(Func<Type, bool> filter)
+        public IEnumerable<Lazy<Type>> GetTypes<TInterfaceType>()
+        {
+            // will return all non abstract public types
+            var lazies = GetFilteredTypes(
+                    m => m.IsClass
+                         && !m.IsAbstract
+                         && m.GetInterfaces().Any(c => c.FullName == typeof(TInterfaceType).FullName))
+                .Where(m => !m.Value.GetGenericArguments().Any());
+
+            return lazies;
+        }
+
+        /// <summary>
+            ///     Gets a filtered list of public types that are not abstract that belong to the application
+            ///     scope.
+            /// </summary>
+            /// <param name="filter">Additional filtering criteria.</param>
+            /// <returns></returns>
+            public IList<Lazy<Type>> GetFilteredTypes(Func<Type, bool> filter)
         {
             Guard.ArgumentNotNull(filter, nameof(filter));
 

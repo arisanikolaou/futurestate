@@ -1,13 +1,13 @@
 ﻿using Autofac;
 using FutureState.Reflection;
 
-namespace FutureState.Autofac.Extensions
+namespace FutureState.Autofac
 {
     public static class ApplicationContainerBuilderEx
     {
-        public static ApplicationContainerBuilder BuildApp(this ContainerBuilder cb, AppTypeScanner scanner)
+        public static ApplicationContainerBuilder RegisterAll(this ContainerBuilder cb, AppTypeScanner scanner)
         {
-            return new ApplicationContainerBuilder(cb, scanner);
+            return new ApplicationContainerBuilder(cb, scanner).RegisterAll();
         }
     }
 }

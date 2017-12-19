@@ -1,10 +1,14 @@
 ﻿namespace FutureState.Data
 {
+    public interface IEntity
+    {
+    }
+
     /// <summary>
     ///     A entity that that can be persisted and can be identified by a single primary key.
     /// </summary>
     /// <typeparam name="TKey">The entity id type.</typeparam>
-    public interface IEntity<out TKey>
+    public interface IEntity<out TKey> : IEntity
     {
         TKey Id { get; }
     }

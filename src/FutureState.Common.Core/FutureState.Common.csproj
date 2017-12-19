@@ -7,7 +7,7 @@
     <ProjectGuid>{3BA5FB45-D642-43DE-8629-37AA3D7CE5BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FutureState.Common</RootNamespace>
+    <RootNamespace>FutureState</RootNamespace>
     <AssemblyName>FutureState.Common</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -58,6 +58,8 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="AppDomainUtil.cs" />
+    <Compile Include="Data\DbInfo.cs" />
+    <Compile Include="Data\LocalDbSetup.cs" />
     <Compile Include="Reflection\AppTypeScanner.cs" />
     <Compile Include="SplitList.cs" />
     <Compile Include="Data\SeqGuid.cs" />

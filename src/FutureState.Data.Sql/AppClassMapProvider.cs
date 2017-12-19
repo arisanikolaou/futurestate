@@ -23,10 +23,9 @@ namespace FutureState.Data.Sql
             SqlMapper.AddTypeHandler(typeof(List<DateTime>), new JsonListTypeHandler<DateTime>());
         }
 
-
         public AppClassMapProvider(AppTypeScanner scanner)
         {
-            _scanner = scanner;
+            _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
         }
 
         /// <summary>
@@ -35,27 +34,9 @@ namespace FutureState.Data.Sql
         public IList<IClassMapper> GetClassMappers()
         {
             // because this is a dynamic type have to compare on type name
-            var entityTypes = _scanner.GetFilteredTypes(
-                m => m.GetInterfaces().Any(c =>
-                {
-                    if (c.Namespace != typeof(IEntity<>).Namespace)
-                        return false;
+            IList<Lazy<Type>> entityTypes = _scanner.GetTypes<IEntity>().ToList();
 
-                    return c.Name.StartsWith("IEntity`", StringComparison.OrdinalIgnoreCase);
-                }));
-
-            var customClassMappers = _scanner.GetFilteredTypes(
-                m => m.GetInterfaces().Any(c =>
-                {
-                    if (c.Namespace != typeof(IClassMapper<>).Namespace)
-                        return false;
-                    if (m.IsAbstract)
-                        return false;
-                    if (m.IsGenericType)
-                        return false;
-
-                    return c.Name.StartsWith("IClassMapper`", StringComparison.OrdinalIgnoreCase);
-                }));
+            IList<Lazy<Type>> customClassMappers = _scanner.GetTypes<IClassMapper>().ToList();
 
             var classMappers = new List<IClassMapper>();
 
@@ -77,9 +58,10 @@ namespace FutureState.Data.Sql
                     classMappers.Add(newCustomEntityMap);
 
                     // invoke generic method
+                    // ReSharper disable once PossibleNullReferenceException
                     var generic = method.MakeGenericMethod(entityType);
 
-                    generic.Invoke(config, new[] {newCustomEntityMap});
+                    generic.Invoke(config, new object[] {newCustomEntityMap});
                 }
 
                 // interogate container for entity maps and update

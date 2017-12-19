@@ -1,6 +1,5 @@
 using System;
 using Autofac;
-using FutureState.Autofac.Data;
 using FutureState.Data;
 using FutureState.Data.Providers;
 

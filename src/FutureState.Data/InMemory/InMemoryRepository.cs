@@ -15,10 +15,7 @@ namespace FutureState.Data
     public class InMemoryRepository<TEntity> :
         InMemoryRepository<TEntity, Guid>,
         IRepositoryLinq<TEntity>,
-        IRepository<TEntity>,
-        IGetter<TEntity>,
-        IReader<TEntity>,
-        ILinqReader<TEntity>
+        IRepository<TEntity>
     {
         public InMemoryRepository(
             IEntityIdProvider<TEntity, Guid> idGenerator,
@@ -31,7 +28,7 @@ namespace FutureState.Data
 
         public InMemoryRepository(IEnumerable<TEntity> items)
             : base(
-                new EntityIdProvider<TEntity, Guid>(new KeyGetter<Guid>(Guid.NewGuid)),
+                new EntityIdProvider<TEntity, Guid>(new KeyGenerator<TEntity,Guid>(Guid.NewGuid)),
                 new AttributeKeyBinder<TEntity, Guid>(),
                 items)
         {

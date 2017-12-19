@@ -1,3 +1,0 @@
-﻿namespace FutureState.App.Tests
-{
-}

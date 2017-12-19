@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using FutureState.Data;
 
-namespace FutureState.Autofac.Data
+namespace FutureState.Autofac
 {
     /// <summary>
     ///     Extension methods to autofac's container builder.
@@ -38,8 +38,8 @@ namespace FutureState.Autofac.Data
         /// <summary>
         ///     Registers a unit of work into the given container associated with a given partition id.
         /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <typeparam name="TKey">The entity's key type.</typeparam>
         /// <param name="builder"></param>
         /// <param name="name">The data model or partition id.</param>
         /// <returns></returns>

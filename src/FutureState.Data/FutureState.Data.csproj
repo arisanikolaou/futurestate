@@ -127,7 +127,6 @@
     <Compile Include="UnitOfWork\TransactionalCommitPolicy.cs" />
     <Compile Include="UnitOfWork\UnitOfWork.cs" />
     <Compile Include="UnitOfWork\UnitOfWork.TEntity.TKey.cs" />
-    <Compile Include="Keys\EntityIdProviderForLong.cs" />
     <Compile Include="KeyBinders\AssignableEntityKeyBinder.cs" />
     <Compile Include="KeyBinders\AttributeKeyBinder.cs" />
     <Compile Include="InMemory\InMemoryRepository.cs" />
