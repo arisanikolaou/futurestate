@@ -15,9 +15,11 @@ namespace FutureState
         ///     Determines whether two objects are equal based on their value type properties
         ///     and/or or string properties.
         /// </summary>
+        /// <param name="destination"></param>
         /// <param name="ignoreProperties">
         ///     The names of any properties to exclude from the comparison.
         /// </param>
+        /// <param name="source"></param>
         public static bool AreValuesEqual<T>(T source, T destination, params string[] ignoreProperties)
         {
             if (source == null && null == destination)

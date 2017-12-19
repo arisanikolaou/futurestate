@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FutureState.Data.Providers
+namespace FutureState
 {
     public abstract class DomainEvent<TItem> : IDomainEvent
     {

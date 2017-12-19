@@ -20,7 +20,7 @@ namespace FutureState.Db.Setup
             _modelDbSetup = CreateUpgrade(ModelDbName, deploymentDir, dacPacFile);
 
             // detatch database so that it can be copied
-            LocalDbSetup.TryDetachDatabase(ModelDbName);
+            LocalDbSetup.TryDetachDatabase(ModelDbName, LocalDbSetup.ConnectionString);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace FutureState.Db.Setup
             //remove read only attribute
             deploymentDirInfo.Attributes &= ~FileAttributes.ReadOnly;
 
-            LocalDbSetup.TryDetachDatabase(dbName);
+            LocalDbSetup.TryDetachDatabase(dbName, LocalDbSetup.ConnectionString);
 
             var fileName = $@"{deploymentDir}\{dbName}.mdf";
             var logFileName = $@"{deploymentDir}\{dbName}_log.ldf";

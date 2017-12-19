@@ -43,7 +43,7 @@ namespace FutureState.Db.Setup
         public static string LocalDbServerName { get; set; } = @"(localdb)\MSSQLLocalDB";
 
         // connection string to local db
-        private string ConnectionString =>
+        public static string ConnectionString =>
             $@"Data Source={LocalDbServerName};Initial Catalog=master;Integrated Security=True";
 
         public DbInfo DbInfo { get; private set; }
@@ -125,11 +125,22 @@ namespace FutureState.Db.Setup
         /// <returns>True if the database has been detached or does not exist.</returns>
         public bool TryDetachDatabase(string dbName)
         {
+            return TryDetachDatabase(dbName, ConnectionString);
+        }
+
+        /// <summary>
+        ///     Detaches a database by a given name.
+        /// </summary>
+        /// <param name="dbName">The name of the database to detach.</param>
+        /// <param name="connectionString">The connection string to the server to detach the database from.</param>
+        /// <returns>True if the database has been detached or does not exist.</returns>
+        public static bool TryDetachDatabase(string dbName,string connectionString)
+        {
             try
             {
                 lock (_syncLock)
                 {
-                    using (var connection = new SqlConnection(ConnectionString))
+                    using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
 
@@ -137,7 +148,7 @@ namespace FutureState.Db.Setup
                         {
                             var cmd = connection.CreateCommand();
                             cmd.CommandText = $"select count(*) from sysdatabases where name = '{dbName}'";
-                            if ((int) cmd.ExecuteScalar() == 0)
+                            if ((int)cmd.ExecuteScalar() == 0)
                                 return true;
                         }
 
