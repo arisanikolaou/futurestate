@@ -25,7 +25,7 @@ namespace FutureState
         /// <returns>The compound hash code.</returns>
         public static int Aggregate(params object[] objects)
         {
-            var hashes = objects.Select(obj => obj == null ? 0 : obj.GetHashCode()).ToArray();
+            var hashes = objects.Select(obj => obj?.GetHashCode() ?? 0).ToArray();
 
             return Compound(hashes);
         }

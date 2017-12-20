@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using static System.Enum;
 
 #endregion
 
 namespace FutureState
 {
-    //todo: unit test
-    // may need to be performance enhanced
 
     /// <summary>
     ///     Helper class to retrieve the description of of enumeration objects.
@@ -57,7 +56,7 @@ namespace FutureState
         public static string GetDescription(Enum enumValue)
         {
             var type = enumValue.GetType();
-            var name = Enum.GetName(type, enumValue);
+            var name = GetName(type, enumValue);
             return GetDescription(type, name);
         }
 
@@ -105,7 +104,7 @@ namespace FutureState
         public static List<string> GetDescriptions(Type type)
         {
             var result = new List<string>();
-            foreach (var name in Enum.GetNames(type))
+            foreach (var name in GetNames(type))
                 result.Add(GetDescription(type, name));
 
             return result;
@@ -155,7 +154,7 @@ namespace FutureState
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
 
-                if (Enum.GetName(typeof(TEnum), pair.Key)
+                if (GetName(typeof(TEnum), pair.Key)
                     .Equals(description, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
             }
@@ -171,7 +170,7 @@ namespace FutureState
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
 
-                if (Enum.GetName(typeof(TEnum), pair.Key)
+                if (GetName(typeof(TEnum), pair.Key)
                     .Equals(description, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
             }
@@ -186,7 +185,7 @@ namespace FutureState
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
             }
@@ -202,7 +201,7 @@ namespace FutureState
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
             }
@@ -218,7 +217,7 @@ namespace FutureState
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return pair.Key;
             }
@@ -242,7 +241,7 @@ namespace FutureState
                 if (attr.EnumType == typeof(TEnumType))
                     return attr.Values.OfType<TEnumType>().ToList();
 
-            return Enum.GetValues(typeof(TEnumType)).OfType<TEnumType>().ToList();
+            return GetValues(typeof(TEnumType)).OfType<TEnumType>().ToList();
         }
 
         public static TEnum GetEnumOrDefault<TEnum>(string value, TEnum @default)
@@ -254,7 +253,7 @@ namespace FutureState
             try
             {
                 TEnum val;
-                return Enum.TryParse(value, true, out val) ? val : @default;
+                return TryParse(value, true, out val) ? val : @default;
             }
             catch (Exception)
             {
@@ -271,7 +270,7 @@ namespace FutureState
             {
                 var newValue = value.Trim();
 
-                var names = Enum.GetNames(typeof(TEnum));
+                var names = GetNames(typeof(TEnum));
 
                 foreach (var name in names)
                     if (string.Compare(name, newValue, ignoreCase) == 0)
@@ -292,7 +291,7 @@ namespace FutureState
         public static Dictionary<string, string> GetEnumStringDict(Type type)
         {
             var result = new Dictionary<string, string>();
-            foreach (var name in Enum.GetNames(type))
+            foreach (var name in GetNames(type))
                 result.Add(GetDescription(type, name), name);
 
             return result;
@@ -305,7 +304,7 @@ namespace FutureState
         /// <returns>The dictionary result of key = value as string, value = Enum</returns>
         public static Dictionary<string, Enum> GetEnumValueAsStringToValueDict(Type type)
         {
-            return Enum.GetValues(type).Cast<Enum>().ToDictionary(enumValue => enumValue.ToString());
+            return GetValues(type).Cast<Enum>().ToDictionary(enumValue => enumValue.ToString());
         }
 
         /// <summary>
@@ -315,13 +314,13 @@ namespace FutureState
         /// <returns>The Tuple result of key = Enum Value, value = Enum Name</returns>
         public static IEnumerable<Tuple<Enum, string>> GetEnumValueDescriptionTuple(Type type)
         {
-            return from Enum enumValue in Enum.GetValues(type)
+            return from Enum enumValue in GetValues(type)
                 select new Tuple<Enum, string>(enumValue, GetDescription(enumValue));
         }
 
         public static IEnumerable<Tuple<TEnum, string>> GetEnumValueDescriptionTuple<TEnum>() where TEnum : struct
         {
-            return from TEnum enumValue in Enum.GetValues(typeof(TEnum)).OfType<TEnum>()
+            return from TEnum enumValue in GetValues(typeof(TEnum)).OfType<TEnum>()
                 select new Tuple<TEnum, string>(enumValue, GetDescription(enumValue));
         }
 
@@ -333,7 +332,7 @@ namespace FutureState
         public static Dictionary<Enum, string> GetEnumValueDict(Type type)
         {
             var result = new Dictionary<Enum, string>();
-            foreach (Enum enumValue in Enum.GetValues(type))
+            foreach (Enum enumValue in GetValues(type))
                 result.Add(enumValue, GetDescription(enumValue));
 
             return result;
@@ -343,7 +342,7 @@ namespace FutureState
             where TEnum : struct
         {
             var result = new Dictionary<TEnum, string>();
-            foreach (TEnum enumValue in Enum.GetValues(typeof(TEnum)))
+            foreach (TEnum enumValue in GetValues(typeof(TEnum)))
                 result.Add(enumValue, GetDescription(enumValue));
 
             return result;
@@ -364,7 +363,7 @@ namespace FutureState
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return true;
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
                     return true;
             }
@@ -386,7 +385,7 @@ namespace FutureState
         {
             var result = new List<KeyValuePair<Enum, string>>();
 
-            foreach (Enum value in Enum.GetValues(type))
+            foreach (Enum value in GetValues(type))
                 result.Add(new KeyValuePair<Enum, string>(value, GetDescription(value)));
 
             return result;
@@ -401,7 +400,7 @@ namespace FutureState
         {
             var result = new ArrayList();
 
-            foreach (Enum value in Enum.GetValues(type))
+            foreach (Enum value in GetValues(type))
                 result.Add(new KeyValuePair<Enum, string>(value, GetDescription(value)));
 
             return result;
@@ -416,7 +415,7 @@ namespace FutureState
         {
             var result = new List<KeyValuePair<Enum, string>>();
 
-            foreach (Enum value in Enum.GetValues(type))
+            foreach (Enum value in GetValues(type))
                 result.Add(new KeyValuePair<Enum, string>(value, GetDescription(value)));
 
             return result;
@@ -456,7 +455,7 @@ namespace FutureState
         public static IEnumerable<T> TryGetEnumValueAttributes<T>(Enum value) where T : Attribute
         {
             var type = value.GetType();
-            var fieldInfo = type.GetField(Enum.GetName(type, value));
+            var fieldInfo = type.GetField(GetName(type, value));
             if (fieldInfo == null)
                 return Enumerable.Empty<T>();
 
@@ -535,7 +534,7 @@ namespace FutureState
 
                 // No Enum List - return all Enum Values
                 if (context.PropertyDescriptor.PropertyType.IsEnum)
-                    _enumVals = new StandardValuesCollection(Enum.GetValues(context.PropertyDescriptor.PropertyType));
+                    _enumVals = new StandardValuesCollection(GetValues(context.PropertyDescriptor.PropertyType));
                 else
                     _enumVals = new StandardValuesCollection(null);
             }
