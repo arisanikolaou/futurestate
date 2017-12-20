@@ -88,6 +88,7 @@ namespace FutureState.IO
         {
             Guard.ArgumentNotNull(keys, nameof(keys));
             Guard.ArgumentNotNull(getEntities, nameof(getEntities));
+
             if (batchSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(batchSize),
                     @"Parameter 'batchSize' must be greater than zero.");

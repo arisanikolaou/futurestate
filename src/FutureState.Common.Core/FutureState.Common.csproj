@@ -97,7 +97,6 @@
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringComparerExtensions.cs" />
     <Compile Include="Extensions\UpdateResultExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="HashCode.cs" />
     <Compile Include="ICurrentDateProvider.cs" />

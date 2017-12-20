@@ -4,17 +4,11 @@ using System.Security.Permissions;
 
 namespace FutureState
 {
-    /// <summary>
-    ///     Base class used to communicate the error details in a given generic <see cref="FsException" />
-    ///     class.
-    /// </summary>
     [Serializable]
     public class Error : IExceptionData, ISerializable
     {
         private string _category;
-
         private string _message;
-
         private string _type;
 
         /// <summary>
