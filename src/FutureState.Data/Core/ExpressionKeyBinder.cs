@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace FutureState.Data.KeyBinders
+namespace FutureState.Data.Core
 {
     /// <summary>
-    ///     Uses supplied functions to get/set the key of the entity.
+    ///     ExpressionKeyBinder uses supplied functions to access primary key of the entity.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TKey">The entity's key type.</typeparam>
@@ -27,12 +27,30 @@ namespace FutureState.Data.KeyBinders
 
         public TKey Get(TEntity entity)
         {
-            return _getter(entity);
+            try
+            {
+                return _getter(entity);
+            }
+            catch (NullReferenceException)
+            {
+                Guard.ArgumentNotNull(entity, nameof(entity));
+
+                throw;
+            }
         }
 
         public void Set(TEntity entity, TKey key)
         {
-            _setter(entity, key);
+            try
+            {
+                _setter(entity, key);
+            }
+            catch (NullReferenceException)
+            {
+                Guard.ArgumentNotNull(entity, nameof(entity));
+
+                throw;
+            }
         }
     }
 }

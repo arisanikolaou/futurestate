@@ -4,11 +4,10 @@ using System.Linq;
 using System.Reflection;
 using FutureState.Reflection;
 
-namespace FutureState.Data.KeyBinders
+namespace FutureState.Data.Core
 {
     /// <summary>
-    ///     Generic all purpose binder that uses reflection to determine 
-    ///     an entity's primary key so that it can be updated by the caller.
+    ///     Generic all purpose binder that uses reflection to determine an entity's primary key.
     /// </summary>
     /// <typeparam name="TEntity">The entity to bind the id value to.</typeparam>
     /// <typeparam name="TKey">The type of key to use.</typeparam>
@@ -41,12 +40,31 @@ namespace FutureState.Data.KeyBinders
 
         public TKey Get(TEntity entity)
         {
-            return (TKey)GetterFn(entity); //don't check for null entity to avoid perf penalty
+            try
+            {
+                return (TKey) GetterFn(entity); //don't check for null entity to avoid perf penalty
+            }
+            catch (NullReferenceException)
+            {
+                //assume null reference
+                Guard.ArgumentNotNull(entity, nameof(entity));
+
+                throw;
+            }
         }
 
-        public void Set(TEntity entity, TKey key)
+        void IEntityKeyBinder<TEntity, TKey>.Set(TEntity entity, TKey key)
         {
-            SetterFn(entity, key); //don't check for null entity
+            try
+            {
+                SetterFn(entity, key); //don't check for null entity
+            }
+            catch (NullReferenceException)
+            {
+                Guard.ArgumentNotNull(entity, nameof(entity)); //assume invalid input
+
+                throw;
+            }
         }
     }
 }

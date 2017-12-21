@@ -53,6 +53,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="AttributeKeyBinderTests.cs" />
+    <Compile Include="ExpressionKeyBinderTests.cs" />
+    <Compile Include="MemoryResidentRepositoryTests.cs" />
     <Compile Include="PageResponseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -85,6 +88,7 @@
     <Reference Include="Moq, Version=4.7.145.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Moq.4.7.145\lib\net45\Moq.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
@@ -109,13 +113,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\FutureState.Common.Core\FutureState.Common.csproj">
+      <Project>{3ba5fb45-d642-43de-8629-37aa3d7ce5bd}</Project>
+      <Name>FutureState.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\FutureState.Data\FutureState.Data.csproj">
       <Project>{58b0d3c2-e786-40bd-b5f7-04b32f0aa241}</Project>
       <Name>FutureState.Data</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="License_DACFx.txt" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\xunit.analyzers.0.8.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
