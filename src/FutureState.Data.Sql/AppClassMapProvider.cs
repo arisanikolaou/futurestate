@@ -10,6 +10,10 @@ using FutureState.Reflection;
 
 namespace FutureState.Data.Sql
 {
+    /// <summary>
+    ///     Helps construct the class maps required to serializer/deserialize
+    /// entities from an underlying data store.
+    /// </summary>
     public class AppClassMapProvider
     {
         private readonly AppTypeScanner _scanner;
@@ -83,6 +87,7 @@ namespace FutureState.Data.Sql
                         classMappers.Add(newCustomEntityMap);
 
                         // invoke generic method
+                        // ReSharper disable once PossibleNullReferenceException
                         var generic = method.MakeGenericMethod(actualType);
 
                         generic.Invoke(config, new object[] {newCustomEntityMap});

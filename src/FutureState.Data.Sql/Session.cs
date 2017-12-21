@@ -29,7 +29,6 @@ namespace FutureState.Data.Sql
         /// <summary>
         ///     Begins a new transaction.
         /// </summary>
-        /// <returns></returns>
         public ITransaction BeginTran()
         {
             _transction = new Transacton(_connection);
