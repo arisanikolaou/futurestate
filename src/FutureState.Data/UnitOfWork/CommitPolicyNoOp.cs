@@ -6,8 +6,15 @@ using System;
 
 namespace FutureState.Data
 {
-    // should be stateless
-    public class NoOpCommitPolicy : ICommitPolicy
+    /// <summary>
+    ///     A commit policy that relies on a unit of work to commit changes to a data store
+    /// rather than the combination of transactions against a session and the unit of work.
+    /// </summary>
+    /// <remarks>
+    ///     To be unsed in units of work where blocking transactions against a database
+    /// are not desirable.
+    /// </remarks>
+    public class CommitPolicyNoOp : ICommitPolicy
     {
         public void OnCommitted(ISession session, string id)
         {

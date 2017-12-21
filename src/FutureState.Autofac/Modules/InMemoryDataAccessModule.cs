@@ -114,7 +114,7 @@ namespace FutureState.Autofac.Modules
             builder.Register(m => new InMemoryRepositoryFactory())
                 .As<IRepositoryFactory>();
 
-            builder.Register(m => new NoOpCommitPolicy())
+            builder.Register(m => new CommitPolicyNoOp())
                 .As<ICommitPolicy>();
 
             //units of work

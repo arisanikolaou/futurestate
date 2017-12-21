@@ -92,9 +92,10 @@ namespace FutureState.Autofac.Modules
                 .Named("Default", typeof(ILinqReader<,>));
 
             // use transactions
-            builder.Register(m => new TransactionalCommitPolicy())
+            builder.Register(m => new CommitPolicy())
                 .AsSelf()
-                .AsImplementedInterfaces();
+                .AsImplementedInterfaces()
+                .SingleInstance();
         }
     }
 }

@@ -32,7 +32,7 @@ namespace FutureState.Data.Sql
         ///     Opens/creates a new session.
         /// </summary>
         /// <returns>A new session.</returns>
-        public ISession OpenSession()
+        public ISession Create()
         {
             var con = new SqlConnection(_conString);
 

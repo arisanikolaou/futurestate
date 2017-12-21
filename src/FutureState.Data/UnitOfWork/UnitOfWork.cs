@@ -5,7 +5,7 @@ using System.Linq;
 namespace FutureState.Data
 {
     /// <summary>
-    ///     Optimizes read/write operations to a common data store by one or more repositories or readers.
+    ///     Optimizes read/write operations to a common data store made by one or more repositories or readers.
     ///     Changes are committed using a configurable commit policy.
     /// </summary>
     /// <remarks>
@@ -43,7 +43,7 @@ namespace FutureState.Data
             _modified = new HashSet<object>();
 
             // do not implement a transaction save commit policy by default
-            _commitPolicy = policy ?? new NoOpCommitPolicy();
+            _commitPolicy = policy ?? new CommitPolicyNoOp();
         }
 
         /// <summary>

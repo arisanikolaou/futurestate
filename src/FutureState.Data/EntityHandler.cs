@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FutureState.Data.Providers
+namespace FutureState.Data
 {
     /// <summary>
     ///     Helps process an entity through a pipe/filter.

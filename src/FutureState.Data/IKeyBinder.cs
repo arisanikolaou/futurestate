@@ -1,7 +1,7 @@
 ﻿namespace FutureState.Data
 {
     /// <summary>
-    ///     Binds entity keys to an from a given entity.
+    ///     Binds a key to an from a given entity.
     /// </summary>
     /// <typeparam name="TEntity">The entity to bind to.</typeparam>
     /// <typeparam name="TKey">The key type to bind.</typeparam>

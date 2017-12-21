@@ -5,16 +5,14 @@
     /// </summary>
     public interface ISessionFactory
     {
-        // id may be helpful in identifying connection problems a.n.a
         /// <summary>
-        ///     A unique instance id.
+        ///     A unique instance id to identify the session.
         /// </summary>
         string Id { get; set; }
 
         /// <summary>
-        ///     Gets the new or existing data store connection or session.
+        ///     Creates a new data store connection.
         /// </summary>
-        /// <returns></returns>
-        ISession OpenSession();
+        ISession Create();
     }
 }

@@ -123,11 +123,11 @@
     <Compile Include="KeyBinders\KeyBinder.cs" />
     <Compile Include="UnitOfWork\EntitySetReader.TEntity, TKey.cs" />
     <Compile Include="UnitOfWork\EntitySetWriter.TEntity.TKey.cs" />
-    <Compile Include="UnitOfWork\NoOpCommitPolicy.cs" />
+    <Compile Include="UnitOfWork\CommitPolicyNoOp.cs" />
     <Compile Include="NoOpSessionFactory.cs" />
     <Compile Include="PageResponse.cs" />
     <Compile Include="UnitOfWork\EntitySet.TEntity.TKey.cs" />
-    <Compile Include="UnitOfWork\TransactionalCommitPolicy.cs" />
+    <Compile Include="UnitOfWork\CommitPolicy.cs" />
     <Compile Include="UnitOfWork\UnitOfWork.cs" />
     <Compile Include="UnitOfWork\UnitOfWork.TEntity.TKey.cs" />
     <Compile Include="KeyBinders\KeyBinderOnAssignables.cs" />

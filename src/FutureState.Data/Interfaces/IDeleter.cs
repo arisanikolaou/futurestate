@@ -10,8 +10,16 @@ namespace FutureState.Data
     /// <typeparam name="TKey">The entity type key.</typeparam>
     public interface IDeleter<in TEntity, in TKey>
     {
+        /// <summary>
+        ///     Deletes a single entity.
+        /// </summary>
+        /// <param name="entity">The entity to delete.</param>
         void Delete(TEntity entity);
 
+        /// <summary>
+        ///     Deletes an entity by its key.
+        /// </summary>
+        /// <param name="key">The key value.</param>
         void DeleteById(TKey key);
     }
 

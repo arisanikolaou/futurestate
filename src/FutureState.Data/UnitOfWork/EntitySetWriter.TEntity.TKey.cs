@@ -5,7 +5,8 @@ using System.Linq;
 namespace FutureState.Data
 {
     /// <summary>
-    ///     Internal repository used to wrap a given repository for use in a unit of work.
+    ///     Adapts a repository to write entities via a repository 
+    /// throgh a consistent data store session.
     /// </summary>
     public class EntitySetWriter<TEntity, TKey> : IWriter<TEntity, TKey>
     {
@@ -25,6 +26,7 @@ namespace FutureState.Data
         ///     Gets the writer to the underlying data store.
         /// </summary>
         private IWriter<TEntity, TKey> Writer => _repositoryFunc.Invoke(_uow.Session);
+
 
         public void Delete(TEntity entity)
         {

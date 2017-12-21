@@ -115,7 +115,7 @@ namespace FutureState.Data
                 throw new InvalidOperationException(
                     "There already is an active session open. Close must be called before another session can be opened.");
 
-            return ActiveDataSession = new DataSession(new Lazy<ISession>(_sessionFactory.OpenSession));
+            return ActiveDataSession = new DataSession(new Lazy<ISession>(_sessionFactory.Create));
         }
 
         // base must be called by derived classes
