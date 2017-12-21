@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FutureState.Data
 {
     /// <summary>
-    ///     An updatable set of entities.
+    ///     Updates a single or multiple set of entities.
     /// </summary>
     /// <typeparam name="TEntity">The entity to update.</typeparam>
     public interface IUpdater<in TEntity>

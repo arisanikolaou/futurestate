@@ -7,7 +7,7 @@ using System;
 namespace FutureState.Data
 {
     /// <summary>
-    ///     Implements the unit of work pattern that groups operations to update a database in one transaction.
+    ///     Implements the unit of work pattern that groups operations to read/write to a data store in one transaction.
     /// </summary>
     /// <remarks>
     ///     Consumers must explicitly open/close (or dispose) the object to interact with any data provided by it.
@@ -15,20 +15,15 @@ namespace FutureState.Data
     public interface IUnitOfWork : IDisposable
     {
         /// <summary>
-        ///     Closes/resets the state of the Data access.
-        /// </summary>
-        void Close();
-
-        /// <summary>
         ///     Commits any outstanding changes.
         /// </summary>
         void Commit();
 
         /// <summary>
-        ///     Begins a disposable read only 'Data access data session'.
+        ///     Begins a disposable read only data session within which reads/writes should be executed.
         /// </summary>
         /// <remarks>
-        ///     Sessions should always be disposed which will cause any underlying connections to close.
+        ///     Sessions should always be disposed after a unit of work is committed or disposed of by the caller.
         /// </remarks>
         DataSession Open();
     }

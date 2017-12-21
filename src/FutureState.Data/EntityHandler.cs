@@ -1,4 +1,6 @@
-﻿namespace FutureState.Data.Providers
+﻿using System;
+
+namespace FutureState.Data.Providers
 {
     /// <summary>
     ///     Helps process an entity through a pipe/filter.
@@ -12,9 +14,9 @@
             IAddHandler<TEntity> addHandler,
             IRemoveHandler<TKey> removeHandler)
         {
-            ActivateHandler = activateHandler;
-            AddHandler = addHandler;
-            RemoveHandler = removeHandler;
+            ActivateHandler = activateHandler ?? throw new ArgumentNullException(nameof(activateHandler));
+            AddHandler = addHandler ?? throw new ArgumentNullException(nameof(addHandler));
+            RemoveHandler = removeHandler ?? throw new ArgumentNullException(nameof(removeHandler));
         }
 
         public IAddHandler<TEntity> AddHandler { get; }
@@ -22,17 +24,17 @@
         public IActiveHandler<TEntity> ActivateHandler { get; }
     }
 
-    public interface IRemoveHandler<TKey>
+    public interface IRemoveHandler<in TKey>
     {
         void Handle(TKey entity);
     }
 
-    public interface IAddHandler<TEntity>
+    public interface IAddHandler<in TEntity>
     {
         void Handle(TEntity entity);
     }
 
-    public interface IActiveHandler<TEntity>
+    public interface IActiveHandler<in TEntity>
     {
         void Handle(TEntity entity);
     }

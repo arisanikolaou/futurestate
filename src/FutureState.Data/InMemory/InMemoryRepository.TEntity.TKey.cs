@@ -204,9 +204,9 @@ namespace FutureState.Data
                 _logger.Trace(@"Item {0} has been deleted or does not exist.", key);
         }
 
-        public void Delete(TEntity item)
+        public void Delete(TEntity entity)
         {
-            DeleteById(_keyBinder.Get(item));
+            DeleteById(_keyBinder.Get(entity));
         }
 
         public void DeleteAll()

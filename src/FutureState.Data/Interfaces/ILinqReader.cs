@@ -11,8 +11,8 @@ namespace FutureState.Data
     /// <summary>
     ///     A reader for a set of for entities.
     /// </summary>
-    /// <typeparam name="TEntity">The entity to read.</typeparam>
-    /// <typeparam name="TKey">The entity key.</typeparam>
+    /// <typeparam name="TEntity">The entity type to read.</typeparam>
+    /// <typeparam name="TKey">The entity key type.</typeparam>
     public interface ILinqReader<TEntity, in TKey> : IPagedReader<TEntity, TKey>
     {
         /// <summary>

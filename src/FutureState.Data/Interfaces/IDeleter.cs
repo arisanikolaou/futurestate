@@ -3,26 +3,35 @@ using System.Linq.Expressions;
 
 namespace FutureState.Data
 {
-    public interface IDeleter<in T, in TK>
+    /// <summary>
+    ///     Can delete a given entity from an underlying data store.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type to delete.</typeparam>
+    /// <typeparam name="TKey">The entity type key.</typeparam>
+    public interface IDeleter<in TEntity, in TKey>
     {
-        void Delete(T item);
+        void Delete(TEntity entity);
 
-        void DeleteById(TK key);
+        void DeleteById(TKey key);
     }
 
-    public interface IDeleter<in T> : IDeleter<T, Guid>
+    /// <summary>
+    ///     Deletes a guid keyed entity from an underlying data store.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type to delete.</typeparam>
+    public interface IDeleter<in TEntity> : IDeleter<TEntity, Guid>
     {
     }
 
     /// <summary>
     ///     Deletes a set of records by a given predicate.
     /// </summary>
-    /// <typeparam name="T">The entity type.</typeparam>
-    /// <typeparam name="TK">The entity's key type.</typeparam>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <typeparam name="TKey">The entity's key type.</typeparam>
     // ReSharper disable once UnusedTypeParameter
-    public interface IBulkDeleter<T, in TK> //do not delete 'redundant' key
+    public interface IBulkDeleter<TEntity, in TKey> //do not delete 'redundant' key
     {
-        void Delete(Expression<Func<T, bool>> predicate);
+        void Delete(Expression<Func<TEntity, bool>> predicate);
     }
 
     /// <summary>

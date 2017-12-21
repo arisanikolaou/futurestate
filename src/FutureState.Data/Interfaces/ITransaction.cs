@@ -18,7 +18,7 @@ namespace FutureState.Data
         bool IsPending { get; }
 
         /// <summary>
-        ///     Commits a transaction.
+        ///     Commits the transaction.
         /// </summary>
         void Commit();
 

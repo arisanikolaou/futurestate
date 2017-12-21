@@ -88,7 +88,7 @@
     <Compile Include="Keys\KeyProvider.cs" />
     <Compile Include="Interfaces\IRepositoryLinq.cs" />
     <Compile Include="Interfaces\IWriter.cs" />
-    <Compile Include="Providers\EntityHandler.cs" />
+    <Compile Include="EntityHandler.cs" />
     <Compile Include="UnitOfWork\DataSession.cs" />
     <Compile Include="UnitOfWork\DataSessionManager.cs" />
     <Compile Include="Interfaces\IBatchInserter.cs" />

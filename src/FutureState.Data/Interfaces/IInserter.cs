@@ -2,12 +2,8 @@
 
 namespace FutureState.Data
 {
-    // a.n.a this appears to be vapourware ... i can't see how this object would be used, ever, on its own.
-    // this leads me to think that every interface should have at most one method or method overload which i don't think
-    // is the objective of the interface segregation principle
-
     /// <summary>
-    ///     Something that can insert something into an underlying repository.
+    ///     Something that can insert something into an underlying data store.
     /// </summary>
     /// <typeparam name="TEntity">The entity type to insert.</typeparam>
     public interface IInserter<in TEntity>
