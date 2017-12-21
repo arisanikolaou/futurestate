@@ -47,8 +47,7 @@ namespace FutureState.Specifications.Tests
 
         public class TestEntity
         {
-            [Required]
-            public string Name { get; set; }
+            [Required] public string Name { get; set; }
         }
     }
 }

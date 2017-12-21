@@ -134,7 +134,7 @@ namespace FutureState.Db.Setup
         /// <param name="dbName">The name of the database to detach.</param>
         /// <param name="connectionString">The connection string to the server to detach the database from.</param>
         /// <returns>True if the database has been detached or does not exist.</returns>
-        public static bool TryDetachDatabase(string dbName,string connectionString)
+        public static bool TryDetachDatabase(string dbName, string connectionString)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace FutureState.Db.Setup
                         {
                             var cmd = connection.CreateCommand();
                             cmd.CommandText = $"select count(*) from sysdatabases where name = '{dbName}'";
-                            if ((int)cmd.ExecuteScalar() == 0)
+                            if ((int) cmd.ExecuteScalar() == 0)
                                 return true;
                         }
 

@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using FutureState.ComponentModel;
-using FutureState.Data.Keys;
+using FutureState.Data;
 using FutureState.Data.Providers;
 using FutureState.Specifications;
 
@@ -8,7 +8,7 @@ namespace FutureState.Autofac.Modules
 {
     /// <summary>
     ///     Regigsters the basic modules required to
-    ///  support the data access architecture.
+    ///     support the data access architecture.
     /// </summary>
     public class GenericDataServiceModule : Module
     {
@@ -29,11 +29,11 @@ namespace FutureState.Autofac.Modules
                 .SingleInstance()
                 .PreserveExistingDefaults();
 
-            builder.RegisterGeneric(typeof(EntityIdProvider<,>))
-                .As(typeof(IEntityIdProvider<,>))
+            builder.RegisterGeneric(typeof(KeyProvider<,>))
+                .As(typeof(KeyProvider<,>))
                 .SingleInstance();
 
-            builder.RegisterGeneric(typeof(DefaultKeyGenerator<,>))
+            builder.RegisterGeneric(typeof(KeyGenerator<,>))
                 .As(typeof(IKeyGenerator<,>))
                 .SingleInstance();
         }

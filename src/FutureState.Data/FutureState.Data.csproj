@@ -81,8 +81,11 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Keys\NoOpEntityIdProvider.cs" />
-    <Compile Include="Keys\EntityIdProvider.cs" />
+    <Compile Include="Keys\IKeyGenerator.cs" />
+    <Compile Include="Keys\KeyGenerator.cs" />
+    <Compile Include="Keys\KeyGeneratorDefault.cs" />
+    <Compile Include="Keys\KeyProviderNoOp.cs" />
+    <Compile Include="Keys\KeyProvider.cs" />
     <Compile Include="Interfaces\IRepositoryLinq.cs" />
     <Compile Include="Interfaces\IWriter.cs" />
     <Compile Include="Providers\EntityHandler.cs" />
@@ -95,9 +98,9 @@
     <Compile Include="UnitOfWork\ICommitPolicy.cs" />
     <Compile Include="Interfaces\IDeleter.cs" />
     <Compile Include="IEntity.cs" />
-    <Compile Include="IEntityKeyBinder.cs" />
+    <Compile Include="IKeyBinder.cs" />
     <Compile Include="Interfaces\IGetter.cs" />
-    <Compile Include="Keys\Interfaces.cs" />
+    <Compile Include="Keys\IKeyProvider.cs" />
     <Compile Include="Interfaces\IInserter.cs" />
     <Compile Include="Interfaces\ILinqReader.cs" />
     <Compile Include="Extensions\ILinqReaderExtensions.cs" />
@@ -117,7 +120,7 @@
     <Compile Include="Interfaces\ITransaction.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
     <Compile Include="Interfaces\IUpdater.cs" />
-    <Compile Include="KeyBinders\ExpressionKeyBinder.cs" />
+    <Compile Include="KeyBinders\KeyBinder.cs" />
     <Compile Include="UnitOfWork\EntitySetReader.TEntity, TKey.cs" />
     <Compile Include="UnitOfWork\EntitySetWriter.TEntity.TKey.cs" />
     <Compile Include="UnitOfWork\NoOpCommitPolicy.cs" />
@@ -127,8 +130,8 @@
     <Compile Include="UnitOfWork\TransactionalCommitPolicy.cs" />
     <Compile Include="UnitOfWork\UnitOfWork.cs" />
     <Compile Include="UnitOfWork\UnitOfWork.TEntity.TKey.cs" />
-    <Compile Include="KeyBinders\AssignableEntityKeyBinder.cs" />
-    <Compile Include="KeyBinders\AttributeKeyBinder.cs" />
+    <Compile Include="KeyBinders\KeyBinderOnAssignables.cs" />
+    <Compile Include="KeyBinders\KeyBinderFromAttributes.cs" />
     <Compile Include="InMemory\InMemoryRepository.cs" />
     <Compile Include="InMemory\InMemoryRepositoryFactory.cs" />
     <Compile Include="IRepositoryFactory.cs" />

@@ -1,7 +1,6 @@
 ﻿using System;
 using Autofac;
 using FutureState.Data;
-using FutureState.Data.Keys;
 
 namespace FutureState.Autofac
 {
@@ -11,34 +10,34 @@ namespace FutureState.Autofac
     public static class IComponentContextEx
     {
         public static Func<ISession, ILinqReader<TEntity, TKey>> GetReader<TEntity, TKey>(this IComponentContext ctx,
-            IEntityIdProvider<TEntity, TKey> idGenerator)
+            IKeyProvider<TEntity, TKey> idGenerator)
             where TEntity : class, new()
         {
             return session => ctx.Resolve<ILinqReader<TEntity, TKey>>(
                 new TypedParameter(typeof(ISession), session),
-                new TypedParameter(typeof(IEntityIdProvider<TEntity>), idGenerator));
+                new TypedParameter(typeof(IKeyProvider<TEntity>), idGenerator));
         }
 
         public static Func<ISession, ILinqReader<TEntity, TKey>> GetReader<TEntity, TKey>(this IComponentContext ctx)
             where TEntity : class, new()
         {
-            return GetReader(ctx, new NoOpEntityIdProvider<TEntity, TKey>());
+            return GetReader(ctx, new KeyProviderNoOp<TEntity, TKey>());
         }
 
         public static Func<ISession, IRepositoryLinq<TEntity, TKey>> GetRepository<TEntity, TKey>(
-            this IComponentContext ctx, IEntityIdProvider<TEntity, TKey> idGenerator)
+            this IComponentContext ctx, IKeyProvider<TEntity, TKey> idGenerator)
             where TEntity : class, new()
         {
             return session => ctx.Resolve<IRepositoryLinq<TEntity, TKey>>(
                 new TypedParameter(typeof(ISession), session),
-                new TypedParameter(typeof(IEntityIdProvider<TEntity>), idGenerator));
+                new TypedParameter(typeof(IKeyProvider<TEntity>), idGenerator));
         }
 
         public static Func<ISession, IRepositoryLinq<TEntity, TKey>> GetRepository<TEntity, TKey>(
             this IComponentContext ctx)
             where TEntity : class, new()
         {
-            return GetRepository(ctx, new NoOpEntityIdProvider<TEntity, TKey>());
+            return GetRepository(ctx, new KeyProviderNoOp<TEntity, TKey>());
         }
 
         public static Func<ISession, IRepositoryLinq<TEntity, long>> GetRepositoryLong<TEntity>(

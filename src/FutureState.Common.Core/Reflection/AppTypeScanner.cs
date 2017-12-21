@@ -10,10 +10,8 @@ namespace FutureState.Reflection
 
     public class AppTypeScanner
     {
-        private readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
-
-
         private readonly string _basePath;
+        private readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
 
         static AppTypeScanner()
         {
@@ -54,7 +52,8 @@ namespace FutureState.Reflection
             if (_basePath == null)
             {
                 var appDirectory = Assembly.GetCallingAssembly()?.Location;
-                appBinDirectory = new DirectoryInfo(Path.GetDirectoryName(appDirectory) ?? throw new InvalidOperationException());
+                appBinDirectory =
+                    new DirectoryInfo(Path.GetDirectoryName(appDirectory) ?? throw new InvalidOperationException());
             }
             else
             {
@@ -93,12 +92,12 @@ namespace FutureState.Reflection
         }
 
         /// <summary>
-            ///     Gets a filtered list of public types that are not abstract that belong to the application
-            ///     scope.
-            /// </summary>
-            /// <param name="filter">Additional filtering criteria.</param>
-            /// <returns></returns>
-            public IList<Lazy<Type>> GetFilteredTypes(Func<Type, bool> filter)
+        ///     Gets a filtered list of public types that are not abstract that belong to the application
+        ///     scope.
+        /// </summary>
+        /// <param name="filter">Additional filtering criteria.</param>
+        /// <returns></returns>
+        public IList<Lazy<Type>> GetFilteredTypes(Func<Type, bool> filter)
         {
             Guard.ArgumentNotNull(filter, nameof(filter));
 

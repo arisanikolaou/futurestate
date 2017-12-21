@@ -14,17 +14,27 @@ namespace FutureState.Autofac.Tests
 {
     public class WiresUpServicesStory : IDisposable
     {
-        private IContainer _container;
+        int contactId = 0;
         private string _conString;
-        private IEnumerable<Contact> _items;
+        private IContainer _container;
         private string _dbName;
+        private IEnumerable<Contact> _items;
         private IEnumerable<Address> _itemsFromGuidKeyedEntity;
 
-        string GetLocalDbConString(string dbName)
+        public void Dispose()
         {
-            string baseDirectory = Environment.CurrentDirectory;
+            var dbSetup = new LocalDbSetup(Environment.CurrentDirectory, _dbName);
+            dbSetup.TryDetachDatabase();
+        }
 
-            string conString = $@"data source=(LocalDb)\MSSQLLocalDB;AttachDBFilename={baseDirectory}\{dbName}.mdf;initial catalog={dbName};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+        private string GetLocalDbConString(string dbName)
+        {
+            var baseDirectory = Environment.CurrentDirectory;
+
+            var conString =
+                $@"data source=(LocalDb)\MSSQLLocalDB;AttachDBFilename={baseDirectory}\{dbName}.mdf;initial catalog={
+                        dbName
+                    };integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
 
             return conString;
         }
@@ -50,7 +60,9 @@ namespace FutureState.Autofac.Tests
         protected void AndGivenAnSqlDrivenApp()
         {
             using (var dbContext = new TestModel(_conString))
+            {
                 Assert.True(dbContext.Contacts.Any());
+            }
 
             var cb = new ContainerBuilder();
 
@@ -61,8 +73,14 @@ namespace FutureState.Autofac.Tests
             });
 
             cb.RegisterAll(new AppTypeScanner(Environment.CurrentDirectory, "FutureState.Autofac"));
+            
+            cb.Register(m => new KeyGenerator<Contact, int>(() => contactId++))
+                .AsSelf().AsImplementedInterfaces().SingleInstance();
 
-            this._container = cb.Build();
+            //cb.Register(m => new KeyGenerator<Address, Guid>(Guid.NewGuid))
+            //    .AsSelf().AsImplementedInterfaces().SingleInstance();
+
+            _container = cb.Build();
         }
 
         protected void WhenResolvingAProviderForAGivenEntity()
@@ -87,12 +105,6 @@ namespace FutureState.Autofac.Tests
         public void WiresUpServices()
         {
             this.BDDfy();
-        }
-
-        public void Dispose()
-        {
-            var dbSetup = new LocalDbSetup(Environment.CurrentDirectory, this._dbName);
-            dbSetup.TryDetachDatabase();
         }
     }
 }

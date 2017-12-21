@@ -258,6 +258,7 @@ namespace Dapper.FastCrud.Mappings
                 default:
                     throw new NotSupportedException($"Option {option} is not supported.");
             }
+
             return this;
         }
 

@@ -5,7 +5,7 @@
     /// </summary>
     /// <typeparam name="TEntity">The entity to bind to.</typeparam>
     /// <typeparam name="TKey">The key type to bind.</typeparam>
-    public interface IEntityKeyBinder<in TEntity, TKey>
+    public interface IKeyBinder<in TEntity, TKey>
     {
         /// <summary>
         ///     Gets the active entity key.

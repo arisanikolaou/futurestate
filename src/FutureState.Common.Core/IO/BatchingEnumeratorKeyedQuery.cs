@@ -61,6 +61,7 @@ namespace FutureState.IO
                 _currentSlice++;
                 return true;
             }
+
             _current.Clear();
 
             return false;

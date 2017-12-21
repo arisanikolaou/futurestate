@@ -269,6 +269,7 @@ namespace FutureState
                             skipCloneFields.Add(field);
                             continue;
                         }
+
                         if (field.Name.StartsWith("<") && field.Name.EndsWith(">k__BackingField"))
                         {
                             var propertyInfo =

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using Autofac;
 using Dapper.Extensions.Linq.Core.Mapper;
 using FutureState.Data;
-using FutureState.Data.Keys;
 using FutureState.Data.Sql;
 using FutureState.Reflection;
 using FutureState.Services;
@@ -18,7 +15,8 @@ using NLog;
 namespace FutureState.Autofac
 {
     /// <summary>
-    ///     Helps construct a given autofac container using the types discovered through a given <see cref="AppTypeScanner"/> instance.
+    ///     Helps construct a given autofac container using the types discovered through a given <see cref="AppTypeScanner" />
+    ///     instance.
     /// </summary>
     public class ApplicationContainerBuilder
     {
@@ -36,8 +34,7 @@ namespace FutureState.Autofac
 
         public ApplicationContainerBuilder RegisterAll()
         {
-            return this
-                .RegisterValidators()
+            return RegisterValidators()
                 .RegisterServices()
                 .RegisterEntityTableMaps()
                 .RegisterSpecializedQueries()
@@ -46,11 +43,11 @@ namespace FutureState.Autofac
                 .RegisterClassMappers();
         }
 
-        ApplicationContainerBuilder RegisterEntityKeyGenerators()
+        private ApplicationContainerBuilder RegisterEntityKeyGenerators()
         {
-            foreach (Lazy<Type> entity in this._scanner.GetTypes<IEntity>())
+            foreach (var entity in _scanner.GetTypes<IEntity>())
             {
-                Type entityType = entity.Value;
+                var entityType = entity.Value;
 
                 var pk = entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     .FirstOrDefault(m => m.GetCustomAttributes<KeyAttribute>(true).Any());
@@ -59,14 +56,12 @@ namespace FutureState.Autofac
                     continue;
 
                 if (pk.PropertyType == typeof(Guid))
-                {
                     this.FastInvoke(new[]
                         {
                             entityType,
                             pk.PropertyType
                         },
                         "RegisterEntityKeyGenerator", new Func<Guid>(SeqGuid.Create));
-                }
             }
 
             return this;
@@ -74,13 +69,16 @@ namespace FutureState.Autofac
 
         protected void RegisterEntityKeyGenerator<TEntity, TKey>(Func<TKey> getKey)
         {
-            _cb.Register(m => new KeyGenerator<TEntity, TKey>(getKey));
+            _cb.Register(m => new KeyGenerator<TEntity, TKey>(getKey))
+                .AsSelf()
+                .AsImplementedInterfaces()
+                .SingleInstance();
         }
 
         /// <summary>
         ///     Registers all classes that inherit from IService.
         /// </summary>
-        ApplicationContainerBuilder RegisterServices()
+        private ApplicationContainerBuilder RegisterServices()
         {
             return RegisterTypes<IService>();
         }
@@ -88,7 +86,7 @@ namespace FutureState.Autofac
         /// <summary>
         ///     Registers all classes that implement a class mapper.
         /// </summary>
-        ApplicationContainerBuilder RegisterClassMappers()
+        private ApplicationContainerBuilder RegisterClassMappers()
         {
             var provider = new AppClassMapProvider(_scanner);
 
@@ -106,7 +104,7 @@ namespace FutureState.Autofac
         ///     Registers all units of work discovered in the application space within a given autofac
         ///     container builder.
         /// </summary>
-        ApplicationContainerBuilder RegisterUnitsOfWork()
+        private ApplicationContainerBuilder RegisterUnitsOfWork()
         {
             // have to compare by type name as this is reflection only type
             var unitOfWorkTypes = _scanner.GetFilteredTypes(
@@ -136,13 +134,13 @@ namespace FutureState.Autofac
         ///     Register all specification providers/validators for a given entity type.
         /// </summary>
         /// <returns></returns>
-        ApplicationContainerBuilder RegisterValidators()
+        private ApplicationContainerBuilder RegisterValidators()
         {
             return RegisterTypes<IProvideSpecifications>();
         }
 
 
-        ApplicationContainerBuilder RegisterEntityTableMaps()
+        private ApplicationContainerBuilder RegisterEntityTableMaps()
         {
             return RegisterTypes<IClassMapper>();
         }
@@ -155,7 +153,7 @@ namespace FutureState.Autofac
         public ApplicationContainerBuilder RegisterTypes<TInterfaceType>()
         {
             // will return all non abstract public types
-            IEnumerable<Lazy<Type>> lazies = _scanner.GetTypes<TInterfaceType>();
+            var lazies = _scanner.GetTypes<TInterfaceType>();
 
             foreach (var lazy in lazies)
                 _cb.RegisterType(lazy.Value)
@@ -169,7 +167,7 @@ namespace FutureState.Autofac
         ///     Registers all specialized data queries discovered in the application space within a given
         ///     autofac container builder.
         /// </summary>
-        ApplicationContainerBuilder RegisterSpecializedQueries()
+        private ApplicationContainerBuilder RegisterSpecializedQueries()
         {
             // get queries that don't have any generic arguments
             // types that are abstract are already excluded

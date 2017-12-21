@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using EmitMapper;
-using FutureState.Data.KeyBinders;
-using FutureState.Data.Keys;
 using NLog;
 
 namespace FutureState.Data
@@ -23,11 +21,11 @@ namespace FutureState.Data
         // ReSharper disable once StaticMemberInGenericType
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IEntityIdProvider<TEntity, TKey> _idGenerator;
+        private readonly IKeyProvider<TEntity, TKey> _idGenerator;
 
         private readonly ConcurrentDictionary<TKey, TEntity> _items;
 
-        private readonly IEntityKeyBinder<TEntity, TKey> _keyBinder;
+        private readonly IKeyBinder<TEntity, TKey> _keyBinder;
 
         private readonly ObjectMapperManager _mapper;
 
@@ -39,8 +37,8 @@ namespace FutureState.Data
         /// <param name="items">Required. The list of entities to pre-populate the current instance with.</param>
         /// <param name="mapper">Object mapper manager instance</param>
         public InMemoryRepository(
-            IEntityIdProvider<TEntity, TKey> idGenerator,
-            IEntityKeyBinder<TEntity, TKey> keyBinder,
+            IKeyProvider<TEntity, TKey> idGenerator,
+            IKeyBinder<TEntity, TKey> keyBinder,
             IEnumerable<TEntity> items,
             ObjectMapperManager mapper)
         {
@@ -64,8 +62,8 @@ namespace FutureState.Data
         /// <param name="keyBinder">The binder for the entity id.</param>
         /// <param name="items">Required. The list of entities to pre-populate the current instance with.</param>
         public InMemoryRepository(
-            IEntityIdProvider<TEntity, TKey> idGenerator,
-            IEntityKeyBinder<TEntity, TKey> keyBinder,
+            IKeyProvider<TEntity, TKey> idGenerator,
+            IKeyBinder<TEntity, TKey> keyBinder,
             IEnumerable<TEntity> items)
             : this(idGenerator, keyBinder, items, ObjectMapperManager.DefaultInstance)
         {
@@ -78,8 +76,8 @@ namespace FutureState.Data
         /// <param name="items">default items collection</param>
         public InMemoryRepository(Func<TEntity, TKey> getKey, IEnumerable<TEntity> items)
             : this(
-                new NoOpEntityIdProvider<TEntity, TKey>(),
-                new ExpressionKeyBinder<TEntity, TKey>(getKey, (_, __) => { }),
+                new KeyProviderNoOp<TEntity, TKey>(),
+                new KeyBinder<TEntity, TKey>(getKey, (_, __) => { }),
                 items)
         {
         }

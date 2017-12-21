@@ -1,6 +1,4 @@
-﻿using FutureState.Data.KeyBinders;
-using FutureState.Data.Keys;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TestStack.BDDfy;
@@ -11,28 +9,28 @@ namespace FutureState.Data.Tests
 {
     public class MemoryResidentRepositoryTests
     {
-        private InMemoryRepository<TestEntity, int> subject;
         private int allItemsCount;
+        private int idCurrent;
         private TestEntity insertedItem;
-        int idCurrent = 0;
+        private InMemoryRepository<TestEntity, int> subject;
 
         internal void GivenAnInMemoryDb()
         {
-            var entityKeyBinder = new ExpressionKeyBinder<TestEntity, int>(
+            var entityKeyBinder = new KeyBinder<TestEntity, int>(
                 e => e.Id,
                 (e, k) => e.Id = k);
 
             var keyGenerator = new KeyGenerator<TestEntity, int>(() => ++idCurrent);
 
-            var entityIdProvider = new EntityIdProvider<TestEntity, int>(
+            var entityIdProvider = new KeyProvider<TestEntity, int>(
                 keyGenerator,
                 entityKeyBinder);
 
-            var list = new List<TestEntity>()
+            var list = new List<TestEntity>
             {
-                new TestEntity() {Id = 0, Name="Name"}
+                new TestEntity {Id = 0, Name = "Name"}
             };
-            
+
             subject = new InMemoryRepository<TestEntity, int>(
                 entityIdProvider, entityKeyBinder, list);
         }
@@ -44,9 +42,9 @@ namespace FutureState.Data.Tests
 
         internal void AndWhenAddingNewItems()
         {
-            subject.Insert(new TestEntity() { Name = "Name2" });
+            subject.Insert(new TestEntity {Name = "Name2"});
 
-            this.insertedItem = subject.Where(m => m.Name == "Name2").FirstOrDefault();
+            insertedItem = subject.Where(m => m.Name == "Name2").FirstOrDefault();
         }
 
         internal void ThenShouldBeAbleToQueryAllItems()
@@ -67,8 +65,8 @@ namespace FutureState.Data.Tests
 
         public class TestEntity
         {
-            [Key]
-            public int Id { get; set; }
+            [Key] public int Id { get; set; }
+
             public string Name { get; set; }
         }
     }

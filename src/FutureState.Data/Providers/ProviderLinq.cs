@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FutureState.ComponentModel;
-using FutureState.Data.Keys;
 using FutureState.Services;
 using FutureState.Specifications;
 using NLog;
@@ -30,7 +29,7 @@ namespace FutureState.Data.Providers
 
         private readonly IList<ISpecification<TEntity>> _specs;
 
-        private readonly IEntityIdProvider<TEntity, TKey> _idProvider;
+        private readonly IKeyProvider<TEntity, TKey> _idProvider;
 
         // processes crud actions
         private readonly Stack<Action<TKey>> _onBeforeDelete;
@@ -66,7 +65,7 @@ namespace FutureState.Data.Providers
         /// <param name="handler">A handler to use to process entities being added/removed or activated through the provider.</param>
         public ProviderLinq(
             IUnitOfWorkLinq<TEntity, TKey> db,
-            IEntityIdProvider<TEntity, TKey> idProvider,
+            IKeyProvider<TEntity, TKey> idProvider,
             IMessagePipe messagePipe = null,
             IProvideSpecifications<TEntity> specProvider = null,
             EntityHandler<TEntity, TKey> handler = null)
@@ -109,7 +108,7 @@ namespace FutureState.Data.Providers
         /// <summary>
         ///     Gets the id provider for the entity type.
         /// </summary>
-        public IEntityIdProvider<TEntity, TKey> GetIdProvider()
+        public IKeyProvider<TEntity, TKey> GetIdProvider()
         {
             return _idProvider;
         }

@@ -3,8 +3,8 @@
     /// <summary>
     ///     Helps process an entity through a pipe/filter.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TEntity">The entity type to handle.</typeparam>
+    /// <typeparam name="TKey">The entity's system key type.</typeparam>
     public class EntityHandler<TEntity, TKey>
     {
         public EntityHandler(

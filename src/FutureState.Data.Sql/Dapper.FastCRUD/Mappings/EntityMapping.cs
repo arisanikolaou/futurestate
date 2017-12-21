@@ -218,7 +218,7 @@ namespace Dapper.FastCrud.Mappings
                         propDescriptor.PropertyType;
 #endif
                     return propInfo.IsGenericType && typeof(IEnumerable).IsAssignableFrom(propDescriptor.PropertyType)
-                           && propDescriptor.PropertyType.GetGenericArguments().Length == 1;
+                                                  && propDescriptor.PropertyType.GetGenericArguments().Length == 1;
                 })
                 //.GroupBy(propDescriptor => propDescriptor.PropertyType)
                 .ToDictionary(

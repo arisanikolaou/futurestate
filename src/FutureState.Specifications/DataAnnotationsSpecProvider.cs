@@ -13,7 +13,7 @@ namespace FutureState.Specifications
     /// </summary>
     public class DataAnnotationsSpecProvider<T> : IProvideSpecifications<T>
     {
-// ReSharper disable StaticFieldInGenericType
+        // ReSharper disable StaticFieldInGenericType
         // ReSharper disable once InconsistentNaming
         private static readonly PropertyInfo[] _properties;
 

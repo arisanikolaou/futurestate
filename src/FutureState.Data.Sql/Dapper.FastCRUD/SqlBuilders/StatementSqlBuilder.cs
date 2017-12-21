@@ -542,6 +542,7 @@ namespace Dapper.FastCrud.SqlBuilders
                             joinClauseBuilder.Append(secondEntitySqlBuilder.GetColumnName(secondEntityProperty,
                                 secondEntitySqlBuilder.GetTableName(), false));
                         }
+
                         joinClauseBuilder.Append(')');
                     }
 

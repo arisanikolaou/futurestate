@@ -2,12 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using FutureState.Reflection;
 
-namespace FutureState.Data.KeyBinders
+namespace FutureState.Data
 {
     /// <summary>
-    ///     Generic all purpose binder that uses reflection to determine 
+    ///     Generic all purpose binder that uses reflection to determine
     ///     an entity's primary key so that it can be updated by the caller.
     /// </summary>
     /// <typeparam name="TEntity">The entity to bind the id value to.</typeparam>
@@ -16,7 +15,7 @@ namespace FutureState.Data.KeyBinders
     ///     Looking for:
     ///     PrimaryKeyAttribute || KeyAttribute
     /// </remarks>
-    public class AttributeKeyBinder<TEntity, TKey> : IEntityKeyBinder<TEntity, TKey>
+    public class KeyBinderFromAttributes<TEntity, TKey> : IKeyBinder<TEntity, TKey>
     {
         // ReSharper disable once StaticFieldInGenericType
         private static readonly PropertyGetterDelegate GetterFn;
@@ -24,7 +23,7 @@ namespace FutureState.Data.KeyBinders
         // ReSharper disable once StaticFieldInGenericType
         private static readonly PropertySetterDelegate SetterFn;
 
-        static AttributeKeyBinder()
+        static KeyBinderFromAttributes()
         {
             //todo: replace with function to get and set pk values in repository
 
@@ -41,7 +40,7 @@ namespace FutureState.Data.KeyBinders
 
         public TKey Get(TEntity entity)
         {
-            return (TKey)GetterFn(entity); //don't check for null entity to avoid perf penalty
+            return (TKey) GetterFn(entity); //don't check for null entity to avoid perf penalty
         }
 
         public void Set(TEntity entity, TKey key)

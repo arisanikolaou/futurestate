@@ -12,7 +12,6 @@ using static System.Enum;
 
 namespace FutureState
 {
-
     /// <summary>
     ///     Helper class to retrieve the description of of enumeration objects.
     /// </summary>

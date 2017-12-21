@@ -4,10 +4,8 @@ using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data;
-using FutureState.Data.Keys;
 using FutureState.Data.Providers;
 using FutureState.Data.Sql;
-using Module = Autofac.Module;
 
 namespace FutureState.Autofac.Modules
 {
@@ -21,18 +19,18 @@ namespace FutureState.Autofac.Modules
 
             //register dapper configuration
             builder.Register(m =>
-            {
-                var classMappers = m.Resolve<IEnumerable<IClassMapper>>();
+                {
+                    var classMappers = m.Resolve<IEnumerable<IClassMapper>>();
 
-                // instance be application scope
-                var config = DapperConfiguration
-                    .Use()
-                    .UseSqlDialect(new SqlServerDialect());
+                    // instance be application scope
+                    var config = DapperConfiguration
+                        .Use()
+                        .UseSqlDialect(new SqlServerDialect());
 
-                classMappers.Each(n => config.Register(n));
+                    classMappers.Each(n => config.Register(n));
 
-                return config.Build();
-            })
+                    return config.Build();
+                })
                 .As<IDapperConfiguration>()
                 .SingleInstance()
                 .AsImplementedInterfaces()
@@ -40,11 +38,11 @@ namespace FutureState.Autofac.Modules
 
             //regiser session factory
             builder.Register(m =>
-            {
-                var componentContext = m.Resolve<IComponentContext>();
+                {
+                    var componentContext = m.Resolve<IComponentContext>();
 
-                return new SessionFactory(this.ConnectionString, componentContext.Resolve<IDapperConfiguration>());
-            })
+                    return new SessionFactory(ConnectionString, componentContext.Resolve<IDapperConfiguration>());
+                })
                 .AsSelf()
                 .AsImplementedInterfaces();
 
@@ -70,8 +68,8 @@ namespace FutureState.Autofac.Modules
                 .AsSelf()
                 .SingleInstance();
 
-            builder.RegisterGeneric(typeof(EntityIdProvider<,>))
-                .As(typeof(IEntityIdProvider<,>));
+            builder.RegisterGeneric(typeof(KeyProvider<,>))
+                .As(typeof(IKeyProvider<,>));
 
             // guid key'ed entities
             builder.RegisterGeneric(typeof(RepositoryLinq<>))

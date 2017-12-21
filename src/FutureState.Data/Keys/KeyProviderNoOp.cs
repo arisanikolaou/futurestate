@@ -1,22 +1,21 @@
-﻿using FutureState.Data.KeyBinders;
-
-namespace FutureState.Data.Keys
+﻿namespace FutureState.Data
 {
     /// <summary>
     ///     AssignedGenerator is a pass-through implementation that assumes the IDs are managed by the caller. This is
     ///     basically no op id generator.
     /// </summary>
     /// <typeparam name="TEntity">The entity to bind the id value to.</typeparam>
-    public class NoOpEntityIdProvider<TEntity, TKey> : IEntityIdProvider<TEntity, TKey>
+    /// <typeparam name="TKey">The key type of the entity.</typeparam>
+    public class KeyProviderNoOp<TEntity, TKey> : IKeyProvider<TEntity, TKey>
     {
-        private readonly IEntityKeyBinder<TEntity, TKey> _binder;
+        private readonly IKeyBinder<TEntity, TKey> _binder;
 
-        public NoOpEntityIdProvider()
-            : this(new AttributeKeyBinder<TEntity, TKey>())
+        public KeyProviderNoOp()
+            : this(new KeyBinderFromAttributes<TEntity, TKey>())
         {
         }
 
-        public NoOpEntityIdProvider(IEntityKeyBinder<TEntity, TKey> binder)
+        public KeyProviderNoOp(IKeyBinder<TEntity, TKey> binder)
         {
             Guard.ArgumentNotNull(binder, nameof(binder));
 
@@ -26,14 +25,13 @@ namespace FutureState.Data.Keys
         /// <summary>
         ///     Gets the key of the entity.
         /// </summary>
-        TKey IEntityIdProvider<TEntity, TKey>.GetKey(TEntity entity)
+        TKey IKeyProvider<TEntity, TKey>.GetKey(TEntity entity)
         {
             return _binder.Get(entity);
         }
 
-        void IEntityIdProvider<TEntity, TKey>.Provide(TEntity entity)
+        void IKeyProvider<TEntity, TKey>.Provide(TEntity entity)
         {
-            //do nothing
         }
     }
 }

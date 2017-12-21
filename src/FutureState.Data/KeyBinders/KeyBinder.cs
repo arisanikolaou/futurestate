@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace FutureState.Data.KeyBinders
+namespace FutureState.Data
 {
     /// <summary>
     ///     Uses supplied functions to get/set the key of the entity.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TKey">The entity's key type.</typeparam>
-    public class ExpressionKeyBinder<TEntity, TKey> : IEntityKeyBinder<TEntity, TKey>
+    public class KeyBinder<TEntity, TKey> : IKeyBinder<TEntity, TKey>
     {
         private readonly Func<TEntity, TKey> _getter;
 
@@ -16,7 +16,7 @@ namespace FutureState.Data.KeyBinders
         /// <summary>
         ///     Creates a new instance using a given getter and setter.
         /// </summary>
-        public ExpressionKeyBinder(Func<TEntity, TKey> getter, Action<TEntity, TKey> setter)
+        public KeyBinder(Func<TEntity, TKey> getter, Action<TEntity, TKey> setter)
         {
             Guard.ArgumentNotNull(getter, nameof(getter));
             Guard.ArgumentNotNull(setter, nameof(setter));

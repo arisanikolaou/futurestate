@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using FutureState.Data.KeyBinders;
-using FutureState.Data.Keys;
 
 namespace FutureState.Data
 {
@@ -34,8 +32,8 @@ namespace FutureState.Data
             return _repositories.GetOrAdd(entityType,
                 type =>
                     new InMemoryRepository<TEntity, TKey>(
-                        new NoOpEntityIdProvider<TEntity, TKey>(),
-                        new AttributeKeyBinder<TEntity, TKey>(),
+                        new KeyProviderNoOp<TEntity, TKey>(),
+                        new KeyBinderFromAttributes<TEntity, TKey>(),
                         new TEntity[0])) as IRepository<TEntity, TKey>;
         }
 
@@ -47,8 +45,8 @@ namespace FutureState.Data
             return _repositories.GetOrAdd(typeof(TEntity),
                 type =>
                     new InMemoryRepository<TEntity, TKey>(
-                        new NoOpEntityIdProvider<TEntity, TKey>(),
-                        new AttributeKeyBinder<TEntity, TKey>(),
+                        new KeyProviderNoOp<TEntity, TKey>(),
+                        new KeyBinderFromAttributes<TEntity, TKey>(),
                         new TEntity[0])) as IRepository<TEntity, TKey>;
         }
 
@@ -57,8 +55,8 @@ namespace FutureState.Data
             return _repositories.GetOrAdd(typeof(TEntity),
                 type =>
                     new InMemoryRepository<TEntity>(
-                        new NoOpEntityIdProvider<TEntity, Guid>(),
-                        new AttributeKeyBinder<TEntity, Guid>(),
+                        new KeyProviderNoOp<TEntity, Guid>(),
+                        new KeyBinderFromAttributes<TEntity, Guid>(),
                         new TEntity[0])) as IRepository<TEntity>;
         }
 

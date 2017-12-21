@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Autofac;
 using FutureState.Data;
-using FutureState.Data.KeyBinders;
-using FutureState.Data.Keys;
 using FutureState.Data.Providers;
 
 namespace FutureState.Autofac.Modules
@@ -19,7 +17,7 @@ namespace FutureState.Autofac.Modules
         ///     Registers functions to resolve a given in memory irepository, ireader and ilinqreader implementation for a given
         ///     entity type and entity type key.
         /// </summary>
-        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IEntityIdProvider<TEntity, TKey> idGenerator)
+        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IKeyProvider<TEntity, TKey> idGenerator)
             where TEntity : class, new()
         {
             //register repository functions
@@ -83,7 +81,8 @@ namespace FutureState.Autofac.Modules
             {
                 cb.Register(
                         (m, q) =>
-                            new InMemoryRepository<TEntity, TKey>(idGenerator, new AttributeKeyBinder<TEntity, TKey>(),
+                            new InMemoryRepository<TEntity, TKey>(idGenerator,
+                                new KeyBinderFromAttributes<TEntity, TKey>(),
                                 new TEntity[0]))
                     .AsSelf()
                     .As<IRepositoryLinq<TEntity, TKey>>()
@@ -141,8 +140,8 @@ namespace FutureState.Autofac.Modules
                 .As<ISessionFactory>()
                 .SingleInstance();
 
-            builder.RegisterGeneric(typeof(EntityIdProvider<,>))
-                .As(typeof(IEntityIdProvider<,>));
+            builder.RegisterGeneric(typeof(KeyProvider<,>))
+                .As(typeof(IKeyProvider<,>));
 
             //in memory repositories
             builder.RegisterGeneric(typeof(InMemoryRepository<>))

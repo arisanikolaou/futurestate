@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FutureState.Data.KeyBinders;
-using FutureState.Data.Keys;
 
 namespace FutureState.Data
 {
@@ -18,8 +16,8 @@ namespace FutureState.Data
         IRepository<TEntity>
     {
         public InMemoryRepository(
-            IEntityIdProvider<TEntity, Guid> idGenerator,
-            IEntityKeyBinder<TEntity, Guid> keyBinder,
+            IKeyProvider<TEntity, Guid> idGenerator,
+            IKeyBinder<TEntity, Guid> keyBinder,
             IEnumerable<TEntity> items)
             :
             base(idGenerator, keyBinder, items)
@@ -28,8 +26,8 @@ namespace FutureState.Data
 
         public InMemoryRepository(IEnumerable<TEntity> items)
             : base(
-                new EntityIdProvider<TEntity, Guid>(new KeyGenerator<TEntity,Guid>(Guid.NewGuid)),
-                new AttributeKeyBinder<TEntity, Guid>(),
+                new KeyProvider<TEntity, Guid>(new KeyGenerator<TEntity, Guid>(Guid.NewGuid)),
+                new KeyBinderFromAttributes<TEntity, Guid>(),
                 items)
         {
         }

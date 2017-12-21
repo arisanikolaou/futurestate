@@ -9,10 +9,10 @@ namespace FutureState.Common.Tests
     [Collection("DurableActionTests")]
     public class ShouldBeAbleToExecuteActionsDurablyStory
     {
+        private readonly int maxRetries = 3;
         private DurableAction _subject;
         private int currentExecutionAttempts;
         private bool keepThrowingException;
-        private readonly int maxRetries = 3;
 
         private void GivenADurableAction()
         {

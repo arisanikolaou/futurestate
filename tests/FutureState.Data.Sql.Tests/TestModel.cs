@@ -1,11 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
+
 namespace FutureState.Data.Sql.Tests
 {
-    using System.ComponentModel.DataAnnotations;
-    using System.Data.Entity;
-
     public class TestModel : DbContext
     {
-
         public TestModel(string conString)
             : base(conString)
         {
@@ -17,8 +16,7 @@ namespace FutureState.Data.Sql.Tests
 
     public class MyEntity
     {
-        [Key]
-        public int Id { get; set; }
+        [Key] public int Id { get; set; }
 
         public string Name { get; set; }
     }

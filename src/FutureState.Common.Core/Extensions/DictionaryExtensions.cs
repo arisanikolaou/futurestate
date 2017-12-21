@@ -66,6 +66,7 @@ namespace FutureState
                 if (!valueComparer.Equals(kvp.Value, secondValue))
                     return false;
             }
+
             return true;
         }
 

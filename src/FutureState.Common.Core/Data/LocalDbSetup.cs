@@ -156,7 +156,7 @@ namespace FutureState.Data
             }
             catch (Exception ex)
             {
-                if(_logger.IsErrorEnabled)
+                if (_logger.IsErrorEnabled)
                     _logger.Error(ex);
 
                 return false;
