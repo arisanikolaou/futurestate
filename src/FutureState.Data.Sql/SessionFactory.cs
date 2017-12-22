@@ -24,8 +24,14 @@ namespace FutureState.Data.Sql
             Configuration = configuration;
         }
 
+        /// <summary>
+        ///     Gets the active dapper configuration used by the session factory.
+        /// </summary>
         public IDapperConfiguration Configuration { get; }
 
+        /// <summary>
+        ///     Gets/sets an optional identifier of the connection.
+        /// </summary>
         public string Id { get; set; }
 
         /// <summary>

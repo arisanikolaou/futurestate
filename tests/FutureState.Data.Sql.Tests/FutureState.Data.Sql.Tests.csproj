@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="MemberMapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionFactoryTests.cs" />
     <Compile Include="TestModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +121,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\FutureState.Common.Core\FutureState.Common.csproj">
+      <Project>{3ba5fb45-d642-43de-8629-37aa3d7ce5bd}</Project>
+      <Name>FutureState.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\FutureState.Data.Sql\FutureState.Data.Sql.csproj">
       <Project>{6B003A23-1002-47EC-A5F5-56E66EE91476}</Project>
       <Name>FutureState.Data.Sql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\FutureState.Data\FutureState.Data.csproj">
+      <Project>{58b0d3c2-e786-40bd-b5f7-04b32f0aa241}</Project>
+      <Name>FutureState.Data</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

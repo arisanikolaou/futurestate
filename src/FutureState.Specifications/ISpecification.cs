@@ -3,7 +3,7 @@
     /// <summary>
     ///     A rule or constraint to evaluate against a given domain object.
     /// </summary>
-    /// <typeparam name="TEntity">The domain object to evaluate.</typeparam>
+    /// <typeparam name="TEntity">The domain object type to evaluate.</typeparam>
     public interface ISpecification<in TEntity>
     {
         /// <summary>

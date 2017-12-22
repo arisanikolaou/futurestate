@@ -58,7 +58,7 @@ namespace FutureState.Specifications
         /// <summary>
         ///     Validates any not null value which derives from <see cref="TEntity" />.
         /// </summary>
-        /// <param name="value">A null or instance object. Null objects will not be validated.</param>
+        /// <param name="subject">A null or instance object. Null objects will not be validated.</param>
         /// <returns>
         ///     True if valid.
         /// </returns>
@@ -66,19 +66,19 @@ namespace FutureState.Specifications
         ///     Can't validate objects not assignable from
         ///     {0}.Params(typeof(TEntity))
         /// </exception>
-        public bool Validate(object value)
+        public bool Validate(object subject)
         {
-            if (value == null)
+            if (subject == null)
                 return true;
 
-            if (value is TEntity)
+            if (subject is TEntity)
             {
                 var sb = new StringBuilder();
                 var isValid = true;
 
                 foreach (var spec in Specs)
                 {
-                    var result = spec.Evaluate(value as TEntity);
+                    var result = spec.Evaluate(subject as TEntity);
 
                     if (!result.IsValid)
                     {

@@ -85,9 +85,9 @@
     <Compile Include="RangeOrEmptyAttribute.cs" />
     <Compile Include="NotEmptyGuidAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AlwaysFalseSpecification.cs" />
-    <Compile Include="AlwaysTrueSpecification.cs" />
-    <Compile Include="AndSpecification.cs" />
+    <Compile Include="Common\AlwaysFalseSpecification.cs" />
+    <Compile Include="Common\AlwaysTrueSpecification.cs" />
+    <Compile Include="Common\AndSpecification.cs" />
     <Compile Include="DataAnnotationsSpecProvider.cs" />
     <Compile Include="DataAnnotationsSpecProvider.object.cs" />
     <Compile Include="DataAnnotationsSpecProviderEx.cs" />
@@ -102,8 +102,8 @@
     <Compile Include="NotEmptyAttribute.cs" />
     <Compile Include="NotEmptyCollectionValidationAttribute.cs" />
     <Compile Include="NotEmptyDateAttribute.cs" />
-    <Compile Include="NotSpecification.cs" />
-    <Compile Include="OrSpecification.cs" />
+    <Compile Include="Common\NotSpecification.cs" />
+    <Compile Include="Common\OrSpecification.cs" />
     <Compile Include="SpecEventArgs.cs" />
     <Compile Include="Specification.cs" />
     <Compile Include="SpecProvider.cs" />

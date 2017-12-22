@@ -7,10 +7,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FutureState.Specifications
 {
-    // an - made field name mandatory
-
     /// <summary>
-    ///     Used to validate string values. Use required to validate other object values.
+    ///     Used to validate string values against zero longth and null values. Use required to validate other object values.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public sealed class NotEmptyAttribute : ValidationAttribute

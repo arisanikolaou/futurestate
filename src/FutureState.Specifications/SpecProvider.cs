@@ -13,7 +13,8 @@ namespace FutureState.Specifications
     ///     Generic abstract base class to accumulate rules/specs for a given entity or service.
     /// </summary>
     /// <remarks>
-    ///     Will automatically accumulate all specifications from an entity.
+    ///     Will automatically accumulate all specifications from an entity based on
+    /// its data annotations.
     /// </remarks>
     /// <typeparam name="TEntityOrService">
     ///     The entity or service to validate.

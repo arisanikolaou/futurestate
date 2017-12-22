@@ -3,10 +3,16 @@ using System.Data;
 namespace FutureState.Data.Sql
 {
     /// <summary>
-    ///     A sql transaction.
+    ///     A wrapper around <see cref="IDbTransaction"/> transaction.
     /// </summary>
     public class Transacton : ITransaction
     {
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="connection">
+        ///     The connection to create the transaction under.
+        /// </param>
         internal Transacton(IDbConnection connection)
         {
             UnderlyingTransaction = connection.BeginTransaction();
@@ -14,8 +20,14 @@ namespace FutureState.Data.Sql
             IsPending = true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IDbTransaction UnderlyingTransaction { get; }
 
+        /// <summary>
+        ///     Rolls back any pending transactions and disposes any underlying connection.
+        /// </summary>
         public void Dispose()
         {
             if (!IsPending) return;
