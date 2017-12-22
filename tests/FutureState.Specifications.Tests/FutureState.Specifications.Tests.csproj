@@ -54,6 +54,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DataAnnotationSpecProviderStory.cs" />
+    <Compile Include="DiscoversAndBuildsCustomValidationRulesStory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
