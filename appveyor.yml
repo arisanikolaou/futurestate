@@ -15,11 +15,6 @@ assembly_info:
   
 test: on
 
-environment:
-  NUGET_APIKEY: 31e362bb-842c-4446-86dc-77d1ebd6b731
-  matrix:
-  - {}
-
 build:
   publish_nuget: true
   include_nuget_refer
