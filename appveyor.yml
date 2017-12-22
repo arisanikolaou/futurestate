@@ -1,10 +1,7 @@
 version: 0.3.{build}
-
 image: Visual Studio 2017
-
 services:
   - mssql2014           # start SQL Server 2014 Express
-
 # enable patching of AssemblyInfo.* files
 assembly_info:
   patch: true
@@ -12,17 +9,12 @@ assembly_info:
   assembly_version: "2.2.{build}"
   assembly_file_version: "{version}"
   assembly_informational_version: "{version}"
-  
 test: on
-
 build:
   publish_nuget: true
   include_nuget_refer
-
 build_script:
-#- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages -ScriptArgs '-BUILD_VERSION="{version}"'
 - cmd: PowerShell -Version 2.0 .\build.ps1
-
 notifications:
 - provider: Email
   to:
