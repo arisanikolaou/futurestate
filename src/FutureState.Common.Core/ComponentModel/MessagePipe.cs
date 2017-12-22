@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 
 namespace FutureState.ComponentModel
 {
-    //an - made thread safer
-
     /// <summary>
     ///     A generic message pipe to send message of type TDomainEvent within a given application domain.
     /// </summary>
@@ -133,15 +131,13 @@ namespace FutureState.ComponentModel
             {
                 //has hash code override
                 var messageConsumer = new MessageConsumer<TDomainEvent>(consumer);
-                if (_subscriptions.Contains(messageConsumer))
-                {
-                    _subscriptions.Remove(messageConsumer);
+                if (!_subscriptions.Contains(messageConsumer))
+                    return false;
 
-                    return true;
-                }
+                _subscriptions.Remove(messageConsumer);
+
+                return true;
             }
-
-            return false;
         }
 
         /// <summary>
@@ -201,16 +197,24 @@ namespace FutureState.ComponentModel
 
             internal MessageConsumer(object owner)
             {
-                Action = domainEvent => { throw new NotSupportedException(); };
+                Action = domainEvent => throw new NotSupportedException();
                 Owner = owner;
+
                 unchecked
                 {
-                    _hashCode = typeof(TDomainEvent).FullName.GetHashCode() ^ Owner.GetHashCode();
+                    var fullName = typeof(TDomainEvent).FullName;
+                    if (fullName != null)
+                        _hashCode = fullName.GetHashCode() ^ Owner.GetHashCode();
                 }
             }
 
             public Action<TDomainEvent> Action { get; }
 
+            /// <summary>
+            ///     Consumes a domain event.
+            /// </summary>
+            /// <param name="domainEvent">The domain event to consume.</param>
+            /// <returns></returns>
             public Task ConsumeAsync(TDomainEvent domainEvent)
             {
                 return Task.Run(() => Action?.Invoke(domainEvent));
@@ -230,8 +234,7 @@ namespace FutureState.ComponentModel
                 if (ReferenceEquals(obj, null))
                     return false;
 
-                var consumer = obj as MessageConsumer<TDomainEvent>;
-                if (consumer != null)
+                if (obj is MessageConsumer<TDomainEvent> consumer)
                     return consumer.GetHashCode() == _hashCode;
 
                 return ReferenceEquals(this, obj);

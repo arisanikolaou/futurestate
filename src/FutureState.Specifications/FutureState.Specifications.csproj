@@ -100,7 +100,6 @@
     <Compile Include="ValidateWithAttribute.cs" />
     <Compile Include="ValidateWithSpecs.cs" />
     <Compile Include="ValidatorAggregate.cs" />
-    <Compile Include="ValueMatchingSpecification.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
