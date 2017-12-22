@@ -13,8 +13,26 @@ assembly_info:
   assembly_file_version: "{version}"
   assembly_informational_version: "{version}"
   
-test: off
+test: on
+
+environment:
+  NUGET_APIKEY: 31e362bb-842c-4446-86dc-77d1ebd6b731
+  matrix:
+  - {}
+
+build:
+  publish_nuget: true
+  include_nuget_refer
 
 build_script:
 #- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages -ScriptArgs '-BUILD_VERSION="{version}"'
 - cmd: PowerShell -Version 2.0 .\build.ps1
+
+notifications:
+- provider: Email
+  to:
+  - aris.nikolaou@outlook.com
+  subject: FutureState build
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false
