@@ -239,7 +239,7 @@ Task("Run-Unit-Tests")
     });
 
 	// build agent
-	XUnit2(string.Format("./FutureState*Tests.dll", configuration), new XUnit2Settings {
+	XUnit2(string.Format("./**/FutureState*Tests.dll", configuration), new XUnit2Settings {
         XmlReport = true,
         OutputDirectory = buildDir
     });
