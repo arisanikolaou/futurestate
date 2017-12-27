@@ -12,8 +12,13 @@ assembly_info:
 test: off
 build:
   publish_nuget: true
+  parallel: true 
+  verbosity: detailed
 build_script:
-- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages
+- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Artefacts
+artifacts:
+  - path: 'nuget\*.nupkg'
+  - path: 'build\*.*'
 notifications:
 - provider: Email
   to:

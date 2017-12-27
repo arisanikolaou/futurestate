@@ -165,17 +165,6 @@ Task("Packages")
 				}
 			});
 		}
-
-		if (AppVeyor.IsRunningOnAppVeyor)
-		{
-			Information("Deploying artefacts on AppVeyor.");
-
-			foreach (var file in GetFiles(distDir))
-				AppVeyor.UploadArtifact(file.FullPath);
-
-			foreach (var file in GetFiles(nugetDir))
-				AppVeyor.UploadArtifact(file.FullPath);
-		}
 	});
 
 Task("Websites")
@@ -262,6 +251,24 @@ Task("Publish-Packages")
 		});
 
 	});
+
+  Task("Artefacts")
+	.IsDependentOn("Packages")
+	.Does(() =>
+	{
+		if (AppVeyor.IsRunningOnAppVeyor)
+		{
+			Information("Deploying artefacts on AppVeyor.");
+
+			foreach (var file in GetFiles(distDir))
+				AppVeyor.UploadArtifact(file.FullPath);
+
+			foreach (var file in GetFiles(nugetDirname + "/*.nupkg"))
+				AppVeyor.UploadArtifact(file.FullPath);
+		}
+
+	});
+
 
 
 //////////////////////////////////////////////////////////////////////
