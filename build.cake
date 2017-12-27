@@ -39,6 +39,7 @@ var apiKey = ArgumentOrEnvironmentVariable("NUGET_APIKEY", "NUGET_APIKEY","");
 //////////////////////////////////////////////////////////////////////
 
 Information("Starting build: " + solutionVersion);
+Information("Nuget Api Key" + apiKey);
 
 Task("Clean-Outputs")
 	.Does(() => 
@@ -240,6 +241,7 @@ Task("Run-Unit-Tests")
 Task("Publish-Packages")
 	.IsDependentOn("Packages")
 	.DoesForEach(GetFiles(nugetDirname + "/*.nupkg"), (package)=> {
+		Information("Api Key" + apiKey);
 
 		// Push the package.
 		NuGetPush(package, new NuGetPushSettings {
