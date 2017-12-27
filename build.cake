@@ -228,19 +228,10 @@ Task("Run-Unit-Tests")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    NUnit3(string.Format("./tests/**/bin/{0}/FutureState*NUnit.Tests.dll", configuration), new NUnit3Settings {
-        NoResults = true
-        });
-
-
-    XUnit2(string.Format("./tests/**/bin/{0}/FutureState*Tests.dll", configuration), new XUnit2Settings {
+    XUnit2(string.Format("./tests/**/bin/{0}/*.Tests.dll", configuration), new XUnit2Settings {
         XmlReport = true,
-        OutputDirectory = buildDir
-    });
-
-	// build agent
-	XUnit2(string.Format("./**/FutureState*Tests.dll", configuration), new XUnit2Settings {
-        XmlReport = true,
+		UseX86 = false,
+		HtmlReport = true,
         OutputDirectory = buildDir
     });
 });
