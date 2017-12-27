@@ -1,17 +1,23 @@
-#addin nuget:?package=Cake.Sonar
-#addin "Cake.FileHelpers"
-#addin nuget:?package=Cake.ArgumentHelpers
-#addin nuget:?package=Cake.SemVer
-#addin nuget:?package=semver&version=2.0.4
+#addin "nuget:?package=Cake.Sonar"
+#addin "nuget:?package=Cake.ArgumentHelpers"
+#addin "nuget:?package=Cake.SemVer"
+#addin "nuget:?package=semver&version=2.0.4"
+#addin "nuget:?package=Cake.Codecov"
+#addin "nuget:?package=Cake.Git"
+#addin "nuget:?package=Cake.AppVeyor"
+#addin "nuget:?package=Refit&version=3.0.0"
+#addin "nuget:?package=Newtonsoft.Json&version=9.0.1"
 #addin "Cake.XdtTransform"
-#addin nuget:?package=Cake.Codecov
-#addin nuget:?package=Cake.Git
+#addin "Cake.FileHelpers"
+#addin "System.Net.Http"
 
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 #tool "xunit.runner.console"
-#tool nuget:?package=MSBuild.SonarQube.Runner.Tool
+#tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
 #tool "nuget:?package=GitVersion.CommandLine"
-#tool nuget:?package=Codecov
+#tool "nuget:?package=Codecov"
+#tool "nuget:?package=GitReleaseNotes"
+#tool "nuget:?package=GitVersion.CommandLine"
+#tool "nuget:?package=gitlink"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -32,14 +38,13 @@ var solutionVersion = Argument<string>("BUILD_VERSION",defaultVersion);
 
 // nuget get
 var nugetServer = "https://www.nuget.org";
-var apiKey = ArgumentOrEnvironmentVariable("NUGET_APIKEY", "NUGET_APIKEY","");
+var apiKey = EnvironmentVariable("NUGET_APIKEY");
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
 Information("Starting build: " + solutionVersion);
-Information("Nuget Api Key" + apiKey);
 
 Task("Clean-Outputs")
 	.Does(() => 
@@ -164,6 +169,12 @@ Task("Packages")
 					{ "Configuration", configuration }
 				}
 			});
+		}
+
+		if (AppVeyor.IsRunningOnAppVeyor)
+		{
+			foreach (var file in GetFiles(distDir))
+				AppVeyor.UploadArtifact(file.FullPath);
 		}
 	});
 
