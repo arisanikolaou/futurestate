@@ -13,7 +13,7 @@ test: off
 build:
   publish_nuget: true
 build_script:
-- cmd: PowerShell -Version 2.0 .\build.ps1 -Target PPublish-Packages
+- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Publish-Packages
 notifications:
 - provider: Email
   to:
