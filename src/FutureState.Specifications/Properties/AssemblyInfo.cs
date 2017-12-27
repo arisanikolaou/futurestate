@@ -2,6 +2,6 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("FutureState.Specifications")]
 [assembly: AssemblyProduct("FutureState")]
-[assembly: AssemblyVersion("0.2.0")]
-[assembly: AssemblyFileVersion("0.2.0")]
-[assembly: AssemblyInformationalVersion("0.1.0+54.Branch.master.Sha.c8c0d7ad52a3f0d8c84d1eac818ad8bb990f4123")]
+[assembly: AssemblyVersion("0.3.0")]
+[assembly: AssemblyFileVersion("0.3.0")]
+[assembly: AssemblyInformationalVersion("0.1.0+56.Branch.master.Sha.41927dbfb811e72700643004d84ce20e89c75632")]

@@ -1,8 +1,6 @@
-#addin "nuget:?package=Cake.Sonar"
 #addin "nuget:?package=Cake.ArgumentHelpers"
 #addin "nuget:?package=Cake.SemVer"
 #addin "nuget:?package=semver&version=2.0.4"
-#addin "nuget:?package=Cake.Codecov"
 #addin "nuget:?package=Cake.Git"
 #addin "nuget:?package=Cake.AppVeyor"
 #addin "nuget:?package=Refit&version=3.0.0"
@@ -12,10 +10,6 @@
 #addin "System.Net.Http"
 
 #tool "xunit.runner.console"
-#tool "nuget:?package=MSBuild.SonarQube.Runner.Tool"
-#tool "nuget:?package=GitVersion.CommandLine"
-#tool "nuget:?package=Codecov"
-#tool "nuget:?package=GitReleaseNotes"
 #tool "nuget:?package=GitVersion.CommandLine"
 #tool "nuget:?package=gitlink"
 
@@ -33,7 +27,7 @@ var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var defaultVersion = "0.2.0";
+var defaultVersion = "0.3.0";
 var solutionVersion = Argument<string>("BUILD_VERSION",defaultVersion);
 
 // nuget get
@@ -45,12 +39,14 @@ var apiKey = EnvironmentVariable("NUGET_APIKEY");
 //////////////////////////////////////////////////////////////////////
 
 Information("Starting build: " + solutionVersion);
+Information("Nuget Api Key: " + apiKey);
 
 Task("Clean-Outputs")
 	.Does(() => 
 	{
 		CleanDirectory(buildDir);
 		CleanDirectory(distDir);
+		CleanDirectory(nugetDir);
 	});
 
 Task("Clean")
@@ -152,18 +148,17 @@ Task("Packages")
 		{
 			Information("Packaging project: " + project);
 
-			// var assemblyInfo = ParseAssemblyInfo(project.GetDirectory().CombineWithFilePath("./Properties/AssemblyInfo.cs"));
-			// var assemblyVersion = ParseSemVer(assemblyInfo.AssemblyVersion); 
-            // var packageVersion = assemblyVersion;
-			// var packageVersion = assemblyVersion.Change(prerelease: "pre" + Jenkins.Environment.Build.BuildNumber);
-            //var packageVersion = assemblyVersion.Change(prerelease: "1");
+			var assemblyInfo = ParseAssemblyInfo(project.GetDirectory().CombineWithFilePath("./Properties/AssemblyInfo.cs"));
+			var assemblyVersion = ParseSemVer(assemblyInfo.AssemblyVersion); 
+            var packageVersion = assemblyVersion;
 
-            // Information(packageVersion.ToString());
+            Information("Package version: " + packageVersion.ToString());
 
 			NuGetPack(project, new NuGetPackSettings
 			{
 				OutputDirectory = nugetDir,
 				IncludeReferencedProjects = true,
+				Version  = packageVersion.ToString(),
 				Properties = new Dictionary<string, string> 
 				{
 					{ "Configuration", configuration }
@@ -173,7 +168,12 @@ Task("Packages")
 
 		if (AppVeyor.IsRunningOnAppVeyor)
 		{
+			Information("Deploying artefacts on AppVeyor.");
+
 			foreach (var file in GetFiles(distDir))
+				AppVeyor.UploadArtifact(file.FullPath);
+
+			foreach (var file in GetFiles(nugetDir))
 				AppVeyor.UploadArtifact(file.FullPath);
 		}
 	});
@@ -252,7 +252,8 @@ Task("Run-Unit-Tests")
 Task("Publish-Packages")
 	.IsDependentOn("Packages")
 	.DoesForEach(GetFiles(nugetDirname + "/*.nupkg"), (package)=> {
-		Information("Api Key" + apiKey);
+
+		Information("Publishing Packages Api Key: " + apiKey);
 
 		// Push the package.
 		NuGetPush(package, new NuGetPushSettings {
