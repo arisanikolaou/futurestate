@@ -7,7 +7,7 @@ using System;
 namespace FutureState.ComponentModel
 {
     /// <summary>
-    /// Responsible for copying/mapping one object type into another object type.
+    ///     Responsible for copying/mapping one object type into another object type.
     /// </summary>
     /// <typeparam name="TFrom">The source object type.</typeparam>
     /// <typeparam name="TTo">The target object type.</typeparam>
@@ -17,7 +17,7 @@ namespace FutureState.ComponentModel
     }
 
     /// <summary>
-    /// Responsible for copying/mapping one object type into another instance
+    ///     Responsible for copying/mapping one object type into another instance
     /// </summary>
     /// <typeparam name="TType">The source and target object type.</typeparam>
     public interface IMapper<TType>
@@ -30,7 +30,7 @@ namespace FutureState.ComponentModel
     public interface IMapper
     {
         /// <summary>
-        /// Maps a source object of a given type to a destination object of a given type.
+        ///     Maps a source object of a given type to a destination object of a given type.
         /// </summary>
         object Map(object src, Type srcType, Type dstType, object dst = null);
     }

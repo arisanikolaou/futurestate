@@ -13,8 +13,8 @@ using System.Runtime.Serialization;
 namespace FutureState
 {
     /// <summary>
-    /// NOTE: this is originally from http://blog.nuclex-games.com/mono-dotnet/fast-deep-cloning/ with some changes.
-    /// Fast deep clone utility using expression trees.
+    ///     NOTE: this is originally from http://blog.nuclex-games.com/mono-dotnet/fast-deep-cloning/ with some changes.
+    ///     Fast deep clone utility using expression trees.
     /// </summary>
     public static class DeepCloneUtil
     {
@@ -24,7 +24,7 @@ namespace FutureState
                 new ConcurrentDictionary<Type, Func<object, Dictionary<object, object>, object>>();
 
         /// <summary>
-        /// Creates a deep clone of the specified object, also creating clones of all child objects being referenced
+        ///     Creates a deep clone of the specified object, also creating clones of all child objects being referenced
         /// </summary>
         /// <typeparam name="TCloned">Type of the object that will be cloned</typeparam>
         /// <param name="objectToClone">Object that will be cloned</param>
@@ -32,11 +32,11 @@ namespace FutureState
         public static TCloned DeepFieldClone<TCloned>(TCloned objectToClone)
         {
             var creator = GetTypeCloner(typeof(TCloned));
-            return (TCloned)creator(objectToClone, new Dictionary<object, object>());
+            return (TCloned) creator(objectToClone, new Dictionary<object, object>());
         }
 
         /// <summary>
-        /// Retrieves the existing clone method for the specified type or compiles one if none exists for the type yet
+        ///     Retrieves the existing clone method for the specified type or compiles one if none exists for the type yet
         /// </summary>
         /// <param name="clonedType">Type for which a clone method will be retrieved</param>
         /// <returns>The clone method for the specified type</returns>
@@ -54,7 +54,7 @@ namespace FutureState
                 typeof(Dictionary<object, object>).GetMethod("get_Item");
 
             private static readonly MethodInfo _fieldInfoSetValueMethod = typeof(FieldInfo).GetMethod("SetValue",
-                new[] { typeof(object), typeof(object) });
+                new[] {typeof(object), typeof(object)});
 
             private static readonly MethodInfo _getTypeClonerMethodInfo =
                 typeof(DeepCloneUtil).GetMethod(nameof(GetTypeCloner), BindingFlags.NonPublic | BindingFlags.Static);
@@ -65,8 +65,8 @@ namespace FutureState
                 typeof(Func<object, Dictionary<object, object>, object>).GetMethod("Invoke");
 
             /// <summary>
-            /// Creates an expression that copies a coplex array value from the source to the target.
-            /// The value will be cloned as well using the dictionary to reuse already cloned objects.
+            ///     Creates an expression that copies a coplex array value from the source to the target.
+            ///     The value will be cloned as well using the dictionary to reuse already cloned objects.
             /// </summary>
             /// <param name="sourceField">The source field.</param>
             /// <param name="targetField">The target field.</param>
@@ -94,8 +94,8 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Creates an expression that copies a coplex value from the source to the target.
-            /// The value will be cloned as well using the dictionary to reuse already cloned objects.
+            ///     Creates an expression that copies a coplex value from the source to the target.
+            ///     The value will be cloned as well using the dictionary to reuse already cloned objects.
             /// </summary>
             /// <param name="original">The original.</param>
             /// <param name="clone">The clone.</param>
@@ -129,7 +129,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Creates an expression that copies a value from the original to the clone.
+            ///     Creates an expression that copies a value from the original to the clone.
             /// </summary>
             /// <param name="original">The original.</param>
             /// <param name="clone">The clone.</param>
@@ -145,10 +145,8 @@ namespace FutureState
             {
                 // workaround for readonly fields: use reflection, this is a lot slower but the only way except using il directly
                 if (fieldInfo.IsInitOnly)
-                {
                     return Expression.Call(Expression.Constant(fieldInfo), _fieldInfoSetValueMethod, clone,
                         Expression.Convert(value, typeof(object)));
-                }
 
                 return Expression.Assign(Expression.Field(clone, fieldInfo), value);
             }
@@ -206,21 +204,15 @@ namespace FutureState
                     _expressions.Add(Expression.Assign(_typedOriginal, Expression.Convert(_original, _type)));
 
                     if (_type.IsArray)
-                    {
                         CloneArray();
-                    }
                     else
-                    {
                         CloneObject();
-                    }
 
                     resultExpression = Expression.Block(_variables, _expressions);
                 }
 
                 if (_type.IsValueType)
-                {
                     resultExpression = Expression.Convert(resultExpression, typeof(object));
-                }
 
                 return
                     Expression.Lambda<Func<object, Dictionary<object, object>, object>>(resultExpression, _original,
@@ -228,7 +220,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Generates state transfer expressions to copy an array of primitive types
+            ///     Generates state transfer expressions to copy an array of primitive types
             /// </summary>
             /// <param name="elementType">Type of array that will be cloned</param>
             /// <param name="source">Variable expression for the original array</param>
@@ -242,17 +234,18 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Returns all the fields of a type, working around a weird reflection issue
-            /// where explicitly declared fields in base classes are returned, but not
-            /// automatic property backing fields.
+            ///     Returns all the fields of a type, working around a weird reflection issue
+            ///     where explicitly declared fields in base classes are returned, but not
+            ///     automatic property backing fields.
             /// </summary>
             /// <param name="type">Type whose fields will be returned</param>
             /// <param name="bindingFlags">Binding flags to use when querying the fields</param>
             /// <param name="skipCloneFields">The fields to skip deep cloning.</param>
             /// <returns>
-            /// All of the type's fields, including its base types
+            ///     All of the type's fields, including its base types
             /// </returns>
-            private static IEnumerable<FieldInfo> GetFieldInfosIncludingBaseClasses(Type type, BindingFlags bindingFlags,
+            private static IEnumerable<FieldInfo> GetFieldInfosIncludingBaseClasses(Type type,
+                BindingFlags bindingFlags,
                 out ISet<FieldInfo> skipCloneFields)
             {
                 skipCloneFields =
@@ -276,19 +269,18 @@ namespace FutureState
                             skipCloneFields.Add(field);
                             continue;
                         }
+
                         if (field.Name.StartsWith("<") && field.Name.EndsWith(">k__BackingField"))
                         {
                             var propertyInfo =
                                 type.GetProperty(field.Name.Substring(1,
                                     field.Name.IndexOf(">k__BackingField", StringComparison.Ordinal) - 1));
                             if (propertyInfo != null)
-                            {
                                 if (propertyInfo.IsDefined(typeof(SkipDeepCloneAttribute), true))
                                 {
                                     skipCloneFields.Add(field);
                                     continue;
                                 }
-                            }
                         }
 
                         fieldsToClone.Add(field);
@@ -301,7 +293,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Determines whether the specified type is primitive or a string.
+            ///     Determines whether the specified type is primitive or a string.
             /// </summary>
             /// <param name="type">The type to check.</param>
             /// <returns><c>true</c> if the type is primitive of a string; otherwise <c>false</c>.</returns>
@@ -311,7 +303,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Clones the array.
+            ///     Clones the array.
             /// </summary>
             private void CloneArray()
             {
@@ -326,7 +318,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Clones the object.
+            ///     Clones the object.
             /// </summary>
             private void CloneObject()
             {
@@ -352,7 +344,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Generates state transfer expressions to copy an array of complex types
+            ///     Generates state transfer expressions to copy an array of complex types
             /// </summary>
             /// <param name="arrayType">Type of array that will be cloned</param>
             /// <param name="elementType">Type of the elements of the array</param>
@@ -491,7 +483,7 @@ namespace FutureState
             }
 
             /// <summary>
-            /// Generates state transfer expressions to copy a complex type
+            ///     Generates state transfer expressions to copy a complex type
             /// </summary>
             /// <param name="complexType">Complex type that will be cloned</param>
             /// <param name="source">Variable expression for the original instance</param>
@@ -509,42 +501,30 @@ namespace FutureState
 
                 // For those field which skip deep copying, do shallow copying by assigning the field value from the source to the target
                 foreach (var fieldInfo in skipCloneFieldInfos)
-                {
                     expression.Add(CloneExpressionHelper.CreateCopyFieldExpression(source, target, fieldInfo));
-                }
 
                 foreach (var fieldInfo in fieldInfos)
                 {
                     var fieldType = fieldInfo.FieldType;
                     if (fieldType.Equals(typeof(DataTable)))
-                    {
-                        //same as in next if but method IsTypePrimiive was failing for DT
                         expression.Add(CloneExpressionHelper.CreateCopyFieldExpression(source, target, fieldInfo));
-                    }
                     else if (IsTypePrimitiveOrString(fieldType))
-                    {
                         expression.Add(CloneExpressionHelper.CreateCopyFieldExpression(source, target, fieldInfo));
-                    }
                     else if (fieldType.IsValueType)
-                    {
-                        // A nested value type is part of the parent and will have its fields directly assigned without boxing, new instance creation or anything like that.
                         GenerateFieldBasedComplexTypeTransferExpressions(fieldType, Expression.Field(source, fieldInfo),
                             Expression.Field(target, fieldInfo), expression);
-                    }
                     else
-                    {
                         GenerateFieldBasedReferenceTypeTransferExpressions(source, target, expression, fieldInfo);
-                    }
                 }
             }
 
             /// <summary>
-            /// Generates the expressions to transfer a reference type (array or class)
+            ///     Generates the expressions to transfer a reference type (array or class)
             /// </summary>
             /// <param name="original">Original value that will be cloned</param>
             /// <param name="clone">Variable that will receive the cloned value</param>
             /// <param name="expressions">
-            /// Receives the expression generated to transfer the values
+            ///     Receives the expression generated to transfer the values
             /// </param>
             /// <param name="fieldInfo">Reflection informations about the field being cloned</param>
             private void GenerateFieldBasedReferenceTypeTransferExpressions(Expression original, Expression clone,

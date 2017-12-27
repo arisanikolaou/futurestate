@@ -29,14 +29,10 @@ namespace FutureState
             string result;
 
             if (!typeof(T).IsEnum)
-            {
                 throw new ArgumentException("T must be an enumerated type");
-            }
 
             if (input != null)
-            {
                 input = input.Trim();
-            }
 
             if (string.IsNullOrEmpty(input))
             {
@@ -67,9 +63,7 @@ namespace FutureState
             where T : struct, IConvertible
         {
             if (!typeof(T).IsEnum)
-            {
                 throw new ArgumentException("T must be an enumerated type");
-            }
 
             T output;
             var result = Enum.TryParse(input, true, out output)
@@ -80,7 +74,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Get string value from input. Return default value if input is null.
+        ///     Get string value from input. Return default value if input is null.
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,21 +85,15 @@ namespace FutureState
             string result;
 
             if (input != null)
-            {
                 input = input.Trim();
-            }
 
             if (string.IsNullOrEmpty(input))
-            {
                 result = nullOrEmptyDefault;
-            }
             else
-            {
                 result =
                     maps.Where(x => x.Item1.Equals(input, StringComparison.OrdinalIgnoreCase))
                         .Select(x => x.Item2)
                         .FirstOrDefault() ?? input;
-            }
 
             return result;
         }

@@ -3,14 +3,31 @@ using System.Data;
 namespace FutureState.Data.Sql
 {
     /// <summary>
-    ///     A sql transaction.
+    ///     A wrapper around <see cref="IDbTransaction"/> transaction.
     /// </summary>
     public class Transacton : ITransaction
     {
-        readonly IDbTransaction _transaction;
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="connection">
+        ///     The connection to create the transaction under.
+        /// </param>
+        internal Transacton(IDbConnection connection)
+        {
+            UnderlyingTransaction = connection.BeginTransaction();
 
-        public IDbTransaction UnderlyingTransaction => _transaction;
+            IsPending = true;
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public IDbTransaction UnderlyingTransaction { get; }
+
+        /// <summary>
+        ///     Rolls back any pending transactions and disposes any underlying connection.
+        /// </summary>
         public void Dispose()
         {
             if (!IsPending) return;
@@ -21,15 +38,8 @@ namespace FutureState.Data.Sql
             }
             finally
             {
-                _transaction.Dispose();
+                UnderlyingTransaction.Dispose();
             }
-        }
-
-        internal Transacton(IDbConnection connection)
-        {
-            _transaction = connection.BeginTransaction();
-
-            IsPending = true;
         }
 
         public bool IsPending { get; private set; }
@@ -41,7 +51,7 @@ namespace FutureState.Data.Sql
         {
             try
             {
-                _transaction.Commit();
+                UnderlyingTransaction.Commit();
             }
             finally
             {
@@ -56,7 +66,7 @@ namespace FutureState.Data.Sql
         {
             try
             {
-                _transaction.Rollback();
+                UnderlyingTransaction.Rollback();
             }
             finally
             {

@@ -57,7 +57,8 @@ namespace Dapper.Extensions.Linq.Implementor
         {
             var classMap = SqlGenerator.Configuration.GetMap<T>();
             var nonIdentityKeyProperties =
-                classMap.LinqPropertyMaps.Where(p => p.KeyType == KeyType.Guid || p.KeyType == KeyType.Assigned).ToList();
+                classMap.LinqPropertyMaps.Where(p => p.KeyType == KeyType.Guid || p.KeyType == KeyType.Assigned)
+                    .ToList();
             var identityColumn = classMap.LinqPropertyMaps.SingleOrDefault(p => p.KeyType == KeyType.Identity);
 
             foreach (var column in nonIdentityKeyProperties)
@@ -118,7 +119,8 @@ namespace Dapper.Extensions.Linq.Implementor
 
             foreach (var property in ReflectionHelper.GetObjectValues(entity, columns))
             {
-                var type = columns.Where(column => column.PropertyInfo.Name == property.Key).Select(column => column.Type).First();
+                var type = columns.Where(column => column.PropertyInfo.Name == property.Key)
+                    .Select(column => column.Type).First();
                 dynamicParameters.Add(property.Key, property.Value, type);
             }
 

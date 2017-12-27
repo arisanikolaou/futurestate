@@ -2,33 +2,26 @@
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 
-
 namespace FutureState
 {
-    /// <summary>
-    /// Base class used to communicate the error details in a given generic <see cref="FsException" />
-    /// class.
-    /// </summary>
     [Serializable]
     public class Error : IExceptionData, ISerializable
     {
         private string _category;
-
         private string _message;
-
         private string _type;
 
         /// <summary>
-        /// Creates a new error object
+        ///     Creates a new error object
         /// </summary>
         /// <param name="category">
-        /// Optional. Gets the category.
+        ///     Optional. Gets the category.
         /// </param>
         /// <param name="type">
-        /// Optional. Gets the type of error.
+        ///     Optional. Gets the type of error.
         /// </param>
         /// <param name="message">
-        /// Required. Gets the error message;
+        ///     Required. Gets the error message;
         /// </param>
         public Error(string message, string type = "", string category = "")
         {
@@ -47,35 +40,35 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Gets the error category.
+        ///     Gets the error category.
         /// </summary>
         public string Category
         {
-            get { return _category; }
+            get => _category;
 
-            protected set { _category = value; }
+            protected set => _category = value;
             // required for jsv serialization support
         }
 
         /// <summary>
-        /// Gets the error type.
+        ///     Gets the error type.
         /// </summary>
         public string Type
         {
-            get { return _type; }
+            get => _type;
 
-            protected set { _type = value; }
+            protected set => _type = value;
             // required for jsv serialization support
         }
 
         /// <summary>
-        /// Gets the error message.
+        ///     Gets the error message.
         /// </summary>
         public string Message
         {
-            get { return _message; }
+            get => _message;
 
-            protected set { _message = value; }
+            protected set => _message = value;
             // required for jsv serialization support
         }
 
@@ -88,7 +81,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Gets the category and error message.
+        ///     Gets the category and error message.
         /// </summary>
         public override string ToString()
         {

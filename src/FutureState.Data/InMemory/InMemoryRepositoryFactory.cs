@@ -1,17 +1,15 @@
-using FutureState.Data.Keys;
 using System;
 using System.Collections.Concurrent;
-using FutureState.Data.KeyBinders;
 
 namespace FutureState.Data
 {
     /// <summary>
-    /// A factory that creates in-memory databases for entities of any given type that are
-    /// all responsible for generating their own global unique identififers.
+    ///     A factory that creates in-memory databases for entities of any given type that are
+    ///     all responsible for generating their own global unique identififers.
     /// </summary>
     public class InMemoryRepositoryFactory : IRepositoryFactory
     {
-        readonly ConcurrentDictionary<Type, object> _repositories;
+        private readonly ConcurrentDictionary<Type, object> _repositories;
 
         public InMemoryRepositoryFactory()
         {
@@ -34,8 +32,8 @@ namespace FutureState.Data
             return _repositories.GetOrAdd(entityType,
                 type =>
                     new InMemoryRepository<TEntity, TKey>(
-                        new NoOpEntityIdProvider<TEntity, TKey>(),
-                        new AttributeKeyBinder<TEntity, TKey>(),
+                        new KeyProviderNoOp<TEntity, TKey>(),
+                        new KeyBinderFromAttributes<TEntity, TKey>(),
                         new TEntity[0])) as IRepository<TEntity, TKey>;
         }
 
@@ -47,8 +45,8 @@ namespace FutureState.Data
             return _repositories.GetOrAdd(typeof(TEntity),
                 type =>
                     new InMemoryRepository<TEntity, TKey>(
-                        new NoOpEntityIdProvider<TEntity, TKey>(),
-                        new AttributeKeyBinder<TEntity, TKey>(),
+                        new KeyProviderNoOp<TEntity, TKey>(),
+                        new KeyBinderFromAttributes<TEntity, TKey>(),
                         new TEntity[0])) as IRepository<TEntity, TKey>;
         }
 
@@ -57,8 +55,8 @@ namespace FutureState.Data
             return _repositories.GetOrAdd(typeof(TEntity),
                 type =>
                     new InMemoryRepository<TEntity>(
-                        new NoOpEntityIdProvider<TEntity, Guid>(),
-                        new AttributeKeyBinder<TEntity, Guid>(),
+                        new KeyProviderNoOp<TEntity, Guid>(),
+                        new KeyBinderFromAttributes<TEntity, Guid>(),
                         new TEntity[0])) as IRepository<TEntity>;
         }
 

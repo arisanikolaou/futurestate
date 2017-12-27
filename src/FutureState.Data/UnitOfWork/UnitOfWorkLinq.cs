@@ -8,7 +8,7 @@ namespace FutureState.Data
     /// </summary>
     /// <typeparam name="TEntity">The entity to save, add or remove.</typeparam>
     /// <typeparam name="TKey">The entity's key type.</typeparam>
-    public interface IUnitOfWorkLinq<TEntity,TKey> : IUnitOfWork where TEntity : class, IEntity<TKey>
+    public interface IUnitOfWorkLinq<TEntity, TKey> : IUnitOfWork where TEntity : class, IEntity<TKey>
     {
         EntitySetLinq<TEntity, TKey> EntitySet { get; }
     }
@@ -25,7 +25,7 @@ namespace FutureState.Data
         protected EntitySetLinq<TEntity, TKey> _entitySet;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="getRepository">The function to produce the repository.</param>
         /// <param name="sessionFactory">The factory to produce sessions to pass into the given repository.</param>
@@ -47,7 +47,7 @@ namespace FutureState.Data
         public EntitySetLinq<TEntity, TKey> EntitySet => _entitySet;
 
         /// <summary>
-        /// Gets the display name of the unit of work.
+        ///     Gets the display name of the unit of work.
         /// </summary>
         public override string ToString()
         {

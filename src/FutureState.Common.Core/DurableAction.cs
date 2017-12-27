@@ -1,16 +1,16 @@
 ﻿#region
 
-using NLog;
 using System;
 using System.Threading;
+using NLog;
 
 #endregion
 
 namespace FutureState
 {
     /// <summary>
-    /// A durable action that should be re-executed until either a maximum
-    /// retry attempt is exceeded or a retry condition is not met.
+    ///     A durable action that should be re-executed until either a maximum
+    ///     retry attempt is exceeded or a retry condition is not met.
     /// </summary>
     public class DurableAction
     {
@@ -19,32 +19,30 @@ namespace FutureState
         private readonly Action _action;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DurableAction" /> class.
+        ///     Initializes a new instance of the <see cref="DurableAction" /> class.
         /// </summary>
         /// <param name="action">The action to execute.</param>
         /// <exception cref="System.ArgumentNullException">action</exception>
         public DurableAction(Action action)
         {
             if (action == null)
-            {
                 throw new ArgumentNullException(nameof(action));
-            }
 
             _action = action;
         }
 
         /// <summary>
-        /// Gets the number of execution attempts made to run the durable action.
+        ///     Gets the number of execution attempts made to run the durable action.
         /// </summary>
         public int ExecutionAttempts { get; private set; }
 
         /// <summary>
-        /// Gets the last exception that was raised.
+        ///     Gets the last exception that was raised.
         /// </summary>
         public Exception LastException { get; private set; }
 
         /// <summary>
-        /// Tries to execute a unit of work for a maximum number of attempts before error-ing out.
+        ///     Tries to execute a unit of work for a maximum number of attempts before error-ing out.
         /// </summary>
         public void Invoke(int maxRetries, int seconds, Predicate<Exception> waitCondition = null)
         {
@@ -52,7 +50,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Tries to execute a unit of work for a maximum number of attempts before erroring out.
+        ///     Tries to execute a unit of work for a maximum number of attempts before erroring out.
         /// </summary>
         /// <param name="waitCondition">The condition to use to wait and repeat the action.</param>
         /// <param name="maxRetries">The max retries before error out.</param>
@@ -62,7 +60,6 @@ namespace FutureState
             ExecutionAttempts = 0;
 
             for (var i = 1; i <= maxRetries; i++)
-            {
                 try
                 {
                     _action.Invoke();
@@ -95,7 +92,6 @@ namespace FutureState
                         throw;
                     }
                 }
-            }
         }
     }
 }

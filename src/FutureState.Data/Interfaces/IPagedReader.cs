@@ -7,7 +7,7 @@ namespace FutureState.Data
     {
     }
 
-    public interface IPagedReader<T> : IPagedReader<T, Guid>, IReader<T>
+    public interface IPagedReader<TEntity> : IPagedReader<TEntity, Guid>, IReader<TEntity>
     {
     }
 }

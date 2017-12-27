@@ -10,7 +10,7 @@ using System.Text;
 namespace FutureState.Specifications
 {
     /// <summary>
-    /// Extension methods for <see cref="ISpecification{T}" />
+    ///     Extension methods for <see cref="ISpecification{T}" />
     /// </summary>
     public static class SpecificationEx
     {
@@ -30,7 +30,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Will throw a <see cref="RuleException" /> if any errors are detected.
+        ///     Will throw a <see cref="RuleException" /> if any errors are detected.
         /// </summary>
         /// <param name="validatable">The entity that is validatable.</param>
         /// <exception cref="RuleException">Raised if any errors are detected in the validatable instance.</exception>
@@ -44,9 +44,7 @@ namespace FutureState.Specifications
             {
                 var sb = new StringBuilder();
                 foreach (var error in errors)
-                {
                     sb.AppendLine(error.ToString());
-                }
                 var message = sb.ToString();
 
                 throw new RuleException(message, errors);
@@ -54,7 +52,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Will throw a <see cref="RuleException" /> if any errors are detected.
+        ///     Will throw a <see cref="RuleException" /> if any errors are detected.
         /// </summary>
         /// <param name="validatable">The entity that is validatable.</param>
         /// <param name="getMessage">The function to construct the error message.</param>
@@ -66,9 +64,7 @@ namespace FutureState.Specifications
 
             var errors = validatable.Validate().ToArray();
             if (errors.Any())
-            {
                 throw new RuleException(getMessage?.Invoke(), errors);
-            }
         }
 
         public static IEnumerable<ISpecification<TEntity>> GetInvalid<TEntity>(
@@ -77,12 +73,8 @@ namespace FutureState.Specifications
         {
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var spec in specs)
-            {
                 if (!spec.Evaluate(entity).IsValid)
-                {
                     yield return spec;
-                }
-            }
         }
 
         public static IEnumerable<Error> ToErrors<TEntity>(
@@ -96,14 +88,12 @@ namespace FutureState.Specifications
                 var result = spec.Evaluate(entity);
 
                 if (!result.IsValid)
-                {
                     yield return new Error(result.DetailedErrorMessage, spec.Key, category);
-                }
             }
         }
 
         /// <summary>
-        /// Raises a <see cref="RuleException" /> if the entity tested has errors.
+        ///     Raises a <see cref="RuleException" /> if the entity tested has errors.
         /// </summary>
         /// <typeparam name="TEntity">The entity type to test.</typeparam>
         /// <param name="specs">The specs to use to test the entity.</param>
@@ -119,13 +109,11 @@ namespace FutureState.Specifications
             var errors = ToErrors(specs, entity, category);
 
             if (errors.Any())
-            {
                 throw new RuleException(exceptionMessageText, errors);
-            }
         }
 
         /// <summary>
-        /// Raises a <see cref="RuleException" /> if the entity tested has errors.
+        ///     Raises a <see cref="RuleException" /> if the entity tested has errors.
         /// </summary>
         public static void ThrowExceptionIfInvalid<TEntity>(
             this IProvideSpecifications<TEntity> specProvider,
@@ -137,7 +125,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Finds the first specification matching a given key.
+        ///     Finds the first specification matching a given key.
         /// </summary>
         public static ISpecification<TEntity> Find<TEntity>(this IEnumerable<ISpecification<TEntity>> specs, string key)
         {

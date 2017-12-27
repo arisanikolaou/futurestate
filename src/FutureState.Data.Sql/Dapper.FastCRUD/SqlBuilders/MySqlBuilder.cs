@@ -47,6 +47,7 @@ namespace Dapper.FastCrud.SqlBuilders
                                 $"SELECT {ConstructRefreshOnInsertColumnSelection()} FROM {GetTableName()} WHERE {GetColumnName(InsertKeyDatabaseGeneratedProperties[0], null, false)} = LAST_INSERT_ID()");
                 }
             }
+
             return sql;
         }
 

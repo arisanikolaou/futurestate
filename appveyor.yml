@@ -1,5 +1,24 @@
-version: 1.0.{build}
-image: Visual Studio 2015
+version: 0.3.{build}
+image: Visual Studio 2017
+services:
+  - mssql2014           # start SQL Server 2014 Express
+# enable patching of AssemblyInfo.* files
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "2.2.{build}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+test: off
+build:
+  publish_nuget: true
 build_script:
 - cmd: PowerShell -Version 2.0 .\build.ps1
-test: off
+notifications:
+- provider: Email
+  to:
+  - aris.nikolaou@outlook.com
+  subject: FutureState build
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false

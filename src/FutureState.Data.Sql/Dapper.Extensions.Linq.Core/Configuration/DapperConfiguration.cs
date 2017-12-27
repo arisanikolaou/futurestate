@@ -5,7 +5,6 @@ using System.Reflection;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Core.Sql;
 
-
 namespace Dapper.Extensions.Linq.Core.Configuration
 {
     public class DapperConfiguration : IDapperConfiguration
@@ -19,7 +18,6 @@ namespace Dapper.Extensions.Linq.Core.Configuration
         {
             ContainerCustomisations = new ContainerCustomisations();
             Assemblies2 = new List<Assembly>();
-
         }
 
         public IContainerCustomisations ContainerCustomisations { get; }
@@ -38,7 +36,6 @@ namespace Dapper.Extensions.Linq.Core.Configuration
             Dialect = dialect;
             return this;
         }
-
 
 
         public IDapperConfiguration Build()

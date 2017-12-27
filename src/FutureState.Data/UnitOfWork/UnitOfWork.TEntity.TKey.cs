@@ -4,18 +4,18 @@ using System.Diagnostics;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Unit of work to read/write the state of a given set of entities.
+    ///     Unit of work to read/write the state of a given set of entities.
     /// </summary>
     /// <typeparam name="TEntity">The entity to add/remove or insert.</typeparam>
     /// <typeparam name="TKey">The entity's key.</typeparam>
-    public interface IUnitOfWork<TEntity,TKey> : IUnitOfWork
+    public interface IUnitOfWork<TEntity, TKey> : IUnitOfWork
         where TEntity : class, IEntity<TKey>
     {
         EntitySet<TEntity, TKey> EntitySet { get; }
     }
 
     /// <summary>
-    /// Unit of work to read/write the state of a given set of entities.
+    ///     Unit of work to read/write the state of a given set of entities.
     /// </summary>
     /// <typeparam name="TEntity">The entity to add/remove or insert.</typeparam>
     /// <typeparam name="TKey">The entity's key.</typeparam>
@@ -26,7 +26,7 @@ namespace FutureState.Data
         protected EntitySet<TEntity, TKey> _entitySet;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="getRepository">The function to produce the repository.</param>
         /// <param name="sessionFactory">The factory to produce sessions to pass into the given repository.</param>
@@ -46,7 +46,7 @@ namespace FutureState.Data
         public EntitySet<TEntity, TKey> EntitySet => _entitySet;
 
         /// <summary>
-        /// Gets the display name of the unit of work.
+        ///     Gets the display name of the unit of work.
         /// </summary>
         public override string ToString()
         {

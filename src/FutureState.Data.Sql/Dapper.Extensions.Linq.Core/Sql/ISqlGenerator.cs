@@ -15,7 +15,8 @@ namespace Dapper.Extensions.Linq.Core.Sql
         string SelectPaged(IClassMapper classMap, IPredicate predicate, IList<ISort> sort, int page, int resultsPerPage,
             IDictionary<string, object> parameters);
 
-        string SelectSet(IClassMapper classMap, IPredicate predicate, IList<ISort> sort, int firstResult, int maxResults,
+        string SelectSet(IClassMapper classMap, IPredicate predicate, IList<ISort> sort, int firstResult,
+            int maxResults,
             IDictionary<string, object> parameters);
 
         string Count(IClassMapper classMap, IPredicate predicate, IDictionary<string, object> parameters);

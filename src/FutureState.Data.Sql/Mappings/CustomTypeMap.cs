@@ -10,12 +10,11 @@ namespace FutureState.Data.Sql.Mappings
 
     public class CustomTypeMap<TEntity> : SqlMapper.ITypeMap
     {
-        private readonly Dictionary<string, SqlMapper.IMemberMap> _properties;
-
-        public Type UndelyingType => _undelyingType;
         // ReSharper disable once StaticMemberInGenericType
-        static readonly Type _undelyingType;
+        private static readonly Type _undelyingType;
+
         private readonly SqlMapper.ITypeMap _innerTypeMap;
+        private readonly Dictionary<string, SqlMapper.IMemberMap> _properties;
 
         static CustomTypeMap()
         {
@@ -24,14 +23,11 @@ namespace FutureState.Data.Sql.Mappings
 
         public CustomTypeMap(SqlMapper.ITypeMap innerTypeMap)
         {
-            this._innerTypeMap = innerTypeMap;
+            _innerTypeMap = innerTypeMap;
             _properties = new Dictionary<string, SqlMapper.IMemberMap>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public void Map(string memberName, string columnName)
-        {
-            _properties[memberName] = new MemberMap(_undelyingType.GetMember(memberName).Single(), columnName);
-        }
+        public Type UndelyingType => _undelyingType;
 
         public ConstructorInfo FindConstructor(string[] names, Type[] types)
         {
@@ -47,16 +43,18 @@ namespace FutureState.Data.Sql.Mappings
         {
             SqlMapper.IMemberMap map;
             if (!_properties.TryGetValue(memberName, out map))
-            { // you might want to return null if you prefer not to fallback to the
-              // default implementation
                 map = _innerTypeMap.GetMember(memberName);
-            }
             return map;
         }
 
         public ConstructorInfo FindExplicitConstructor()
         {
             return _innerTypeMap.FindExplicitConstructor();
+        }
+
+        public void Map(string memberName, string columnName)
+        {
+            _properties[memberName] = new MemberMap(_undelyingType.GetMember(memberName).Single(), columnName);
         }
     }
 }

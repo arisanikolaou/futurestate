@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using Dapper.Extensions.Linq.Core.Enums;
+using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.FluentMap.Dommel.Mapping;
-using Dapper.FluentMap.Mapping;
 using FutureState;
-using IPropertyMap = Dapper.Extensions.Linq.Core.Mapper.IPropertyMap;
 
 namespace Dapper.Extensions.Linq.Mapper
 {
@@ -18,7 +17,7 @@ namespace Dapper.Extensions.Linq.Mapper
     {
         internal const string LinqBinary = "System.Data.Linq.Binary";
 
-        static readonly Dictionary<Type, DbType> _typeMap = new Dictionary<Type, DbType>
+        private static readonly Dictionary<Type, DbType> _typeMap = new Dictionary<Type, DbType>
         {
             {typeof(byte), DbType.Byte},
             {typeof(sbyte), DbType.SByte},
@@ -59,11 +58,11 @@ namespace Dapper.Extensions.Linq.Mapper
             {typeof(object), DbType.Object}
         };
 
-        readonly DommelPropertyMap _innerMap;
+        private readonly DommelPropertyMap _innerMap;
 
         public LinqPropertyMap(DommelPropertyMap map)
         {
-            Guard.ArgumentNotNull(map,"map");
+            Guard.ArgumentNotNull(map, "map");
 
             _innerMap = map;
 
@@ -100,7 +99,7 @@ namespace Dapper.Extensions.Linq.Mapper
 
         public bool CaseSensitive { get; set; }
 
-        static DbType LookupDbType(Type type)
+        private static DbType LookupDbType(Type type)
         {
             DbType dbType;
             var nullUnderlyingType = Nullable.GetUnderlyingType(type);

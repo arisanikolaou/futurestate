@@ -7,12 +7,12 @@ using System.Collections.Generic;
 namespace FutureState.Specifications
 {
     /// <summary>
-    /// Validates a given objects against an aggregated set of rules.
+    ///     Validates a given objects against an aggregated set of rules.
     /// </summary>
     public interface IValidatorAggregate
     {
         /// <summary>
-        /// The list of validation errors that was encountered testing the subject.
+        ///     The list of validation errors that was encountered testing the subject.
         /// </summary>
         /// <param name="subject">The subject to test.</param>
         /// <returns></returns>

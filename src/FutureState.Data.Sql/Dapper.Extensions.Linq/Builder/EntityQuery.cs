@@ -14,12 +14,12 @@ namespace Dapper.Extensions.Linq.Builder
     public sealed class EntityQuery<T> : IEntityBuilder<T> where T : class
     {
         private readonly Expression<Func<T, bool>> _expression;
+        private readonly IDapperImplementor _implementor;
         private readonly IDapperSession _session;
         private readonly IList<ISort> _sort;
         private bool _nolock;
         private int? _take;
         private int? _timeout;
-        readonly IDapperImplementor _implementor;
 
         public EntityQuery(IDapperImplementor implementor, IDapperSession session, Expression<Func<T, bool>> expression)
         {
@@ -123,7 +123,8 @@ namespace Dapper.Extensions.Linq.Builder
 
             var p = predicate?.Predicates == null ? null : predicate;
 
-            return _implementor.GetList<T>(_session.Connection, p, _sort, _session.Transaction, _timeout, false, _take, _nolock);
+            return _implementor.GetList<T>(_session.Connection, p, _sort, _session.Transaction, _timeout, false, _take,
+                _nolock);
         }
     }
 }

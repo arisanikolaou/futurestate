@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Represents a repository of entities to read and write to.
+    ///     Represents a repository of entities to read and write to.
     /// </summary>
     /// <typeparam name="TEntity">The entity to save, update and/or delete.</typeparam>
     /// <typeparam name="TKey">The entity's primary key.</typeparam>
@@ -12,11 +12,10 @@ namespace FutureState.Data
         IWriter<TEntity, TKey>,
         IReader<TEntity, TKey>
     {
-
     }
 
     /// <summary>
-    /// Represents a repository of entities to read and write to.
+    ///     Represents a repository of entities to read and write to.
     /// </summary>
     public interface IRepository<TEntity> : IRepository<TEntity, Guid>,
         IDeleter<TEntity>,
@@ -25,7 +24,7 @@ namespace FutureState.Data
     }
 
     /// <summary>
-    /// A specialized type of repository used to read/write keyed entities in bulk.
+    ///     A specialized type of repository used to read/write keyed entities in bulk.
     /// </summary>
     public interface IBulkRepository<TEntity, in TKey> //don't inherit from irepository
     {
@@ -37,7 +36,7 @@ namespace FutureState.Data
     }
 
     /// <summary>
-    /// A specialized type of repository used to read/write keyed entities in bulk.
+    ///     A specialized type of repository used to read/write keyed entities in bulk.
     /// </summary>
     public interface IBulkRepository<TEntity> : IBulkRepository<TEntity, Guid>
     {

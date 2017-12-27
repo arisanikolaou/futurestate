@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace FutureState
 {
     /// <summary>
-    /// Code automation class to raise thread safe events.
+    ///     Code automation class to raise thread safe events.
     /// </summary>
     public static class EventHandlerExtensions
     {
@@ -30,7 +30,6 @@ namespace FutureState
                     var innerMethod = methods[i] as EventHandler<T>;
 
                     if (innerMethod != null)
-                    {
                         Task.Factory.StartNew(
                             () =>
                             {
@@ -41,16 +40,11 @@ namespace FutureState
                                 catch (Exception ex)
                                 {
                                     if (exceptionHandler != null)
-                                    {
                                         exceptionHandler(ex);
-                                    }
                                     else
-                                    {
                                         throw;
-                                    }
                                 }
                             });
-                    }
                 }
             }
         }
@@ -71,7 +65,6 @@ namespace FutureState
                     var innerMethod = methods[i] as EventHandler;
 
                     if (innerMethod != null)
-                    {
                         Task.Factory.StartNew(
                             () =>
                             {
@@ -82,48 +75,39 @@ namespace FutureState
                                 catch (Exception ex)
                                 {
                                     if (exceptionHandler != null)
-                                    {
                                         exceptionHandler(ex);
-                                    }
                                     else
-                                    {
                                         throw;
-                                    }
                                 }
                             });
-                    }
                 }
             }
         }
 
         /// <summary>
-        /// Raises an event in a thread safe wayd.
+        ///     Raises an event in a thread safe wayd.
         /// </summary>
         public static void Raise(this EventHandler del, object sender, EventArgs e)
         {
             var evt = del;
 
             if (evt != null)
-            {
                 evt.Invoke(sender, e);
-            }
         }
 
         /// <summary>
-        /// Raises an event in a thread safe way.
+        ///     Raises an event in a thread safe way.
         /// </summary>
         public static void Raise<T>(this EventHandler<T> del, object sender, T e) where T : EventArgs
         {
             var evt = del;
 
             if (evt != null)
-            {
                 evt.Invoke(sender, e);
-            }
         }
 
         /// <summary>
-        /// Raises an event in a thread safe way and ensures that all subscribers are notified.
+        ///     Raises an event in a thread safe way and ensures that all subscribers are notified.
         /// </summary>
         [DebuggerStepThrough]
         public static void RaiseSafe(this EventHandler del, object sender, EventArgs e,
@@ -141,7 +125,6 @@ namespace FutureState
                     var innerMethod = methods[i] as EventHandler;
 
                     if (innerMethod != null)
-                    {
                         try
                         {
                             innerMethod.Invoke(sender, e);
@@ -149,21 +132,16 @@ namespace FutureState
                         catch (Exception ex)
                         {
                             if (exceptionHandler != null)
-                            {
                                 exceptionHandler(ex);
-                            }
                             else
-                            {
                                 throw;
-                            }
                         }
-                    }
                 }
             }
         }
 
         /// <summary>
-        /// Raises an event in a thread safe way and ensures that all subscribers are notified.
+        ///     Raises an event in a thread safe way and ensures that all subscribers are notified.
         /// </summary>
         [DebuggerStepThrough]
         public static void RaiseSafe<T>(this EventHandler<T> del, object sender, T e,
@@ -182,7 +160,6 @@ namespace FutureState
                     var innerMethod = methods[i] as EventHandler<T>;
 
                     if (innerMethod != null)
-                    {
                         try
                         {
                             innerMethod.Invoke(sender, e);
@@ -190,15 +167,10 @@ namespace FutureState
                         catch (Exception ex)
                         {
                             if (exceptionHandler != null)
-                            {
                                 exceptionHandler(ex);
-                            }
                             else
-                            {
                                 throw;
-                            }
                         }
-                    }
                 }
             }
         }

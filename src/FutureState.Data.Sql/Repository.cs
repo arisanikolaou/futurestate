@@ -118,12 +118,12 @@ namespace FutureState.Data.Sql
         /// <summary>
         ///     Deletes an entity by its key.
         /// </summary>
-        /// <param name="item">The item to delete.</param>
-        public void Delete(TEntity item)
+        /// <param name="entity">The item to delete.</param>
+        public void Delete(TEntity entity)
         {
-            Guard.ArgumentNotNull(item, nameof(item));
+            Guard.ArgumentNotNull(entity, nameof(entity));
 
-            DeleteById(item.Id);
+            DeleteById(entity.Id);
         }
 
         /// <summary>
@@ -192,7 +192,8 @@ namespace FutureState.Data.Sql
         public long Count()
         {
             return
-                Convert.ToInt64(_connection.ExecuteScalar($"Select Count(*) From [{_tableName}]", null, GetCurrentTran()));
+                Convert.ToInt64(_connection.ExecuteScalar($"Select Count(*) From [{_tableName}]", null,
+                    GetCurrentTran()));
         }
 
         public IEnumerable<TEntity> GetByIds(IEnumerable<TKey> ids)

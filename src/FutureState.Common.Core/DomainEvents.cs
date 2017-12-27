@@ -1,17 +1,17 @@
 ﻿using System;
 
-namespace FutureState.Data.Providers
+namespace FutureState
 {
     public abstract class DomainEvent<TItem> : IDomainEvent
     {
-        public TItem Item { get; }
-
         protected DomainEvent(TItem entity)
         {
             Guard.ArgumentNotNull(entity, "entity");
 
             Item = entity;
         }
+
+        public TItem Item { get; }
     }
 
     public sealed class ItemAdded<TItem> : DomainEvent<TItem>
@@ -31,15 +31,15 @@ namespace FutureState.Data.Providers
     // ReSharper disable once UnusedTypeParameter
     public sealed class ItemDeleted<TItem, TKey> : IDomainEvent
     {
-        public TKey Key { get; }
-
-        public Type Type => typeof(TItem);
-
         public ItemDeleted(TKey key)
         {
             Guard.ArgumentNotNull(key, "key");
 
             Key = key;
         }
+
+        public TKey Key { get; }
+
+        public Type Type => typeof(TItem);
     }
 }

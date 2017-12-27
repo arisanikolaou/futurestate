@@ -8,10 +8,7 @@ namespace FutureState.Data.Sql
     /// </summary>
     public class SessionFactory : ISessionFactory
     {
-        readonly string _conString;
-
-        public string Id { get; set; }
-        public IDapperConfiguration Configuration { get; }
+        private readonly string _conString;
 
         /// <summary>
         ///     Creates a new session factory.
@@ -28,10 +25,20 @@ namespace FutureState.Data.Sql
         }
 
         /// <summary>
+        ///     Gets the active dapper configuration used by the session factory.
+        /// </summary>
+        public IDapperConfiguration Configuration { get; }
+
+        /// <summary>
+        ///     Gets/sets an optional identifier of the connection.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         ///     Opens/creates a new session.
         /// </summary>
         /// <returns>A new session.</returns>
-        public ISession OpenSession()
+        public ISession Create()
         {
             var con = new SqlConnection(_conString);
 

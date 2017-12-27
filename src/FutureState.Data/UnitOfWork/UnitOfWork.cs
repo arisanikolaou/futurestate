@@ -5,16 +5,16 @@ using System.Linq;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Optimizes read/write operations to a common data store by one or more repositories or readers.
-    /// Changes are committed using a configurable commit policy.
+    ///     Optimizes read/write operations to a common data store made by one or more repositories or readers.
+    ///     Changes are committed using a configurable commit policy.
     /// </summary>
     /// <remarks>
-    /// Units of work are re-useable unless disposed but are not thread safe.
-    /// Commit/rollback implementations are controlled through an <see cref="ICommitPolicy" /> instance.
+    ///     Units of work are re-useable unless disposed but are not thread safe.
+    ///     Commit/rollback implementations are controlled through an <see cref="ICommitPolicy" /> instance.
     /// </remarks>
     public class UnitOfWork : DataSessionManager, IUnitOfWork
     {
-        readonly ICommitPolicy _commitPolicy;
+        private readonly ICommitPolicy _commitPolicy;
 
         internal readonly HashSet<object> _deleted;
 
@@ -25,7 +25,7 @@ namespace FutureState.Data
         internal readonly HashSet<object> _modified;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="sessionFactory">The underlying data session factory to use.</param>
         /// <param name="policy">The policy to use when committing changes.</param>
@@ -43,33 +43,31 @@ namespace FutureState.Data
             _modified = new HashSet<object>();
 
             // do not implement a transaction save commit policy by default
-            _commitPolicy = policy ?? new NoOpCommitPolicy();
+            _commitPolicy = policy ?? new CommitPolicyNoOp();
         }
 
         /// <summary>
-        /// The entities that will be deleted in the next Commit operation.
+        ///     The entities that will be deleted in the next Commit operation.
         /// </summary>
         public object[] Deleted => _deleted.ToArray();
 
         /// <summary>
-        /// The entities that will be inserted in the next Commit operation.
+        ///     The entities that will be inserted in the next Commit operation.
         /// </summary>
         public object[] Inserted => _inserted.ToArray();
 
         /// <summary>
-        /// The entities that will be modified in the next Commit operation.
+        ///     The entities that will be modified in the next Commit operation.
         /// </summary>
         public object[] Modified => _modified.ToArray();
 
         /// <summary>
-        /// Commits any outstanding changes.
+        ///     Commits any outstanding changes.
         /// </summary>
         public void Commit()
         {
             if (IsDisposed)
-            {
                 throw new ObjectDisposedException(GetType().Name);
-            }
 
             OnCommitting();
 
@@ -117,8 +115,8 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Enlists a custom action to be performed whenever the internal change stack
-        /// is being executed.
+        ///     Enlists a custom action to be performed whenever the internal change stack
+        ///     is being executed.
         /// </summary>
         public void Enlist(Action action)
         {
@@ -128,7 +126,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Gets the number of pending changes.
+        ///     Gets the number of pending changes.
         /// </summary>
         public int GetPendingChanges()
         {
@@ -136,7 +134,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Gets the display name of the Data access.
+        ///     Gets the display name of the Data access.
         /// </summary>
         public override string ToString()
         {
@@ -144,18 +142,17 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Raised when the Data access has been committed.
+        ///     Raised when the Data access has been committed.
         /// </summary>
         protected virtual void OnCommitted()
         {
         }
 
         /// <summary>
-        /// Raised when the Data access is committing.
+        ///     Raised when the Data access is committing.
         /// </summary>
         protected virtual void OnCommitting()
         {
         }
-
     }
 }

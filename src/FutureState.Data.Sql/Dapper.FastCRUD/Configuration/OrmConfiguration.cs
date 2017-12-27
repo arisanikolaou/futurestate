@@ -34,8 +34,8 @@ namespace Dapper.FastCrud
         /// </summary>
         public static SqlDialect DefaultDialect
         {
-            get { return _currentDefaultDialect; }
-            set { _currentDefaultDialect = value; }
+            get => _currentDefaultDialect;
+            set => _currentDefaultDialect = value;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Dapper.FastCrud
         /// </summary>
         public static OrmConventions Conventions
         {
-            get { return _currentOrmConventions; }
+            get => _currentOrmConventions;
             set
             {
                 Requires.NotNull(value, nameof(Conventions));

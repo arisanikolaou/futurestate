@@ -6,21 +6,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using static System.Enum;
 
 #endregion
 
 namespace FutureState
 {
-    //todo: unit test
-    // may need to be performance enhanced
-
     /// <summary>
-    /// Helper class to retrieve the description of of enumeration objects.
+    ///     Helper class to retrieve the description of of enumeration objects.
     /// </summary>
     public static class EnumHelper
     {
         /// <summary>
-        /// Gets the Description attribute of an enum
+        ///     Gets the Description attribute of an enum
         /// </summary>
         /// <param name="type">The type of the enumeration</param>
         /// <param name="name">The string name of the enumeration value</param>
@@ -29,16 +27,14 @@ namespace FutureState
         {
             var fi = type.GetField(name);
             if (fi == null)
-            {
                 return string.Empty;
-            }
 
-            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : name;
         }
 
         /// <summary>
-        /// Gets the description attribute of an enum value.
+        ///     Gets the description attribute of an enum value.
         /// </summary>
         /// <typeparam name="TEnum">The type of the enum.</typeparam>
         /// <param name="value">The enum value.</param>
@@ -47,24 +43,24 @@ namespace FutureState
             where TEnum : struct
         {
             var fi = typeof(TEnum).GetField(value.ToString());
-            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : value.ToString();
         }
 
         /// <summary>
-        /// Gets the Description attribute of an enum value
+        ///     Gets the Description attribute of an enum value
         /// </summary>
         /// <param name="enumValue">The enum value</param>
         /// <returns>The description string</returns>
         public static string GetDescription(Enum enumValue)
         {
             var type = enumValue.GetType();
-            var name = Enum.GetName(type, enumValue);
+            var name = GetName(type, enumValue);
             return GetDescription(type, name);
         }
 
         /// <summary>
-        /// Extension method to get the value of Description attribute on enum
+        ///     Extension method to get the value of Description attribute on enum
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -79,16 +75,14 @@ namespace FutureState
                 var attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
 
                 if (attrs.Length > 0)
-                {
-                    return ((DescriptionAttribute)attrs[0]).Description;
-                }
+                    return ((DescriptionAttribute) attrs[0]).Description;
             }
 
             return value.ToString();
         }
 
         /// <summary>
-        /// Gets the value of the description attribute of a given enum value
+        ///     Gets the value of the description attribute of a given enum value
         /// </summary>
         /// <param name="enumType">The type of enum</param>
         /// <param name="enumField">The enum value</param>
@@ -97,29 +91,27 @@ namespace FutureState
         {
             var da =
                 (DescriptionAttribute)
-                    Attribute.GetCustomAttribute(enumType.GetField(enumField.ToString()), typeof(DescriptionAttribute));
+                Attribute.GetCustomAttribute(enumType.GetField(enumField.ToString()), typeof(DescriptionAttribute));
             return da == null ? null : da.Description;
         }
 
         /// <summary>
-        /// Gets the list of descriptions for a enumeration
+        ///     Gets the list of descriptions for a enumeration
         /// </summary>
         /// <param name="type">The enum to evaluate</param>
         /// <returns>The list of description</returns>
         public static List<string> GetDescriptions(Type type)
         {
             var result = new List<string>();
-            foreach (var name in Enum.GetNames(type))
-            {
+            foreach (var name in GetNames(type))
                 result.Add(GetDescription(type, name));
-            }
 
             return result;
         }
 
         /// <summary>
-        /// Gets the Enumeration value for an enumeration given a description.
-        /// Throws Arugument Exception if the description is not found.
+        ///     Gets the Enumeration value for an enumeration given a description.
+        ///     Throws Arugument Exception if the description is not found.
         /// </summary>
         /// <param name="type">The enumeration type</param>
         /// <param name="description">The description of the enum value to retrieve</param>
@@ -127,12 +119,8 @@ namespace FutureState
         public static Enum GetEnumFromDescription(Type type, string description)
         {
             foreach (var pair in GetEnumValueDict(type))
-            {
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
-            }
 
             throw new ArgumentException("Invalid description for type, " + type);
         }
@@ -141,12 +129,8 @@ namespace FutureState
             where TEnum : struct
         {
             foreach (var pair in GetEnumValueDict<TEnum>())
-            {
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
-            }
 
             throw new ArgumentException("Invalid description for type, " + typeof(TEnum));
         }
@@ -155,12 +139,8 @@ namespace FutureState
             where TEnum : struct
         {
             foreach (var pair in GetEnumValueDict<TEnum>())
-            {
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
-            }
 
             return _default;
         }
@@ -171,15 +151,11 @@ namespace FutureState
             foreach (var pair in GetEnumValueDict<TEnum>())
             {
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
 
-                if (Enum.GetName(typeof(TEnum), pair.Key)
+                if (GetName(typeof(TEnum), pair.Key)
                     .Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
             }
 
             return _default;
@@ -191,15 +167,11 @@ namespace FutureState
             foreach (var pair in GetEnumValueDict<TEnum>())
             {
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
 
-                if (Enum.GetName(typeof(TEnum), pair.Key)
+                if (GetName(typeof(TEnum), pair.Key)
                     .Equals(description, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
             }
 
             return _default;
@@ -210,15 +182,11 @@ namespace FutureState
             foreach (var pair in GetEnumValueDict(enumType))
             {
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
             }
 
             throw new ArgumentException(
@@ -230,15 +198,11 @@ namespace FutureState
             foreach (var pair in GetEnumValueDict(enumType))
             {
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
             }
 
             return defaultValue;
@@ -250,22 +214,18 @@ namespace FutureState
             foreach (var pair in dict)
             {
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return pair.Key;
-                }
             }
 
             return dict.First().Key;
         }
 
         /// <summary>
-        /// Gets a list of TEnumType values from EnumListAttribute
+        ///     Gets a list of TEnumType values from EnumListAttribute
         /// </summary>
         /// <typeparam name="TEnumType"></typeparam>
         /// <typeparam name="TTargetType"></typeparam>
@@ -275,30 +235,24 @@ namespace FutureState
         {
             var targetType = typeof(TTargetType);
             var fi = targetType.GetField(targetValue.ToString());
-            var attributes = (EnumListAttribute[])fi.GetCustomAttributes(typeof(EnumListAttribute), false);
+            var attributes = (EnumListAttribute[]) fi.GetCustomAttributes(typeof(EnumListAttribute), false);
             foreach (var attr in attributes)
-            {
                 if (attr.EnumType == typeof(TEnumType))
-                {
                     return attr.Values.OfType<TEnumType>().ToList();
-                }
-            }
 
-            return Enum.GetValues(typeof(TEnumType)).OfType<TEnumType>().ToList();
+            return GetValues(typeof(TEnumType)).OfType<TEnumType>().ToList();
         }
 
         public static TEnum GetEnumOrDefault<TEnum>(string value, TEnum @default)
             where TEnum : struct
         {
             if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(value.Trim()))
-            {
                 return @default;
-            }
 
             try
             {
                 TEnum val;
-                return Enum.TryParse(value, true, out val) ? val : @default;
+                return TryParse(value, true, out val) ? val : @default;
             }
             catch (Exception)
             {
@@ -315,76 +269,70 @@ namespace FutureState
             {
                 var newValue = value.Trim();
 
-                var names = Enum.GetNames(typeof(TEnum));
+                var names = GetNames(typeof(TEnum));
 
                 foreach (var name in names)
-                {
                     if (string.Compare(name, newValue, ignoreCase) == 0)
                     {
-                        result = (TEnum)Enum.Parse(typeof(TEnum), name);
+                        result = (TEnum) Enum.Parse(typeof(TEnum), name);
                         break;
                     }
-                }
             }
 
             return result;
         }
 
         /// <summary>
-        /// Gets a dictionary(string name, string description) of an enum type
+        ///     Gets a dictionary(string name, string description) of an enum type
         /// </summary>
         /// <param name="type">The enumeration to evaluation</param>
         /// <returns>The dictionary result of key = Description, value = EnumName</returns>
         public static Dictionary<string, string> GetEnumStringDict(Type type)
         {
             var result = new Dictionary<string, string>();
-            foreach (var name in Enum.GetNames(type))
-            {
+            foreach (var name in GetNames(type))
                 result.Add(GetDescription(type, name), name);
-            }
 
             return result;
         }
 
         /// <summary>
-        /// Gets a dictionary(string valueAsString, Enum value) of an enum type
+        ///     Gets a dictionary(string valueAsString, Enum value) of an enum type
         /// </summary>
         /// <param name="type">The enumeration to evaluation</param>
         /// <returns>The dictionary result of key = value as string, value = Enum</returns>
         public static Dictionary<string, Enum> GetEnumValueAsStringToValueDict(Type type)
         {
-            return Enum.GetValues(type).Cast<Enum>().ToDictionary(enumValue => enumValue.ToString());
+            return GetValues(type).Cast<Enum>().ToDictionary(enumValue => enumValue.ToString());
         }
 
         /// <summary>
-        /// Gets a Collection of tuples(enum value, string description) of an enum type
+        ///     Gets a Collection of tuples(enum value, string description) of an enum type
         /// </summary>
         /// <param name="type">The enumeration to evaluation</param>
         /// <returns>The Tuple result of key = Enum Value, value = Enum Name</returns>
         public static IEnumerable<Tuple<Enum, string>> GetEnumValueDescriptionTuple(Type type)
         {
-            return from Enum enumValue in Enum.GetValues(type)
-                   select new Tuple<Enum, string>(enumValue, GetDescription(enumValue));
+            return from Enum enumValue in GetValues(type)
+                select new Tuple<Enum, string>(enumValue, GetDescription(enumValue));
         }
 
         public static IEnumerable<Tuple<TEnum, string>> GetEnumValueDescriptionTuple<TEnum>() where TEnum : struct
         {
-            return from TEnum enumValue in Enum.GetValues(typeof(TEnum)).OfType<TEnum>()
-                   select new Tuple<TEnum, string>(enumValue, GetDescription(enumValue));
+            return from TEnum enumValue in GetValues(typeof(TEnum)).OfType<TEnum>()
+                select new Tuple<TEnum, string>(enumValue, GetDescription(enumValue));
         }
 
         /// <summary>
-        /// Gets a dictionary(string name, string description) of an enum type
+        ///     Gets a dictionary(string name, string description) of an enum type
         /// </summary>
         /// <param name="type">The enumeration to evaluation</param>
         /// <returns>The dictionary result of key = Description, value = EnumName</returns>
         public static Dictionary<Enum, string> GetEnumValueDict(Type type)
         {
             var result = new Dictionary<Enum, string>();
-            foreach (Enum enumValue in Enum.GetValues(type))
-            {
+            foreach (Enum enumValue in GetValues(type))
                 result.Add(enumValue, GetDescription(enumValue));
-            }
 
             return result;
         }
@@ -393,10 +341,8 @@ namespace FutureState
             where TEnum : struct
         {
             var result = new Dictionary<TEnum, string>();
-            foreach (TEnum enumValue in Enum.GetValues(typeof(TEnum)))
-            {
+            foreach (TEnum enumValue in GetValues(typeof(TEnum)))
                 result.Add(enumValue, GetDescription(enumValue));
-            }
 
             return result;
         }
@@ -405,7 +351,7 @@ namespace FutureState
         {
             var da =
                 (ObsoleteAttribute)
-                    Attribute.GetCustomAttribute(enumType.GetField(item.ToString()), typeof(ObsoleteAttribute));
+                Attribute.GetCustomAttribute(enumType.GetField(item.ToString()), typeof(ObsoleteAttribute));
             return da == null;
         }
 
@@ -414,15 +360,11 @@ namespace FutureState
             foreach (var pair in GetEnumValueDict(enumType))
             {
                 if (pair.Value.Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return true;
-                }
 
-                if (Enum.GetName(enumType, pair.Key)
+                if (GetName(enumType, pair.Key)
                     .Equals(nameOrDescription, StringComparison.InvariantCultureIgnoreCase))
-                {
                     return true;
-                }
             }
 
             return false;
@@ -430,11 +372,11 @@ namespace FutureState
 
         public static T Parse<T>(string value)
         {
-            return (T)Enum.Parse(typeof(T), value, false);
+            return (T) Enum.Parse(typeof(T), value, false);
         }
 
         /// <summary>
-        /// Get a List of KeyValuePair(Enum, string) of a enumeration type
+        ///     Get a List of KeyValuePair(Enum, string) of a enumeration type
         /// </summary>
         /// <param name="type">The enumeration to evaluate</param>
         /// <returns>List of (Enum, stringDescription) pairs </returns>
@@ -442,16 +384,14 @@ namespace FutureState
         {
             var result = new List<KeyValuePair<Enum, string>>();
 
-            foreach (Enum value in Enum.GetValues(type))
-            {
+            foreach (Enum value in GetValues(type))
                 result.Add(new KeyValuePair<Enum, string>(value, GetDescription(value)));
-            }
 
             return result;
         }
 
         /// <summary>
-        /// Get a list of KeyValuePair(Enum, stringDescription) of a enumeration type
+        ///     Get a list of KeyValuePair(Enum, stringDescription) of a enumeration type
         /// </summary>
         /// <param name="type">The enumeration to evaluate</param>
         /// <returns>List of (Enum, stringDescription) pairs </returns>
@@ -459,16 +399,14 @@ namespace FutureState
         {
             var result = new ArrayList();
 
-            foreach (Enum value in Enum.GetValues(type))
-            {
+            foreach (Enum value in GetValues(type))
                 result.Add(new KeyValuePair<Enum, string>(value, GetDescription(value)));
-            }
 
             return result;
         }
 
         /// <summary>
-        /// Get a list of KeyValuePair of a enumeration type
+        ///     Get a list of KeyValuePair of a enumeration type
         /// </summary>
         /// <param name="type">The enumeration to evaluate</param>
         /// <returns>List of (Enum, stringDescription) pairs </returns>
@@ -476,10 +414,8 @@ namespace FutureState
         {
             var result = new List<KeyValuePair<Enum, string>>();
 
-            foreach (Enum value in Enum.GetValues(type))
-            {
+            foreach (Enum value in GetValues(type))
                 result.Add(new KeyValuePair<Enum, string>(value, GetDescription(value)));
-            }
 
             return result;
         }
@@ -489,19 +425,17 @@ namespace FutureState
             result = default(TEnum);
 
             foreach (var pair in GetEnumValueDict<TEnum>())
-            {
                 if (pair.Value.Equals(description, StringComparison.InvariantCultureIgnoreCase))
                 {
                     result = pair.Key;
                     return true;
                 }
-            }
 
             return false;
         }
 
         /// <summary>
-        /// Fetches an attribute of the specified type from Enum.
+        ///     Fetches an attribute of the specified type from Enum.
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <param name="value">Enum value.</param>
@@ -512,7 +446,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Fetches all attributes of the specified type from Enum.
+        ///     Fetches all attributes of the specified type from Enum.
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <param name="value">Enum value.</param>
@@ -520,17 +454,15 @@ namespace FutureState
         public static IEnumerable<T> TryGetEnumValueAttributes<T>(Enum value) where T : Attribute
         {
             var type = value.GetType();
-            var fieldInfo = type.GetField(Enum.GetName(type, value));
+            var fieldInfo = type.GetField(GetName(type, value));
             if (fieldInfo == null)
-            {
                 return Enumerable.Empty<T>();
-            }
 
-            return (T[])fieldInfo.GetCustomAttributes(typeof(T), false);
+            return (T[]) fieldInfo.GetCustomAttributes(typeof(T), false);
         }
 
         /// <summary>
-        /// Fetches an attribute of the specified type from Enum.
+        ///     Fetches an attribute of the specified type from Enum.
         /// </summary>
         /// <typeparam name="T">Attribute type.</typeparam>
         /// <typeparam name="TProperty">Type of the attribute property.</typeparam>
@@ -546,8 +478,8 @@ namespace FutureState
     }
 
     /// <summary>
-    /// Attribute allows to specify set of allowable Enum values
-    /// note. Can also be used together with UI attributes to limit the enum values list
+    ///     Attribute allows to specify set of allowable Enum values
+    ///     note. Can also be used together with UI attributes to limit the enum values list
     /// </summary>
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
     public sealed class EnumListAttribute : Attribute
@@ -555,15 +487,11 @@ namespace FutureState
         public EnumListAttribute(Type tp, params object[] acceptableValues)
         {
             if (tp == null)
-            {
                 throw new ArgumentNullException("Type argument should not be null", nameof(tp));
-            }
 
             if (!tp.IsEnum)
-            {
                 throw new InvalidOperationException(
                     "The EnumListAttribute attribute should be applied to Enum type only.");
-            }
 
             EnumType = tp;
             Values = acceptableValues;
@@ -575,8 +503,8 @@ namespace FutureState
     }
 
     /// <summary>
-    /// The converter works together with EnumListAttribute.
-    /// GetStandardValues returns the list of enum values specifyed in EnumListAttribute
+    ///     The converter works together with EnumListAttribute.
+    ///     GetStandardValues returns the list of enum values specifyed in EnumListAttribute
     /// </summary>
     public class LimitEnumConverter : EnumConverter
     {
@@ -605,14 +533,9 @@ namespace FutureState
 
                 // No Enum List - return all Enum Values
                 if (context.PropertyDescriptor.PropertyType.IsEnum)
-                {
-                    _enumVals = new StandardValuesCollection(Enum.GetValues(context.PropertyDescriptor.PropertyType));
-                }
+                    _enumVals = new StandardValuesCollection(GetValues(context.PropertyDescriptor.PropertyType));
                 else
-                {
-                    // not an enum - do nothing
                     _enumVals = new StandardValuesCollection(null);
-                }
             }
 
             return _enumVals;
@@ -620,9 +543,9 @@ namespace FutureState
     }
 
     /// <summary>
-    /// Converts description to enum value.
-    /// Also limits the possible values (derived from EnumListAttribute)
-    /// if value limit is not needed - should be derived directly from EnumConverter
+    ///     Converts description to enum value.
+    ///     Also limits the possible values (derived from EnumListAttribute)
+    ///     if value limit is not needed - should be derived directly from EnumConverter
     /// </summary>
     public class EnumDescriptionToEnumConverter : LimitEnumConverter
     {
@@ -636,19 +559,13 @@ namespace FutureState
             var fis = value.GetFields();
             foreach (var fi in fis)
             {
-                var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
                 if (attributes.Length > 0)
-                {
                     if (attributes[0].Description == description)
-                    {
                         return fi.GetValue(fi.Name);
-                    }
-                }
 
                 if (fi.Name == description)
-                {
                     return fi.GetValue(fi.Name);
-                }
             }
 
             return description;
@@ -657,9 +574,7 @@ namespace FutureState
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string)
-            {
-                return GetEnumValueFromDescription(context.PropertyDescriptor.PropertyType, (string)value);
-            }
+                return GetEnumValueFromDescription(context.PropertyDescriptor.PropertyType, (string) value);
 
             return base.ConvertFrom(context, culture, value);
         }
@@ -671,9 +586,7 @@ namespace FutureState
             Type destinationType)
         {
             if (value is Enum && destinationType == typeof(string))
-            {
                 return EnumHelper.GetDescription(value.GetType(), value.ToString());
-            }
 
             return base.ConvertTo(context, culture, value, destinationType);
         }

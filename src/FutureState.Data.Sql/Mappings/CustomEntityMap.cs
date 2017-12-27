@@ -20,11 +20,11 @@ namespace FutureState.Data.Sql.Mappings
     public class CustomEntityMap<TEntity> : DommelEntityMap<TEntity>, IClassMapper<TEntity>
         where TEntity : class
     {
-        static readonly Dictionary<Type, KeyType> _propertyKeyMappings;
+        private static readonly Dictionary<Type, KeyType> _propertyKeyMappings;
 
-        static readonly string _defaultTableName;
-        static readonly string _defaultSchemaName;
-        static readonly PropertyInfo[] _properties;
+        private static readonly string _defaultTableName;
+        private static readonly string _defaultSchemaName;
+        private static readonly PropertyInfo[] _properties;
 
         static CustomEntityMap()
         {
@@ -32,7 +32,8 @@ namespace FutureState.Data.Sql.Mappings
                 _defaultTableName = ((TableAttribute) typeof(TEntity).GetCustomAttribute(typeof(TableAttribute))).Name;
 
             if (Attribute.IsDefined(typeof(TEntity), typeof(SchemaAttribute)))
-                _defaultSchemaName = ((SchemaAttribute) typeof(TEntity).GetCustomAttribute(typeof(SchemaAttribute))).Name;
+                _defaultSchemaName = ((SchemaAttribute) typeof(TEntity).GetCustomAttribute(typeof(SchemaAttribute)))
+                    .Name;
 
             _propertyKeyMappings = new Dictionary<Type, KeyType>
             {
@@ -84,14 +85,14 @@ namespace FutureState.Data.Sql.Mappings
             // add all other properties properties
             _properties.Each(m =>
             {
-                bool ignore = m.GetCustomAttributes(typeof(NotMappedAttribute)).Any();
+                var ignore = m.GetCustomAttributes(typeof(NotMappedAttribute)).Any();
 
-                bool isKey = m.GetCustomAttributes(typeof(KeyAttribute)).Any();
+                var isKey = m.GetCustomAttributes(typeof(KeyAttribute)).Any();
 
                 // not already assigned
                 var columnName =
                     m.GetCustomAttributes(typeof(ColumnAttribute))
-                        .Select(q => ((ColumnAttribute)q).Name)
+                        .Select(q => ((ColumnAttribute) q).Name)
                         .FirstOrDefault() ?? m.Name;
 
                 var map = new DommelPropertyMap(m);
@@ -118,7 +119,7 @@ namespace FutureState.Data.Sql.Mappings
                 customTypeMap.Map(m.Name, columnName);
 
                 linkMap.Key(KeyType.Assigned);
-                this.LinqPropertyMaps.Add(linkMap);
+                LinqPropertyMaps.Add(linkMap);
             });
         }
 

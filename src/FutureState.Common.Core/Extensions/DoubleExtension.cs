@@ -46,8 +46,8 @@ namespace FutureState
         }
 
         /// <summary>
-        /// This is similar to '==' operator, bu with the tolerance
-        /// This will eliminate Resharper warnings on 'double == 0'
+        ///     This is similar to '==' operator, bu with the tolerance
+        ///     This will eliminate Resharper warnings on 'double == 0'
         /// </summary>
         /// <returns></returns>
         public static bool IsZero(this double doubleValue)
@@ -68,9 +68,7 @@ namespace FutureState
         public static double? Sum(double? a, double? b)
         {
             if (!a.HasValue && !b.HasValue)
-            {
                 return a;
-            }
 
             var aNum = a ?? 0; // if a has a value, assign it to aNum, if not assign 0 to aNum
             var bNum = b ?? 0; // same thing for b
@@ -81,9 +79,7 @@ namespace FutureState
         public static double Sum(double? a, double? b, double defualt)
         {
             if (!a.HasValue && !b.HasValue)
-            {
                 return defualt;
-            }
 
             var aNum = a.HasValue ? a.Value : 0; // if a has a value, assign it to aNum, if not assign 0 to aNum
             var bNum = b.HasValue ? b.Value : 0; // same thing for b
@@ -92,7 +88,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Parser that processes % and bps
+        ///     Parser that processes % and bps
         /// </summary>
         public static double ParseEx(string input)
         {
@@ -102,15 +98,11 @@ namespace FutureState
             input = input.Replace("%", string.Empty);
             // check length difference to avoid strings with multiple %
             if (input.Length == length - 1)
-            {
                 return double.Parse(input) / 100;
-            }
             // bps
             input = input.ToLower().Replace("bps", string.Empty);
             if (input.Length == length - 3)
-            {
                 return double.Parse(input) / 10000;
-            }
 
             return double.Parse(input);
         }

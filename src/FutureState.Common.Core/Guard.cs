@@ -24,12 +24,12 @@ using System.Runtime.CompilerServices;
 namespace FutureState
 {
     /// <summary>
-    /// A static helper class that includes various parameter checking routines.
+    ///     A static helper class that includes various parameter checking routines.
     /// </summary>
     public static class Guard
     {
         /// <summary>
-        /// Throws <see cref="ArgumentNullException" /> if the given argument is null.
+        ///     Throws <see cref="ArgumentNullException" /> if the given argument is null.
         /// </summary>
         /// <exception cref="ArgumentNullException"> if tested value if null.</exception>
         /// <param name="argumentValue">Argument value to test.</param>
@@ -42,13 +42,11 @@ namespace FutureState
             string argumentName)
         {
             if (argumentValue == null)
-            {
                 throw new ArgumentNullException(argumentName);
-            }
         }
 
         /// <summary>
-        /// Throws an exception if the tested string argument is null or the empty string.
+        ///     Throws an exception if the tested string argument is null or the empty string.
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown if string value is null.</exception>
         /// <exception cref="ArgumentException">Thrown if the string is empty</exception>
@@ -62,18 +60,14 @@ namespace FutureState
             string argumentName)
         {
             if (argumentValue == null)
-            {
                 throw new ArgumentNullException(argumentName);
-            }
 
             if (argumentValue.Length == 0)
-            {
                 throw new ArgumentException($"Argument '{argumentName}' cannot be empty.", argumentName);
-            }
         }
 
         /// <summary>
-        /// Throws an exception if the tested string argument is null or the empty string.
+        ///     Throws an exception if the tested string argument is null or the empty string.
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown if string value is null.</exception>
         /// <exception cref="ArgumentException">Thrown if the string is empty</exception>
@@ -87,14 +81,10 @@ namespace FutureState
             string argumentName)
         {
             if (argumentValue == null)
-            {
                 throw new ArgumentNullException(argumentName);
-            }
 
             if (string.IsNullOrWhiteSpace(argumentValue))
-            {
                 throw new ArgumentException($"Argument '{argumentName}' cannot be empty.", argumentName);
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -105,9 +95,7 @@ namespace FutureState
             ArgumentNotNull(collection, name);
 
             if (!collection.OfType<object>().Any())
-            {
                 throw new ArgumentException("Collection is empty.", name);
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,20 +118,18 @@ namespace FutureState
 
             // string checking
             if (@object is string)
-            {
                 if (checkForWhiteSpace
-                    ? string.IsNullOrWhiteSpace((string)@object)
-                    : string.IsNullOrEmpty((string)@object))
+                    ? string.IsNullOrWhiteSpace((string) @object)
+                    : string.IsNullOrEmpty((string) @object))
                 {
                     message = message ?? "Null or white space string.";
                     throw new ArgumentException(message, expression.GetParameterName());
                 }
-            }
 
             // collection checking
             if (checkForEmptyCollection && @object is IEnumerable && !(@object is string))
             {
-                var enumerator = ((IEnumerable)@object).GetEnumerator();
+                var enumerator = ((IEnumerable) @object).GetEnumerator();
                 if (!enumerator.MoveNext())
                 {
                     message = message ?? "Collection has no items.";
@@ -153,7 +139,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Throws an exception if a given condition is met.
+        ///     Throws an exception if a given condition is met.
         /// </summary>
         /// <param name="successCondition">The condition to evaluate.</param>
         /// <param name="exceptionGetter">Function constructing the exception to throw.</param>
@@ -163,13 +149,11 @@ namespace FutureState
         public static void Ensure(bool successCondition, Func<Exception> exceptionGetter)
         {
             if (!successCondition)
-            {
                 throw exceptionGetter();
-            }
         }
 
         /// <summary>
-        /// Returns a validated not null instance of a given object or throws an argument null exception.
+        ///     Returns a validated not null instance of a given object or throws an argument null exception.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [TargetedPatchingOptOut("Critical to performance.")]
@@ -178,15 +162,13 @@ namespace FutureState
             where T : class
         {
             if (obj == null)
-            {
                 throw new ArgumentNullException(errorMessage);
-            }
 
             return obj;
         }
 
         /// <summary>
-        /// Fluently asserts an object is not null before raising a argument null exception.
+        ///     Fluently asserts an object is not null before raising a argument null exception.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [TargetedPatchingOptOut("Critical to performance.")]
@@ -195,9 +177,7 @@ namespace FutureState
             where T : class
         {
             if (obj == null)
-            {
                 throw new ArgumentNullException(errorMessage);
-            }
 
             return obj;
         }
@@ -206,10 +186,8 @@ namespace FutureState
         {
             if (arg < min ||
                 arg > max)
-            {
                 throw new ArgumentOutOfRangeException("Argument {0}={1} must be between {2} and {3}".Params(
                     argumentName, arg, min, max));
-            }
         }
     }
 }
