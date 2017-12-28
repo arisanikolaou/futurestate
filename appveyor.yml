@@ -23,7 +23,7 @@ notifications:
 - provider: Email
   to:
   - aris.nikolaou@outlook.com
-  subject: FutureState build
+  subject: FutureState Build
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: false
