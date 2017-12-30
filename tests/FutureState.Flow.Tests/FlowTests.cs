@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace FutureState.Flow.Tests
 {
-    [TestClass]
+
     public class FlowTests
     {
 
-        [TestMethod]
-        public void TestMethod1()
+        [Fact]
+        public void CanProcessDataFromSources()
         {
             // test formatting a json file entity source from 
             // one type to another
@@ -55,6 +55,7 @@ namespace FutureState.Flow.Tests
             // load processor configuration
             subject.LoadConfiguration();
 
+            // process
             subject.Process();
 
             // process should notify target
