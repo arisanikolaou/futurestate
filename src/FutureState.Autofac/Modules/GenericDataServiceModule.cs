@@ -20,7 +20,9 @@ namespace FutureState.Autofac.Modules
 
             //  spec provider
             builder.RegisterGeneric(typeof(SpecProvider<>))
-                .As(typeof(IProvideSpecifications<>));
+                .AsSelf()
+                .As(typeof(IProvideSpecifications<>))
+                .SingleInstance();
 
             //  register message pipe
             builder.Register(m => new MessagePipe())

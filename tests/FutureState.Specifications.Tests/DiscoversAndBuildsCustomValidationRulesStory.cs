@@ -9,7 +9,7 @@ namespace FutureState.Specifications.Tests
     [Story]
     public class DiscoversAndBuildsCustomValidationRulesStory
     {
-        private ISpecification<TestClass>[] rules;
+        private ISpecification<TestClass>[] _rules;
         private IEnumerable<Error> _errorsTestingCustomRules;
         private IEnumerable<Error> _errorsTestingDefaultAnnotations;
 
@@ -25,7 +25,7 @@ namespace FutureState.Specifications.Tests
                 return SpecResult.Success;
             }, "NameNotJohn", "Name can't be john for some reason defined by the business");
 
-            this.rules = specProvider.GetSpecifications().ToArray();
+            this._rules = specProvider.GetSpecifications().ToArray();
         }
 
         protected void WhenTestingASubjettWithCustomRule()
@@ -36,18 +36,18 @@ namespace FutureState.Specifications.Tests
             };
 
             // fails custom rule
-            this._errorsTestingCustomRules = rules.ToErrors(entity);
+            this._errorsTestingCustomRules = _rules.ToErrors(entity);
         }
 
         protected void AndWhenTestingWithDatAnnotations()
         {
             // can't be empty
-            this._errorsTestingDefaultAnnotations = rules.ToErrors(new TestClass());
+            this._errorsTestingDefaultAnnotations = _rules.ToErrors(new TestClass());
         }
 
         protected void ThenAllRulesShouldEvaluateAndBeValid()
         {
-            Assert.Equal(2, rules.Length);
+            Assert.Equal(2, _rules.Length);
 
             Assert.Single(_errorsTestingCustomRules);
             Assert.Contains("Name can't be John", _errorsTestingCustomRules.First().Message);
