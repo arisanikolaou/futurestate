@@ -38,6 +38,10 @@ namespace FutureState.Autofac.Modules
             builder.RegisterGeneric(typeof(KeyGenerator<,>))
                 .As(typeof(IKeyGenerator<,>))
                 .SingleInstance();
+
+            builder.RegisterGeneric(typeof(KeyBinderFromAttributes<,>))
+                .As(typeof(IKeyBinder<,>))
+                .SingleInstance();
         }
     }
 }

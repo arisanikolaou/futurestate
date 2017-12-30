@@ -1,5 +1,9 @@
-﻿using System;
+﻿using FutureState.Data;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using Xunit;
 
 namespace FutureState.Flow.Tests
@@ -8,58 +12,85 @@ namespace FutureState.Flow.Tests
     public class FlowTests
     {
 
+
         [Fact]
         public void CanProcessDataFromSources()
         {
-            // test formatting a json file entity source from 
-            // one type to another
+            var flowId = Guid.Parse("3f97d931-73a9-4ae1-bee1-f1bf00ccd79e");
+            var flowDisplayName = "Flow";
 
+            // data source
             var testInput = new List<TestInput>()
             {
                 new TestInput()
                 {
                     Id = 1,
                     Name = "Name"
+                },
+                new TestInput()
+                {
+                    Id = 2,
+                    Name = "Name 2"
                 }
             };
 
-            var portSource = new PortSource<TestInput>((i, x, a) =>
+            // data source provider
+            var portSource = new PortSource<TestInput>((sequenceFrom, entitiesCount) =>
             {
-                return new ReceiveMessageResponse<TestInput>()
+                int localIndex = sequenceFrom;
+                var outPut = new List<TestInput>();
+
+                for (localIndex = sequenceFrom; localIndex < entitiesCount && localIndex < testInput.Count; localIndex++)
+                    outPut.Add(testInput[localIndex]);
+
+                var package = new Package<TestInput>()
                 {
-                    Package = new Package<TestInput>()
-                    {
-                        Data = testInput,
-                        CorrelationId = Guid.NewGuid()
-                    }
+                    Data = testInput,
+                    Name = flowDisplayName,
                 };
-            });
 
-            var subject = new Processor<TestOutput, TestInput>((processor) =>
+                return new QueryResponse<TestInput>(package, localIndex);
+            })
             {
-                var output = new List<TestOutput>();
+                FlowId = flowId
+            };
 
-                foreach (var source in processor.PortSources)
+            // processor
+            var subject = new Processor<TestOutput, TestInput>((entity) =>
+            {
+                var outputEntity = new TestOutput()
                 {
-                    var souceInputs = source.Receive("", Guid.Empty, 7);
-                    foreach (var entity in souceInputs.Package.Data)
-                    {
-                        
-                    }
+                    Id = entity.Id,
+                    Name = entity.Name + "_transformed",
+                    DateCreated = DateTime.UtcNow
+                };
+
+                return outputEntity;
+            })
+            {
+                Configuration = new ProcessorConfiguration()
+                {
+                    Id = string.Format("Processor.{0}", typeof(TestOutput).Name),
+                    PollTime = 1,
+                    WindowSize = 10,
+                    FlowDirPath = Environment.CurrentDirectory
                 }
-                return new ProcessState();
-            });
+            };
 
             subject.PortSources.Add(portSource);
 
-            // load processor configuration
-            subject.LoadConfiguration();
+            // start processing (acti)
+            subject.Start();
 
-            // process
-            subject.Process();
+            // wait to finish processing
+            Thread.Sleep(3000);
 
-            // process should notify target
+            var results = subject.Get().ToList();
+
+            Assert.True(results.Count() > 0);
+            Assert.Contains(results, m => m.Name.Contains("_transformed"));
         }
+
 
         public class TestInput
         {

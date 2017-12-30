@@ -82,12 +82,19 @@
     <Reference Include="xunit.execution.desktop, Version=2.3.1.3858, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.extensibility.execution.2.3.1\lib\net452\xunit.execution.desktop.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet, Version=4.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\YamlDotNet.4.2.3\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FlowTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\FutureState.Common.Core\FutureState.Common.csproj">
+      <Project>{3BA5FB45-D642-43DE-8629-37AA3D7CE5BD}</Project>
+      <Name>FutureState.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\FutureState.Flow\FutureState.Flow.csproj">
       <Project>{edb233c6-0f90-46ce-b72c-f5e96d04259f}</Project>
       <Name>FutureState.Flow</Name>
