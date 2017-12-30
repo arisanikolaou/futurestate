@@ -68,13 +68,7 @@ namespace FutureState.Flow.Tests
                 return outputEntity;
             })
             {
-                Configuration = new ProcessorConfiguration()
-                {
-                    Id = string.Format("Processor.{0}", typeof(TestOutput).Name),
-                    PollTime = 1,
-                    WindowSize = 10,
-                    FlowDirPath = Environment.CurrentDirectory
-                }
+                Configuration = new ProcessorConfiguration($"Processor.{typeof(TestOutput).Name}")
             };
 
             subject.PortSources.Add(portSource);

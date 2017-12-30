@@ -35,7 +35,7 @@ namespace FutureState.Flow.Data
                 }
             }
 
-            return new ProcessorConfiguration();
+            return new ProcessorConfiguration("Default");
         }
 
         /// <summary>

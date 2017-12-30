@@ -41,12 +41,9 @@ namespace FutureState.Flow
 
         public QueryResponse(Package<TEntity> package, int localId)
         {
-            var response = new QueryResponse<TEntity>()
-            {
-                Package = package,
-                LocalId = localId,
-                SequenceTo = SeqGuid.Create() // next check point
-            };
+            Package = package;
+            LocalId = localId;
+            SequenceTo = SeqGuid.Create(); // next check point
         }
     }
 }
