@@ -185,7 +185,7 @@ namespace FutureState.Flow
                         .Get(
                         Configuration.ProcessorId, // client id
                         lastCheckPoint, // sequence id
-                        Configuration.WindowSize);
+                        Configuration.PageSize);
 
                     flowState = new ProcessFlowState(pSourcePackage.Package.FlowId, pSourcePackage.CheckPointTo);
 
@@ -266,7 +266,6 @@ namespace FutureState.Flow
                     package = new Package<TEntityOut>
                     {
                         FlowId = pSourcePackage.Package.FlowId,
-                        Name = pSourcePackage.Package.Name,
                         Data = outputData,
                         Invalid = invalidData,
                         Errors = processErrors

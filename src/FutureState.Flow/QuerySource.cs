@@ -6,20 +6,13 @@ using System.Collections.Generic;
 
 namespace FutureState.Flow
 {
-    public class QuerySource : QuerySource<object>
-    {
-        public QuerySource(Func<int, int, QueryResponse<object>> receiveFn) : base(receiveFn)
-        {
-        }
-    }
-
-    // the data source for a given processsor. this is essentially a data stream connection
 
     /// <summary>
     ///     A prospective data source for any given processor that is capable of
-    /// playing back messages to a consumer from any given point of time.
+    /// playing back messages to a consumer from any given point of time represented by a 'check point'.
     /// </summary>
     /// <typeparam name="TEntity">
+    ///     The type of entity being queried.
     /// </typeparam>
     public class QuerySource<TEntity>
     {
@@ -43,10 +36,13 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="receiveFn"></param>
-        public QuerySource(Func<int, int, QueryResponse<TEntity>> receiveFn)
+        /// <param name="flowId">The associated flow id.</param>
+        /// <param name="dataProvider">Local id and the page size.</param>
+        public QuerySource(Guid flowId, Func<int, int, QueryResponse<TEntity>> dataProvider)
         {
-            _receiveFn = receiveFn;
+            FlowId = flowId;
+
+            _receiveFn = dataProvider;
             _repository = new QueryResponseStateRepository(Environment.CurrentDirectory, typeof(TEntity));
         }
 
@@ -63,14 +59,14 @@ namespace FutureState.Flow
         ///     Used to map the starting point to playback messages to the
         /// consumer.
         /// </param>
-        /// <param name="entitiesCount">
+        /// <param name="pageSize">
         ///     The window size to assemble a snapshot for.
         /// </param>
         /// <returns></returns>
         public virtual QueryResponse<TEntity> Get(
             string processorId,
             Guid sequenceFrom,
-            int entitiesCount)
+            int pageSize)
         {
             List<QueryResponseState> state = _repository.Get(processorId);
 
@@ -79,7 +75,8 @@ namespace FutureState.Flow
                 // find the internal row id (or line id)
                 int localId = state.Where(m => m.CheckPoint == sequenceFrom).Select(m => m.LocalIndex).FirstOrDefault();
 
-                QueryResponse<TEntity> response =  _receiveFn(localId, entitiesCount);
+                // get query response
+                QueryResponse<TEntity> response =  _receiveFn(localId, pageSize);
 
                 response.CheckPointFrom = sequenceFrom;
                 response.Package.FlowId = FlowId;
@@ -91,7 +88,7 @@ namespace FutureState.Flow
                 {
                     FlowId = this.FlowId,
                     ProcessorId = processorId,
-                    LocalIndex = response.LocalId,
+                    LocalIndex = response.CheckPointLocalTo,
                     CheckPoint = response.CheckPointTo
                 });
 

@@ -24,11 +24,6 @@ namespace FutureState.Flow
         public int Step { get; set; }
 
         /// <summary>
-        ///     The display name of the flow.
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         ///     The underlying package data.
         /// </summary>
         public List<TEntity> Data { get; set; }

@@ -1,4 +1,5 @@
 ﻿using FutureState.Data;
+using FutureState.Flow.QuerySources;
 using FutureState.Specifications;
 using System;
 using System.Collections.Generic;
@@ -46,26 +47,7 @@ namespace FutureState.Flow.Tests
         public void AndGivenAValidQuerySourceForThisData()
         {
             // data source provider
-            this.portSource = new QuerySource<TestInput>((sequenceFrom, entitiesCount) =>
-            {
-                int localIndex = sequenceFrom;
-                var outPut = new List<TestInput>();
-
-                for (localIndex = sequenceFrom; localIndex < entitiesCount && localIndex < testInput.Count; localIndex++)
-                    outPut.Add(testInput[localIndex]);
-
-                // create package to feed processor
-                var package = new Package<TestInput>()
-                {
-                    Data = testInput,
-                    Name = flowDisplayName,
-                };
-
-                return new QueryResponse<TestInput>(package, localIndex);
-            })
-            {
-                FlowId = flowId
-            };
+            this.portSource = new QuerySourceInMemory<TestInput>(flowId, testInput); ;
         }
 
 
@@ -79,15 +61,15 @@ namespace FutureState.Flow.Tests
                 FlowDirPath = Environment.CurrentDirectory
             };
 
-            this.subject = new Processor<TestOutput, TestInput>((entity) =>
+            this.subject = new Processor<TestOutput, TestInput>((inputEntity) =>
             {
                 localIndexCount++;
 
                 // map incoming data to outgoing data
                 var outputEntity = new TestOutput()
                 {
-                    Id = entity.Id,
-                    Name = entity.Name + "_transformed" + localIndexCount,
+                    Id = inputEntity.Id,
+                    Name = inputEntity.Name + "_transformed" + localIndexCount,
                     DateCreated = DateTime.UtcNow,
                     Description = localIndexCount % 2 == 0 ? null : "Description" + localIndexCount
                 };

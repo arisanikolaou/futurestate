@@ -7,7 +7,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the max number of entities to process from a given data source.
         /// </summary>
-        public int WindowSize { get; set; }
+        public int PageSize { get; set; }
 
         /// <summary>
         ///     Gets the base path to output staging files to.
@@ -49,7 +49,7 @@ namespace FutureState.Flow
         {
             ProcessorId = processorId;
             PollTime = pollTime;
-            WindowSize = windowSize;
+            PageSize = windowSize;
             FlowDirPath = baseDirectory ?? Environment.CurrentDirectory;
         }
     }
