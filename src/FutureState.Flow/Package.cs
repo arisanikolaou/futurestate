@@ -13,6 +13,19 @@ namespace FutureState.Flow
     /// <typeparam name="TEntity">The batch entity type.</typeparam>
     public class Package<TEntity>
     {
+        public Package()
+        {
+        }
+
+        public Package(Guid flowId)
+        {
+            FlowId = flowId;
+
+            Invalid = new List<ProcessEntityError>();
+            Errors = new List<ProcessError>();
+            Data = new List<TEntity>();
+        }
+
         /// <summary>
         ///     The flow identifier.
         /// </summary>

@@ -257,15 +257,12 @@ namespace FutureState.Flow
                     {
                         var collectionErrors = _specsForCollection.ToErrors(outputData);
                         if (collectionErrors.Any())
-                        {
-                            throw new RuleException("Can't process output data as one of more rules were violated.", collectionErrors);
-                        }
+                            throw new RuleException("Can't process output data as one or more rules were violated.", collectionErrors);
                     }
 
                     // save results attaching source package thread
-                    package = new Package<TEntityOut>
+                    package = new Package<TEntityOut>(pSourcePackage.Package.FlowId)
                     {
-                        FlowId = pSourcePackage.Package.FlowId,
                         Data = outputData,
                         Invalid = invalidData,
                         Errors = processErrors

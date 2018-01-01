@@ -28,9 +28,8 @@ namespace FutureState.Flow.QuerySources
                     outPut.Add(entities[localIndex]);
 
                 // create package to feed processor
-                var package = new Package<TEntity>()
+                var package = new Package<TEntity>(flowId)
                 {
-                    FlowId = flowId,
                     Data = entities
                 };
 
