@@ -1,6 +1,7 @@
 ﻿using FutureState.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -20,22 +21,16 @@ namespace FutureState.Flow.Tests
             var flowDisplayName = "Flow";
 
             // data source
-            var testInput = new List<TestInput>()
-            {
-                new TestInput()
+            var testInput = new List<TestInput>();
+            for (int i = 0; i < 3; i++)
+                testInput.Add(new TestInput()
                 {
-                    Id = 1,
-                    Name = "Name"
-                },
-                new TestInput()
-                {
-                    Id = 2,
-                    Name = "Name 2"
-                }
-            };
+                    Id = i,
+                    Name = "Name:" + i
+                });
 
             // data source provider
-            var portSource = new PortSource<TestInput>((sequenceFrom, entitiesCount) =>
+            var portSource = new QuerySource<TestInput>((sequenceFrom, entitiesCount) =>
             {
                 int localIndex = sequenceFrom;
                 var outPut = new List<TestInput>();
@@ -56,13 +51,17 @@ namespace FutureState.Flow.Tests
             };
 
             // processor
+            int localIndexCount = 0;
             var subject = new Processor<TestOutput, TestInput>((entity) =>
             {
+                localIndexCount++;
+
                 var outputEntity = new TestOutput()
                 {
                     Id = entity.Id,
-                    Name = entity.Name + "_transformed",
-                    DateCreated = DateTime.UtcNow
+                    Name = entity.Name + "_transformed" + localIndexCount,
+                    DateCreated = DateTime.UtcNow,
+                    Description = localIndexCount % 2 == 0 ? null : "Description" + localIndexCount
                 };
 
                 return outputEntity;
@@ -81,6 +80,7 @@ namespace FutureState.Flow.Tests
 
             var results = subject.Get().ToList();
 
+            // assert that the results were transformed
             Assert.True(results.Count() > 0);
             Assert.Contains(results, m => m.Name.Contains("_transformed"));
         }
@@ -101,6 +101,9 @@ namespace FutureState.Flow.Tests
             public int Id { get; set; }
 
             public DateTime DateCreated { get; set; }
+
+            [Required]
+            public string Description { get; set; }
         }
     }
 }

@@ -24,9 +24,9 @@ namespace FutureState.Flow.Data
             _entityType = entityType;
         }
 
-        public List<QueryResponseState> Get(string consumerId)
+        public List<QueryResponseState> Get(string processorId)
         {
-            string filePath = $@"{BasePath}\port-source.{_entityType.Name}.{consumerId}.yaml";
+            string filePath = $@"{BasePath}\processor.source.{_entityType.Name}.{processorId}.yaml";
 
             if (File.Exists(filePath))
             {
@@ -44,9 +44,9 @@ namespace FutureState.Flow.Data
             }
         }
 
-        public void Save(string consumerId, List<QueryResponseState> state)
+        public void Save(string processorId, List<QueryResponseState> state)
         {
-            string filePath = $@"{BasePath}\port-source.{_entityType.Name}.{consumerId}.yaml";
+            string filePath = $@"{BasePath}\processor.source.{_entityType.Name}.{processorId}.yaml";
 
             if (_logger.IsTraceEnabled)
                 _logger.Trace($"Saving query response state to file {filePath}.");

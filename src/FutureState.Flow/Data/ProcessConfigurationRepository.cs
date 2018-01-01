@@ -10,9 +10,9 @@ namespace FutureState.Flow.Data
         private readonly object _syncLock = new object();
         private readonly string _configFilePath;
 
-        public ProcessConfigurationRepository(string filePath)
+        public ProcessConfigurationRepository(string configFilePath)
         {
-            _configFilePath = filePath;
+            _configFilePath = configFilePath;
         }
 
         /// <summary>

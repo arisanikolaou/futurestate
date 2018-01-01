@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace FutureState.Flow
 {
-    public class QuerySource : PortSource<object>
+    public class QuerySource : QuerySource<object>
     {
         public QuerySource(Func<int, int, QueryResponse<object>> receiveFn) : base(receiveFn)
         {
@@ -21,7 +21,7 @@ namespace FutureState.Flow
     /// </summary>
     /// <typeparam name="TEntity">
     /// </typeparam>
-    public class PortSource<TEntity>
+    public class QuerySource<TEntity>
     {
         private static readonly object _syncLock = new object();
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -44,7 +44,7 @@ namespace FutureState.Flow
         ///     Creates a new instance.
         /// </summary>
         /// <param name="receiveFn"></param>
-        public PortSource(Func<int, int, QueryResponse<TEntity>> receiveFn)
+        public QuerySource(Func<int, int, QueryResponse<TEntity>> receiveFn)
         {
             _receiveFn = receiveFn;
             _repository = new QueryResponseStateRepository(Environment.CurrentDirectory, typeof(TEntity));
@@ -56,7 +56,7 @@ namespace FutureState.Flow
         /// <remarks>
         ///     A consumer id must be unique for a given 'Flow'.
         /// </remarks>
-        /// <param name="consumerId">
+        /// <param name="processorId">
         ///     The id of the consumer requesting the snapshot data (the package).
         /// </param>
         /// <param name="sequenceFrom">
@@ -68,11 +68,11 @@ namespace FutureState.Flow
         /// </param>
         /// <returns></returns>
         public virtual QueryResponse<TEntity> Get(
-            string consumerId,
+            string processorId,
             Guid sequenceFrom,
             int entitiesCount)
         {
-            List<QueryResponseState> state = _repository.Get(consumerId);
+            List<QueryResponseState> state = _repository.Get(processorId);
 
             try
             {
@@ -90,7 +90,7 @@ namespace FutureState.Flow
                 state.Add(new QueryResponseState()
                 {
                     FlowId = this.FlowId,
-                    ConsumerId = consumerId,
+                    ConsumerId = processorId,
                     LocalIndex = response.LocalId,
                     CheckPoint = response.SequenceTo
                 });
@@ -100,7 +100,7 @@ namespace FutureState.Flow
             finally
             {
                 // save query response and local check point to map external checkpoint to an internal one
-                _repository.Save(consumerId, state);
+                _repository.Save(processorId, state);
             }
         }
     }

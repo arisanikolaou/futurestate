@@ -53,16 +53,16 @@
     <Compile Include="Data\ProcessConfigurationRepository.cs" />
     <Compile Include="Data\ProcessStateRepository.cs" />
     <Compile Include="Data\QueryResponseStateRepository.cs" />
+    <Compile Include="ProcessFlow.cs" />
+    <Compile Include="QueryResponse.cs" />
     <Compile Include="QueryResponseState.cs" />
     <Compile Include="ErrorEvent.cs" />
-    <Compile Include="Flow.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="QuerySource.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
     <Compile Include="ProcessState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReceiveMessageResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -71,6 +71,10 @@
     <ProjectReference Include="..\FutureState.Common.Core\FutureState.Common.csproj">
       <Project>{3BA5FB45-D642-43DE-8629-37AA3D7CE5BD}</Project>
       <Name>FutureState.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FutureState.Specifications\FutureState.Specifications.csproj">
+      <Project>{96B0A895-7A34-411D-BDE6-FC0B222AA18D}</Project>
+      <Name>FutureState.Specifications</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

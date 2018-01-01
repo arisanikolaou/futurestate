@@ -32,6 +32,11 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the errors encountered processing data.
         /// </summary>
-        public List<ErrorEvent> Errors { get; set; }
+        public List<ProcessError> Errors { get; set; }
+
+        /// <summary>
+        ///     Invalid entities.
+        /// </summary>
+        public List<ProcessEntityError> Invalid { get; set; }
     }
 }

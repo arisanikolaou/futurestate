@@ -20,6 +20,22 @@ namespace FutureState.Flow
 
     public class ProcessFlowState
     {
+        public ProcessFlowState()
+        {
+            // required by serializer
+        }
+
+        public ProcessFlowState(Guid flowId, Guid sequenceTo)
+        {
+            // required by serializer
+            FlowId = flowId;
+            StartDate = DateTime.UtcNow;
+            Host = Environment.MachineName;
+            User = Environment.UserName;
+            CheckPoint = sequenceTo;
+        }
+        
+
         /// <summary>
         ///     Gets or sets the flow id.
         /// </summary>
@@ -61,17 +77,8 @@ namespace FutureState.Flow
         public string User { get; set; }
 
         /// <summary>
-        ///     Creates a default instance.
+        ///     Gets the number of entities that failed validation.
         /// </summary>
-        public static ProcessFlowState Create()
-        {
-            return new ProcessFlowState()
-            {
-                StartDate = DateTime.UtcNow,
-                Host = Environment.MachineName,
-                User = Environment.UserName,
-                CheckPoint = Guid.NewGuid()
-            };
-        }
+        public int EntitiesInvalid { get; set; }
     }
 }

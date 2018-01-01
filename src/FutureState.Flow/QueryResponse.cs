@@ -35,7 +35,7 @@ namespace FutureState.Flow
 
         public QueryResponse()
         {
-
+            // will be required for serializer
         }
 
 
@@ -44,6 +44,14 @@ namespace FutureState.Flow
             Package = package;
             LocalId = localId;
             SequenceTo = SeqGuid.Create(); // next check point
+        }
+
+        public QueryResponse(Guid sequenceFrom, Guid sequenceTo, int localId, Package<TEntity> package)
+        {
+            SequenceFrom = sequenceFrom;
+            SequenceTo = sequenceTo;
+            LocalId = localId;
+            Package = package;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets/sets the id of the processor this configuration is valid for.
         /// </summary>
-        public string Id { get; set; }
+        public string ProcessorId { get; set; }
 
         /// <summary>
         ///     Creates a new instance.
@@ -41,13 +41,13 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="id">The process id the configuration is attached to.</param>
+        /// <param name="processorId">The process id the configuration is attached to.</param>
         /// <param name="pollTime">The flow poll time in seconds.</param>
         /// <param name="windowSize"></param>
         /// <param name="baseDirectory"></param>
-        public ProcessorConfiguration(string id, int pollTime = 1, int windowSize = 1000, string baseDirectory = null)
+        public ProcessorConfiguration(string processorId, int pollTime = 1, int windowSize = 1000, string baseDirectory = null)
         {
-            Id = id;
+            ProcessorId = processorId;
             PollTime = pollTime;
             WindowSize = windowSize;
             FlowDirPath = baseDirectory ?? Environment.CurrentDirectory;

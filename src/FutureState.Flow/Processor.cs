@@ -1,9 +1,11 @@
 ﻿using FutureState.Flow.Data;
+using FutureState.Specifications;
 using Newtonsoft.Json;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace FutureState.Flow
@@ -24,36 +26,53 @@ namespace FutureState.Flow
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private readonly object _syncLock = new object();
+
         private Timer _timer;
         private readonly Func<TEntityIn, TEntityOut> _mapper;
-        private readonly object _syncLock = new object();
         private bool _disposed = false;
         private ProcessConfigurationRepository _processConfigurationRepository;
         private ProcessStateRepository _processStateRepository;
         private PackageRepository<TEntityOut> _packageRepository;
+        private readonly IEnumerable<ISpecification<TEntityOut>> _specifications;
 
         /// <summary>
         ///     Gets the port source(s) data driving the current processor.
         /// </summary>
-        public List<PortSource<TEntityIn>> PortSources { get; set; } = new List<PortSource<TEntityIn>>();
+        public List<QuerySource<TEntityIn>> PortSources { get; set; }
 
         /// <summary>
         ///     Gets the processors configuration.
         /// </summary>
-        public ProcessorConfiguration Configuration { get; set; } = new ProcessorConfiguration();
+        public ProcessorConfiguration Configuration { get; set; }
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public Processor(Func<TEntityIn, TEntityOut> mapper)
+        public Processor(
+            Func<TEntityIn, TEntityOut> mapper, 
+            ProcessorConfiguration configuration = null, 
+            IProvideSpecifications<TEntityOut> specProvider = null,
+            params QuerySource<TEntityIn>[] querySources)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _processConfigurationRepository = new ProcessConfigurationRepository($"processor.{typeof(TEntityOut).Name}.config");
-            _processStateRepository = new ProcessStateRepository(Environment.CurrentDirectory, typeof(TEntityOut));
-            _packageRepository = new PackageRepository<TEntityOut>(Environment.CurrentDirectory);
+
+
+            Configuration = configuration ?? new ProcessorConfiguration($"processor.{typeof(TEntityOut).Name}");
+            PortSources = new List<QuerySource<TEntityIn>>();
+            if (querySources != null)
+                PortSources.AddRange(querySources);
 
             // don't auto start in the contructor
+            _processConfigurationRepository = new ProcessConfigurationRepository($"processor.{typeof(TEntityOut).Name}.config");
+            _processStateRepository = new ProcessStateRepository(Configuration.FlowDirPath, typeof(TEntityOut));
+            _packageRepository = new PackageRepository<TEntityOut>(Configuration.FlowDirPath);
+
+            specProvider = specProvider ?? new SpecProvider<TEntityOut>();
+            _specifications = specProvider.GetSpecifications();
         }
+
+        public IEnumerable<TEntityOut> Get() =>  _packageRepository.Get<TEntityOut>();
 
         /// <summary>
         ///     Starts the current instance.
@@ -64,6 +83,15 @@ namespace FutureState.Flow
                 _logger.Trace("Starting processor.");
 
             this.Configuration = _processConfigurationRepository.Get();
+
+            if (this.Configuration == null)
+                throw new InvalidOperationException("Configuration has not been resolved.");
+
+            if (this.Configuration.PollTime < 1)
+                throw new InvalidOperationException("Configuration.PollTime must be a value greater than 0.");
+
+            if (this.PortSources == null)
+                throw new InvalidOperationException("PortSources cannot be null.");
 
             _timer?.Dispose();
 
@@ -92,12 +120,16 @@ namespace FutureState.Flow
         public virtual ProcessState Process()
         {
             if (PortSources == null)
-                throw new InvalidOperationException("PortSources is null");
+                throw new InvalidOperationException("PortSources has not been assigned.");
 
+            // todo: leaky abstraction
             _processStateRepository.BasePath = Configuration.FlowDirPath;
             _packageRepository.BasePath = Configuration.FlowDirPath;
 
             ProcessState state = _processStateRepository.Get();
+
+            if (_disposed)
+                return state;
 
             try
             {
@@ -115,11 +147,12 @@ namespace FutureState.Flow
 
         protected virtual ProcessState ProcessInner(ProcessState state)
         {
+
             foreach (var portSource in PortSources)
             {
                 Package<TEntityOut> package;
 
-                var flowState = ProcessFlowState.Create();
+                ProcessFlowState flowState = null;
 
                 try
                 {
@@ -133,16 +166,15 @@ namespace FutureState.Flow
 
                     var pSourcePackage = portSource
                         .Get(
-                        Configuration.Id, // client id
+                        Configuration.ProcessorId, // client id
                         lastCheckPoint, // sequence id
                         Configuration.WindowSize);
 
-                    // assign flow id
-                    flowState.FlowId = pSourcePackage.Package.FlowId;
-                    flowState.CheckPoint = pSourcePackage.SequenceTo;
+                    flowState = new ProcessFlowState(pSourcePackage.Package.FlowId, pSourcePackage.SequenceTo);
 
                     var outputData = new List<TEntityOut>();
-                    var errors = new List<ErrorEvent>();
+                    var invalidData = new List<ProcessEntityError>();
+                    var processErrors = new List<ProcessError>();
 
                     if (pSourcePackage?.Package?.Data == null)
                         throw new InvalidOperationException("Source data is null.");
@@ -158,9 +190,16 @@ namespace FutureState.Flow
                         {
                             TEntityOut outEntity = _mapper(source);
 
-                            outputData.Add(outEntity);
+                            // validate 
+                            var mappingErrors = _specifications.ToErrors(outEntity).ToList();
 
-                            flowState.EntitiesProcessed++;
+                            if (!mappingErrors.Any())
+                                outputData.Add(outEntity);
+                            else
+                                invalidData.Add(new ProcessEntityError(outEntity, mappingErrors));
+
+                            flowState.EntitiesInvalid ++;
+                            flowState.EntitiesProcessed ++;
                         }
                         catch (Exception ex)
                         {
@@ -175,7 +214,7 @@ namespace FutureState.Flow
                                 if (_logger.IsErrorEnabled)
                                     _logger.Error(ex);
 
-                                errors.Add(new ErrorEvent()
+                                processErrors.Add(new ProcessError()
                                 {
                                     Type = "Process",
                                     Message = ex.Message,
@@ -194,7 +233,8 @@ namespace FutureState.Flow
                         FlowId = pSourcePackage.Package.FlowId,
                         Name = pSourcePackage.Package.Name,
                         Data = outputData,
-                        Errors = errors
+                        Invalid = invalidData,
+                        Errors = processErrors
                     };
                 }
                 catch (Exception ex)
@@ -225,41 +265,11 @@ namespace FutureState.Flow
                 }
 
                 // add when successful
-                state.Details.Add(flowState);
+                if(flowState != null)
+                    state.Details.Add(flowState);
             }
 
             return state;
-        }
-
-        /// <summary>
-        ///     Gets all entities processed by the current instance.
-        /// </summary>
-        /// <returns></returns>
-        public virtual IEnumerable<TEntityOut> Get()
-        {
-            lock (_syncLock)
-            {
-                var serializer = new JsonSerializer();
-
-                if (Configuration == null)
-                    throw new InvalidOperationException("No configuration has been assigned to the active instance.");
-
-                foreach (var filePath in Directory.GetFiles(Configuration.FlowDirPath, $"data.{typeof(TEntityOut).Name}.*.json"))
-                {
-                    using (var file = File.OpenText(filePath))
-                    {
-                        var package = (Package<TEntityOut>)serializer.Deserialize(file, typeof(Package<TEntityOut>));
-
-                        if (package.Data == null)
-                            throw new InvalidOperationException("Failed to load package data.");
-
-                        foreach (var item in package.Data)
-                            yield return item;
-                    }
-                }
-
-                yield break;
-            }
         }
 
         protected virtual void Dispose(bool disposing)

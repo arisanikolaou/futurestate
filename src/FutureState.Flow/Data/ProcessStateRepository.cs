@@ -22,18 +22,17 @@ namespace FutureState.Flow.Data
 
         public ProcessState Get()
         {
-            string filePath = $@"{BasePath}\processor-state.{_entityType.Name}.json";
+            string filePath = $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
 
             if (File.Exists(filePath))
             {
+                var deserializer = new Deserializer();
+
+                string text = null;
                 lock (_syncLock)
-                {
-                    var readOutput = File.ReadAllText(filePath);
+                    text = File.ReadAllText(filePath);
 
-                    var deserializer = new Deserializer();
-
-                    return deserializer.Deserialize<ProcessState>(readOutput);
-                }
+                return deserializer.Deserialize<ProcessState>(text);
             }
             else
             {
@@ -46,16 +45,18 @@ namespace FutureState.Flow.Data
 
         public void Save(ProcessState state)
         {
+            Guard.ArgumentNotNull(state, nameof(state));
+
+            string filePath = $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
+
+            var serializer = new Serializer();
+
             lock (_syncLock)
             {
-                string filePath = $@"{BasePath}\processor-state.{_entityType.Name}.json";
-
                 if (File.Exists(filePath))
                     File.Delete(filePath);
 
-                var serializer = new Serializer();
-
-                var serialize = serializer.Serialize(state);
+                string serialize = serializer.Serialize(state);
 
                 File.WriteAllText(filePath, serialize);
             }
