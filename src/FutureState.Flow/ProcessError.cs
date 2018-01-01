@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace FutureState.Flow
+﻿namespace FutureState.Flow
 {
+    /// <summary>
+    ///     A generic error encountered processing a batch of entities.
+    /// </summary>
     public class ProcessError
     {
         public ProcessError()
@@ -21,23 +22,5 @@ namespace FutureState.Flow
         public string Message { get; set; }
 
         public int ProcessIndex { get; set; }
-    }
-
-    public class ProcessEntityError
-    {
-        public ProcessEntityError()
-        {
-            // required by serializer
-        }
-
-        public ProcessEntityError(object entity, List<Error> errors)
-        {
-            Entity = entity;
-            Errors = errors;
-        }
-
-        public object Entity { get; set; }
-
-        public List<Error> Errors { get; set; }
     }
 }

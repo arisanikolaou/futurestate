@@ -187,7 +187,7 @@ namespace FutureState.Flow
                         lastCheckPoint, // sequence id
                         Configuration.WindowSize);
 
-                    flowState = new ProcessFlowState(pSourcePackage.Package.FlowId, pSourcePackage.SequenceTo);
+                    flowState = new ProcessFlowState(pSourcePackage.Package.FlowId, pSourcePackage.CheckPointTo);
 
                     var outputData = new List<TEntityOut>();
                     var invalidData = new List<ProcessEntityError>();

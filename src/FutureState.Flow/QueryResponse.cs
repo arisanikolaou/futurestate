@@ -14,13 +14,12 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the start of the snapshot.
         /// </summary>
-        public Guid SequenceFrom { get; set; }
+        public Guid CheckPointFrom { get; set; }
 
         /// <summary>
         ///     Gets the id of the end of the snapshot. This will be a sequential id.
         /// </summary>
-        public Guid SequenceTo { get; set; }
-
+        public Guid CheckPointTo { get; set; }
 
         /// <summary>
         ///     Gets/sets the local id.
@@ -28,11 +27,14 @@ namespace FutureState.Flow
         public int LocalId { get; set; }
 
         /// <summary>
-        ///     Gets the package that was assembled.
+        ///     Gets the package that was assembled to satisfy a request.
         /// </summary>
         public Package<TEntity> Package { get; set; }
 
 
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
         public QueryResponse()
         {
             // will be required for serializer
@@ -43,13 +45,13 @@ namespace FutureState.Flow
         {
             Package = package;
             LocalId = localId;
-            SequenceTo = SeqGuid.Create(); // next check point
+            CheckPointTo = SeqGuid.Create(); // next check point
         }
 
-        public QueryResponse(Guid sequenceFrom, Guid sequenceTo, int localId, Package<TEntity> package)
+        public QueryResponse(Guid checkPointFrom, Guid checkPointTo, int localId, Package<TEntity> package)
         {
-            SequenceFrom = sequenceFrom;
-            SequenceTo = sequenceTo;
+            CheckPointFrom = checkPointFrom;
+            CheckPointTo = checkPointTo;
             LocalId = localId;
             Package = package;
         }

@@ -7,6 +7,10 @@ namespace FutureState.Flow
     {
     }
 
+    /// <summary>
+    ///     A batch/package of entites exchanged between a query source and a processor.
+    /// </summary>
+    /// <typeparam name="TEntity">The batch entity type.</typeparam>
     public class Package<TEntity>
     {
         /// <summary>

@@ -81,7 +81,7 @@ namespace FutureState.Flow
 
                 QueryResponse<TEntity> response =  _receiveFn(localId, entitiesCount);
 
-                response.SequenceFrom = sequenceFrom;
+                response.CheckPointFrom = sequenceFrom;
                 response.Package.FlowId = FlowId;
 
                 if (response == null)
@@ -90,9 +90,9 @@ namespace FutureState.Flow
                 state.Add(new QueryResponseState()
                 {
                     FlowId = this.FlowId,
-                    ConsumerId = processorId,
+                    ProcessorId = processorId,
                     LocalIndex = response.LocalId,
-                    CheckPoint = response.SequenceTo
+                    CheckPoint = response.CheckPointTo
                 });
 
                 return response;
