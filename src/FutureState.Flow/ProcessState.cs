@@ -3,21 +3,36 @@ using System.Collections.Generic;
 
 namespace FutureState.Flow
 {
+    /// <summary>
+    ///     A state container for a set of process flow states executed by a processor.
+    /// </summary>
     public class ProcessState
     {
-        public Guid FlowId { get; set; }
+        public ProcessState()
+        {
+        }
+
+        public ProcessState(string processId)
+        {
+            ProcessId = processId;
+            Details = new List<ProcessFlowState>();
+        }
 
         /// <summary>
-        ///     Gets/set the last checkpoint.
+        ///     Gets or sets the processor id that owns the state.
         /// </summary>
-        public Guid CheckPoint { get; set; }
+        public string ProcessId { get; set; }
 
         /// <summary>
-        ///
+        ///     Gets the process flow stae details.
         /// </summary>
         public List<ProcessFlowState> Details { get; set; }
     }
 
+    /// <summary>
+    ///     The execution details of a given flow process. A flow process is the result of reading data from
+    ///     incoming sources and transforming them to a target statte.
+    /// </summary>
     public class ProcessFlowState
     {
         public ProcessFlowState()

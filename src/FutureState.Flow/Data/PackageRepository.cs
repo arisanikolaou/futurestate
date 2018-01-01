@@ -11,10 +11,14 @@ namespace FutureState.Flow.Data
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly object _syncLock = new object();
 
+
         public string BasePath { get; set; }
+
 
         public PackageRepository(string basePath)
         {
+            Guard.ArgumentNotNullOrEmptyOrWhiteSpace(basePath, nameof(basePath));
+
             BasePath = basePath;
         }
 
@@ -35,28 +39,42 @@ namespace FutureState.Flow.Data
         }
 
         /// <summary>
-        ///     Gets all entities that match a given output entity type.
+        ///     Gets all underling valid entities associated with all discovered packages.
         /// </summary>
-        public virtual IEnumerable<TEntityOut> Get<TEntityOut>()
+        public virtual IEnumerable<TEntity> GetEntities<TEntity>()
+        {
+            var serializer = new JsonSerializer();
+
+            var packages = Get<TEntity>();
+
+            foreach (var package in packages)
+                foreach (var item in package.Data)
+                    yield return item;
+        }
+
+        /// <summary>
+        ///     Gets all packages that match a given entity type.
+        /// </summary>
+        public virtual IEnumerable<Package<TEntity>> Get<TEntity>()
         {
             var serializer = new JsonSerializer();
 
             lock (_syncLock)
             {
-                foreach (var filePath in Directory.GetFiles(BasePath, $"processor.data.{typeof(TEntityOut).Name}.*.json"))
+                foreach (var filePath in Directory.GetFiles(BasePath, $"processor.data.{typeof(TEntity).Name}.*.json"))
                 {
                     using (var file = File.OpenText(filePath))
                     {
-                        Package<TEntityOut> package = null;
+                        Package<TEntity> package = null;
 
                         try
                         {
-                            package = (Package<TEntityOut>)serializer.Deserialize(file, typeof(Package<TEntityOut>));
+                            package = (Package<TEntity>)serializer.Deserialize(file, typeof(Package<TEntity>));
 
                             if (package.Data == null)
-                                throw new InvalidOperationException($"Failed to load package data from path: {typeof(TEntityOut).Name}.");
+                                throw new InvalidOperationException($"Failed to load package data from path: {typeof(TEntity).Name}.");
                         }
-                        catch(InvalidOperationException ex)
+                        catch (InvalidOperationException ex)
                         {
                             throw;
                         }
@@ -65,8 +83,7 @@ namespace FutureState.Flow.Data
                             throw new Exception($"Failed to read data from file {filePath}.", ex);
                         }
 
-                        foreach (var item in package.Data)
-                            yield return item;
+                        yield return package;
                     }
                 }
 

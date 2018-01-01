@@ -1,10 +1,8 @@
 ﻿using FutureState.Flow.Data;
 using FutureState.Specifications;
-using Newtonsoft.Json;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -20,8 +18,8 @@ namespace FutureState.Flow
     /// <summary>
     ///     Processes data from one or more data sources via a lightweight event sourcing model.
     /// </summary>
-    /// <typeparam name="TEntityOut">The entity produced by the current instance.</typeparam>
-    /// <typeparam name="TEntityIn">The incoming entity data source.</typeparam>
+    /// <typeparam name="TEntityOut">The entity type produced by the current instance.</typeparam>
+    /// <typeparam name="TEntityIn">The incoming entity type expected from data sources queried in the incoming ports.</typeparam>
     public class Processor<TEntityOut, TEntityIn> : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -34,7 +32,8 @@ namespace FutureState.Flow
         private ProcessConfigurationRepository _processConfigurationRepository;
         private ProcessStateRepository _processStateRepository;
         private PackageRepository<TEntityOut> _packageRepository;
-        private readonly IEnumerable<ISpecification<TEntityOut>> _specifications;
+        private readonly IEnumerable<ISpecification<TEntityOut>> _specsForEntity;
+        private readonly List<ISpecification<IEnumerable<TEntityOut>>> _specsForCollection;
 
         /// <summary>
         ///     Gets the port source(s) data driving the current processor.
@@ -46,13 +45,20 @@ namespace FutureState.Flow
         /// </summary>
         public ProcessorConfiguration Configuration { get; set; }
 
+
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
+        /// <param name="mapper">The mapper function to use.</param>
+        /// <param name="configuration">The processor configuration to rely to.</param>
+        /// <param name="specProvider">Provides rules to validate a single materialized entity.</param>
+        /// <param name="specProviderForCollection">Provides rules to validate a collection of materialized entities.</param>
+        /// <param name="querySources">The sources to read input data from.</param>
         public Processor(
-            Func<TEntityIn, TEntityOut> mapper, 
-            ProcessorConfiguration configuration = null, 
+            Func<TEntityIn, TEntityOut> mapper,
+            ProcessorConfiguration configuration = null,
             IProvideSpecifications<TEntityOut> specProvider = null,
+            IProvideSpecifications<IEnumerable<TEntityOut>> specProviderForCollection = null,
             params QuerySource<TEntityIn>[] querySources)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -69,10 +75,15 @@ namespace FutureState.Flow
             _packageRepository = new PackageRepository<TEntityOut>(Configuration.FlowDirPath);
 
             specProvider = specProvider ?? new SpecProvider<TEntityOut>();
-            _specifications = specProvider.GetSpecifications();
+
+            _specsForEntity = specProvider.GetSpecifications();
+            _specsForCollection = specProviderForCollection?.GetSpecifications().ToList() ?? new List<ISpecification<IEnumerable<TEntityOut>>>();
         }
 
-        public IEnumerable<TEntityOut> Get() =>  _packageRepository.Get<TEntityOut>();
+        public IEnumerable<TEntityOut> GetValidData() => _packageRepository.GetEntities<TEntityOut>();
+
+
+        public IEnumerable<ProcessEntityError> GetInvalidData() => _packageRepository.Get<TEntityOut>().SelectMany(m => m.Invalid);
 
         /// <summary>
         ///     Starts the current instance.
@@ -117,6 +128,10 @@ namespace FutureState.Flow
             _timer?.Dispose();
         }
 
+        /// <summary>
+        ///     Processes (pull) data from the underlying query sources.
+        /// </summary>
+        /// <returns></returns>
         public virtual ProcessState Process()
         {
             if (PortSources == null)
@@ -126,6 +141,7 @@ namespace FutureState.Flow
             _processStateRepository.BasePath = Configuration.FlowDirPath;
             _packageRepository.BasePath = Configuration.FlowDirPath;
 
+            // load/create process state
             ProcessState state = _processStateRepository.Get();
 
             if (_disposed)
@@ -145,7 +161,7 @@ namespace FutureState.Flow
             return state;
         }
 
-        protected virtual ProcessState ProcessInner(ProcessState state)
+        protected virtual ProcessState ProcessInner(ProcessState processState)
         {
 
             foreach (var portSource in PortSources)
@@ -160,11 +176,12 @@ namespace FutureState.Flow
                         _logger.Trace($"Processing flows from {portSource.ToString()}.");
 
                     Guid lastCheckPoint = Guid.Empty;
-                    var lastIndex = state.Details.Count - 1;
+                    var lastIndex = processState.Details.Count - 1;
                     if (lastIndex != -1)
-                        lastCheckPoint = state.Details[lastIndex].CheckPoint;
+                        lastCheckPoint = processState.Details[lastIndex].CheckPoint;
 
-                    var pSourcePackage = portSource
+                    // query sources for new data
+                    QueryResponse<TEntityIn> pSourcePackage = portSource
                         .Get(
                         Configuration.ProcessorId, // client id
                         lastCheckPoint, // sequence id
@@ -191,15 +208,21 @@ namespace FutureState.Flow
                             TEntityOut outEntity = _mapper(source);
 
                             // validate 
-                            var mappingErrors = _specifications.ToErrors(outEntity).ToList();
+                            var mappingErrors = _specsForEntity.ToErrors(outEntity).ToList();
 
                             if (!mappingErrors.Any())
+                            {
                                 outputData.Add(outEntity);
-                            else
-                                invalidData.Add(new ProcessEntityError(outEntity, mappingErrors));
 
-                            flowState.EntitiesInvalid ++;
-                            flowState.EntitiesProcessed ++;
+                                OnEntityProcessed(outEntity);
+                            }
+                            else
+                            {
+                                invalidData.Add(new ProcessEntityError(outEntity, mappingErrors));
+                                flowState.EntitiesInvalid++;
+                            }
+
+                            flowState.EntitiesProcessed++;
                         }
                         catch (Exception ex)
                         {
@@ -220,12 +243,24 @@ namespace FutureState.Flow
                                     Message = ex.Message,
                                     ProcessIndex = processIndex,
                                 });
+
+                                // continue processing
                             }
                         }
                     }
 
                     if (_logger.IsTraceEnabled)
                         _logger.Trace("Assembling output package.");
+
+                    // validate collection
+                    if (_specsForCollection != null)
+                    {
+                        var collectionErrors = _specsForCollection.ToErrors(outputData);
+                        if (collectionErrors.Any())
+                        {
+                            throw new RuleException("Can't process output data as one of more rules were violated.", collectionErrors);
+                        }
+                    }
 
                     // save results attaching source package thread
                     package = new Package<TEntityOut>
@@ -237,6 +272,10 @@ namespace FutureState.Flow
                         Errors = processErrors
                     };
                 }
+                catch (RuleException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     if (_logger.IsErrorEnabled)
@@ -245,6 +284,7 @@ namespace FutureState.Flow
                     throw;
                 }
 
+                // save to package store/repository
                 try
                 {
                     if (_logger.IsTraceEnabled)
@@ -261,15 +301,29 @@ namespace FutureState.Flow
                     if (_logger.IsErrorEnabled)
                         _logger.Error(ex, "Failed to save output package.");
 
-                    throw;
+                    throw new Exception("Failed to save outgoing package due to an unexpected error.", ex);
                 }
 
                 // add when successful
-                if(flowState != null)
-                    state.Details.Add(flowState);
+                if (flowState != null)
+                {
+                    // set date completed
+                    flowState.EndDate = DateTime.UtcNow;
+
+                    processState.Details.Add(flowState);
+                }
             }
 
-            return state;
+            return processState;
+        }
+
+        /// <summary>
+        ///     Called whenever an entity was successfully processed and is valid.
+        /// </summary>
+        /// <param name="validOutEntity">The valid output entity.</param>
+        protected virtual void OnEntityProcessed(TEntityOut validOutEntity)
+        {
+            // reserve for use by base class
         }
 
         protected virtual void Dispose(bool disposing)

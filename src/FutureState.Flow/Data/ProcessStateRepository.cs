@@ -20,9 +20,12 @@ namespace FutureState.Flow.Data
 
         public string BasePath { get; set; }
 
+        /// <summary>
+        ///     Loads or creates processor state.
+        /// </summary>
         public ProcessState Get()
         {
-            string filePath = $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
+            string filePath = GetFilePath();
 
             if (File.Exists(filePath))
             {
@@ -36,27 +39,31 @@ namespace FutureState.Flow.Data
             }
             else
             {
-                return new ProcessState()
-                {
-                    Details = new List<ProcessFlowState>()
-                };
+                return new ProcessState($"Processor-{_entityType.Name}");
             }
         }
 
+        string GetFilePath() =>  $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
+
+        /// <summary>
+        ///     Saves the state.
+        /// </summary>
+        /// <param name="state">The state to save.</param>
         public void Save(ProcessState state)
         {
             Guard.ArgumentNotNull(state, nameof(state));
 
-            string filePath = $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
+            string filePath = GetFilePath();
 
             var serializer = new Serializer();
 
             lock (_syncLock)
             {
+                string serialize = serializer.Serialize(state);
+
+                // always overwrite
                 if (File.Exists(filePath))
                     File.Delete(filePath);
-
-                string serialize = serializer.Serialize(state);
 
                 File.WriteAllText(filePath, serialize);
             }
