@@ -41,7 +41,7 @@ namespace FutureState.Flow
         public List<QuerySource<TEntityIn>> PortSources { get; set; }
 
         /// <summary>
-        ///     Gets the processors configuration.
+        ///     Gets the processor's configuration data.
         /// </summary>
         public ProcessorConfiguration Configuration { get; set; }
 
@@ -163,6 +163,7 @@ namespace FutureState.Flow
 
         protected virtual ProcessState ProcessInner(ProcessState processState)
         {
+            int pageSize = Configuration.PageSize;
 
             foreach (var portSource in PortSources)
             {
@@ -185,7 +186,7 @@ namespace FutureState.Flow
                         .Get(
                         Configuration.ProcessorId, // client id
                         lastCheckPoint, // sequence id
-                        Configuration.PageSize);
+                        pageSize);
 
                     flowState = new ProcessFlowState(pSourcePackage.Package.FlowId, pSourcePackage.CheckPointTo);
 
@@ -199,7 +200,14 @@ namespace FutureState.Flow
                     int processIndex = 0;
 
                     // iterate through the list .. todo process in parallel?
-                    foreach (var source in pSourcePackage.Package.Data)
+                    var queryData = pSourcePackage.Package.Data;
+
+                    if(queryData.Count == pageSize)
+                    {
+                        // assume more processing is needed
+                    }
+
+                    foreach (var source in queryData)
                     {
                         processIndex++;
 
@@ -210,6 +218,7 @@ namespace FutureState.Flow
                             // validate 
                             var mappingErrors = _specsForEntity.ToErrors(outEntity).ToList();
 
+                            // if valid stage in valid entities otherwise invalid entities 
                             if (!mappingErrors.Any())
                             {
                                 outputData.Add(outEntity);

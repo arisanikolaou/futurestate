@@ -43,14 +43,14 @@ namespace FutureState.Flow
         /// </summary>
         /// <param name="processorId">The process id the configuration is attached to.</param>
         /// <param name="pollTime">The flow poll time in seconds.</param>
-        /// <param name="windowSize"></param>
-        /// <param name="baseDirectory"></param>
-        public ProcessorConfiguration(string processorId, int pollTime = 1, int windowSize = 1000, string baseDirectory = null)
+        /// <param name="pageSize">The max number of entities to query.</param>
+        /// <param name="flowDirPath">Defaults to processor current directory if null.</param>
+        public ProcessorConfiguration(string processorId, int pollTime = 1, int pageSize = 1000, string flowDirPath = null)
         {
             ProcessorId = processorId;
             PollTime = pollTime;
-            PageSize = windowSize;
-            FlowDirPath = baseDirectory ?? Environment.CurrentDirectory;
+            PageSize = pageSize;
+            FlowDirPath = flowDirPath ?? Environment.CurrentDirectory;
         }
     }
 }
