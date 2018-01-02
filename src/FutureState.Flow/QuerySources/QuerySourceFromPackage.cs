@@ -15,11 +15,13 @@ namespace FutureState.Flow.QuerySources
 
         static Func<int, int, QueryResponse<TEntity>> GetFlowFn(Guid flowId, PackageRepository<TEntity> repository)
         {
-            var entities = repository.GetEntities<TEntity>().ToList();
+            var entities = repository
+                .GetEntities<TEntity>()
+                .ToList();
 
             return (checkPointLocal, pageSize) =>
             {
-                int localIndex = checkPointLocal;
+                int localIndex;
 
                 var outPut = new List<TEntity>();
 
@@ -27,10 +29,10 @@ namespace FutureState.Flow.QuerySources
                 for (localIndex = checkPointLocal; localIndex < pageSize && localIndex < entities.Count; localIndex++)
                     outPut.Add(entities[localIndex]);
 
-                // create package to feed processor
+                // create response package
                 var package = new Package<TEntity>(flowId)
                 {
-                    Data = entities
+                    Data = outPut
                 };
 
                 return new QueryResponse<TEntity>(package, localIndex);

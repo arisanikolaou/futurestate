@@ -16,7 +16,7 @@ namespace FutureState.Flow.QuerySources
         {
             return (checkPointLocal, pageSize) =>
             {
-                int localIndex = checkPointLocal;
+                int localIndex;
 
                 var outPut = new List<TEntity>();
 
@@ -24,10 +24,9 @@ namespace FutureState.Flow.QuerySources
                 for (localIndex = checkPointLocal; localIndex < pageSize && localIndex < entities.Count; localIndex++)
                     outPut.Add(entities[localIndex]);
 
-                // create package to feed processor
                 var package = new Package<TEntity>(flowId)
                 {
-                    Data = entities
+                    Data = outPut
                 };
 
                 return new QueryResponse<TEntity>(package, localIndex);

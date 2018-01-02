@@ -1,10 +1,10 @@
-﻿using FutureState.Flow.Data;
-using FutureState.Specifications;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using FutureState.Flow.Data;
+using FutureState.Specifications;
+using NLog;
 
 namespace FutureState.Flow
 {
@@ -22,16 +22,17 @@ namespace FutureState.Flow
     /// <typeparam name="TEntityIn">The incoming entity type expected from data sources queried in the incoming ports.</typeparam>
     public class Processor<TEntityOut, TEntityIn> : IDisposable
     {
+        // ReSharper disable once StaticMemberInGenericType
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly object _syncLock = new object();
 
         private Timer _timer;
         private readonly Func<TEntityIn, TEntityOut> _mapper;
-        private bool _disposed = false;
-        private ProcessConfigurationRepository _processConfigurationRepository;
-        private ProcessStateRepository _processStateRepository;
-        private PackageRepository<TEntityOut> _packageRepository;
+        private bool _disposed;
+        private readonly ProcessConfigurationRepository _processConfigurationRepository;
+        private readonly ProcessStateRepository _processStateRepository;
+        private readonly PackageRepository<TEntityOut> _packageRepository;
         private readonly IEnumerable<ISpecification<TEntityOut>> _specsForEntity;
         private readonly List<ISpecification<IEnumerable<TEntityOut>>> _specsForCollection;
 
@@ -93,28 +94,28 @@ namespace FutureState.Flow
             if (_logger.IsTraceEnabled)
                 _logger.Trace("Starting processor.");
 
-            this.Configuration = _processConfigurationRepository.Get();
+            Configuration = _processConfigurationRepository.Get();
 
-            if (this.Configuration == null)
+            if (Configuration == null)
                 throw new InvalidOperationException("Configuration has not been resolved.");
 
-            if (this.Configuration.PollTime < 1)
+            if (Configuration.PollTime < 1)
                 throw new InvalidOperationException("Configuration.PollTime must be a value greater than 0.");
 
-            if (this.PortSources == null)
+            if (PortSources == null)
                 throw new InvalidOperationException("PortSources cannot be null.");
 
             _timer?.Dispose();
 
             // keep polling for new data
-            _timer = new Timer((o) =>
+            _timer = new Timer(o =>
             {
                 if (!_disposed)
-                    this.Process();
+                    Process();
             },
                 this,
                 TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(this.Configuration.PollTime));
+                TimeSpan.FromSeconds(Configuration.PollTime));
         }
 
         /// <summary>
@@ -169,12 +170,12 @@ namespace FutureState.Flow
             {
                 Package<TEntityOut> package;
 
-                ProcessFlowState flowState = null;
+                ProcessFlowState flowState;
 
                 try
                 {
                     if (_logger.IsTraceEnabled)
-                        _logger.Trace($"Processing flows from {portSource.ToString()}.");
+                        _logger.Trace($"Processing flows from {portSource}.");
 
                     Guid lastCheckPoint = Guid.Empty;
                     var lastIndex = processState.Details.Count - 1;
@@ -190,11 +191,11 @@ namespace FutureState.Flow
 
                     flowState = new ProcessFlowState(pSourcePackage.Package.FlowId, pSourcePackage.CheckPointTo);
 
-                    var outputData = new List<TEntityOut>();
+                    var validData = new List<TEntityOut>();
                     var invalidData = new List<ProcessEntityError>();
                     var processErrors = new List<ProcessError>();
 
-                    if (pSourcePackage?.Package?.Data == null)
+                    if (pSourcePackage.Package?.Data == null)
                         throw new InvalidOperationException("Source data is null.");
 
                     int processIndex = 0;
@@ -221,7 +222,7 @@ namespace FutureState.Flow
                             // if valid stage in valid entities otherwise invalid entities 
                             if (!mappingErrors.Any())
                             {
-                                outputData.Add(outEntity);
+                                validData.Add(outEntity);
 
                                 OnEntityProcessed(outEntity);
                             }
@@ -241,20 +242,18 @@ namespace FutureState.Flow
                             {
                                 throw new Exception("Failed to process incoming entity due to an unexpected error.", ex);
                             }
-                            else
+
+                            if (_logger.IsErrorEnabled)
+                                _logger.Error(ex);
+
+                            processErrors.Add(new ProcessError
                             {
-                                if (_logger.IsErrorEnabled)
-                                    _logger.Error(ex);
+                                Type = "Process",
+                                Message = ex.Message,
+                                ProcessIndex = processIndex
+                            });
 
-                                processErrors.Add(new ProcessError()
-                                {
-                                    Type = "Process",
-                                    Message = ex.Message,
-                                    ProcessIndex = processIndex,
-                                });
-
-                                // continue processing
-                            }
+                            // continue processing
                         }
                     }
 
@@ -264,7 +263,7 @@ namespace FutureState.Flow
                     // validate collection
                     if (_specsForCollection != null)
                     {
-                        var collectionErrors = _specsForCollection.ToErrors(outputData);
+                        var collectionErrors = _specsForCollection.ToErrors(validData).ToList();
                         if (collectionErrors.Any())
                             throw new RuleException("Can't process output data as one or more rules were violated.", collectionErrors);
                     }
@@ -272,7 +271,7 @@ namespace FutureState.Flow
                     // save results attaching source package thread
                     package = new Package<TEntityOut>(pSourcePackage.Package.FlowId)
                     {
-                        Data = outputData,
+                        Data = validData,
                         Invalid = invalidData,
                         Errors = processErrors
                     };
@@ -296,7 +295,7 @@ namespace FutureState.Flow
                         _logger.Trace("Saving output package.");
 
                     // save to local file system
-                    this._packageRepository.Save(package);
+                    _packageRepository.Save(package);
 
                     if (_logger.IsTraceEnabled)
                         _logger.Trace("Saved output package.");
@@ -309,14 +308,10 @@ namespace FutureState.Flow
                     throw new Exception("Failed to save outgoing package due to an unexpected error.", ex);
                 }
 
-                // add when successful
-                if (flowState != null)
-                {
-                    // set date completed
-                    flowState.EndDate = DateTime.UtcNow;
+                // set date completed
+                flowState.EndDate = DateTime.UtcNow;
 
-                    processState.Details.Add(flowState);
-                }
+                processState.Details.Add(flowState);
             }
 
             return processState;
