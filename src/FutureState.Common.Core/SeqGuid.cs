@@ -1,7 +1,10 @@
 ﻿using System;
 
-namespace FutureState.Data
+namespace FutureState
 {
+    /// <summary>
+    ///     CombGuid generator.
+    /// </summary>
     public static class SeqGuid
     {
         /// <summary>
