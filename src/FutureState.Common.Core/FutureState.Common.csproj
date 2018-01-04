@@ -60,7 +60,7 @@
     <Compile Include="AppDomainUtil.cs" />
     <Compile Include="Reflection\AppTypeScanner.cs" />
     <Compile Include="SplitList.cs" />
-    <Compile Include="Data\SeqGuid.cs" />
+    <Compile Include="SeqGuid.cs" />
     <Compile Include="DomainEvents.cs" />
     <Compile Include="IExceptionData.cs" />
     <Compile Include="Data\BatchUpdateResult.cs" />
@@ -132,8 +132,6 @@
   </Target>
   -->
   <ItemGroup>
-    <Folder Include="Archive\" />
-    <Folder Include="ComponentModel\Archive\" />
     <Folder Include="IO\Archive\" />
   </ItemGroup>
   <Choose>

@@ -54,6 +54,7 @@
     <Compile Include="SendsReceivesDomainMessagesInProcessStory.cs" />
     <Compile Include="DurableActionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeqGuidTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\xunit.analyzers.0.8.0\analyzers\dotnet\cs\xunit.analyzers.dll" />

@@ -9,6 +9,7 @@ using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Core.Predicates;
 using Dapper.Extensions.Linq.Core.Sql;
 using Dapper.Extensions.Linq.Predicates;
+using FutureState;
 using FutureState.Data;
 
 namespace Dapper.Extensions.Linq.Implementor
