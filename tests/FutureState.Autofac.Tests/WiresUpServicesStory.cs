@@ -77,9 +77,6 @@ namespace FutureState.Autofac.Tests
             cb.Register(m => new KeyGenerator<Contact, int>(() => contactId++))
                 .AsSelf().AsImplementedInterfaces().SingleInstance();
 
-            //cb.Register(m => new KeyGenerator<Address, Guid>(Guid.NewGuid))
-            //    .AsSelf().AsImplementedInterfaces().SingleInstance();
-
             _container = cb.Build();
         }
 

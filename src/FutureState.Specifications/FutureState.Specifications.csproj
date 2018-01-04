@@ -164,6 +164,7 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
       <ItemGroup>
         <Reference Include="mscorlib">
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -377,6 +378,7 @@
         <Reference Include="System.Data.SqlClient">
           <HintPath>..\..\packages\app\System.Data.SqlClient\lib\net451\System.Data.SqlClient.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1068,6 +1070,7 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\lib\net46\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1111,6 +1114,7 @@
         <Reference Include="System.Security.Cryptography.Cng">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Cng\lib\net46\System.Security.Cryptography.Cng.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1197,6 +1201,7 @@
         <Reference Include="System.Security.Cryptography.X509Certificates">
           <HintPath>..\..\packages\app\System.Security.Cryptography.X509Certificates\lib\net46\System.Security.Cryptography.X509Certificates.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>

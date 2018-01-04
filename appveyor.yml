@@ -12,13 +12,18 @@ assembly_info:
 test: off
 build:
   publish_nuget: true
+  parallel: true 
+  verbosity: detailed
 build_script:
-- cmd: PowerShell -Version 2.0 .\build.ps1
+- cmd: PowerShell -Version 2.0 .\build.ps1 -Target Artefacts
+artifacts:
+  - path: 'nuget\*.nupkg'
+  - path: 'build\*.*'
 notifications:
 - provider: Email
   to:
   - aris.nikolaou@outlook.com
-  subject: FutureState build
+  subject: FutureState Build
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: false

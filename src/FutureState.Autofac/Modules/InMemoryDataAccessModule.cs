@@ -117,14 +117,15 @@ namespace FutureState.Autofac.Modules
             builder.Register(m => new CommitPolicyNoOp())
                 .As<ICommitPolicy>();
 
-            //units of work
             builder.RegisterGeneric(typeof(UnitOfWork<,>))
                 .Named("Default", typeof(UnitOfWork<,>))
+                .As(typeof(IUnitOfWork<,>))
                 .SingleInstance()
                 .AsSelf();
 
             builder.RegisterGeneric(typeof(UnitOfWorkLinq<,>))
                 .Named("Default", typeof(UnitOfWorkLinq<,>))
+                .As(typeof(IUnitOfWorkLinq<,>))
                 .SingleInstance()
                 .AsSelf();
 
