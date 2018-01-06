@@ -1,9 +1,6 @@
 ﻿using FutureState.ComponentModel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -36,14 +33,10 @@ namespace FutureState.Common.Tests
 
         public void WhenDemandingANonExistingServiceType()
         {
-            try
+            Assert.Throws<Exception>(() =>
             {
                 aggregate.Demand(m => m.Type == typeof(NonExistant));
-            }
-            catch(Exception ex)
-            {
-                this.error = ex;
-            }
+            });
         }
 
         public void ThenServicesShouldBeResolved()

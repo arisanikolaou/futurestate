@@ -62,8 +62,6 @@
     <Compile Include="Data\LocalDbSetup.cs" />
     <Compile Include="Reflection\AppTypeScanner.cs" />
     <Compile Include="Reflection\PropertyInvoker.cs" />
-    <Compile Include="Data\SeqGuid.cs" />
-    <Compile Include="SplitList.cs" />
     <Compile Include="SeqGuid.cs" />
     <Compile Include="DomainEvents.cs" />
     <Compile Include="IExceptionData.cs" />
@@ -128,10 +126,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup />
   <ItemGroup>
     <Folder Include="IO\Archive\" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5'">
       <ItemGroup>
