@@ -63,7 +63,8 @@ namespace Dapper.FastCrud.SqlStatements
         /// <summary>
         ///     Performs an UPDATE operation on multiple entities identified by an optional WHERE clause.
         /// </summary>
-        int BulkUpdate(IDbConnection connection, TEntity entity, AggregatedSqlStatementOptions<TEntity> statementOptions);
+        int BulkUpdate(IDbConnection connection, TEntity entity,
+            AggregatedSqlStatementOptions<TEntity> statementOptions);
 
         /// <summary>
         ///     Performs an UPDATE operation on multiple entities identified by an optional WHERE clause.

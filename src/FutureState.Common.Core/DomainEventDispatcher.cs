@@ -9,7 +9,7 @@ using System.Linq;
 namespace FutureState
 {
     /// <summary>
-    /// A basic domain event dispatcher.
+    ///     A basic domain event dispatcher.
     /// </summary>
     public class DomainEventDispatcher : IDomainEventDispatcher
     {
@@ -25,10 +25,7 @@ namespace FutureState
             Guard.ArgumentNotNull(domainEvent, nameof(domainEvent));
 
             _dispatchers.Each(
-                m =>
-                {
-                    m?.Invoke(domainEvent);
-                });
+                m => { m?.Invoke(domainEvent); });
         }
     }
 }

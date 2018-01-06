@@ -7,11 +7,7 @@ namespace FutureState.Data
     /// </summary>
     public class EntitySetLinq<TEntity, TKey> : EntitySet<TEntity, TKey>
     {
-        readonly Func<ISession, IRepositoryLinq<TEntity, TKey>> _getRepositoryLinq;
-
-        public ILinqReader<TEntity, TKey> LinqReader => _getRepositoryLinq.Invoke(_unitOfWork.Session);
-
-        public IBulkDeleter<TEntity, TKey> BulkDeleter => _getRepositoryLinq.Invoke(_unitOfWork.Session);
+        private readonly Func<ISession, IRepositoryLinq<TEntity, TKey>> _getRepositoryLinq;
 
         /// <summary>
         ///     Creates a new instance.
@@ -24,5 +20,9 @@ namespace FutureState.Data
         {
             _getRepositoryLinq = getRepository;
         }
+
+        public ILinqReader<TEntity, TKey> LinqReader => _getRepositoryLinq.Invoke(_unitOfWork.Session);
+
+        public IBulkDeleter<TEntity, TKey> BulkDeleter => _getRepositoryLinq.Invoke(_unitOfWork.Session);
     }
 }

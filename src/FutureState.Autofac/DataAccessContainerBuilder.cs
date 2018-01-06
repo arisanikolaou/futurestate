@@ -1,8 +1,9 @@
-using Autofac;
-using FutureState.Data.Providers;
 using System;
+using Autofac;
+using FutureState.Data;
+using FutureState.Data.Providers;
 
-namespace FutureState.Data.Autofac
+namespace FutureState.Autofac
 {
     /// <summary>
     ///     Helps build an autofac container with registrations for a linqreader, repository and unit of work registrations for
@@ -23,22 +24,23 @@ namespace FutureState.Data.Autofac
         }
 
         /// <summary>
-        ///     Registers a LinqReader in the container for the given entity with the given key type. Linq readers allow an entity to be queried
-        /// through the default data acceess provider registered in a given container.
+        ///     Registers a LinqReader in the container for the given entity with the given key type. Linq readers allow an entity
+        ///     to be queried
+        ///     through the default data acceess provider registered in a given container.
         /// </summary>
         public DataAccessContainerBuilder<TEntity, TKey> RegisterLinqReader()
         {
             _containerBuilder.Register(
-                m =>
-                {
-                    //use same session
-                    var sessionFactory = m.Resolve<ISessionFactory>();
-                    var ctx = m.Resolve<IComponentContext>();
-                    var reader = ctx.GetReader<TEntity, TKey>();
+                    m =>
+                    {
+                        //use same session
+                        var sessionFactory = m.Resolve<ISessionFactory>();
+                        var ctx = m.Resolve<IComponentContext>();
+                        var reader = ctx.GetReader<TEntity, TKey>();
 
-                    return new ProviderLinqReader<TEntity, TKey>(sessionFactory, reader);
-                })
-                             .As<ProviderLinqReader<TEntity, TKey>>();
+                        return new ProviderLinqReader<TEntity, TKey>(sessionFactory, reader);
+                    })
+                .As<ProviderLinqReader<TEntity, TKey>>();
 
             return this;
         }
@@ -50,13 +52,13 @@ namespace FutureState.Data.Autofac
             Func<ISession, ILinqReader<TEntity, TKey>> getLinqReader)
         {
             _containerBuilder.Register(
-                m =>
-                {
-                    var sessionFactory = m.Resolve<ISessionFactory>();
+                    m =>
+                    {
+                        var sessionFactory = m.Resolve<ISessionFactory>();
 
-                    return new ProviderLinqReader<TEntity, TKey>(sessionFactory, getLinqReader);
-                })
-                             .As<ProviderLinqReader<TEntity, TKey>>();
+                        return new ProviderLinqReader<TEntity, TKey>(sessionFactory, getLinqReader);
+                    })
+                .As<ProviderLinqReader<TEntity, TKey>>();
 
             return this;
         }
@@ -64,16 +66,16 @@ namespace FutureState.Data.Autofac
         public DataAccessContainerBuilder<TEntity, TKey> RegisterUnitOfWork()
         {
             _containerBuilder.Register(
-                m =>
-                {
-                    var sessionFactory = m.Resolve<ISessionFactory>();
-                    var ctx = m.Resolve<IComponentContext>();
+                    m =>
+                    {
+                        var sessionFactory = m.Resolve<ISessionFactory>();
+                        var ctx = m.Resolve<IComponentContext>();
 
-                    return new UnitOfWork<TEntity, TKey>(
-                        ctx.GetRepository<TEntity, TKey>(),
-                        sessionFactory);
-                })
-                             .As<UnitOfWork<TEntity, TKey>>();
+                        return new UnitOfWork<TEntity, TKey>(
+                            ctx.GetRepository<TEntity, TKey>(),
+                            sessionFactory);
+                    })
+                .As<UnitOfWork<TEntity, TKey>>();
             return this;
         }
 
@@ -85,14 +87,14 @@ namespace FutureState.Data.Autofac
         public DataAccessContainerBuilder<TEntity, TKey> RegisterUnitOfWork(string dbModelId)
         {
             _containerBuilder.Register(
-                m =>
-                {
-                    var sessionFactory = m.ResolveNamed<ISessionFactory>(dbModelId);
-                    var ctx = m.Resolve<IComponentContext>();
+                    m =>
+                    {
+                        var sessionFactory = m.ResolveNamed<ISessionFactory>(dbModelId);
+                        var ctx = m.Resolve<IComponentContext>();
 
-                    return new UnitOfWork<TEntity, TKey>(ctx.GetRepository<TEntity, TKey>(), sessionFactory);
-                })
-                             .Named<UnitOfWork<TEntity, TKey>>(dbModelId);
+                        return new UnitOfWork<TEntity, TKey>(ctx.GetRepository<TEntity, TKey>(), sessionFactory);
+                    })
+                .Named<UnitOfWork<TEntity, TKey>>(dbModelId);
 
             return this;
         }

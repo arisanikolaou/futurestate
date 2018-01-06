@@ -47,7 +47,8 @@ namespace Dapper.FastCrud.SqlStatements
         {
             return connection
                 .Query
-                <TMainEntity, TFirstJoinedEntity, TSecondJoinedEntity, RelationshipEntityInstanceIdentity<TMainEntity>>(
+                <TMainEntity, TFirstJoinedEntity, TSecondJoinedEntity,
+                    RelationshipEntityInstanceIdentity<TMainEntity>>(
                     statement,
                     (mainEntity, firstJoinedEntity, secondJoinedEntity) =>
                     {
@@ -77,7 +78,8 @@ namespace Dapper.FastCrud.SqlStatements
         {
             return connection
                 .QueryAsync
-                <TMainEntity, TFirstJoinedEntity, TSecondJoinedEntity, RelationshipEntityInstanceIdentity<TMainEntity>>(
+                <TMainEntity, TFirstJoinedEntity, TSecondJoinedEntity,
+                    RelationshipEntityInstanceIdentity<TMainEntity>>(
                     statement,
                     (mainEntity, firstJoinedEntity, secondJoinedEntity) =>
                     {

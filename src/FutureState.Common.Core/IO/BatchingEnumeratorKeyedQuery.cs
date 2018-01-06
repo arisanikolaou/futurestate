@@ -9,7 +9,7 @@ using System.Linq;
 namespace FutureState.IO
 {
     /// <summary>
-    /// Implements batching enumerator to query sets of keyed entities using a function callback.
+    ///     Implements batching enumerator to query sets of keyed entities using a function callback.
     /// </summary>
     /// <typeparam name="TEntity">The entity to query for.</typeparam>
     /// <typeparam name="TKey">The entity key type.</typeparam>
@@ -24,7 +24,7 @@ namespace FutureState.IO
         private int _currentSlice;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="keys">The full set of keys to query for..</param>
         /// <param name="getEntities">Function to get entities by their ids.</param>
@@ -35,9 +35,8 @@ namespace FutureState.IO
             Guard.ArgumentNotNull(keys, nameof(keys));
             Guard.ArgumentNotNull(getEntities, nameof(getEntities));
             if (batchSize <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(batchSize), @"Parameter 'batchSize' must be greater than zero.");
-            }
+                throw new ArgumentOutOfRangeException(nameof(batchSize),
+                    @"Parameter 'batchSize' must be greater than zero.");
 
             _slices = keys.Slice(batchSize).ToList();
             _currentSlice = 0;
@@ -62,6 +61,7 @@ namespace FutureState.IO
                 _currentSlice++;
                 return true;
             }
+
             _current.Clear();
 
             return false;

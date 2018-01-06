@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Reads all or a single entity by its key.
+    ///     Reads all or a single entity by its key.
     /// </summary>
     public interface IReader<out TEntity, in TKey> : IGetter<TEntity, TKey>
     {
@@ -19,17 +19,17 @@ namespace FutureState.Data
         IEnumerable<TEntity> GetAll();
 
         /// <summary>
-        /// Gets whether there are any items in the underlying collection.
+        ///     Gets whether there are any items in the underlying collection.
         /// </summary>
         bool Any();
 
         /// <summary>
-        /// Gets the number of entities in the underlying collection.
+        ///     Gets the number of entities in the underlying collection.
         /// </summary>
         long Count();
 
         /// <summary>
-        /// Gets all entities matching the given entity ids.
+        ///     Gets all entities matching the given entity ids.
         /// </summary>
         /// <param name="ids">The ids.</param>
         /// <returns></returns>
@@ -37,7 +37,7 @@ namespace FutureState.Data
     }
 
     /// <summary>
-    /// Reads all or a single entity by its key.
+    ///     Reads all or a single entity by its key.
     /// </summary>
     public interface IReader<out TEntity> : IReader<TEntity, Guid>, IGetter<TEntity>
     {

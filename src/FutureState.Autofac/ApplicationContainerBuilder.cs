@@ -1,38 +1,84 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using Autofac;
 using Dapper.Extensions.Linq.Core.Mapper;
 using FutureState.Data;
-using NLog;
+using FutureState.Data.Sql;
+using FutureState.Reflection;
 using FutureState.Services;
 using FutureState.Specifications;
-using FutureState.Reflection;
-using FutureState.Data.Sql;
+using Magnum.Reflection;
+using NLog;
 
-namespace FutureState.App
+namespace FutureState.Autofac
 {
     /// <summary>
-    ///     Helps construct a given autofac container using the types discovered in a given type scanner instance.
+    ///     Helps construct a given autofac container using the types discovered through a given <see cref="AppTypeScanner" />
+    ///     instance.
     /// </summary>
     public class ApplicationContainerBuilder
     {
-        readonly static Logger _logger = LogManager.GetCurrentClassLogger();
+        // ReSharper disable once InconsistentNaming
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ContainerBuilder cb;
-        private readonly AppTypeScanner scanner;
+        private readonly ContainerBuilder _cb;
+        private readonly AppTypeScanner _scanner;
 
         public ApplicationContainerBuilder(ContainerBuilder cb, AppTypeScanner scanner)
         {
-            Guard.ArgumentNotNull(cb, nameof(cb));
+            _cb = cb ?? throw new ArgumentNullException(nameof(cb));
+            _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
+        }
 
-            this.cb = cb;
-            this.scanner = scanner;
+        public ApplicationContainerBuilder RegisterAll()
+        {
+            return RegisterValidators()
+                .RegisterServices()
+                .RegisterEntityTableMaps()
+                .RegisterSpecializedQueries()
+                .RegisterUnitsOfWork()
+                .RegisterEntityKeyGenerators()
+                .RegisterClassMappers();
+        }
+
+        private ApplicationContainerBuilder RegisterEntityKeyGenerators()
+        {
+            foreach (var entity in _scanner.GetTypes<IEntity>())
+            {
+                var entityType = entity.Value;
+
+                var pk = entityType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .FirstOrDefault(m => m.GetCustomAttributes<KeyAttribute>(true).Any());
+
+                if (pk == null)
+                    continue;
+
+                if (pk.PropertyType == typeof(Guid))
+                    this.FastInvoke(new[]
+                        {
+                            entityType,
+                            pk.PropertyType
+                        },
+                        "RegisterEntityKeyGenerator", new Func<Guid>(SeqGuid.Create));
+            }
+
+            return this;
+        }
+
+        protected void RegisterEntityKeyGenerator<TEntity, TKey>(Func<TKey> getKey)
+        {
+            _cb.Register(m => new KeyGenerator<TEntity, TKey>(getKey))
+                .AsSelf()
+                .AsImplementedInterfaces()
+                .SingleInstance();
         }
 
         /// <summary>
         ///     Registers all classes that inherit from IService.
         /// </summary>
-        public ApplicationContainerBuilder RegisterServices()
+        private ApplicationContainerBuilder RegisterServices()
         {
             return RegisterTypes<IService>();
         }
@@ -40,12 +86,12 @@ namespace FutureState.App
         /// <summary>
         ///     Registers all classes that implement a class mapper.
         /// </summary>
-        public ApplicationContainerBuilder RegisterClassMappers()
+        private ApplicationContainerBuilder RegisterClassMappers()
         {
-            var provider = new AppClassMapProvider(this.scanner);
+            var provider = new AppClassMapProvider(_scanner);
 
             foreach (var classMapper in provider.GetClassMappers())
-                cb.Register(m => classMapper)
+                _cb.Register(m => classMapper)
                     .AsSelf()
                     .As<IClassMapper>()
                     .PreserveExistingDefaults();
@@ -56,19 +102,19 @@ namespace FutureState.App
 
         /// <summary>
         ///     Registers all units of work discovered in the application space within a given autofac
-        /// container builder.
+        ///     container builder.
         /// </summary>
-        public ApplicationContainerBuilder RegisterUnitsOfWork()
+        private ApplicationContainerBuilder RegisterUnitsOfWork()
         {
             // have to compare by type name as this is reflection only type
-            var unitOfWorkTypes = scanner.GetFilteredTypes(
+            var unitOfWorkTypes = _scanner.GetFilteredTypes(
                 m => m.GetInterfaces().Any(c => c.FullName == typeof(IUnitOfWork).FullName));
 
             foreach (var unitOfWork in unitOfWorkTypes)
             {
                 var type = unitOfWork.Value;
 
-                var registration = cb.RegisterType(type)
+                var registration = _cb.RegisterType(type)
                     .AsSelf()
                     .InstancePerLifetimeScope() // allow db to be shared by multiple dependencies
                     .PreserveExistingDefaults();
@@ -77,25 +123,24 @@ namespace FutureState.App
                 foreach (var interfaceType in type.GetInterfaces())
                     if (interfaceType.AssemblyQualifiedName != null)
                         registration.As(interfaceType);
-                    else
-                        if(_logger.IsDebugEnabled)
-                            _logger.Debug($"Type has invalid interface map: {type.FullName}");
+                    else if (_logger.IsDebugEnabled)
+                        _logger.Debug($"Type has invalid interface map: {type.FullName}");
             }
 
             return this;
         }
 
         /// <summary>
-        ///     Register all specification providers.
+        ///     Register all specification providers/validators for a given entity type.
         /// </summary>
         /// <returns></returns>
-        public ApplicationContainerBuilder RegisterValidators()
+        private ApplicationContainerBuilder RegisterValidators()
         {
             return RegisterTypes<IProvideSpecifications>();
         }
 
 
-        public ApplicationContainerBuilder RegisterEntityTableMaps()
+        private ApplicationContainerBuilder RegisterEntityTableMaps()
         {
             return RegisterTypes<IClassMapper>();
         }
@@ -108,47 +153,43 @@ namespace FutureState.App
         public ApplicationContainerBuilder RegisterTypes<TInterfaceType>()
         {
             // will return all non abstract public types
-            var dataQueryTypesLazy = scanner.GetFilteredTypes(
-                    m => m.IsClass && !m.IsAbstract && m.GetInterfaces().Any(c => c.FullName == typeof(TInterfaceType).FullName))
-                    .Where(m => !m.Value.GetGenericArguments().Any())
-                    .ToCollection();
+            var lazies = _scanner.GetTypes<TInterfaceType>();
 
-            foreach (var dataQueryLazy in dataQueryTypesLazy)
-            {
-                cb.RegisterType(dataQueryLazy.Value)
+            foreach (var lazy in lazies)
+                _cb.RegisterType(lazy.Value)
                     .AsSelf()
                     .AsImplementedInterfaces();
-            }
 
             return this;
         }
 
         /// <summary>
         ///     Registers all specialized data queries discovered in the application space within a given
-        /// autofac container builder.
+        ///     autofac container builder.
         /// </summary>
-        public ApplicationContainerBuilder RegisterSpecializedQueries()
+        private ApplicationContainerBuilder RegisterSpecializedQueries()
         {
             // get queries that don't have any generic arguments
             // types that are abstract are already excluded
-            var dataQueryTypesLazy = scanner.GetFilteredTypes(
+            var dataQueryTypesLazy = _scanner.GetFilteredTypes(
                     m => m.GetInterfaces().Any(c => c.FullName == typeof(IDataQuery).FullName))
                 .Where(m => !m.Value.GetGenericArguments().Any());
 
             var method = typeof(ApplicationContainerBuilder).GetMethod("RegisterDataQuery");
             if (method == null)
-                throw new InvalidOperationException($"Method 'RegisterDataQuery' not found on class: {typeof(ApplicationContainerBuilder).FullName}");
+                throw new InvalidOperationException(
+                    $"Method 'RegisterDataQuery' not found on class: {typeof(ApplicationContainerBuilder).FullName}");
 
             foreach (var dataQueryLazy in dataQueryTypesLazy)
             {
-                cb.RegisterType(dataQueryLazy.Value)
+                _cb.RegisterType(dataQueryLazy.Value)
                     .AsSelf()
                     .AsImplementedInterfaces()
                     .PreserveExistingDefaults();
 
                 // register self
                 var genericMethod = method.MakeGenericMethod(dataQueryLazy.Value);
-                genericMethod.Invoke(this, new object[0] {  });
+                genericMethod.Invoke(this, new object[] { });
 
                 // register on each interface type deriving from IDataQuery
                 var specializedQueryInterfaces =
@@ -170,17 +211,17 @@ namespace FutureState.App
         public ApplicationContainerBuilder RegisterDataQuery<TDataQuery>()
             where TDataQuery : IDataQuery
         {
-            cb.Register(m =>
-            {
-                var cntx = m.Resolve<IComponentContext>();
+            _cb.Register(m =>
+                {
+                    var cntx = m.Resolve<IComponentContext>();
 
-                var func =
-                    new Func<ISession, TDataQuery>(
-                        session => cntx.Resolve<TDataQuery>(new TypedParameter(typeof(ISession), session)));
+                    var func =
+                        new Func<ISession, TDataQuery>(
+                            session => cntx.Resolve<TDataQuery>(new TypedParameter(typeof(ISession), session)));
 
-                return func;
-            }).As<Func<ISession, TDataQuery>>()
-            .PreserveExistingDefaults();
+                    return func;
+                }).As<Func<ISession, TDataQuery>>()
+                .PreserveExistingDefaults();
 
             return this;
         }

@@ -7,12 +7,12 @@ using System.Collections.Generic;
 namespace FutureState.Specifications
 {
     /// <summary>
-    /// An entity or service that can validate its own state.
+    ///     An entity or service that can validate its own state.
     /// </summary>
     public interface IValidatable
     {
         /// <summary>
-        /// Gets a list of errors detected in the current instance.
+        ///     Gets a list of errors detected in the current instance.
         /// </summary>
         IEnumerable<Error> Validate();
     }

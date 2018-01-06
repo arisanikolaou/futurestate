@@ -7,7 +7,7 @@
     <ProjectGuid>{3BA5FB45-D642-43DE-8629-37AA3D7CE5BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FutureState.Common</RootNamespace>
+    <RootNamespace>FutureState</RootNamespace>
     <AssemblyName>FutureState.Common</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -58,9 +58,11 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="AppDomainUtil.cs" />
+    <Compile Include="Data\DbInfo.cs" />
+    <Compile Include="Data\LocalDbSetup.cs" />
     <Compile Include="Reflection\AppTypeScanner.cs" />
-    <Compile Include="SplitList.cs" />
-    <Compile Include="Data\SeqGuid.cs" />
+    <Compile Include="Reflection\PropertyInvoker.cs" />
+    <Compile Include="SeqGuid.cs" />
     <Compile Include="DomainEvents.cs" />
     <Compile Include="IExceptionData.cs" />
     <Compile Include="Data\BatchUpdateResult.cs" />
@@ -69,7 +71,6 @@
     <Compile Include="Extensions\ErrorEx.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Reflection\LambdaComparer.cs" />
-    <Compile Include="Reflection\PropertyInvoker.cs" />
     <Compile Include="Reflection\SkipDeepCloneAttribute.cs" />
     <Compile Include="RuleException.cs" />
     <Compile Include="Services\IService.cs" />
@@ -86,8 +87,6 @@
     <Compile Include="DomainEventDispatcher.cs" />
     <Compile Include="Extensions\DoubleExtension.cs" />
     <Compile Include="DurableAction.cs" />
-    <Compile Include="Reflection\DynamicInvoker.cs" />
-    <Compile Include="Reflection\DynamicMethods.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\EnumerableStringEx.cs" />
     <Compile Include="EnumHelper.cs" />
@@ -98,8 +97,6 @@
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringComparerExtensions.cs" />
     <Compile Include="Extensions\UpdateResultExtensions.cs" />
-    <Compile Include="Reflection\FastInvokeDelegate2.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="HashCode.cs" />
     <Compile Include="ICurrentDateProvider.cs" />
@@ -110,8 +107,6 @@
     <Compile Include="IO\IBatchingEnumerator.cs" />
     <Compile Include="ObjectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadOnlyDictionary.cs" />
-    <Compile Include="Extensions\ReadOnlyDictionaryEx.cs" />
     <Compile Include="Reflection\ChainingPropertyDescriptor.cs" />
     <Compile Include="Reflection\DefaultMapper.cs" />
     <Compile Include="Reflection\HyperTypeDescriptionProvider.cs" />
@@ -132,10 +127,9 @@
   </Target>
   -->
   <ItemGroup>
-    <Folder Include="Archive\" />
-    <Folder Include="ComponentModel\Archive\" />
     <Folder Include="IO\Archive\" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5'">
       <ItemGroup>
@@ -157,8 +151,6 @@
         </Reference>
         <Reference Include="System.Xml">
         </Reference>
-        <Reference Include="System.Xml.Linq">
-        </Reference>
       </ItemGroup>
     </When>
     <When Condition="($(TargetFrameworkIdentifier) == '.NETCore' And $(TargetFrameworkVersion) == 'v5.0') Or ($(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6' Or $(TargetFrameworkVersion) == 'v2.0')) Or ($(TargetFrameworkIdentifier) == '.NETCoreApp' And ($(TargetFrameworkVersion) == 'v1.0' Or $(TargetFrameworkVersion) == 'v1.1' Or $(TargetFrameworkVersion) == 'v2.0')) Or ($(TargetFrameworkIdentifier) == 'MonoAndroid' And ($(TargetFrameworkVersion) == 'v7.0' Or $(TargetFrameworkVersion) == 'v7.1')) Or ($(TargetFrameworkIdentifier) == 'MonoTouch') Or ($(TargetFrameworkIdentifier) == 'Xamarin.tvOS') Or ($(TargetFrameworkIdentifier) == 'Xamarin.watchOS') Or ($(TargetFrameworkIdentifier) == 'Xamarin.iOS') Or ($(TargetFrameworkIdentifier) == 'Xamarin.Mac')">
@@ -171,17 +163,8 @@
     </When>
   </Choose>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
-    </Reference>
     <Reference Include="EmitMapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EmitMapper.1.0.0\lib\EmitMapper.dll</HintPath>
-    </Reference>
-    <Reference Include="Magnum, Version=2.1.3.0, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Magnum.2.1.3\lib\NET40\Magnum.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
@@ -205,12 +188,7 @@
         </Reference>
       </ItemGroup>
     </When>
-    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
-      <ItemGroup>
-        <Reference Include="Microsoft.CSharp">
-        </Reference>
-      </ItemGroup>
-    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')" />
     <When Condition="($(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.0' Or $(TargetFrameworkVersion) == 'v1.1' Or $(TargetFrameworkVersion) == 'v1.2' Or $(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6' Or $(TargetFrameworkVersion) == 'v2.0')) Or ($(TargetFrameworkIdentifier) == '.NETCoreApp' And ($(TargetFrameworkVersion) == 'v1.0' Or $(TargetFrameworkVersion) == 'v1.1' Or $(TargetFrameworkVersion) == 'v2.0'))">
       <ItemGroup>
         <Reference Include="Microsoft.CSharp">
@@ -258,6 +236,7 @@
         <Reference Include="System">
         </Reference>
         <Reference Include="mscorlib">
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -469,6 +448,7 @@
         <Reference Include="System.Data.SqlClient">
           <HintPath>..\..\packages\app\System.Data.SqlClient\lib\net451\System.Data.SqlClient.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1051,14 +1031,7 @@
     </When>
   </Choose>
   <Choose>
-    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')">
-      <ItemGroup>
-        <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
-          <HintPath>..\..\packages\app\System.Runtime.InteropServices.RuntimeInformation\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-      </ItemGroup>
-    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v5.0')" />
     <When Condition="($(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6' Or $(TargetFrameworkVersion) == 'v2.0')) Or ($(TargetFrameworkIdentifier) == '.NETCoreApp' And ($(TargetFrameworkVersion) == 'v1.0' Or $(TargetFrameworkVersion) == 'v1.1' Or $(TargetFrameworkVersion) == 'v2.0')) Or ($(TargetFrameworkIdentifier) == 'MonoAndroid' And ($(TargetFrameworkVersion) == 'v7.0' Or $(TargetFrameworkVersion) == 'v7.1'))">
       <ItemGroup>
         <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
@@ -1175,6 +1148,7 @@
         <Reference Include="System.Security.Cryptography.Algorithms">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Algorithms\lib\net46\System.Security.Cryptography.Algorithms.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1218,6 +1192,7 @@
         <Reference Include="System.Security.Cryptography.Cng">
           <HintPath>..\..\packages\app\System.Security.Cryptography.Cng\lib\net46\System.Security.Cryptography.Cng.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>
@@ -1304,6 +1279,7 @@
         <Reference Include="System.Security.Cryptography.X509Certificates">
           <HintPath>..\..\packages\app\System.Security.Cryptography.X509Certificates\lib\net46\System.Security.Cryptography.X509Certificates.dll</HintPath>
           <Private>True</Private>
+          <Paket>True</Paket>
         </Reference>
       </ItemGroup>
     </When>

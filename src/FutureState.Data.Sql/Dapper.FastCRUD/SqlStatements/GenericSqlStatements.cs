@@ -75,10 +75,10 @@ namespace Dapper.FastCrud.SqlStatements
 
                 var insertedEntity =
                     connection.Query<TEntity>(
-                        insertStatement,
-                        entity,
-                        statementOptions.Transaction,
-                        commandTimeout: (int?) statementOptions.CommandTimeout?.TotalSeconds)
+                            insertStatement,
+                            entity,
+                            statementOptions.Transaction,
+                            commandTimeout: (int?) statementOptions.CommandTimeout?.TotalSeconds)
                         .FirstOrDefault();
 
                 // copy all the database generated props back onto our entity
@@ -295,7 +295,6 @@ namespace Dapper.FastCrud.SqlStatements
         public IEnumerable<TEntity> BatchSelect(IDbConnection connection,
             AggregatedSqlStatementOptions<TEntity> statementOptions)
         {
-
             return connection.Query<TEntity>(
                 SqlBuilder.ConstructFullBatchSelectStatement(
                     statementOptions.WhereClause,
@@ -327,7 +326,7 @@ namespace Dapper.FastCrud.SqlStatements
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void CopyEntity(TEntity source, TEntity destination, PropertyMapping[] properties)
+        private void CopyEntity(TEntity source, TEntity destination, PropertyMapping[] properties)
         {
             foreach (var propMapping in properties)
             {

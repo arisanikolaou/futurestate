@@ -20,17 +20,8 @@ namespace FutureState
 
         public LambdaComparer(Func<T, T, bool> lambdaComparer, Func<T, int> lambdaHash)
         {
-            if (lambdaComparer == null)
-            {
-                throw new ArgumentNullException(nameof(lambdaComparer));
-            }
-            if (lambdaHash == null)
-            {
-                throw new ArgumentNullException(nameof(lambdaHash));
-            }
-
-            _lambdaComparer = lambdaComparer;
-            _lambdaHash = lambdaHash;
+            _lambdaComparer = lambdaComparer ?? throw new ArgumentNullException(nameof(lambdaComparer));
+            _lambdaHash = lambdaHash ?? throw new ArgumentNullException(nameof(lambdaHash));
         }
 
         public bool Equals(T x, T y)

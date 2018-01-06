@@ -16,7 +16,7 @@ namespace FutureState
     public static class EnumerableExtensions
     {
         /// <summary>
-        /// Compares two string arrays by length, order but not case sensitivity.
+        ///     Compares two string arrays by length, order but not case sensitivity.
         /// </summary>
         public static bool AreEquivalent(this string[] namesA, string[] namesB)
         {
@@ -24,95 +24,71 @@ namespace FutureState
             Guard.ArgumentNotNull(namesB, nameof(namesB));
 
             if (namesA.Length != namesB.Length)
-            {
                 return false;
-            }
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             for (var i = 0; i < namesA.Length; i++)
-            {
                 if (!namesA[i].Equals(namesB[i], StringComparison.OrdinalIgnoreCase))
-                {
                     return false;
-                }
-            }
 
             return true;
         }
 
         /// <summary>
-        /// Gets whether all elements in the array are convertable to an int.
+        ///     Gets whether all elements in the array are convertable to an int.
         /// </summary>
         public static bool HasNumericElements(this string[] stringArray)
         {
             if (stringArray == null)
-            {
                 return false;
-            }
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var strElement in stringArray)
             {
                 int i;
                 if (!int.TryParse(strElement, out i))
-                {
                     return false;
-                }
             }
 
             return true;
         }
 
         public static bool IsEquivalentTo<T>(this IEnumerable<T> source, IEnumerable<T> other,
-            Func<T, T, bool> @equals = null)
+            Func<T, T, bool> equals = null)
         {
             if (Equals(source, other))
-            {
                 return true;
-            }
             if (source == null || other == null)
-            {
                 return false;
-            }
 
             var lhsList = source.ToList();
             var rhsList = other.ToList();
 
             if (lhsList.Count != rhsList.Count)
-            {
                 return false;
-            }
 
-            if (@equals == null)
-            {
-                @equals = (a, b) => Equals(a, b);
-            }
+            if (equals == null)
+                equals = (a, b) => Equals(a, b);
 
             for (var i = 0; i < lhsList.Count; i++)
-            {
-                if (!@equals(lhsList[i], rhsList[i]))
-                {
+                if (!equals(lhsList[i], rhsList[i]))
                     return false;
-                }
-            }
             return true;
         }
 
         /// <summary>
-        /// Similar to AddRange but allows to be called on null and passed null as an argument
+        ///     Similar to AddRange but allows to be called on null and passed null as an argument
         /// </summary>
         public static void AddRangeEx<T>(this List<T> list, IEnumerable<T> collectionToAdd)
         {
             if (list == null || collectionToAdd == null)
-            {
                 return;
-            }
 
             list.AddRange(collectionToAdd);
         }
 
         /// <summary>
-        /// Splits an enumerable sequence into batches which are passed to a handling method.
+        ///     Splits an enumerable sequence into batches which are passed to a handling method.
         /// </summary>
         /// <param name="items">The list to batch.</param>
         /// <param name="maxBatchSize">Must be greater than zero.</param>
@@ -123,9 +99,8 @@ namespace FutureState
             Guard.ArgumentNotNull(batching, nameof(batching));
 
             if (maxBatchSize < 1)
-            {
-                throw new ArgumentOutOfRangeException("'maxBatchSize' {0} cannot be less than zero.".Params(maxBatchSize));
-            }
+                throw new ArgumentOutOfRangeException(
+                    "'maxBatchSize' {0} cannot be less than zero.".Params(maxBatchSize));
 
             if (maxBatchSize == 0)
             {
@@ -158,25 +133,21 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Yields the union of a and b.
+        ///     Yields the union of a and b.
         /// </summary>
         public static IEnumerable<TItem> Combine<TItem>(this IEnumerable<TItem> a, IEnumerable<TItem> b)
         {
             foreach (var item in a)
-            {
                 yield return item;
-            }
 
             foreach (var item in b)
-            {
                 yield return item;
-            }
         }
 
         // faster the executing immediate by about 20 % via FirstOrDefault or returning an Array
 
         /// <summary>
-        /// Executes a deferred query yielding an enumeration immediately to the caller.
+        ///     Executes a deferred query yielding an enumeration immediately to the caller.
         /// </summary>
         public static IEnumerable<T> ExecImmediate<T>(this IEnumerable<T> enumerable)
         {
@@ -184,32 +155,28 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Create a batch of certain size.
+        ///     Create a batch of certain size.
         /// </summary>
         /// <param name="items">Enumerable to check.</param>
         /// <param name="maxItems">Size for the batch.</param>
         /// <returns></returns>
         public static IEnumerable<IEnumerable<T>> BatchEx<T>(this IEnumerable<T> items, int maxItems)
         {
-            return items?.Select((item, inx) => new { item, inx })
+            return items?.Select((item, inx) => new {item, inx})
                 .GroupBy(x => x.inx / maxItems)
                 .Select(g => g.Select(x => x.item));
         }
 
         /// <summary>
-        /// Combines to enumerations into an aggregate enumeration and treats null enumerations as zero length arrays.
+        ///     Combines to enumerations into an aggregate enumeration and treats null enumerations as zero length arrays.
         /// </summary>
         public static IEnumerable<T> ConcatEx<T>(this IEnumerable<T> enumOne, IEnumerable<T> enumTwo)
         {
             if (enumOne == null)
-            {
                 return enumTwo;
-            }
 
             if (enumTwo == null)
-            {
                 return enumOne;
-            }
 
             return enumOne.Concat(enumTwo);
         }
@@ -219,9 +186,7 @@ namespace FutureState
             var enumerable = targets as T[] ?? targets.ToArray();
 
             if (targets == null || !enumerable.Any())
-            {
                 return true;
-            }
 
             var hash = source.ToHashSet();
 
@@ -229,7 +194,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Used to flatten dictionary to the string.
+        ///     Used to flatten dictionary to the string.
         /// </summary>
         /// <typeparam name="TKey">Dictionary key type.</typeparam>
         /// <typeparam name="TValue">Dictionary value type.</typeparam>
@@ -238,7 +203,7 @@ namespace FutureState
         /// <param name="sequenceSeparator">Symbol to use between the pairs in the result string.</param>
         /// <param name="take">Specified number of elements to take from the dictionary</param>
         /// <returns>
-        /// <c>String that represents the dictionary.</c>
+        ///     <c>String that represents the dictionary.</c>
         /// </returns>
         public static string DictionaryToString<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,
@@ -247,9 +212,7 @@ namespace FutureState
             int take = int.MaxValue)
         {
             if (dictionary == null)
-            {
                 return null;
-            }
 
             var stringBuilder = new StringBuilder();
             dictionary.Take(take)
@@ -262,11 +225,11 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Gets a hash usign hashes of individual elements
-        /// NOTE this is not GetHashCode override since we should try to use immutable elements when computing hashcodes
-        /// This is for purposes of detecting equal(in terms of elements equality) collections
-        /// Does not throw an exception on null
-        /// Null elements are ignored thus two collections that differ only by number of nulls will return the same result
+        ///     Gets a hash usign hashes of individual elements
+        ///     NOTE this is not GetHashCode override since we should try to use immutable elements when computing hashcodes
+        ///     This is for purposes of detecting equal(in terms of elements equality) collections
+        ///     Does not throw an exception on null
+        ///     Null elements are ignored thus two collections that differ only by number of nulls will return the same result
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="firstCollection"></param>
@@ -274,9 +237,7 @@ namespace FutureState
         public static int GetEnumerableHash<T>(this IEnumerable<T> firstCollection)
         {
             if (firstCollection == null)
-            {
                 return 0;
-            }
 
             // we store this since we want to use nonNullElemsHashCodes.Count as initial seed to minimize collision of hashes
             // e.g. without it two lists {0,0,1} and {0,1} would produce the same results
@@ -289,7 +250,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Similar to previous one, but allows to pass a hashfunction
+        ///     Similar to previous one, but allows to pass a hashfunction
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="firstCollection"></param>
@@ -298,9 +259,7 @@ namespace FutureState
         public static int GetEnumerableHash<T>(this IEnumerable<T> firstCollection, Func<T, int> hashFunc)
         {
             if (firstCollection == null)
-            {
                 return 0;
-            }
 
             // we store this since we want to use nonNullElemsHashCodes.Count as initial seed to minimize collision of hashes
             // e.g. without it two lists {0,0,1} and {0,1} would produce the same results
@@ -314,14 +273,10 @@ namespace FutureState
         public static bool IsAnyContainedIn<T>(this IEnumerable<T> targets, params T[] source)
         {
             if (targets == null || !targets.Any())
-            {
                 return true;
-            }
 
             if (source == null)
-            {
                 return false;
-            }
 
             var hash = source.ToHashSet();
 
@@ -329,7 +284,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Determines whether provided collection is null or empty.
+        ///     Determines whether provided collection is null or empty.
         /// </summary>
         /// <param name="collection">The collection to check.</param>
         /// <returns><c>True</c> if input is a non-null/non-empty collection. <c>False</c> otherwise.</returns>
@@ -341,7 +296,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Determines whether provided collection is null or empty.
+        ///     Determines whether provided collection is null or empty.
         /// </summary>
         /// <param name="collection">The collection to check.</param>
         /// <returns><c>True</c> if input collection is null or empty. <c>False</c> otherwise.</returns>
@@ -353,7 +308,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Wrist friendly call to IsNullOrWhiteSpace.
+        ///     Wrist friendly call to IsNullOrWhiteSpace.
         /// </summary>
         public static bool IsNullOrEmpty(this string value)
         {
@@ -363,17 +318,13 @@ namespace FutureState
         public static IEnumerable<T> OfGenericType<T>(this IEnumerable<T> collection, Type genericType)
         {
             if (collection == null)
-            {
                 yield break;
-            }
 
             foreach (var elem in collection)
             {
                 var tp = elem.GetType();
                 if (tp.IsGenericType && tp.GetGenericTypeDefinition() == genericType)
-                {
                     yield return elem;
-                }
             }
         }
 
@@ -383,9 +334,7 @@ namespace FutureState
             foreach (var item in collection)
             {
                 if (stopCondition(item))
-                {
                     continue;
-                }
 
                 action?.Invoke(item);
 
@@ -394,15 +343,14 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Slices a sequence into a sub-sequences each containing maxItemsPerSlice, except for the last
-        /// which will contain any items left over
+        ///     Slices a sequence into a sub-sequences each containing maxItemsPerSlice, except for the last
+        ///     which will contain any items left over
         /// </summary>
         public static IEnumerable<IEnumerable<T>> Slice<T>(this IEnumerable<T> sequence, int maxItemsPerSlice)
         {
             if (maxItemsPerSlice <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maxItemsPerSlice), "maxItemsPerSlice must be greater than 0");
-            }
+                throw new ArgumentOutOfRangeException(nameof(maxItemsPerSlice),
+                    "maxItemsPerSlice must be greater than 0");
 
             var slice = new List<T>(maxItemsPerSlice);
 
@@ -420,13 +368,11 @@ namespace FutureState
             // return the "crumbs" (leftovers) that
             // didn't make it into a full slice
             if (slice.Count > 0)
-            {
                 yield return slice.ToArray();
-            }
         }
 
         /// <summary>
-        /// Converts a non null enumeration to a collection
+        ///     Converts a non null enumeration to a collection
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -438,58 +384,58 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Converts a non null enumeration to a collection
+        ///     Converts a non null enumeration to a collection
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ICollection<T> ToCollectionSafe<T>(this IEnumerable<T> items)
         {
             if (items == null)
-            {
                 return null;
-            }
 
             return items as ICollection<T> ?? items.ToList();
         }
 
         /// <summary>
-        /// Same as ToHashSet but returns null if items are null.
+        ///     Same as ToHashSet but returns null if items are null.
         /// </summary>
         [DebuggerStepThrough]
-        public static HashSet<T> ToHashSetSafe<T>(this IEnumerable<T> items) => items?.ToHashSet();
+        public static HashSet<T> ToHashSetSafe<T>(this IEnumerable<T> items)
+        {
+            return items?.ToHashSet();
+        }
 
         /// <summary>
-        /// Returns null if the array is null otherwise the array.
+        ///     Returns null if the array is null otherwise the array.
         /// </summary>
         [DebuggerStepThrough]
-        public static T[] ToArraySafe<T>(this IEnumerable<T> items) => items?.ToArray();
+        public static T[] ToArraySafe<T>(this IEnumerable<T> items)
+        {
+            return items?.ToArray();
+        }
 
         /// <summary>
-        /// This is similar to the standard Union.
-        /// Does not throw an exception if any collection is null
+        ///     This is similar to the standard Union.
+        ///     Does not throw an exception if any collection is null
         /// </summary>
         public static IEnumerable<T> UnionEx<T>(this IEnumerable<T> firstCollection, IEnumerable<T> secondCollection)
         {
             if (firstCollection == null)
-            {
                 return secondCollection;
-            }
 
             if (secondCollection == null)
-            {
                 return firstCollection;
-            }
 
             return firstCollection.Union(secondCollection);
         }
 
         //todo: replace by more linq?
         /// <summary>
-        /// Gets a list of unique elements by a given key.
+        ///     Gets a list of unique elements by a given key.
         /// </summary>
         /// <remarks>
-        /// Taken from here:
-        /// http://stackoverflow.com/questions/489258/linq-distinct-on-a-particular-property
+        ///     Taken from here:
+        ///     http://stackoverflow.com/questions/489258/linq-distinct-on-a-particular-property
         /// </remarks>
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector)
@@ -497,37 +443,29 @@ namespace FutureState
             var seenKeys = new HashSet<TKey>();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var element in source)
-            {
                 if (seenKeys.Add(keySelector(element)))
-                {
                     yield return element;
-                }
-            }
         }
 
         /// <summary>
-        /// Executes a callback/action method against every element of a sequence. If the sequence is null then null is
-        /// returned to the caller.
+        ///     Executes a callback/action method against every element of a sequence. If the sequence is null then null is
+        ///     returned to the caller.
         /// </summary>
         [DebuggerStepThrough]
         public static IEnumerable<T> Each<T>(this IEnumerable<T> sequence, Action<T> callback)
         {
             if (callback == null || sequence == null)
-            {
                 return sequence;
-            }
 
             foreach (var obj in sequence)
-            {
                 callback?.Invoke(obj);
-            }
 
             //return the incoming list, array
             return sequence;
         }
 
         /// <summary>
-        /// Creates an enumeration from a single element.
+        ///     Creates an enumeration from a single element.
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -537,21 +475,19 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Creates an enumeration from a single element. Returns an empty enumerable if object is null
+        ///     Creates an enumeration from a single element. Returns an empty enumerable if object is null
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<T> ToEnumerableExNull<T>(this T @object)
         {
             if (@object == null)
-            {
                 yield break;
-            }
             yield return @object;
         }
 
         /// <summary>
-        /// Converts a sequence to a hash set.
+        ///     Converts a sequence to a hash set.
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -561,7 +497,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Gets a concatenated string with the 'stringified' representation of each item in a sequence.
+        ///     Gets a concatenated string with the 'stringified' representation of each item in a sequence.
         /// </summary>
         public static string CollectionLog<T>(this IEnumerable<T> sequence) where T : class
         {

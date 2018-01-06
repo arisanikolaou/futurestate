@@ -1,38 +1,37 @@
-﻿using Autofac;
-using FutureState.Data.Keys;
-using FutureState.Data.Providers;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using FutureState.Data.KeyBinders;
+using Autofac;
+using FutureState.Data;
+using FutureState.Data.Providers;
 
-namespace FutureState.Data.Autofac
+namespace FutureState.Autofac.Modules
 {
     /// <summary>
     ///     Registers in memory repositories, readers and units of work.
     /// </summary>
     public class InMemoryDataAccessModule : Module
     {
-        readonly IList<Action<ContainerBuilder>> _builderConfigurators = new List<Action<ContainerBuilder>>();
+        private readonly IList<Action<ContainerBuilder>> _builderConfigurators = new List<Action<ContainerBuilder>>();
 
         /// <summary>
-        /// Registers functions to resolve a given in memory irepository, ireader and ilinqreader implementation for a given
-        /// entity type and entity type key.
+        ///     Registers functions to resolve a given in memory irepository, ireader and ilinqreader implementation for a given
+        ///     entity type and entity type key.
         /// </summary>
-        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IEntityIdProvider<TEntity,TKey> idGenerator)
+        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IKeyProvider<TEntity, TKey> idGenerator)
             where TEntity : class, new()
         {
             //register repository functions
             Action<ContainerBuilder> buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                    {
-                        var cc = m.Resolve<IComponentContext>();
+                        (m, q) =>
+                        {
+                            var cc = m.Resolve<IComponentContext>();
 
-                        var fun = cc.GetRepository<TEntity, TKey>(idGenerator);
+                            var fun = cc.GetRepository(idGenerator);
 
-                        return fun;
-                    })
+                            return fun;
+                        })
                     .As(typeof(Func<ISession, IRepository<TEntity, TKey>>))
                     .SingleInstance();
             };
@@ -43,14 +42,14 @@ namespace FutureState.Data.Autofac
             buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                    {
-                        var cc = m.Resolve<IComponentContext>();
+                        (m, q) =>
+                        {
+                            var cc = m.Resolve<IComponentContext>();
 
-                        var fun = cc.GetReader<TEntity, TKey>(idGenerator);
+                            var fun = cc.GetReader(idGenerator);
 
-                        return fun;
-                    })
+                            return fun;
+                        })
                     .As(typeof(Func<ISession, IReader<TEntity, TKey>>))
                     .SingleInstance();
             };
@@ -61,14 +60,14 @@ namespace FutureState.Data.Autofac
             buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                    {
-                        var cc = m.Resolve<IComponentContext>();
+                        (m, q) =>
+                        {
+                            var cc = m.Resolve<IComponentContext>();
 
-                        var fun = cc.GetReader<TEntity, TKey>(idGenerator);
+                            var fun = cc.GetReader(idGenerator);
 
-                        return fun;
-                    })
+                            return fun;
+                        })
                     .As(typeof(Func<ISession, ILinqReader<TEntity, TKey>>))
                     .SingleInstance();
             };
@@ -81,9 +80,10 @@ namespace FutureState.Data.Autofac
             buildGetRepositoryFunction = cb =>
             {
                 cb.Register(
-                    (m, q) =>
-                        new InMemoryRepository<TEntity, TKey>(idGenerator, new AttributeKeyBinder<TEntity, TKey>(),
-                            new TEntity[0]))
+                        (m, q) =>
+                            new InMemoryRepository<TEntity, TKey>(idGenerator,
+                                new KeyBinderFromAttributes<TEntity, TKey>(),
+                                new TEntity[0]))
                     .AsSelf()
                     .As<IRepositoryLinq<TEntity, TKey>>()
                     .As<IGetter<TEntity, TKey>>()
@@ -104,8 +104,8 @@ namespace FutureState.Data.Autofac
 
 
         /// <summary>
-        /// Registers a single instance in memory repository for any given entity type and an in memory session into a given
-        /// container.
+        ///     Registers a single instance in memory repository for any given entity type and an in memory session into a given
+        ///     container.
         /// </summary>
         protected override void Load(ContainerBuilder builder)
         {
@@ -114,17 +114,18 @@ namespace FutureState.Data.Autofac
             builder.Register(m => new InMemoryRepositoryFactory())
                 .As<IRepositoryFactory>();
 
-            builder.Register(m => new NoOpCommitPolicy())
+            builder.Register(m => new CommitPolicyNoOp())
                 .As<ICommitPolicy>();
 
-            //units of work
             builder.RegisterGeneric(typeof(UnitOfWork<,>))
                 .Named("Default", typeof(UnitOfWork<,>))
+                .As(typeof(IUnitOfWork<,>))
                 .SingleInstance()
                 .AsSelf();
 
             builder.RegisterGeneric(typeof(UnitOfWorkLinq<,>))
                 .Named("Default", typeof(UnitOfWorkLinq<,>))
+                .As(typeof(IUnitOfWorkLinq<,>))
                 .SingleInstance()
                 .AsSelf();
 
@@ -140,12 +141,8 @@ namespace FutureState.Data.Autofac
                 .As<ISessionFactory>()
                 .SingleInstance();
 
-            builder.RegisterGeneric(typeof(EntityIdProvider<,>))
-                .As(typeof(IEntityIdProvider<,>));
-
-            // guid generator
-            builder.Register(m => new KeyGetter<Guid>(SeqGuid.Create))
-                .As(typeof(IKeyGetter<Guid>)).PreserveExistingDefaults().SingleInstance();
+            builder.RegisterGeneric(typeof(KeyProvider<,>))
+                .As(typeof(IKeyProvider<,>));
 
             //in memory repositories
             builder.RegisterGeneric(typeof(InMemoryRepository<>))

@@ -44,7 +44,8 @@ namespace Dapper.FastCrud
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IFormattable Table<TEntity>(EntityMapping entityMappingOverride = null)
         {
-            return new SqlEntityFormattableParameter<TEntity>(SqlParameterElementType.Table, null, entityMappingOverride);
+            return new SqlEntityFormattableParameter<TEntity>(SqlParameterElementType.Table, null,
+                entityMappingOverride);
         }
 
         /// <summary>
@@ -72,7 +73,8 @@ namespace Dapper.FastCrud
         public static IFormattable TableAndColumn(string propertyName, EntityMapping entityMappingOverride = null)
         {
             Requires.NotNullOrEmpty(propertyName, nameof(propertyName));
-            return new SqlParameterFormatter(SqlParameterElementType.TableAndColumn, propertyName, entityMappingOverride);
+            return new SqlParameterFormatter(SqlParameterElementType.TableAndColumn, propertyName,
+                entityMappingOverride);
         }
 
         /// <summary>

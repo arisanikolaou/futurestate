@@ -1,18 +1,23 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Dapper;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.FluentMap;
 using Dapper.FluentMap.Configuration;
 using FutureState.Data.Sql.Mappings;
 using FutureState.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FutureState.Data.Sql
 {
+    /// <summary>
+    ///     Helps construct the class maps required to serializer/deserialize
+    /// entities from an underlying data store.
+    /// </summary>
     public class AppClassMapProvider
     {
-        private AppTypeScanner _scanner;
+        private readonly AppTypeScanner _scanner;
 
         static AppClassMapProvider()
         {
@@ -23,38 +28,25 @@ namespace FutureState.Data.Sql
             SqlMapper.AddTypeHandler(typeof(List<DateTime>), new JsonListTypeHandler<DateTime>());
         }
 
-
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="scanner">The assembly type scanner to use.</param>
         public AppClassMapProvider(AppTypeScanner scanner)
         {
-            this._scanner = scanner;
+            _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
         }
+
         /// <summary>
-        ///     Initialize all default entity mappers to support sql data queries.
+        ///     Initialize all default entity mappers to support sql data queries
+        /// that can be discovered in the assemblies referenced by the current instance.
         /// </summary>
         public IList<IClassMapper> GetClassMappers()
         {
             // because this is a dynamic type have to compare on type name
-            var entityTypes = _scanner.GetFilteredTypes(
-                m => m.GetInterfaces().Any(c =>
-                {
-                    if (c.Namespace != typeof(IEntity<>).Namespace)
-                        return false;
+            IList<Lazy<Type>> entityTypes = _scanner.GetTypes<IEntity>().ToList();
 
-                    return c.Name.StartsWith("IEntity`", StringComparison.OrdinalIgnoreCase);
-                }));
-
-            var customClassMappers = _scanner.GetFilteredTypes(
-                m => m.GetInterfaces().Any(c =>
-                {
-                    if (c.Namespace != typeof(IClassMapper<>).Namespace)
-                        return false;
-                    if (m.IsAbstract)
-                        return false;
-                    if (m.IsGenericType)
-                        return false;
-
-                    return c.Name.StartsWith("IClassMapper`", StringComparison.OrdinalIgnoreCase);
-                }));
+            IList<Lazy<Type>> customClassMappers = _scanner.GetTypes<IClassMapper>().ToList();
 
             var classMappers = new List<IClassMapper>();
 
@@ -62,11 +54,13 @@ namespace FutureState.Data.Sql
             FluentMapper.Initialize(config =>
             {
                 var method = typeof(FluentMapConfiguration).GetMethod("AddMap");
+                if (method == null)
+                    throw new InvalidOperationException("AddMap method not found.");
 
                 // add specialized class mapper firs
                 foreach (var type in customClassMappers)
                 {
-                    IClassMapper newCustomEntityMap = Activator.CreateInstance(type.Value) as IClassMapper;
+                    var newCustomEntityMap = Activator.CreateInstance(type.Value) as IClassMapper;
 
                     var entityProperty = type.Value.GetProperty("EntityType");
                     if (entityProperty == null)
@@ -76,13 +70,14 @@ namespace FutureState.Data.Sql
                     classMappers.Add(newCustomEntityMap);
 
                     // invoke generic method
-                    var generic = method.MakeGenericMethod(entityType);
+                    // ReSharper disable once PossibleNullReferenceException
+                    MethodInfo generic = method.MakeGenericMethod(entityType);
 
-                    generic.Invoke(config, new[] { newCustomEntityMap });
+                    generic.Invoke(config, new object[] {newCustomEntityMap});
                 }
 
                 // interogate container for entity maps and update
-                foreach (var lazyEntityType in entityTypes)
+                foreach (Lazy<Type> lazyEntityType in entityTypes)
                 {
                     var actualType = lazyEntityType.Value;
 
@@ -94,19 +89,22 @@ namespace FutureState.Data.Sql
 
                     try
                     {
-                        var newCustomEntityMapType = typeof(CustomEntityMap<>).MakeGenericType(actualType);
+                        var newCustomEntityMapType = typeof(CustomEntityMap<>)
+                            .MakeGenericType(actualType);
 
+                        // create class mapper instance
                         var newCustomEntityMap = Activator.CreateInstance(newCustomEntityMapType) as IClassMapper;
                         classMappers.Add(newCustomEntityMap);
 
                         // invoke generic method
+                        // ReSharper disable once PossibleNullReferenceException
                         var generic = method.MakeGenericMethod(actualType);
 
-                        generic.Invoke(config, new object[] { newCustomEntityMap });
+                        generic.Invoke(config, new object[] {newCustomEntityMap});
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"Failed to assign default class mapper for {actualType.FullName}",
+                        throw new Exception($"Failed to assign default class mapper for {actualType.FullName} due to an unexpected error.",
                             ex);
                     }
                 }

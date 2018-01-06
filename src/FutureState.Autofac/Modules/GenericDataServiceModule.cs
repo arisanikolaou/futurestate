@@ -1,14 +1,14 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using FutureState.ComponentModel;
+using FutureState.Data;
 using FutureState.Data.Providers;
 using FutureState.Specifications;
-using FutureState.Data.Keys;
 
-namespace FutureState.Data.Autofac.Services
+namespace FutureState.Autofac.Modules
 {
     /// <summary>
-    ///     Regigsters the basic modules required to support the data access architecture.
+    ///     Regigsters the basic modules required to
+    ///     support the data access architecture.
     /// </summary>
     public class GenericDataServiceModule : Module
     {
@@ -20,7 +20,9 @@ namespace FutureState.Data.Autofac.Services
 
             //  spec provider
             builder.RegisterGeneric(typeof(SpecProvider<>))
-                .As(typeof(IProvideSpecifications<>));
+                .AsSelf()
+                .As(typeof(IProvideSpecifications<>))
+                .SingleInstance();
 
             //  register message pipe
             builder.Register(m => new MessagePipe())
@@ -29,20 +31,13 @@ namespace FutureState.Data.Autofac.Services
                 .SingleInstance()
                 .PreserveExistingDefaults();
 
-            builder.RegisterGeneric(typeof(EntityIdProvider<,>))
-                .As(typeof(IEntityIdProvider<,>))
+            builder.RegisterGeneric(typeof(KeyProvider<,>))
+                .As(typeof(KeyProvider<,>))
                 .SingleInstance();
 
-            builder.Register(m => new KeyGetter<Guid>(SeqGuid.Create))
-                .As(typeof(IKeyGetter<Guid>))
-                .SingleInstance()
-                .PreserveExistingDefaults();
-
-            long current = 0;//TODO: optimize
-            builder.Register(m => new KeyGetter<string>((current ++).ToString))
-                .As(typeof(IKeyGetter<string>))
-                .SingleInstance()
-                .PreserveExistingDefaults();
+            builder.RegisterGeneric(typeof(KeyGenerator<,>))
+                .As(typeof(IKeyGenerator<,>))
+                .SingleInstance();
         }
     }
 }

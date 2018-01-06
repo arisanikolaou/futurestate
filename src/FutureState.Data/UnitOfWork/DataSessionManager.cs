@@ -1,21 +1,21 @@
-﻿using NLog;
-using System;
+﻿using System;
+using NLog;
 
 namespace FutureState.Data
 {
     /// <summary>
-    /// Optimizes access to a given data session by one or more linq readers.
+    ///     Optimizes access to a given data session by one or more linq readers.
     /// </summary>
     public class DataSessionManager : IDisposable
     {
         protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        readonly ILinqReaderHandler _linqReaderHandler;
+        private readonly ILinqReaderHandler _linqReaderHandler;
 
-        readonly ISessionFactory _sessionFactory;
+        private readonly ISessionFactory _sessionFactory;
 
         /// <summary>
-        /// Creates a new instance.
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="sessionFactory">The underlying session factory to use.</param>
         /// <param name="handler">An optional handler to add responsibilities to a set of linq readers.</param>
@@ -28,12 +28,12 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Gets the active open session.
+        ///     Gets the active open session.
         /// </summary>
         internal DataSession ActiveDataSession { get; private set; }
 
         /// <summary>
-        /// An optional identifier for the instance.
+        ///     An optional identifier for the instance.
         /// </summary>
         public string Id { get; protected set; }
 
@@ -41,40 +41,34 @@ namespace FutureState.Data
         internal bool IsClosed => ActiveDataSession == null || ActiveDataSession.IsDisposed;
 
         /// <summary>
-        /// Gets whether the current instance has been disposed.
+        ///     Gets whether the current instance has been disposed.
         /// </summary>
         public bool IsDisposed { get; private set; }
 
         /// <summary>
-        /// Always gets an active open session from the underlying session factory.
+        ///     Always gets an active open session from the underlying session factory.
         /// </summary>
         protected internal ISession Session
         {
             get
             {
                 if (IsDisposed)
-                {
                     throw new ObjectDisposedException("The unit of work has been disposed.");
-                }
 
                 if (ActiveDataSession == null)
-                {
                     throw new InvalidOperationException(
                         "Open must be called before the underlying data session can be accessed.");
-                }
 
                 if (ActiveDataSession.IsDisposed)
-                {
                     throw new InvalidOperationException(
                         "The underlying data session has been disposed and can no longer be used.");
-                }
 
                 return ActiveDataSession.Session;
             }
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
@@ -85,7 +79,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Closes any active data session.
+        ///     Closes any active data session.
         /// </summary>
         public virtual void Close()
         {
@@ -97,7 +91,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Associates a given reader to the current instance to take advantage of session pooling.
+        ///     Associates a given reader to the current instance to take advantage of session pooling.
         /// </summary>
         public EntitySetReader<TEntity, TKey> GetManagedReader<TEntity, TKey>(
             Func<ISession, ILinqReader<TEntity, TKey>> getLinqReader)
@@ -113,17 +107,15 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Explicitly opens a new disposable data session.
+        ///     Explicitly opens a new disposable data session.
         /// </summary>
         public virtual DataSession Open()
         {
             if (ActiveDataSession != null && !ActiveDataSession.IsDisposed)
-            {
                 throw new InvalidOperationException(
                     "There already is an active session open. Close must be called before another session can be opened.");
-            }
 
-            return ActiveDataSession = new DataSession(new Lazy<ISession>(_sessionFactory.OpenSession));
+            return ActiveDataSession = new DataSession(new Lazy<ISession>(_sessionFactory.Create));
         }
 
         // base must be called by derived classes
@@ -133,14 +125,14 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
+        ///     Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <remarks>
-        /// Will close any underlying data connections.
+        ///     Will close any underlying data connections.
         /// </remarks>
         /// <param name="disposing">
-        /// <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only.
-        /// unmanaged resources.
+        ///     <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only.
+        ///     unmanaged resources.
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
@@ -153,7 +145,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Gets the handler(s) for a given link reader.
+        ///     Gets the handler(s) for a given link reader.
         /// </summary>
         /// <typeparam name="TEntity">The entity type being provided by the reader.</typeparam>
         /// <typeparam name="TKey">They type of key for the given entity.</typeparam>
@@ -173,7 +165,7 @@ namespace FutureState.Data
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="DataSessionManager" /> class.
+        ///     Finalizes an instance of the <see cref="DataSessionManager" /> class.
         /// </summary>
         ~DataSessionManager()
         {

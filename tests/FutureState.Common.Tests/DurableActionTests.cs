@@ -1,5 +1,4 @@
-﻿using FutureState;
-using System;
+﻿using System;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -10,12 +9,12 @@ namespace FutureState.Common.Tests
     [Collection("DurableActionTests")]
     public class ShouldBeAbleToExecuteActionsDurablyStory
     {
-        int currentExecutionAttempts = 0;
-        bool keepThrowingException = false;
-        int maxRetries = 3;
+        private readonly int maxRetries = 3;
         private DurableAction _subject;
+        private int currentExecutionAttempts;
+        private bool keepThrowingException;
 
-        void GivenADurableAction()
+        private void GivenADurableAction()
         {
             _subject = new DurableAction(() =>
             {
@@ -26,19 +25,19 @@ namespace FutureState.Common.Tests
             });
         }
 
-        void WhenExecutingWithAnErrorFirstTime()
+        private void WhenExecutingWithAnErrorFirstTime()
         {
             _subject.Invoke(maxRetries, TimeSpan.FromMilliseconds(10));
         }
 
-        void AndWhenExecutingPastMaximumRetries()
+        private void AndWhenExecutingPastMaximumRetries()
         {
             keepThrowingException = true;
 
             Assert.Throws<TimeoutException>(() => _subject.Invoke(maxRetries, TimeSpan.FromMilliseconds(10)));
         }
 
-        void ThenActionShouldExecuteFirstTimeButNotAfterMaxRetries()
+        private void ThenActionShouldExecuteFirstTimeButNotAfterMaxRetries()
         {
             // 
         }

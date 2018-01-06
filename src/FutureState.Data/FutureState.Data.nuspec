@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<package >
+
+<package>
   <metadata>
     <id>FutureState.Data</id>
     <version>$version$</version>
@@ -11,8 +12,8 @@
     <releaseNotes>
       ## Version 0.1 ##
     </releaseNotes>
-    <copyright>Copyright 2017</copyright>
-    <tags>Sloader</tags>
+    <copyright></copyright>
+    <tags></tags>
     <dependencies />
   </metadata>
 </package>

@@ -5,12 +5,13 @@ using System.Linq;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Internal repository used to wrap a given repository for use in a unit of work.
+    ///     Adapts a repository to write entities via a repository 
+    /// throgh a consistent data store session.
     /// </summary>
     public class EntitySetWriter<TEntity, TKey> : IWriter<TEntity, TKey>
     {
-        readonly UnitOfWork _uow;
-        readonly Func<ISession, IRepository<TEntity, TKey>> _repositoryFunc;
+        private readonly Func<ISession, IRepository<TEntity, TKey>> _repositoryFunc;
+        private readonly UnitOfWork _uow;
 
         internal EntitySetWriter(UnitOfWork work, Func<ISession, IRepository<TEntity, TKey>> repositoryFunc)
         {
@@ -26,9 +27,10 @@ namespace FutureState.Data
         /// </summary>
         private IWriter<TEntity, TKey> Writer => _repositoryFunc.Invoke(_uow.Session);
 
+
         public void Delete(TEntity entity)
         {
-            this.ValidateAction();
+            ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.Delete(entity));
             _uow._deleted.Add(entity);
@@ -37,7 +39,7 @@ namespace FutureState.Data
 
         public void DeleteAll()
         {
-            this.ValidateAction();
+            ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.DeleteAll());
             _uow._deleted.Add(_repositoryFunc.Invoke(_uow.Session).GetAll());
@@ -45,15 +47,15 @@ namespace FutureState.Data
 
         public void DeleteById(TKey key)
         {
-            this.ValidateAction();
+            ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.DeleteById(key));
-            _uow._deleted.Add(key);// don't add entity
+            _uow._deleted.Add(key); // don't add entity
         }
 
         public void Insert(TEntity entity)
         {
-            this.ValidateAction();
+            ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.Insert(entity));
             _uow._inserted.Add(entity);
@@ -61,7 +63,7 @@ namespace FutureState.Data
 
         public void Insert(IEnumerable<TEntity> entities)
         {
-            this.ValidateAction();
+            ValidateAction();
 
             // avoid deferred execution
             var local = entities as ICollection<TEntity> ?? entities.ToArray();
@@ -69,14 +71,12 @@ namespace FutureState.Data
             _uow._executionQueue.Enqueue(() => Writer.Insert(local));
 
             foreach (var entity in local)
-            {
                 _uow._inserted.Add(entity);
-            }
         }
 
         public void Update(TEntity entity)
         {
-            this.ValidateAction();
+            ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.Update(entity));
             _uow._modified.Add(entity);
@@ -86,7 +86,7 @@ namespace FutureState.Data
         {
             Guard.ArgumentNotNull(entities, "entities");
 
-            this.ValidateAction();
+            ValidateAction();
 
             //to avoid double possible enumeration
             var entityList = entities.ToList();
@@ -96,13 +96,11 @@ namespace FutureState.Data
         }
 
 
-        void ValidateAction()
+        private void ValidateAction()
         {
             if (_uow.IsDisposed)
-            {
                 throw new InvalidOperationException(
                     "The underlying session has been disposed and can no longer be written or read from.");
-            }
         }
     }
 }

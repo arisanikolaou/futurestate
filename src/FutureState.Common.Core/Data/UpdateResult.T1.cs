@@ -1,7 +1,7 @@
 ﻿namespace FutureState.Data
 {
     /// <summary>
-    /// Returns an UpdateResult created after updating a given data structure.
+    ///     Returns an UpdateResult created after updating a given data structure.
     /// </summary>
     public class UpdateResult<T>
     {

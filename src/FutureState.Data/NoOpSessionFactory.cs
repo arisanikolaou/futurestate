@@ -1,21 +1,14 @@
 ﻿namespace FutureState.Data
 {
-    //todo: revisit design
-
     #region NoOpSessionFactory
 
     public class NoOpSessionFactory : ISessionFactory
     {
         public string Id { get; set; }
 
-        public ISession OpenSession()
+        public ISession Create()
         {
             return new NoOpSession();
-        }
-
-        public override string ToString()
-        {
-            return nameof(NoOpSessionFactory);
         }
 
         private class NoOpSession : ISession
@@ -37,11 +30,6 @@
             public ITransaction GetCurrentTran()
             {
                 return _current;
-            }
-
-            public void Close()
-            {
-                Dispose();
             }
 
             private class NoOpTransaction : ITransaction

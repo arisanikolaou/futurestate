@@ -9,7 +9,7 @@ namespace FutureState.Specifications
     public static class DataAnnotationsSpecProviderEx
     {
         /// <summary>
-        /// Validates an object using a new <see cref="DataAnnotationsSpecProvider{T}" /> instance.
+        ///     Validates an object using a new <see cref="DataAnnotationsSpecProvider{T}" /> instance.
         /// </summary>
         public static void Validate<T>(T instance)
         {
@@ -21,13 +21,11 @@ namespace FutureState.Specifications
             var errors = specs.ToErrors(instance);
 
             if (errors.Any())
-            {
                 throw new RuleException(@"Object violates specification.", errors);
-            }
         }
 
         /// <summary>
-        /// Validates an object using a given <see cref="DataAnnotationsSpecProvider{T}" /> instance.
+        ///     Validates an object using a given <see cref="DataAnnotationsSpecProvider{T}" /> instance.
         /// </summary>
         public static void Validate<T>(this DataAnnotationsSpecProvider<T> specProvider, T instance)
         {
@@ -39,9 +37,7 @@ namespace FutureState.Specifications
             var errors = specs.ToErrors(instance);
 
             if (errors.Any())
-            {
                 throw new RuleException(@"Object violates specification.", errors);
-            }
         }
     }
 }

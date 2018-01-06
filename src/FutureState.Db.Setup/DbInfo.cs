@@ -5,11 +5,11 @@
     /// </summary>
     public sealed class DbInfo
     {
-        public DbInfo(string dbName,string dbFileName,string logFileName)
+        public DbInfo(string dbName, string dbFileName, string logFileName)
         {
-            this.DbName = dbName;
-            this.DbFileName = dbFileName;
-            this.LogFileName = logFileName;
+            DbName = dbName;
+            DbFileName = dbFileName;
+            LogFileName = logFileName;
         }
 
         public string LogFileName { get; }

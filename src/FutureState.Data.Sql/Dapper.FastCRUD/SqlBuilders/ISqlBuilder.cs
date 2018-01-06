@@ -44,7 +44,8 @@ namespace Dapper.FastCrud
         /// </summary>
         /// <param name="property">Property for which you want to get the column name.</param>
         /// <param name="tableAlias">Optional table alias.</param>
-        string GetColumnName<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> property, string tableAlias = null);
+        string GetColumnName<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> property,
+            string tableAlias = null);
 
         /// <summary>
         ///     Constructs a condition of form <code>ColumnName=@PropertyName and ...</code> with all the key columns (e.g.

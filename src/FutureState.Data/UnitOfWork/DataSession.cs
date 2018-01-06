@@ -7,7 +7,7 @@ using System;
 namespace FutureState.Data
 {
     /// <summary>
-    /// An managed connection to a given data store.
+    ///     An managed connection to a given data store.
     /// </summary>
     public sealed class DataSession : IDisposable
     {
@@ -23,7 +23,7 @@ namespace FutureState.Data
         internal ISession Session => _getSession.Value;
 
         /// <summary>
-        /// Disposes and closes the underlying data session.
+        ///     Disposes and closes the underlying data session.
         /// </summary>
         public void Dispose()
         {
@@ -37,9 +37,7 @@ namespace FutureState.Data
         private void Close()
         {
             if (_getSession.IsValueCreated)
-            {
                 _getSession.Value.Dispose();
-            }
         }
 
         ~DataSession()

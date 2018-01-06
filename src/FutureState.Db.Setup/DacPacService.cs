@@ -11,11 +11,6 @@ namespace FutureState.Db.Setup
     /// </summary>
     public class DacPacService
     {
-        /// <summary>
-        ///     List of messages received from the underlying dac pac service.
-        /// </summary>
-        public List<string> Messages { get; }
-
         public static readonly string LocalDbServerName = LocalDbSetup.LocalDbServerName;
 
         public DacPacService()
@@ -24,24 +19,29 @@ namespace FutureState.Db.Setup
         }
 
         /// <summary>
+        ///     List of messages received from the underlying dac pac service.
+        /// </summary>
+        public List<string> Messages { get; }
+
+        /// <summary>
         ///     Sets up a datatabase from a given dacpac file.
         /// </summary>
         /// <param name="databaseName">The name of the databaes to install the database to.</param>
         /// <param name="dacPacFilePath"></param>
         public void Deploy(string databaseName, string dacPacFilePath)
         {
-            if(!File.Exists(dacPacFilePath))
+            if (!File.Exists(dacPacFilePath))
                 throw new ArgumentOutOfRangeException(dacPacFilePath);
 
             // deploy to a local sql server
-            var conBuilder = new SqlConnectionStringBuilder()
+            var conBuilder = new SqlConnectionStringBuilder
             {
                 DataSource = LocalDbServerName,
                 InitialCatalog = "master"
             };
 
             // ReSharper disable once SuggestVarOrType_BuiltInTypes
-            string conString = conBuilder.ToString();
+            var conString = conBuilder.ToString();
 
             Deploy(conString, databaseName, dacPacFilePath);
         }
@@ -50,10 +50,9 @@ namespace FutureState.Db.Setup
         ///     Deploys a given database from a dacpac file.
         /// </summary>
         public void Deploy(string connectionString,
-                                    string databaseName,
-                                    string dacPacFileName)
+            string databaseName,
+            string dacPacFileName)
         {
-
             Messages.Add($"Deploying database: {databaseName}");
 
             var dacOptions = new DacDeployOptions
@@ -74,10 +73,9 @@ namespace FutureState.Db.Setup
                 using (var dacpac = DacPackage.Load(dacPacFileName))
                 {
                     dacServiceInstance.Deploy(dacpac, databaseName,
-                                            true, // upgrade existing
-                                            dacOptions);
+                        true, // upgrade existing
+                        dacOptions);
                 }
-
             }
             catch (Exception ex)
             {

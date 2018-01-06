@@ -57,9 +57,7 @@ namespace Hyper.ComponentModel
             {
                 var property = descriptor.ComponentType.GetProperty(descriptor.Name);
                 if (property == null)
-                {
                     return false;
-                }
 
                 lock (properties)
                 {
@@ -83,7 +81,7 @@ namespace Hyper.ComponentModel
                             MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.SpecialName |
                             MethodAttributes.RTSpecialName,
                             CallingConventions.Standard,
-                            new[] { typeof(PropertyDescriptor) });
+                            new[] {typeof(PropertyDescriptor)});
                     var il = cb.GetILGenerator();
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldarg_1);
@@ -92,7 +90,7 @@ namespace Hyper.ComponentModel
                         typeof(ChainingPropertyDescriptor).GetConstructor(
                             BindingFlags.NonPublic | BindingFlags.Instance,
                             null,
-                            new[] { typeof(PropertyDescriptor) },
+                            new[] {typeof(PropertyDescriptor)},
                             null));
                     il.Emit(OpCodes.Ret);
 
@@ -110,7 +108,7 @@ namespace Hyper.ComponentModel
                             MethodAttributes.Final,
                             baseMethod.CallingConvention,
                             baseMethod.ReturnType,
-                            new[] { typeof(object) });
+                            new[] {typeof(object)});
 
                         // start writing IL into the method
                         il = mb.GetILGenerator();
@@ -134,10 +132,7 @@ namespace Hyper.ComponentModel
                         il.Emit(OpCodes.Callvirt, property.GetGetMethod());
 
                         if (property.PropertyType.IsValueType)
-                        {
-                            // box it from the known (value) struct type
                             il.Emit(OpCodes.Box, property.PropertyType);
-                        }
 
                         // return the value
                         il.Emit(OpCodes.Ret);
@@ -159,13 +154,9 @@ namespace Hyper.ComponentModel
                         Type.EmptyTypes);
                     il = mb.GetILGenerator();
                     if (supportsChangeEvents)
-                    {
                         il.Emit(OpCodes.Ldc_I4_1);
-                    }
                     else
-                    {
                         il.Emit(OpCodes.Ldc_I4_0);
-                    }
 
                     il.Emit(OpCodes.Ret);
                     tb.DefineMethodOverride(mb, baseMethod);
@@ -181,13 +172,9 @@ namespace Hyper.ComponentModel
                         Type.EmptyTypes);
                     il = mb.GetILGenerator();
                     if (isReadOnly)
-                    {
                         il.Emit(OpCodes.Ldc_I4_1);
-                    }
                     else
-                    {
                         il.Emit(OpCodes.Ldc_I4_0);
-                    }
 
                     il.Emit(OpCodes.Ret);
                     tb.DefineMethodOverride(mb, baseMethod);
@@ -205,19 +192,15 @@ namespace Hyper.ComponentModel
                                 MethodAttributes.Final,
                                 baseMethod.CallingConvention,
                                 baseMethod.ReturnType,
-                                new[] { typeof(object), typeof(object) });
+                                new[] {typeof(object), typeof(object)});
                             il = mb.GetILGenerator();
                             il.Emit(OpCodes.Ldarg_1);
                             il.Emit(OpCodes.Castclass, property.DeclaringType);
                             il.Emit(OpCodes.Ldarg_2);
                             if (property.PropertyType.IsValueType)
-                            {
                                 il.Emit(OpCodes.Unbox_Any, property.PropertyType);
-                            }
                             else
-                            {
                                 il.Emit(OpCodes.Castclass, property.PropertyType);
-                            }
 
                             il.Emit(OpCodes.Callvirt, property.GetSetMethod());
                             il.Emit(OpCodes.Ret);
@@ -236,7 +219,7 @@ namespace Hyper.ComponentModel
                                     MethodAttributes.Final | MethodAttributes.SpecialName,
                                     baseMethod.CallingConvention,
                                     baseMethod.ReturnType,
-                                    new[] { typeof(object), typeof(EventHandler) });
+                                    new[] {typeof(object), typeof(EventHandler)});
                                 il = mb.GetILGenerator();
                                 il.Emit(OpCodes.Ldarg_1);
                                 il.Emit(OpCodes.Castclass, property.DeclaringType);
@@ -252,7 +235,7 @@ namespace Hyper.ComponentModel
                                     MethodAttributes.Final | MethodAttributes.SpecialName,
                                     baseMethod.CallingConvention,
                                     baseMethod.ReturnType,
-                                    new[] { typeof(object), typeof(EventHandler) });
+                                    new[] {typeof(object), typeof(EventHandler)});
                                 il = mb.GetILGenerator();
                                 il.Emit(OpCodes.Ldarg_1);
                                 il.Emit(OpCodes.Castclass, property.DeclaringType);
@@ -266,12 +249,10 @@ namespace Hyper.ComponentModel
 
                     var newDesc =
                         tb.CreateType()
-                            .GetConstructor(new[] { typeof(PropertyDescriptor) })
-                            .Invoke(new object[] { descriptor }) as PropertyDescriptor;
+                            .GetConstructor(new[] {typeof(PropertyDescriptor)})
+                            .Invoke(new object[] {descriptor}) as PropertyDescriptor;
                     if (newDesc == null)
-                    {
                         return false;
-                    }
 
                     descriptor = newDesc;
                     properties[property] = descriptor;
@@ -300,9 +281,7 @@ namespace Hyper.ComponentModel
 
                 // if it looks like reflection, try to create a bespoke descriptor
                 if (ReferenceEquals(wrapMe, pd.GetType()) && TryCreatePropertyDescriptor(ref pd))
-                {
                     changed = true;
-                }
 
                 newProps[index++] = pd;
             }

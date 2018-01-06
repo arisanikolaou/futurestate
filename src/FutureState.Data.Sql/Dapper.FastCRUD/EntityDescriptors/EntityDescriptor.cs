@@ -22,8 +22,8 @@ namespace Dapper.FastCrud.EntityDescriptors
         /// </summary>
         public EntityMapping DefaultEntityMapping
         {
-            get { return _defaultEntityMapping; }
-            set { _defaultEntityMapping = value; }
+            get => _defaultEntityMapping;
+            set => _defaultEntityMapping = value;
         }
 
         /// <summary>

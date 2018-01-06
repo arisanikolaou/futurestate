@@ -37,8 +37,8 @@ namespace Dapper.Extensions.Linq.Core.Sessions
 
         public string ConnectionString
         {
-            get { return Connection.ConnectionString; }
-            set { Connection.ConnectionString = value; }
+            get => Connection.ConnectionString;
+            set => Connection.ConnectionString = value;
         }
 
         public int ConnectionTimeout => Connection.ConnectionTimeout;

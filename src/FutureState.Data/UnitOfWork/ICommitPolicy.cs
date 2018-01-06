@@ -7,8 +7,8 @@ using System;
 namespace FutureState.Data
 {
     /// <summary>
-    /// Controls how a unit of work will commit changes to an underlying data store
-    /// given certain system states.
+    ///     Controls how a unit of work will commit changes to an underlying data store
+    ///     given certain system states.
     /// </summary>
     public interface ICommitPolicy
     {

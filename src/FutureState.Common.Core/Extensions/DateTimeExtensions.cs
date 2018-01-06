@@ -28,7 +28,7 @@ namespace FutureState
         {
             var unspecifiedDate = value.HasValue
                 ? DateTime.SpecifyKind(value.Value.Date, DateTimeKind.Unspecified)
-                : (DateTime?)null;
+                : (DateTime?) null;
 
             return unspecifiedDate;
         }
@@ -36,9 +36,7 @@ namespace FutureState
         public static DateTime ForceUtc(this DateTime value)
         {
             if (value.Kind == DateTimeKind.Utc)
-            {
                 return value;
-            }
 
             return new DateTime(value.Ticks, DateTimeKind.Utc);
         }
@@ -61,7 +59,7 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Similar to Magnum's ForceUtc but works with nullable DateTime
+        ///     Similar to Magnum's ForceUtc but works with nullable DateTime
         /// </summary>
         public static DateTime? ForceUtc(this DateTime? dateTime)
         {
@@ -69,8 +67,8 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Similar to Magnum's ForceUtc but works with nullable DateTime
-        /// and strips out time
+        ///     Similar to Magnum's ForceUtc but works with nullable DateTime
+        ///     and strips out time
         /// </summary>
         public static DateTime? ForceUtcDate(this DateTime? dateTime)
         {
@@ -78,8 +76,8 @@ namespace FutureState
         }
 
         /// <summary>
-        /// Similar to Magnum's ForceUtc
-        /// and strips out time
+        ///     Similar to Magnum's ForceUtc
+        ///     and strips out time
         /// </summary>
         public static DateTime ForceUtcDate(this DateTime dateTime)
         {
@@ -87,9 +85,9 @@ namespace FutureState
         }
 
         /// <summary>
-        /// This gives month from the currentDate to another one
-        /// Note. gives just whole number of months
-        /// e.g. this Apr 2012, and Another is Mar 2011, should return 11 months
+        ///     This gives month from the currentDate to another one
+        ///     Note. gives just whole number of months
+        ///     e.g. this Apr 2012, and Another is Mar 2011, should return 11 months
         /// </summary>
         /// <returns></returns>
         public static int MonthDiff(this DateTime thisDate, DateTime endDate)

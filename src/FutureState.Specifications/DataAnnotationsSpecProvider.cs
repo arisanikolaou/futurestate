@@ -8,21 +8,21 @@ using System.Text;
 namespace FutureState.Specifications
 {
     /// <summary>
-    /// Builds a list of specifications for a given entity based on the <see cref="ValidationAttribute" />
-    /// declared in the entity's public properties.
+    ///     Builds a list of specifications for a given entity based on the <see cref="ValidationAttribute" />
+    ///     declared in the entity's public properties.
     /// </summary>
     public class DataAnnotationsSpecProvider<T> : IProvideSpecifications<T>
     {
         // ReSharper disable StaticFieldInGenericType
         // ReSharper disable once InconsistentNaming
-        static readonly PropertyInfo[] _properties;
+        private static readonly PropertyInfo[] _properties;
 
-        IEnumerable<ISpecification<T>> _specs;
+        private IEnumerable<ISpecification<T>> _specs;
 
         static DataAnnotationsSpecProvider()
         {
             // interface data annotations should be considered - they won't be returned with a given flatten hierarchy call
-            var types = new[] { typeof(T) }.Concat(typeof(T).GetInterfaces());
+            var types = new[] {typeof(T)}.Concat(typeof(T).GetInterfaces());
 
             var flattenedProperties = new List<PropertyInfo>();
             types.Each(
@@ -40,7 +40,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Validates the state of an object based on its property annotations.
+        ///     Validates the state of an object based on its property annotations.
         /// </summary>
         public IEnumerable<ISpecification<T>> GetSpecifications()
         {
@@ -53,7 +53,7 @@ namespace FutureState.Specifications
         }
 
         /// <summary>
-        /// Gets the properties of the given instance type that can be tested.
+        ///     Gets the properties of the given instance type that can be tested.
         /// </summary>
         protected virtual PropertyInfo[] GetProperties()
         {
@@ -71,9 +71,7 @@ namespace FutureState.Specifications
                 {
                     var spec = CreateSpec(property, attribute);
                     if (spec != null)
-                    {
                         yield return spec;
-                    }
                 }
             }
 

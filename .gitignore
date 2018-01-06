@@ -247,3 +247,4 @@ _Pvt_Extensions
 .fake/
 /src/FutureState.Db/FutureState.Db.jfm
 /build/TestResults.xml
+/build/TestResults.html

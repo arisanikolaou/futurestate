@@ -1,7 +1,7 @@
 ﻿namespace FutureState.Data
 {
     /// <summary>
-    /// In memory implementation of ISession.
+    ///     In memory implementation of ISession.
     /// </summary>
     public class InMemorySession : ISession
     {

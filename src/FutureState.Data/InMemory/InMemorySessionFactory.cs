@@ -4,7 +4,7 @@
     {
         public string Id { get; set; }
 
-        public ISession OpenSession()
+        public ISession Create()
         {
             return new InMemorySession();
         }

@@ -1,7 +1,7 @@
 ﻿namespace FutureState.Data
 {
     /// <summary>
-    /// In memory implementation of <see cref="ITransaction"/>.
+    ///     In memory implementation of <see cref="ITransaction" />.
     /// </summary>
     public class InMemoryTran : ITransaction
     {
