@@ -74,7 +74,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     public abstract class UnitOfWorkManagesTransactionsStoryBase
     {
         private string _conString;
-        private IDapperConfiguration _config;
+        private static IDapperConfiguration _config;
         private SessionFactory _sessionFactory;
         private readonly DateTime _referencedate = new DateTime(2011, 1, 1, 9, 30, 15);
         protected decimal _referenceNumber = 14.12m;
@@ -85,6 +85,24 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         private TestEntity[] _deletedEntities;
         protected ICommitPolicy _commitPolicy;
         protected string _dbName;
+
+        static UnitOfWorkManagesTransactionsStoryBase()
+        {
+            // can only be configured once per entity
+            _config = DapperConfiguration
+                .Use()
+                .UseSqlDialect(new SqlServerDialect());
+
+            var classMapper = new CustomEntityMap<TestEntity>();
+            classMapper.SetIdentityGenerated(m => m.Id);
+
+            var classMappers = new List<IClassMapper>()
+            {
+                classMapper
+            };
+
+            classMappers.Each(n => _config.Register(n));
+        }
 
         protected void GivenANewTestSqlDbWithASingleEntity()
         {
@@ -115,24 +133,6 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
                 Assert.NotNull(result);
             }
-        }
-
-        protected void AndGivenADapperConfiguration()
-        {
-            // instance be application scope
-            this._config = DapperConfiguration
-                .Use()
-                .UseSqlDialect(new SqlServerDialect());
-
-            var classMapper = new CustomEntityMap<TestEntity>();
-            classMapper.SetIdentityGenerated(m => m.Id);
-
-            var classMappers = new List<IClassMapper>()
-            {
-                classMapper
-            };
-
-            classMappers.Each(n => _config.Register(n));
         }
 
         protected void AndGivenAValidSessionFactory()
