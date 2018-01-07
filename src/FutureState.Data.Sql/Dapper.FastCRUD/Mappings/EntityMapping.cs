@@ -82,22 +82,23 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         internal void FreezeMapping()
         {
-            if (!_isFrozen)
-                lock (this)
-                {
-                    if (!_isFrozen)
-                    {
-                        var maxColumnOrder = _propertyMappings.Select(propMapping => propMapping.ColumnOrder).Max();
-                        foreach (var propMapping in _propertyMappings)
-                            if (propMapping.ColumnOrder < 0)
-                                propMapping.ColumnOrder = ++maxColumnOrder;
+            if (_isFrozen)
+                return;
 
-                        ConstructChildParentEntityRelationships();
-                        ConstructParentChildEntityRelationships();
+            lock (this)
+            {
+                if (_isFrozen)
+                    return;
+                var maxColumnOrder = _propertyMappings.Select(propMapping => propMapping.ColumnOrder).Max();
+                foreach (var propMapping in _propertyMappings)
+                    if (propMapping.ColumnOrder < 0)
+                        propMapping.ColumnOrder = ++maxColumnOrder;
 
-                        _isFrozen = true;
-                    }
-                }
+                ConstructChildParentEntityRelationships();
+                ConstructParentChildEntityRelationships();
+
+                _isFrozen = true;
+            }
         }
 
         /// <summary>

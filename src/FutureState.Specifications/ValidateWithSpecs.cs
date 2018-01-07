@@ -9,7 +9,7 @@ using NLog;
 
 namespace FutureState.Specifications
 {
-    // this is a IValidator wrapper
+    // an IValidator wrapper
 
     /// <summary>
     ///     Validates a given entity or service against a given <see cref="IProvideSpecifications{TEntity}" /> instance.
@@ -24,23 +24,26 @@ namespace FutureState.Specifications
         where TEntity : class
     {
         // ReSharper disable once StaticFieldInGenericType
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly ISpecification<TEntity>[] Specs;
+        private static readonly ISpecification<TEntity>[] _specs;
 
         /// <summary>
         ///     Builds a static list of specs for the given type once per application lifetime.
         /// </summary>
         static ValidateWithSpecs()
         {
-            if (Logger.IsDebugEnabled)
-                Logger.Debug(
+            if (_logger.IsDebugEnabled)
+            {
+                _logger.Debug(
                     "Activating {0} to get list of specifications for entity or service {1}.",
-                    typeof(TSpecProvider),
-                    typeof(TEntity));
+                    typeof(TSpecProvider).FullName,
+                    typeof(TEntity).FullName);
+            }
 
             // activate only once when the assembly is loaded
-            Specs = Activator.CreateInstance<TSpecProvider>().GetSpecifications().ToArray();
+            _specs = Activator.CreateInstance<TSpecProvider>()
+                .GetSpecifications().ToArray();
         }
 
         /// <summary>
@@ -71,33 +74,35 @@ namespace FutureState.Specifications
             if (subject == null)
                 return true;
 
-            if (subject is TEntity)
+            if (!(subject is TEntity))
+                throw new InvalidOperationException(
+                    "Can't validate objects not assignable from {0}".Params(typeof(TEntity)));
+
+            var sb = new StringBuilder();
+            var isValid = true;
+
+            foreach (var spec in _specs)
             {
-                var sb = new StringBuilder();
-                var isValid = true;
+                var result = spec.Evaluate((TEntity) subject);
 
-                foreach (var spec in Specs)
-                {
-                    var result = spec.Evaluate(subject as TEntity);
+                if (result.IsValid)
+                    continue;
 
-                    if (!result.IsValid)
-                    {
-                        sb.Append(result.DetailedErrorMessage);
-                        isValid = false;
-                    }
-                }
+                sb.Append(result.DetailedErrorMessage);
 
-                if (!isValid)
-                    if (!string.IsNullOrWhiteSpace(Name))
-                        ErrorMessage = "{0} has the following errors: \n {1}".Params(Name, sb);
-                    else
-                        ErrorMessage = sb.ToString();
-
-                return isValid;
+                isValid = false;
             }
 
-            throw new InvalidOperationException(
-                "Can't validate objects not assignable from {0}".Params(typeof(TEntity)));
+            if (isValid)
+                return true;
+
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (!string.IsNullOrWhiteSpace(Name))
+                ErrorMessage = "{0} has the following errors: \n {1}".Params(Name, sb);
+            else
+                ErrorMessage = sb.ToString();
+
+            return false;
         }
     }
 }
