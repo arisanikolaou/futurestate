@@ -12,6 +12,7 @@ using Xunit;
 namespace FutureState.Data.Sql.Tests.UnitOfWork
 {
     [Story]
+    [Collection("Unit of work tests")]
     public class UnitOfWorkManagesTransactionsNoOpCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
     {
         [BddfyFact]
@@ -25,6 +26,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     }
 
     [Story]
+    [Collection("Unit of work tests")]
     public class UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
     {
         [BddfyFact]
@@ -38,6 +40,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     }
 
     [Story]
+    [Collection("Unit of work tests")]
     public class UnitOfWorkManagesTransactionsWithInMemRepositoryStory : UnitOfWorkManagesTransactionsStoryBase
     {
         private InMemoryRepository<TestEntity, int> _repository;
