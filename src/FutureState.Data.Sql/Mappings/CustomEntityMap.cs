@@ -38,69 +38,74 @@ namespace FutureState.Data.Sql.Mappings
         private static readonly PropertyDescriptor[] _propertyDescriptors;
         private static readonly string _tableName;
         private static readonly CustomTypeMap<TEntity> _customTypeMap;
+        static readonly object _syncLock = new object();
 
         static CustomEntityMap()
         {
-            if (Attribute.IsDefined(typeof(TEntity), typeof(TableAttribute)))
-                _defaultTableName = ((TableAttribute) typeof(TEntity).GetCustomAttribute(typeof(TableAttribute))).Name;
-
-            if (Attribute.IsDefined(typeof(TEntity), typeof(SchemaAttribute)))
-                _defaultSchemaName = ((SchemaAttribute) typeof(TEntity).GetCustomAttribute(typeof(SchemaAttribute)))
-                    .Name;
-
-            _propertyKeyMappings = new Dictionary<Type, KeyType>
+            lock (_syncLock)
             {
-                {typeof(byte), KeyType.Identity},
-                {typeof(byte?), KeyType.Identity},
-                {typeof(sbyte), KeyType.Identity},
-                {typeof(sbyte?), KeyType.Identity},
-                {typeof(short), KeyType.Identity},
-                {typeof(short?), KeyType.Identity},
-                {typeof(ushort), KeyType.Identity},
-                {typeof(ushort?), KeyType.Identity},
-                {typeof(int), KeyType.Identity},
-                {typeof(int?), KeyType.Identity},
-                {typeof(uint), KeyType.Identity},
-                {typeof(uint?), KeyType.Identity},
-                {typeof(long), KeyType.Identity},
-                {typeof(long?), KeyType.Identity},
-                {typeof(ulong), KeyType.Identity},
-                {typeof(ulong?), KeyType.Identity},
-                {typeof(BigInteger), KeyType.Identity},
-                {typeof(BigInteger?), KeyType.Identity},
-                {typeof(Guid), KeyType.Guid},
-                {typeof(Guid?), KeyType.Guid}
-            };
+                if (Attribute.IsDefined(typeof(TEntity), typeof(TableAttribute)))
+                    _defaultTableName = ((TableAttribute) typeof(TEntity).GetCustomAttribute(typeof(TableAttribute)))
+                        .Name;
 
-            // get the writable public properties
-            _properties = typeof(TEntity)
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(m => m.GetSetMethod(false) != null)
-                // ignore
-                .Where(m => !m.GetCustomAttributes(typeof(NotMappedAttribute)).Any())
-                .Where(m => !m.GetCustomAttributes(typeof(IgnoreDataMemberAttribute)).Any())
-                .ToArray();
+                if (Attribute.IsDefined(typeof(TEntity), typeof(SchemaAttribute)))
+                    _defaultSchemaName = ((SchemaAttribute) typeof(TEntity).GetCustomAttribute(typeof(SchemaAttribute)))
+                        .Name;
 
-            var validProperties = _properties.Select(m => m.Name).Distinct().ToList();
+                _propertyKeyMappings = new Dictionary<Type, KeyType>
+                {
+                    {typeof(byte), KeyType.Identity},
+                    {typeof(byte?), KeyType.Identity},
+                    {typeof(sbyte), KeyType.Identity},
+                    {typeof(sbyte?), KeyType.Identity},
+                    {typeof(short), KeyType.Identity},
+                    {typeof(short?), KeyType.Identity},
+                    {typeof(ushort), KeyType.Identity},
+                    {typeof(ushort?), KeyType.Identity},
+                    {typeof(int), KeyType.Identity},
+                    {typeof(int?), KeyType.Identity},
+                    {typeof(uint), KeyType.Identity},
+                    {typeof(uint?), KeyType.Identity},
+                    {typeof(long), KeyType.Identity},
+                    {typeof(long?), KeyType.Identity},
+                    {typeof(ulong), KeyType.Identity},
+                    {typeof(ulong?), KeyType.Identity},
+                    {typeof(BigInteger), KeyType.Identity},
+                    {typeof(BigInteger?), KeyType.Identity},
+                    {typeof(Guid), KeyType.Guid},
+                    {typeof(Guid?), KeyType.Guid}
+                };
 
-            var descriptors = TypeDescriptor.GetProperties(typeof(TEntity));
+                // get the writable public properties
+                _properties = typeof(TEntity)
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(m => m.GetSetMethod(false) != null)
+                    // ignore
+                    .Where(m => !m.GetCustomAttributes(typeof(NotMappedAttribute)).Any())
+                    .Where(m => !m.GetCustomAttributes(typeof(IgnoreDataMemberAttribute)).Any())
+                    .ToArray();
 
-            _propertyDescriptors = descriptors
-                .OfType<PropertyDescriptor>()
-                .Where(m => validProperties.Contains(m.Name))
-                .ToArray();
+                var validProperties = _properties.Select(m => m.Name).Distinct().ToList();
 
-            _tableName = _defaultTableName ?? typeof(TEntity).Name.Pluralize();
+                var descriptors = TypeDescriptor.GetProperties(typeof(TEntity));
 
-            // dapper type mapping wrap into custom type map
-            var typeMap = SqlMapper.GetTypeMap(typeof(TEntity));
-            _customTypeMap = new CustomTypeMap<TEntity>(typeMap);
+                _propertyDescriptors = descriptors
+                    .OfType<PropertyDescriptor>()
+                    .Where(m => validProperties.Contains(m.Name))
+                    .ToArray();
 
-            // fast crud registration
-            _fastCrudMap = OrmConfiguration.RegisterEntity<TEntity>()
-                .SetTableName(_tableName);
+                _tableName = _defaultTableName ?? typeof(TEntity).Name.Pluralize();
 
-            AdaptToFastCrud(_fastCrudMap, _customTypeMap);
+                // dapper type mapping wrap into custom type map
+                var typeMap = SqlMapper.GetTypeMap(typeof(TEntity));
+                _customTypeMap = new CustomTypeMap<TEntity>(typeMap);
+
+                // fast crud registration
+                _fastCrudMap = OrmConfiguration.RegisterEntity<TEntity>()
+                    .SetTableName(_tableName);
+
+                AdaptToFastCrud(_fastCrudMap, _customTypeMap);
+            }
         }
 
         static void AdaptToFastCrud(EntityMapping<TEntity> mapping, SqlMapper.ITypeMap entityMap)
@@ -143,10 +148,10 @@ namespace FutureState.Data.Sql.Mappings
             // add all other properties properties
             foreach (PropertyInfo property in _properties)
             {
-                var isKey = property.GetCustomAttributes(typeof(KeyAttribute)).Any();
+                bool isKey = property.GetCustomAttributes(typeof(KeyAttribute)).Any();
 
                 // not already assigned
-                var columnName =
+                string columnName =
                     property.GetCustomAttributes(typeof(ColumnAttribute))
                         .Select(q => ((ColumnAttribute)q).Name)
                         .FirstOrDefault() ?? property.Name; // default to property name
