@@ -25,12 +25,13 @@ namespace FutureState.Data.Sql.Mappings
     /// <summary>
     ///     Creates a custom type map that supports both fast crud and dapper type maps.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TEntity">The type of entity to map.</typeparam>
     public class CustomEntityMap<TEntity> : DommelEntityMap<TEntity>, IClassMapper<TEntity>
         where TEntity : class
     {
         private static readonly Dictionary<Type, KeyType> _propertyKeyMappings;
-
+        private static readonly IList<DommelPropertyMap> _propertyMaps;
+        private static readonly IList<IPropertyMap> _linqPropertyMaps;
         private static readonly string _defaultTableName;
         private static readonly string _defaultSchemaName;
         private static readonly PropertyInfo[] _properties;
@@ -38,21 +39,18 @@ namespace FutureState.Data.Sql.Mappings
         private static readonly PropertyDescriptor[] _propertyDescriptors;
         private static readonly string _tableName;
         private static readonly CustomTypeMap<TEntity> _customTypeMap;
-        static readonly object _syncLock = new object();
 
         static CustomEntityMap()
         {
-            lock (_syncLock)
-            {
-                if (Attribute.IsDefined(typeof(TEntity), typeof(TableAttribute)))
-                    _defaultTableName = ((TableAttribute) typeof(TEntity).GetCustomAttribute(typeof(TableAttribute)))
-                        .Name;
+            if (Attribute.IsDefined(typeof(TEntity), typeof(TableAttribute)))
+                _defaultTableName = ((TableAttribute)typeof(TEntity).GetCustomAttribute(typeof(TableAttribute)))
+                    .Name;
 
-                if (Attribute.IsDefined(typeof(TEntity), typeof(SchemaAttribute)))
-                    _defaultSchemaName = ((SchemaAttribute) typeof(TEntity).GetCustomAttribute(typeof(SchemaAttribute)))
-                        .Name;
+            if (Attribute.IsDefined(typeof(TEntity), typeof(SchemaAttribute)))
+                _defaultSchemaName = ((SchemaAttribute)typeof(TEntity).GetCustomAttribute(typeof(SchemaAttribute)))
+                    .Name;
 
-                _propertyKeyMappings = new Dictionary<Type, KeyType>
+            _propertyKeyMappings = new Dictionary<Type, KeyType>
                 {
                     {typeof(byte), KeyType.Identity},
                     {typeof(byte?), KeyType.Identity},
@@ -76,75 +74,40 @@ namespace FutureState.Data.Sql.Mappings
                     {typeof(Guid?), KeyType.Guid}
                 };
 
-                // get the writable public properties
-                _properties = typeof(TEntity)
-                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                    .Where(m => m.GetSetMethod(false) != null)
-                    // ignore
-                    .Where(m => !m.GetCustomAttributes(typeof(NotMappedAttribute)).Any())
-                    .Where(m => !m.GetCustomAttributes(typeof(IgnoreDataMemberAttribute)).Any())
-                    .ToArray();
+            // get the writable public properties
+            _properties = typeof(TEntity)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m => m.GetSetMethod(false) != null)
+                // ignore
+                .Where(m => !m.GetCustomAttributes(typeof(NotMappedAttribute)).Any())
+                .Where(m => !m.GetCustomAttributes(typeof(IgnoreDataMemberAttribute)).Any())
+                .ToArray();
 
-                var validProperties = _properties.Select(m => m.Name).Distinct().ToList();
+            var validProperties = _properties.Select(m => m.Name).Distinct().ToList();
 
-                var descriptors = TypeDescriptor.GetProperties(typeof(TEntity));
+            var descriptors = TypeDescriptor.GetProperties(typeof(TEntity));
 
-                _propertyDescriptors = descriptors
-                    .OfType<PropertyDescriptor>()
-                    .Where(m => validProperties.Contains(m.Name))
-                    .ToArray();
+            _propertyDescriptors = descriptors
+                .OfType<PropertyDescriptor>()
+                .Where(m => validProperties.Contains(m.Name))
+                .ToArray();
 
-                _tableName = _defaultTableName ?? typeof(TEntity).Name.Pluralize();
+            _tableName = _defaultTableName ?? typeof(TEntity).Name.Pluralize();
 
-                // dapper type mapping wrap into custom type map
-                var typeMap = SqlMapper.GetTypeMap(typeof(TEntity));
-                _customTypeMap = new CustomTypeMap<TEntity>(typeMap);
+            // dapper type mapping wrap into custom type map
+            var typeMap = SqlMapper.GetTypeMap(typeof(TEntity));
+            _customTypeMap = new CustomTypeMap<TEntity>(typeMap);
 
-                // fast crud registration
-                _fastCrudMap = OrmConfiguration.RegisterEntity<TEntity>()
-                    .SetTableName(_tableName);
+            // fast crud registration
+            _fastCrudMap = OrmConfiguration.RegisterEntity<TEntity>()
+                .SetTableName(_tableName);
 
-                AdaptToFastCrud(_fastCrudMap, _customTypeMap);
-            }
-        }
+            AdaptToFastCrud(_fastCrudMap, _customTypeMap);
 
-        static void AdaptToFastCrud(EntityMapping<TEntity> mapping, SqlMapper.ITypeMap entityMap)
-        {
-            var currentConventions = OrmConfiguration.Conventions;
+            _linqPropertyMaps = new List<IPropertyMap>();
 
-            foreach (PropertyDescriptor propDescriptor in _propertyDescriptors)
-            {
-                SqlMapper.IMemberMap entityMember = entityMap.GetMember(propDescriptor.Name);
+            _propertyMaps = new List<DommelPropertyMap>();
 
-                PropertyMapping propMapping = mapping
-                    .SetPropertyByMapping(new PropertyMapping(mapping, propDescriptor));
-     
-                if (entityMember != null)
-                    propMapping.DatabaseColumnName = entityMember.ColumnName;
-
-                currentConventions.ConfigureEntityPropertyMapping(propMapping);
-            }
-        }
-
-        /// <summary>
-        ///     Creates a new instance.
-        /// </summary>
-        public CustomEntityMap()
-        {
-            if (_propertyDescriptors.Length == 0)
-                throw new InvalidOperationException("Entity contains no valid properties.");
-
-            SchemaName = _defaultSchemaName;
-
-            // cascade table name
-            ToTable(_tableName);
-
-            // property maps for fast crud as well as dapper
-            FillPropertyMaps();
-        }
-
-        private void FillPropertyMaps()
-        {
             // add all other properties properties
             foreach (PropertyInfo property in _properties)
             {
@@ -174,18 +137,62 @@ namespace FutureState.Data.Sql.Mappings
                     linkMap.Key(keyAssignmentType);
                 }
 
-                PropertyMaps.Add(map);
+                _propertyMaps.Add(map);
 
                 //cascade column mapping to dapper property maps
                 _customTypeMap.Map(property.Name, columnName);
 
                 linkMap.Key(KeyType.Assigned);
 
-                LinqPropertyMaps.Add(linkMap);
+                _linqPropertyMaps.Add(linkMap);
             }
         }
 
-        private void SetupIfIdentity(PropertyInfo property, DommelPropertyMap map)
+        static void AdaptToFastCrud(EntityMapping<TEntity> mapping, SqlMapper.ITypeMap entityMap)
+        {
+            var currentConventions = OrmConfiguration.Conventions;
+
+            foreach (PropertyDescriptor propDescriptor in _propertyDescriptors)
+            {
+                SqlMapper.IMemberMap entityMember = entityMap.GetMember(propDescriptor.Name);
+
+                PropertyMapping propMapping = mapping
+                    .SetPropertyByMapping(new PropertyMapping(mapping, propDescriptor));
+
+                if (entityMember != null)
+                    propMapping.DatabaseColumnName = entityMember.ColumnName;
+
+                currentConventions.ConfigureEntityPropertyMapping(propMapping);
+            }
+        }
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public CustomEntityMap()
+        {
+            if (_propertyDescriptors.Length == 0)
+                throw new InvalidOperationException("Entity contains no valid properties.");
+
+            SchemaName = _defaultSchemaName;
+
+            // cascade table name
+            ToTable(_tableName);
+
+            // property maps for fast crud as well as dapper
+            FillPropertyMaps();
+        }
+
+        private void FillPropertyMaps()
+        {
+            foreach (var map in _propertyMaps)
+                this.PropertyMaps.Add(map);
+
+            foreach (var linqPropertyMap in _linqPropertyMaps)
+                this.LinqPropertyMaps.Add(linqPropertyMap);
+        }
+
+        static void SetupIfIdentity(PropertyInfo property, DommelPropertyMap map)
         {
             if (property.GetCustomAttributes(typeof(DatabaseGeneratedAttribute))
                 .FirstOrDefault() is DatabaseGeneratedAttribute dbGenerated)

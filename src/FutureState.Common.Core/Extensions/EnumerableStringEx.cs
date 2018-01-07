@@ -8,8 +8,7 @@ using System.Linq;
 
 namespace FutureState
 {
-    /// <summary>
-    /// </summary>
+
     public static class EnumerableStringEx
     {
         public static int IndexOfIgnoreCase(this IEnumerable<string> list, string item)

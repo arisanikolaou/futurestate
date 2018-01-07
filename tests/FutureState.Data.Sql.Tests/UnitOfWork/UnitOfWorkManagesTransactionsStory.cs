@@ -17,7 +17,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         [BddfyFact]
         public void UnitOfWorkManagesTransactionsNoOpCommitPolicy()
         {
-            this._commitPolicy = null;
+            this._commitPolicy = new CommitPolicyNoOp(); // don't rely on sql transaction
             this._dbName = "UnitOfWorkManagesTransactionsNoOpCommitPolicy";
 
             this.BDDfy();
@@ -25,15 +25,46 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     }
 
     [Story]
-    public class UnitOfWorkManagesTransactionsTransactionalCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
+    public class UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
     {
         [BddfyFact]
-        public void UnitOfWorkManagesTransactionsTransactionalCommitPolicy()
+        public void UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicy()
         {
-            this._commitPolicy = new CommitPolicy();
-            this._dbName = "UnitOfWorkManagesTransactionsTransactionalCommitPolicy";
+            this._commitPolicy = new CommitPolicy(); // always create sql transaction
+            this._dbName = "UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicy";
 
             this.BDDfy();
+        }
+    }
+
+    [Story]
+    public class UnitOfWorkManagesTransactionsWithInMemRepositoryStory : UnitOfWorkManagesTransactionsStoryBase
+    {
+        private InMemoryRepository<TestEntity, int> _repository;
+
+        [BddfyFact]
+        public void UnitOfWorkManagesTransactionsWithInMemRepository()
+        {
+            this._dbName = "UnitOfWorkManagesTransactionsWithInMemRepository";
+
+            this.BDDfy();
+        }
+
+        protected override IRepositoryLinq<TestEntity, int> GetRepository(ISession session)
+        {
+            if (_repository == null)
+            {
+                int i = 1; // todo: should be auto generated from class mappers
+
+                _repository = new InMemoryRepository<TestEntity, int>(
+                    new KeyProvider<TestEntity, int>(
+                        new KeyGenerator<TestEntity, int>(() => i++)),
+                    new KeyBinder<TestEntity, int>(m => m.Id, (entity, i1) => entity.Id = i1),
+                    new List<TestEntity>());
+
+            }
+
+            return _repository;
         }
     }
 
@@ -49,7 +80,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         private TestEntity _insertedEntityNotCommited;
         private TestEntity _updatedEntity;
         private TestEntity[] _deletedEntities;
-        protected CommitPolicy _commitPolicy;
+        protected ICommitPolicy _commitPolicy;
         protected string _dbName;
 
         protected void GivenANewTestSqlDbWithASingleEntity()
@@ -115,9 +146,14 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         protected void AndGivenAUnitOfWork()
         {
             this._db = new UnitOfWork<TestEntity, int>(
-                (session) => new RepositoryLinq<TestEntity, int>(session),
+                GetRepository,
                 _sessionFactory,
                 _commitPolicy);
+        }
+
+        protected virtual IRepositoryLinq<TestEntity, int> GetRepository(ISession session)
+        {
+            return new RepositoryLinq<TestEntity, int>(session);
         }
 
         protected void WhenInsertingViaUnitOfWork()
@@ -201,7 +237,8 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
         protected void ThenShouldNotBeAbleToReadWhenSessionIsNotOpen()
         {
-            Assert.Throws<InvalidOperationException>(() => {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
                 // user has to explicitly call Open
                 this._insertedEntityNotCommited = _db.EntitySet.Reader.Get(1);
             });
@@ -209,7 +246,8 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
         protected void ThenShouldNotBeAbleToOpen2ConsecutiveSessions()
         {
-            Assert.Throws<InvalidOperationException>(() => {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
                 using (_db.Open())
                 {
                     using (_db.Open()) // should raise an exception

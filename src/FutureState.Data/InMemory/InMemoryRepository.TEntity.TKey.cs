@@ -199,8 +199,7 @@ namespace FutureState.Data
 
         public void DeleteById(TKey key)
         {
-            TEntity item;
-            if (!_items.TryRemove(key, out item))
+            if (!_items.TryRemove(key, out _))
                 _logger.Trace(@"Item {0} has been deleted or does not exist.", key);
         }
 
@@ -211,7 +210,7 @@ namespace FutureState.Data
 
         public void DeleteAll()
         {
-            GetAll().Each(item => DeleteById(_keyBinder.Get(item)));
+            _items.Clear();
         }
 
         public IEnumerable<TEntity> GetAll()
