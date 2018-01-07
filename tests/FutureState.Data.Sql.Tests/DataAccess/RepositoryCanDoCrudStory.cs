@@ -5,7 +5,6 @@ using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data.Sql.Mappings;
-using FutureState.Data.Sql.Tests.TestModels.RepositoryTests;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -26,6 +25,8 @@ namespace FutureState.Data.Sql.Tests
         private MyEntity _deletedEntity;
         private MyEntity[] _resultsAfterDeleted;
         private IEnumerable<ProjectedItem> _projectedItem;
+        private readonly DateTime _referencedate = new DateTime(2011, 1, 1, 9, 30, 15);
+        public decimal _referenceNumber = 14.12m;
 
         protected void GivenANewTestSqlDbWithASingleEntity()
         {
@@ -38,17 +39,19 @@ namespace FutureState.Data.Sql.Tests
             dbSetup.CreateLocalDb(true);
 
             // create db
-            using (var repositoryDb = new RepositoryDb(connectionString))
+            using (var repositoryDb = new TestModel(connectionString))
             {
-                repositoryDb.MyEntities.Add(new TestModels.RepositoryTests.MyEntity() { Id = 1, Name = "Name" });
+                repositoryDb.MyEntities
+                    .Add(new MyEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber});
 
                 repositoryDb.SaveChanges();
             }
 
             // asser setup is complete
-            using (var repositoryDb = new RepositoryDb(connectionString))
+            using (var repositoryDb = new TestModel(connectionString))
             {
-                var result = repositoryDb.MyEntities.FirstOrDefault(m => m.Name == "Name");
+                var result = repositoryDb.MyEntities
+                    .FirstOrDefault(m => m.Name == "Name");
 
                 Assert.NotNull(result);
             }
@@ -93,7 +96,7 @@ namespace FutureState.Data.Sql.Tests
 
                 Assert.True(_resultAfterInitialGetAll.Length > 0);
 
-                repo.Insert(new MyEntity() { Name = "Name 2" });
+                repo.Insert(new MyEntity() { Name = "Name 2", Date = _referencedate, Money = _referenceNumber });
 
                 this._resultsAfterInserted = repo.GetAll().ToArray();
 
@@ -192,14 +195,20 @@ namespace FutureState.Data.Sql.Tests
             }
         }
 
-        protected void ThenRepositoryShouldWork()
+        protected void ThenRepositoryReadWriteShouldWork()
         {
             Assert.Equal(2, _resultsAfterInserted.Length);
 
             Assert.NotNull(_resultsAfterInserted.FirstOrDefault(m => m.Name == "Name 2"));
 
+            // check date loads
+            Assert.Equal(_referencedate, _resultsAfterInserted.FirstOrDefault(m => m.Name == "Name 2")?.Date);
+
+            // check number
+            Assert.Equal(_referenceNumber, _resultsAfterInserted.FirstOrDefault(m => m.Name == "Name 2")?.Money);
+
             Assert.NotNull(whereQueryByName);
-            
+
             Assert.NotNull(_updatedResult);
 
             Assert.NotNull(_entityQueriedByKey);

@@ -73,12 +73,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="RepositoryCanDoCrudStory.cs" />
+    <Compile Include="DataAccess\RepositoryCanDoCrudStory.cs" />
     <Compile Include="MemberMapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionFactoryTests.cs" />
-    <Compile Include="TestModel.cs" />
-    <Compile Include="TestModels\RepositoryTests\RepositoryDb.cs" />
+    <Compile Include="DataAccess\TestModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -173,9 +172,6 @@
       <Project>{58b0d3c2-e786-40bd-b5f7-04b32f0aa241}</Project>
       <Name>FutureState.Data</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="License_DACFx.txt" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\xunit.analyzers.0.8.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
