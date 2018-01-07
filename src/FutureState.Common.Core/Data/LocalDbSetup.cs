@@ -60,6 +60,8 @@ namespace FutureState.Data
                 // If the file exists, and we want to delete old data, remove it here and create a new database.
                 if (File.Exists(_dbFileName) && deleteIfExists)
                 {
+                    TryDetachDatabase();
+
                     if (File.Exists(_logFileName))
                         File.Delete(_logFileName);
 
