@@ -32,7 +32,7 @@ namespace FutureState.Common.Tests
                 TestEntity2 = new TestEntity2 {Name = "Name2"}
             };
 
-            var clone = DeepCloneUtil.DeepFieldClone(source);
+            var clone = source.CloneDeep();
 
             Assert.False(ReferenceEquals(clone, source));
 
