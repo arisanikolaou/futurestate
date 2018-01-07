@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Dapper.FastCrud.Validations;
+using FutureState;
 
 namespace Dapper.FastCrud.Mappings
 {
@@ -128,7 +129,7 @@ namespace Dapper.FastCrud.Mappings
         /// <summary>
         ///     Removes a property mapping.
         /// </summary>
-        internal void RemoveProperty(string propertyName)
+        public void RemoveProperty(string propertyName)
         {
             PropertyMapping propertyMapping;
             if (_propertyNameMappingsMap.TryGetValue(propertyName, out propertyMapping))
@@ -139,27 +140,38 @@ namespace Dapper.FastCrud.Mappings
         /// <summary>
         ///     Prepares a new property mapping.
         /// </summary>
-        protected PropertyMapping SetPropertyInternal(string propertyName)
+        public PropertyMapping SetPropertyByName(string propertyName)
         {
             var propDescriptor =
                 TypeDescriptor.GetProperties(EntityType)
                     .OfType<PropertyDescriptor>()
                     .Single(propInfo => propInfo.Name == propertyName);
-            return SetPropertyInternal(propDescriptor);
+
+            return SetPropertyByDescriptor(propDescriptor);
         }
 
         /// <summary>
         ///     Registers a property mapping.
         /// </summary>
-        protected PropertyMapping SetPropertyInternal(PropertyDescriptor property)
+        public PropertyMapping SetProperty(PropertyDescriptor property)
         {
-            return SetPropertyInternal(new PropertyMapping(this, property));
+            this.ValidateState();
+
+            return SetPropertyByName(new PropertyMapping(this, property));
         }
 
         /// <summary>
         ///     Registers a property mapping.
         /// </summary>
-        protected PropertyMapping SetPropertyInternal(PropertyMapping propertyMapping)
+        public PropertyMapping SetPropertyByDescriptor(PropertyDescriptor property)
+        {
+            return SetPropertyByName(new PropertyMapping(this, property));
+        }
+
+        /// <summary>
+        ///     Registers a property mapping.
+        /// </summary>
+        protected PropertyMapping SetPropertyByName(PropertyMapping propertyMapping)
         {
             Requires.Argument(propertyMapping.EntityMapping == this, nameof(propertyMapping),
                 "Unable to add a property mapping that is not assigned to the current entity mapping");
@@ -309,15 +321,32 @@ namespace Dapper.FastCrud.Mappings
         {
             ValidateState();
 
-            Requires.NotNull(property, nameof(property));
-            //Requires.NotNull(propertySetupFct, nameof(propertySetupFct));   // it can be null
-
             var propName = ((MemberExpression) property.Body).Member.Name;
-            var propMapping = SetPropertyInternal(propName);
+            var propMapping = SetPropertyByName(propName);
             propertySetupFct?.Invoke(propMapping);
             return this;
         }
 
+        public EntityMapping<TEntity> SetProperty(
+            string propertyName,
+            Action<PropertyMapping> propertySetupFct)
+        {
+            ValidateState();
+
+            var propMapping = SetPropertyByName(propertyName);
+            propertySetupFct?.Invoke(propMapping);
+            return this;
+        }
+
+        public EntityMapping<TEntity> SetProperty(
+            string propertyName)
+        {
+            ValidateState();
+
+            SetPropertyByName(propertyName);
+
+            return this;
+        }
 
         /// <summary>
         ///     Returns all the property mappings, optionally filtered by their options.
@@ -464,7 +493,7 @@ namespace Dapper.FastCrud.Mappings
             foreach (
                 var clonedPropMapping in
                 PropertyMappings.Select(propNameMapping => propNameMapping.Value.Clone(clonedMappings)))
-                clonedMappings.SetPropertyInternal(clonedPropMapping);
+                clonedMappings.SetPropertyByName(clonedPropMapping);
 
             return clonedMappings;
         }

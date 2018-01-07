@@ -14,7 +14,7 @@ namespace FutureState.Data.Sql.Tests
         public virtual DbSet<MyEntity> MyEntities { get; set; }
     }
 
-    public class MyEntity
+    public class MyEntity : IEntity<int>
     {
         [Key] public int Id { get; set; }
 
