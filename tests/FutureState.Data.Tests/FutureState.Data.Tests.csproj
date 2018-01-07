@@ -145,9 +145,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="License_DACFx.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Analyzer Include="..\..\packages\xunit.analyzers.0.8.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <Choose>
