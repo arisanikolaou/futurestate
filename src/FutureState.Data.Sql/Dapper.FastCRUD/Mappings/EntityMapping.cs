@@ -157,7 +157,7 @@ namespace Dapper.FastCrud.Mappings
         {
             this.ValidateState();
 
-            return SetPropertyByName(new PropertyMapping(this, property));
+            return SetPropertyByMapping(new PropertyMapping(this, property));
         }
 
         /// <summary>
@@ -165,13 +165,13 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public PropertyMapping SetPropertyByDescriptor(PropertyDescriptor property)
         {
-            return SetPropertyByName(new PropertyMapping(this, property));
+            return SetPropertyByMapping(new PropertyMapping(this, property));
         }
 
         /// <summary>
         ///     Registers a property mapping.
         /// </summary>
-        protected PropertyMapping SetPropertyByName(PropertyMapping propertyMapping)
+        public PropertyMapping SetPropertyByMapping(PropertyMapping propertyMapping)
         {
             Requires.Argument(propertyMapping.EntityMapping == this, nameof(propertyMapping),
                 "Unable to add a property mapping that is not assigned to the current entity mapping");
@@ -493,7 +493,7 @@ namespace Dapper.FastCrud.Mappings
             foreach (
                 var clonedPropMapping in
                 PropertyMappings.Select(propNameMapping => propNameMapping.Value.Clone(clonedMappings)))
-                clonedMappings.SetPropertyByName(clonedPropMapping);
+                clonedMappings.SetPropertyByMapping(clonedPropMapping);
 
             return clonedMappings;
         }

@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 
-namespace FutureState.Data.Sql.Tests
+namespace FutureState.Data.Sql.Tests.Repository
 {
     public class TestModel : DbContext
     {

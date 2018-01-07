@@ -24,7 +24,9 @@ namespace Dapper.FastCrud.Mappings
                     SetSchemaName(schemaName);
             }
 
-            IEnumerable<PropertyDescriptor> entityProperties = currentConventions.GetEntityProperties(EntityType);
+            IEnumerable<PropertyDescriptor> entityProperties = currentConventions
+                .GetEntityProperties(EntityType);
+
             SqlMapper.ITypeMap entityMap = SqlMapper.GetTypeMap(typeof(TEntity));
 
             foreach (PropertyDescriptor propDescriptor in entityProperties)

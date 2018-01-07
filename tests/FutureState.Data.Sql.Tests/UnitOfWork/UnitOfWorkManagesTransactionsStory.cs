@@ -1,0 +1,223 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Dapper.Extensions.Linq.Core.Configuration;
+using Dapper.Extensions.Linq.Core.Mapper;
+using Dapper.Extensions.Linq.Sql;
+using FutureState.Data.Sql.Mappings;
+using TestStack.BDDfy;
+using TestStack.BDDfy.Xunit;
+using Xunit;
+
+namespace FutureState.Data.Sql.Tests.UnitOfWork
+{
+    [Story]
+    public class UnitOfWorkManagesTransactionsNoOpCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
+    {
+        [BddfyFact]
+        public void UnitOfWorkManagesTransactionsNoOpCommitPolicy()
+        {
+            this._commitPolicy = null;
+            this._dbName = "UnitOfWorkManagesTransactionsNoOpCommitPolicy";
+
+            this.BDDfy();
+        }
+    }
+
+    [Story]
+    public class UnitOfWorkManagesTransactionsTransactionalCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
+    {
+        [BddfyFact]
+        public void UnitOfWorkManagesTransactionsTransactionalCommitPolicy()
+        {
+            this._commitPolicy = new CommitPolicy();
+            this._dbName = "UnitOfWorkManagesTransactionsTransactionalCommitPolicy";
+
+            this.BDDfy();
+        }
+    }
+
+    public abstract class UnitOfWorkManagesTransactionsStoryBase
+    {
+        private string _conString;
+        private IDapperConfiguration _config;
+        private SessionFactory _sessionFactory;
+        private readonly DateTime _referencedate = new DateTime(2011, 1, 1, 9, 30, 15);
+        protected decimal _referenceNumber = 14.12m;
+        private UnitOfWork<TestEntity, int> _db;
+        private TestEntity _insertedEntity;
+        private TestEntity _insertedEntityNotCommited;
+        private TestEntity _updatedEntity;
+        private TestEntity[] _deletedEntities;
+        protected CommitPolicy _commitPolicy;
+        protected string _dbName;
+
+        protected void GivenANewTestSqlDbWithASingleEntity()
+        {
+            string dbServerName = LocalDbSetup.LocalDbServerName;
+            if (string.IsNullOrWhiteSpace(_dbName))
+                throw new InvalidOperationException();
+
+            this._conString = $@"data source={dbServerName};initial catalog={_dbName};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+
+            // delete any existing databases
+            var dbSetup = new LocalDbSetup(Environment.CurrentDirectory, _dbName);
+            dbSetup.CreateLocalDb(true);
+
+            // create db
+            using (var repositoryDb = new TestModel(_conString))
+            {
+                repositoryDb.MyEntities
+                    .Add(new TestEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber });
+
+                repositoryDb.SaveChanges();
+            }
+
+            // asser setup is complete
+            using (var repositoryDb = new TestModel(_conString))
+            {
+                var result = repositoryDb.MyEntities
+                    .FirstOrDefault(m => m.Name == "Name");
+
+                Assert.NotNull(result);
+            }
+        }
+
+        protected void AndGivenADapperConfiguration()
+        {
+            // instance be application scope
+            this._config = DapperConfiguration
+                .Use()
+                .UseSqlDialect(new SqlServerDialect());
+
+            var classMapper = new CustomEntityMap<TestEntity>();
+            classMapper.SetIdentityGenerated(m => m.Id);
+
+            var classMappers = new List<IClassMapper>()
+            {
+                classMapper
+            };
+
+            classMappers.Each(n => _config.Register(n));
+        }
+
+        protected void AndGivenAValidSessionFactory()
+        {
+            this._sessionFactory = new SessionFactory(_conString, _config);
+
+            using (var session = _sessionFactory.Create())
+            {
+                // test connection
+                session.Dispose();
+            }
+        }
+
+        protected void AndGivenAUnitOfWork()
+        {
+            this._db = new UnitOfWork<TestEntity, int>(
+                (session) => new RepositoryLinq<TestEntity, int>(session),
+                _sessionFactory,
+                _commitPolicy);
+        }
+
+        protected void WhenInsertingViaUnitOfWork()
+        {
+            using (_db.Open())
+            {
+                _db.EntitySet.Writer.Insert(new TestEntity()
+                {
+                    Date = _referencedate,
+                    Money = _referenceNumber,
+                    Name = "Name"
+                });
+
+                TestEntity testEntity2;
+                _db.EntitySet.Writer.Insert(testEntity2 = new TestEntity()
+                {
+                    Date = _referencedate,
+                    Money = _referenceNumber,
+                    Name = "Name 2"
+                });
+
+                _db.EntitySet.Writer.Insert(testEntity2);
+
+                testEntity2.Name = "Name 3";
+
+                _db.EntitySet.Writer.Update(testEntity2);
+
+                // save changes
+                _db.Commit();
+            }
+
+            using (_db.Open())
+            {
+                this._insertedEntity = _db.EntitySet.Reader.Get(1);
+
+                this._updatedEntity = _db.EntitySet
+                    .Reader.GetAll().FirstOrDefault(m => m.Name == "Name 3");
+            }
+        }
+
+        protected void AndWhenInsertingButNotCommitting()
+        {
+            using (_db.Open())
+            {
+                _db.EntitySet.Writer.Insert(new TestEntity()
+                {
+                    Date = _referencedate,
+                    Money = _referenceNumber,
+                    Name = "Not commited"
+                });
+
+                // don't save changes
+                // 2 would be the next entity
+                this._insertedEntityNotCommited = _db.EntitySet
+                    .Reader.GetAll().FirstOrDefault(m => m.Name == "Not commited");
+            }
+        }
+
+        protected void AndWhenDeletingAllViaUnitOfWork()
+        {
+            using (_db.Open())
+            {
+                _db.EntitySet.Writer.DeleteAll();
+
+                _db.Commit();
+            }
+
+            using (_db.Open())
+            {
+                _deletedEntities = _db.EntitySet.Reader.GetAll().ToArray();
+            }
+        }
+
+        protected void ThenShouldBeAbleToInsertAndUpdateEntities()
+        {
+            Assert.NotNull(_insertedEntity);
+            Assert.Null(_insertedEntityNotCommited);
+            Assert.NotNull(_updatedEntity);
+            Assert.Empty(_deletedEntities);
+        }
+
+        protected void ThenShouldNotBeAbleToReadWhenSessionIsNotOpen()
+        {
+            Assert.Throws<InvalidOperationException>(() => {
+                // user has to explicitly call Open
+                this._insertedEntityNotCommited = _db.EntitySet.Reader.Get(1);
+            });
+        }
+
+        protected void ThenShouldNotBeAbleToOpen2ConsecutiveSessions()
+        {
+            Assert.Throws<InvalidOperationException>(() => {
+                using (_db.Open())
+                {
+                    using (_db.Open()) // should raise an exception
+                    {
+                        this._insertedEntityNotCommited = _db.EntitySet.Reader.Get(2);
+                    }
+                }
+            });
+        }
+    }
+}
