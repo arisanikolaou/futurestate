@@ -13,7 +13,7 @@ namespace FutureState.IO
     /// </summary>
     /// <typeparam name="TEntity">The entity to query for.</typeparam>
     /// <typeparam name="TKey">The entity key type.</typeparam>
-    public class BatchingEnumeratorKeyedQuery<TEntity, TKey> : IBatchingEnumerator<TEntity>
+    public class EnumerableBatcherKeyedQuery<TEntity, TKey> : IEnumerableBatcher<TEntity>
     {
         private readonly Func<IEnumerable<TKey>, IEnumerable<TEntity>> _getEntities;
 
@@ -29,7 +29,7 @@ namespace FutureState.IO
         /// <param name="keys">The full set of keys to query for..</param>
         /// <param name="getEntities">Function to get entities by their ids.</param>
         /// <param name="batchSize">The batch size to split the results. The default is 1000.</param>
-        public BatchingEnumeratorKeyedQuery(IEnumerable<TKey> keys,
+        public EnumerableBatcherKeyedQuery(IEnumerable<TKey> keys,
             Func<IEnumerable<TKey>, IEnumerable<TEntity>> getEntities, int batchSize = 1000)
         {
             Guard.ArgumentNotNull(keys, nameof(keys));

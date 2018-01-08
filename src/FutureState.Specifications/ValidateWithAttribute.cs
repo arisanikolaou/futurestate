@@ -32,9 +32,7 @@ namespace FutureState.Specifications
             _validator = Activator.CreateInstance(validatorType) as IValidator;
             if (_validator == null)
                 throw new InvalidOperationException(
-                    "The type {0} is not an implementation of {1}".Params(
-                        validatorType.FullName,
-                        typeof(IValidatable).FullName));
+                    $"The type {validatorType.FullName} is not an implementation of {typeof(IValidatable).FullName}");
 
             _validator.Name = name;
         }

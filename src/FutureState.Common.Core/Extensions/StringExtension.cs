@@ -31,8 +31,7 @@ namespace FutureState
             if (!typeof(T).IsEnum)
                 throw new ArgumentException("T must be an enumerated type");
 
-            if (input != null)
-                input = input.Trim();
+            input = input?.Trim();
 
             if (string.IsNullOrEmpty(input))
             {
@@ -40,17 +39,15 @@ namespace FutureState
             }
             else
             {
-                T output;
-                if (Enum.TryParse(input, true, out output))
+                if (Enum.TryParse(input, true, out T output))
                 {
                     result = output.ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {
                     var map = maps.FirstOrDefault(x => x.Item1.Equals(input, StringComparison.OrdinalIgnoreCase));
-                    result = map != null
-                        ? map.Item2.ToString(CultureInfo.InvariantCulture)
-                        : defaultValue.ToString(CultureInfo.InvariantCulture);
+
+                    result = map?.Item2.ToString(CultureInfo.InvariantCulture) ?? defaultValue.ToString(CultureInfo.InvariantCulture);
                 }
             }
 
@@ -84,8 +81,7 @@ namespace FutureState
         {
             string result;
 
-            if (input != null)
-                input = input.Trim();
+            input = input?.Trim();
 
             if (string.IsNullOrEmpty(input))
                 result = nullOrEmptyDefault;
@@ -96,20 +92,6 @@ namespace FutureState
                         .FirstOrDefault() ?? input;
 
             return result;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [DebuggerNonUserCode]
-        public static string Params(this string text, params object[] args)
-        {
-            return string.Format(text, args);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [DebuggerNonUserCode]
-        public static string Params(this string text, string arg)
-        {
-            return string.Format(text, arg);
         }
     }
 }

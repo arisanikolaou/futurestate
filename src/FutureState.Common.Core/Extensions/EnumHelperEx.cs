@@ -45,15 +45,14 @@ namespace FutureState
         {
             if (value == null)
                 throw new NotSupportedException(
-                    "Null can't be converted into a {0} type.".Params(typeof(TEnum).FullName));
+                    $"Null can't be converted into a {typeof(TEnum).FullName} type.");
 
             value = value.Trim().ToLower();
 
             if (DbOfEnumNamesToValues.ContainsKey(value))
                 return DbOfEnumNamesToValues[value];
 
-            throw new NotSupportedException("The value {0} can't be converted into a {1} type.".Params(value,
-                typeof(TEnum).FullName));
+            throw new NotSupportedException($"The value {value} can't be converted into a {typeof(TEnum).FullName} type.");
         }
 
         public static TEnum GetEnumFromNameOrDescription(string description, TEnum defaultValue)

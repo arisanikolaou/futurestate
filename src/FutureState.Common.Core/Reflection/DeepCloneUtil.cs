@@ -256,6 +256,7 @@ namespace FutureState
                         new LambdaComparer<FieldInfo>(
                             (field1, field2) =>
                                 field1.DeclaringType == field2.DeclaringType && field1.Name == field2.Name));
+
                 var fieldsToClone =
                     new HashSet<FieldInfo>(
                         new LambdaComparer<FieldInfo>(

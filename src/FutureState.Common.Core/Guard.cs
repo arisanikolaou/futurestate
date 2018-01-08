@@ -186,8 +186,8 @@ namespace FutureState
         {
             if (arg < min ||
                 arg > max)
-                throw new ArgumentOutOfRangeException("Argument {0}={1} must be between {2} and {3}".Params(
-                    argumentName, arg, min, max));
+                throw new ArgumentOutOfRangeException(
+                    $"Argument {argumentName}={arg} must be between {min} and {max}");
         }
     }
 }

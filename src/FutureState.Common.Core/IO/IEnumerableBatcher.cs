@@ -10,7 +10,7 @@ namespace FutureState.IO
     ///     Abstracts logic to stream and batch through a given data source.
     /// </summary>
     /// <typeparam name="TEntity">The entity type.</typeparam>
-    public interface IBatchingEnumerator<out TEntity>
+    public interface IEnumerableBatcher<out TEntity>
     {
         /// <summary>
         ///     Gets the batch size to be used.

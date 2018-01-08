@@ -100,7 +100,7 @@ namespace FutureState
 
             if (maxBatchSize < 1)
                 throw new ArgumentOutOfRangeException(
-                    "'maxBatchSize' {0} cannot be less than zero.".Params(maxBatchSize));
+                    $"'maxBatchSize' {maxBatchSize} cannot be less than zero.");
 
             if (maxBatchSize == 0)
             {

@@ -10,41 +10,41 @@ namespace FutureState.Common.Tests
     [Story]
     public class ServiceAggregateTests
     {
-        private ServiceAggregate<IInstrumentService> aggregate;
-        private IInstrumentService service1;
-        private IInstrumentService service2;
+        private ServiceAggregate<IInstrumentService> _aggregate;
+        private IInstrumentService _service1;
+        private IInstrumentService _service2;
 
         protected void GivenAServiceAggregate()
         {
-            this.aggregate = new ServiceAggregate<IInstrumentService>(
+            this._aggregate = new ServiceAggregate<IInstrumentService>(
                 new IInstrumentService[] { new Service1(), new Service2() , new Service2() });
         }
 
         protected void WhenDemandingAServiceType()
         {
-            this.service1 = aggregate.Demand(m => m.Type == typeof(Bond));
+            this._service1 = _aggregate.Demand(m => m.Type == typeof(Bond));
         }
 
         protected void WhenDemandingAnotherServiceType()
         {
-            this.service2 = aggregate.Demand(m => m.Type == typeof(Equity));
+            this._service2 = _aggregate.Demand(m => m.Type == typeof(Equity));
         }
 
         protected void ThenDemandingANonExistingServiceTypeShouldThrowNotSupportedError()
         {
             Assert.Throws<NotSupportedException>(() =>
             {
-                aggregate.Demand(m => m.Type == typeof(NonExistant));
+                _aggregate.Demand(m => m.Type == typeof(NonExistant));
             });
         }
 
         protected void ThenServicesShouldBeResolved()
         {
-            Assert.NotNull(service1);
-            Assert.Equal(typeof(Bond), service1.Type );
+            Assert.NotNull(_service1);
+            Assert.Equal(typeof(Bond), _service1.Type );
 
-            Assert.NotNull(service2);
-            Assert.Equal(typeof(Equity), service2.Type);
+            Assert.NotNull(_service2);
+            Assert.Equal(typeof(Equity), _service2.Type);
         }
 
         [BddfyFact]

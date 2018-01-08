@@ -36,8 +36,7 @@ namespace FutureState.Specifications
                         ? validationContext.ObjectInstance.GetType().ToString()
                         : "";
 
-                ErrorMessage = "'{0}' cannot be null or empty at: {1}"
-                    .Params(_fieldName, typeName);
+                ErrorMessage = $"'{_fieldName}' cannot be null or empty at: {typeName}";
 
                 return new ValidationResult(ErrorMessage);
             }

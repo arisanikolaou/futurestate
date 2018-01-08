@@ -28,20 +28,16 @@ namespace FutureState.Specifications
 
             var guid = Guid.Empty;
 
-            if (!Guid.TryParse(val, out guid))
-            {
-                var typeName =
-                    validationContext != null && validationContext.ObjectInstance != null
-                        ? validationContext.ObjectInstance.GetType().ToString()
-                        : "";
+            if (Guid.TryParse(val, out guid))
+                return ValidationResult.Success;
 
-                ErrorMessage = "'{0}' cannot be an empty guid: {1}"
-                    .Params(_fieldName, typeName);
+            var typeName =
+                validationContext?.ObjectInstance?.GetType().ToString() ?? "";
 
-                return new ValidationResult(ErrorMessage);
-            }
+            ErrorMessage = $"'{_fieldName}' cannot be an empty guid: {typeName}";
 
-            return ValidationResult.Success;
+            return new ValidationResult(ErrorMessage);
+
         }
     }
 }

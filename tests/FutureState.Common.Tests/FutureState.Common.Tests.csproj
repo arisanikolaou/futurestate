@@ -91,9 +91,11 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BatchingEnumeratorTests.cs" />
     <Compile Include="DeepCloneUtilTests.cs" />
     <Compile Include="DefaultMapperTests.cs" />
     <Compile Include="Diagnostics\AgentAggregateTests.cs" />
+    <Compile Include="DictionaryExtensionTests.cs" />
     <Compile Include="SendsReceivesDomainMessagesInProcessStory.cs" />
     <Compile Include="DurableActionTests.cs" />
     <Compile Include="ObjectHelperTests.cs" />

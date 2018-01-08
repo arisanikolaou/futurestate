@@ -11,36 +11,25 @@ namespace FutureState
 {
     public static class DictionaryExtensions
     {
-        /// <summary>
-        ///     Gets a string value from a string dictionary object.
-        /// </summary>
-        public static string Get(this Dictionary<string, string> dictionary, string key)
-        {
-            if (dictionary.ContainsKey(key))
-                return dictionary[key];
-
-            return null;
-        }
 
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
-            TValue value;
-            dictionary.TryGetValue(key, out value);
+            dictionary.TryGetValue(key, out var value);
+
             return value;
         }
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
-            TValue value;
-            dictionary.TryGetValue(key, out value);
+            dictionary.TryGetValue(key, out var value);
+
             return value;
         }
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
             Func<TValue> defaultValueProvider)
         {
-            TValue value;
-            if (!dictionary.TryGetValue(key, out value))
+            if (!dictionary.TryGetValue(key, out var value))
                 return defaultValueProvider();
 
             return value;
@@ -60,8 +49,7 @@ namespace FutureState
 
             foreach (var kvp in lhs)
             {
-                TValue secondValue;
-                if (!rhs.TryGetValue(kvp.Key, out secondValue))
+                if (!rhs.TryGetValue(kvp.Key, out var secondValue))
                     return false;
                 if (!valueComparer.Equals(kvp.Value, secondValue))
                     return false;
@@ -73,62 +61,9 @@ namespace FutureState
         public static IDictionary<TKey, TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> left,
             IDictionary<TKey, TValue> right)
         {
-            return left.Concat(right).ToDictionary(p => p.Key, p => p.Value);
+            return left.Concat(right).ToUniqueDictionary(p => p.Key, p => p.Value);
         }
 
-        /// <summary>
-        ///     Adds or updates a string value to a given string dictionary.
-        /// </summary>
-        /// x
-        public static void Set(this Dictionary<string, string> dictionary, string key, string value)
-        {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key), "Key cannot be a null or empty value.");
-
-            if (dictionary.ContainsKey(key))
-                dictionary[key] = value;
-            else
-                dictionary.Add(key, value);
-        }
-
-        public static void Set<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
-        {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key), "Key cannot be a null or empty value.");
-
-            if (dictionary.ContainsKey(key))
-                dictionary[key] = value;
-            else
-                dictionary.Add(key, value);
-        }
-
-        public static BatchUpdateResult ToBatchUpdateResult<T>(this IEnumerable<UpdateResult<T>> list)
-        {
-            int added = 0,
-                updated = 0,
-                deleted = 0;
-
-            list.Each(
-                value =>
-                {
-                    switch (value.Result)
-                    {
-                        case UpdateResult.Added:
-                            added++;
-                            break;
-
-                        case UpdateResult.Updated:
-                            updated++;
-                            break;
-
-                        case UpdateResult.Deleted:
-                            deleted++;
-                            break;
-                    }
-                });
-
-            return new BatchUpdateResult(added, updated, deleted);
-        }
 
         /// <summary>
         ///     Builds a dictionary populated with unique keys based an an enumerable set of entities.
@@ -162,6 +97,16 @@ namespace FutureState
             }
         }
 
+        /// <summary>
+        ///     Creates a dictionary composed of unique key pair values selected from a source list.
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="values"></param>
+        /// <param name="getKeyFunc"></param>
+        /// <param name="getValueFunc"></param>
+        /// <returns></returns>
         public static Dictionary<TKey, TValue> ToUniqueDictionary<TSource, TKey, TValue>(
             this IEnumerable<TSource> values,
             Func<TSource, TKey> getKeyFunc,
@@ -199,18 +144,6 @@ namespace FutureState
             }
 
             return dictionary;
-        }
-
-        public static IEnumerable<TK> GetKeysSafe<TK, TV>(this Dictionary<TK, TV> dictionary)
-        {
-            if (dictionary == null) return Enumerable.Empty<TK>();
-            return dictionary.Keys;
-        }
-
-        public static bool ContainsKeySafe<TK, TV>(this Dictionary<TK, TV> dictionary, TK key)
-        {
-            if (dictionary == null) return false;
-            return dictionary.ContainsKey(key);
         }
     }
 }

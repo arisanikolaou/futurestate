@@ -11,8 +11,8 @@ namespace FutureState.IO
     /// <summary>
     ///     Splits a set into equal weighted chunks/buckets or batches.
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public class BatchingEnumerator<TEntity> : IBatchingEnumerator<TEntity>
+    /// <typeparam name="TEntity">The type of entity being batched.</typeparam>
+    public class EnumerableBatcher<TEntity> : IEnumerableBatcher<TEntity>
     {
         private readonly IEnumerable<TEntity> _items;
 
@@ -25,7 +25,7 @@ namespace FutureState.IO
         /// </summary>
         /// <param name="items"></param>
         /// <param name="batchSize">Size if  each batch which must be greater than one.</param>
-        public BatchingEnumerator(IEnumerable<TEntity> items, int batchSize = 1000)
+        public EnumerableBatcher(IEnumerable<TEntity> items, int batchSize = 1000)
         {
             Guard.ArgumentNotNull(items, nameof(items));
             if (batchSize <= 0)
@@ -55,13 +55,14 @@ namespace FutureState.IO
             return _current.Any();
         }
 
-        private IEnumerable<T> Batch<T>(IEnumerable<T> source, int size, int page)
+        private IEnumerable<T> GetBatch<T>(IEnumerable<T> source, int size, int page)
         {
             source = source.Skip(page * size);
 
-            var itemsCount = source.Count();
+            var enumerable = source.ToArray();
+            var itemsCount = enumerable.Count();
 
-            var sourceArray = source.ToArray();
+            var sourceArray = enumerable;
 
             for (var i = 0; i < itemsCount && i < size; i++)
                 yield return sourceArray[i];
@@ -69,11 +70,11 @@ namespace FutureState.IO
 
         private void CalcCurrent(int page)
         {
-            _current = Batch(_items, BatchSize, page).ToList();
+            _current = GetBatch(_items, BatchSize, page).ToList();
         }
     }
 
-    public class BatchingEnumerator<TEntity, TKey> : IBatchingEnumerator<TEntity>
+    public class EnumerableBatcher<TEntity, TKey> : IEnumerableBatcher<TEntity>
     {
         private readonly Func<IEnumerable<TKey>, IEnumerable<TEntity>> _getEntities;
 
@@ -83,7 +84,7 @@ namespace FutureState.IO
 
         private int _currentSlice;
 
-        public BatchingEnumerator(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, IEnumerable<TEntity>> getEntities,
+        public EnumerableBatcher(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, IEnumerable<TEntity>> getEntities,
             int batchSize = 1000)
         {
             Guard.ArgumentNotNull(keys, nameof(keys));
