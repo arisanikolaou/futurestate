@@ -82,22 +82,23 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         internal void FreezeMapping()
         {
-            if (!_isFrozen)
-                lock (this)
-                {
-                    if (!_isFrozen)
-                    {
-                        var maxColumnOrder = _propertyMappings.Select(propMapping => propMapping.ColumnOrder).Max();
-                        foreach (var propMapping in _propertyMappings)
-                            if (propMapping.ColumnOrder < 0)
-                                propMapping.ColumnOrder = ++maxColumnOrder;
+            if (_isFrozen)
+                return;
 
-                        ConstructChildParentEntityRelationships();
-                        ConstructParentChildEntityRelationships();
+            lock (this)
+            {
+                if (_isFrozen)
+                    return;
+                var maxColumnOrder = _propertyMappings.Select(propMapping => propMapping.ColumnOrder).Max();
+                foreach (var propMapping in _propertyMappings)
+                    if (propMapping.ColumnOrder < 0)
+                        propMapping.ColumnOrder = ++maxColumnOrder;
 
-                        _isFrozen = true;
-                    }
-                }
+                ConstructChildParentEntityRelationships();
+                ConstructParentChildEntityRelationships();
+
+                _isFrozen = true;
+            }
         }
 
         /// <summary>
@@ -157,7 +158,7 @@ namespace Dapper.FastCrud.Mappings
         {
             this.ValidateState();
 
-            return SetPropertyByName(new PropertyMapping(this, property));
+            return SetPropertyByMapping(new PropertyMapping(this, property));
         }
 
         /// <summary>
@@ -165,13 +166,13 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public PropertyMapping SetPropertyByDescriptor(PropertyDescriptor property)
         {
-            return SetPropertyByName(new PropertyMapping(this, property));
+            return SetPropertyByMapping(new PropertyMapping(this, property));
         }
 
         /// <summary>
         ///     Registers a property mapping.
         /// </summary>
-        protected PropertyMapping SetPropertyByName(PropertyMapping propertyMapping)
+        public PropertyMapping SetPropertyByMapping(PropertyMapping propertyMapping)
         {
             Requires.Argument(propertyMapping.EntityMapping == this, nameof(propertyMapping),
                 "Unable to add a property mapping that is not assigned to the current entity mapping");
@@ -493,7 +494,7 @@ namespace Dapper.FastCrud.Mappings
             foreach (
                 var clonedPropMapping in
                 PropertyMappings.Select(propNameMapping => propNameMapping.Value.Clone(clonedMappings)))
-                clonedMappings.SetPropertyByName(clonedPropMapping);
+                clonedMappings.SetPropertyByMapping(clonedPropMapping);
 
             return clonedMappings;
         }

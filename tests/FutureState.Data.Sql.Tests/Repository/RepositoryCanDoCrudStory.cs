@@ -9,17 +9,17 @@ using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
 
-namespace FutureState.Data.Sql.Tests
+namespace FutureState.Data.Sql.Tests.Repository
 {
     [Story]
     public class RepositoryCanDoCrudStory
     {
-        private string connectionString;
-        private IDapperConfiguration config;
-        private SessionFactory sessionFactory;
+        private string _conString;
+        private IDapperConfiguration _config;
+        private SessionFactory _sessionFactory;
         private MyEntity[] _resultAfterInitialGetAll;
         private MyEntity[] _resultsAfterInserted;
-        private MyEntity whereQueryByName;
+        private MyEntity _whereQueryByName;
         private MyEntity _entityQueriedByKey;
         private MyEntity _updatedResult;
         private MyEntity _deletedEntity;
@@ -31,15 +31,15 @@ namespace FutureState.Data.Sql.Tests
         protected void GivenANewTestSqlDbWithASingleEntity()
         {
             string dbServerName = LocalDbSetup.LocalDbServerName;
-            string dbName = "FutureState.Data.Tests.TestModels.RepositoryTests.RepositoryDb";
-            this.connectionString = $@"data source={dbServerName};initial catalog={dbName};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+            string dbName = "RepositoryCanDoCrudStory";
+            this._conString = $@"data source={dbServerName};initial catalog={dbName};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
 
             // delete any existing databases
             var dbSetup = new LocalDbSetup(Environment.CurrentDirectory, dbName);
             dbSetup.CreateLocalDb(true);
 
             // create db
-            using (var repositoryDb = new TestModel(connectionString))
+            using (var repositoryDb = new TestModel(_conString))
             {
                 repositoryDb.MyEntities
                     .Add(new MyEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber});
@@ -48,7 +48,7 @@ namespace FutureState.Data.Sql.Tests
             }
 
             // asser setup is complete
-            using (var repositoryDb = new TestModel(connectionString))
+            using (var repositoryDb = new TestModel(_conString))
             {
                 var result = repositoryDb.MyEntities
                     .FirstOrDefault(m => m.Name == "Name");
@@ -60,7 +60,7 @@ namespace FutureState.Data.Sql.Tests
         protected void AndGivenADapperConfiguration()
         {
             // instance be application scope
-            this.config = DapperConfiguration
+            this._config = DapperConfiguration
                 .Use()
                 .UseSqlDialect(new SqlServerDialect());
 
@@ -72,14 +72,14 @@ namespace FutureState.Data.Sql.Tests
                 classMapper
             };
 
-            classMappers.Each(n => config.Register(n));
+            classMappers.Each(n => _config.Register(n));
         }
 
         protected void AndGivenAValidSessionFactory()
         {
-            this.sessionFactory = new SessionFactory(connectionString, config);
+            this._sessionFactory = new SessionFactory(_conString, _config);
 
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 // test connection
                 session.Dispose();
@@ -88,7 +88,7 @@ namespace FutureState.Data.Sql.Tests
 
         protected void WhenExecutingCrudOperations()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new Repository<MyEntity, int>(session);
 
@@ -105,11 +105,11 @@ namespace FutureState.Data.Sql.Tests
 
         protected void AndWhenQueryingByName()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
-                this.whereQueryByName = repo
+                this._whereQueryByName = repo
                     .Where(m => m.Name == "Name 2")
                     .FirstOrDefault();
             }
@@ -117,7 +117,7 @@ namespace FutureState.Data.Sql.Tests
 
         protected void AndWhenGettingByKey()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new Repository<MyEntity, int>(session);
 
@@ -127,7 +127,7 @@ namespace FutureState.Data.Sql.Tests
 
         protected void AndWhenProjecting()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
@@ -143,7 +143,7 @@ namespace FutureState.Data.Sql.Tests
 
         protected void AndWhenUpdating()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new Repository<MyEntity, int>(session);
 
@@ -153,7 +153,7 @@ namespace FutureState.Data.Sql.Tests
                 repo.Update(result);
             }
 
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
@@ -163,14 +163,14 @@ namespace FutureState.Data.Sql.Tests
 
         protected void AndWhenDeleting()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new Repository<MyEntity, int>(session);
 
                 repo.DeleteById(1);
             }
 
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
@@ -180,14 +180,14 @@ namespace FutureState.Data.Sql.Tests
 
         protected void AndWhenDeletingAll()
         {
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new Repository<MyEntity, int>(session);
 
                 repo.DeleteAll();
             }
 
-            using (var session = sessionFactory.Create())
+            using (var session = _sessionFactory.Create())
             {
                 var repo = new Repository<MyEntity, int>(session);
 
@@ -207,7 +207,7 @@ namespace FutureState.Data.Sql.Tests
             // check number
             Assert.Equal(_referenceNumber, _resultsAfterInserted.FirstOrDefault(m => m.Name == "Name 2")?.Money);
 
-            Assert.NotNull(whereQueryByName);
+            Assert.NotNull(_whereQueryByName);
 
             Assert.NotNull(_updatedResult);
 

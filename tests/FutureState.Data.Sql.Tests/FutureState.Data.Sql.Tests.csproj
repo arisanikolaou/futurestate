@@ -92,11 +92,14 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="DataAccess\RepositoryCanDoCrudStory.cs" />
+    <Compile Include="Repository\RepositoryCanDoCrudStory.cs" />
     <Compile Include="MemberMapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionFactoryTests.cs" />
-    <Compile Include="DataAccess\TestModel.cs" />
+    <Compile Include="Repository\TestModel.cs" />
+    <Compile Include="UnitOfWork\TestModel.cs" />
+    <Compile Include="UnitOfWork\UnitOfWorkManagesTransactionsStory.cs" />
+    <Compile Include="UnitOfWork\TestEntity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

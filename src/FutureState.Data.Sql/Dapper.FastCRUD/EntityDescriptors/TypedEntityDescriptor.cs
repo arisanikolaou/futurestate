@@ -50,7 +50,6 @@ namespace Dapper.FastCrud.EntityDescriptors
         {
             entityMapping.FreezeMapping();
 
-            ISqlStatements sqlStatements;
             GenericStatementSqlBuilder statementSqlBuilder;
 
             switch (entityMapping.Dialect)
@@ -71,7 +70,7 @@ namespace Dapper.FastCrud.EntityDescriptors
                     throw new NotSupportedException($"Dialect {entityMapping.Dialect} is not supported");
             }
 
-            sqlStatements = new GenericSqlStatements<TEntity>(statementSqlBuilder);
+            ISqlStatements sqlStatements = new GenericSqlStatements<TEntity>(statementSqlBuilder);
             return sqlStatements;
         }
     }

@@ -49,7 +49,6 @@ namespace FutureState
         ///     This is similar to '==' operator, bu with the tolerance
         ///     This will eliminate Resharper warnings on 'double == 0'
         /// </summary>
-        /// <returns></returns>
         public static bool IsZero(this double doubleValue)
         {
             return Math.Abs(doubleValue - 0.0) < Epsilon;
@@ -65,13 +64,13 @@ namespace FutureState
             return double.IsNaN(doubleValue) || Math.Abs(doubleValue - 0.0) < Epsilon;
         }
 
-
         /// <summary>
         ///     Parse value from basis po
         /// </summary>
         public static double ParseEx(string input)
         {
-            if (input == null) throw new ArgumentNullException(nameof(input), "Cannot convert null to double.");
+            if (input == null)
+                throw new ArgumentNullException(nameof(input), "Cannot convert null to double.");
 
             var length = input.Length;
             input = input.Replace("%", string.Empty);

@@ -91,6 +91,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CanValidateEmailDeclaritivelyStory.cs" />
     <Compile Include="DataAnnotationSpecProviderStory.cs" />
     <Compile Include="DevsCanDefineSpecsForAnEntityStory.cs" />
     <Compile Include="DiscoversAndBuildsCustomValidationRulesStory.cs" />
