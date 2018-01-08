@@ -75,6 +75,7 @@
     <Compile Include="DeepCloneUtilTests.cs" />
     <Compile Include="DefaultMapperTests.cs" />
     <Compile Include="Diagnostics\AgentAggregateTests.cs" />
+    <Compile Include="Extension\DateExtensionTests.cs" />
     <Compile Include="SendsReceivesDomainMessagesInProcessStory.cs" />
     <Compile Include="DurableActionTests.cs" />
     <Compile Include="ObjectHelperTests.cs" />

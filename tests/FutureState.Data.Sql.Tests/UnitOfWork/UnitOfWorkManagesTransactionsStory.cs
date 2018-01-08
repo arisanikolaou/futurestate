@@ -12,7 +12,6 @@ using Xunit;
 namespace FutureState.Data.Sql.Tests.UnitOfWork
 {
     [Story]
-    [Collection("Unit of work tests")]
     public class UnitOfWorkManagesTransactionsNoOpCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
     {
         [BddfyFact]
@@ -26,7 +25,6 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     }
 
     [Story]
-    [Collection("Unit of work tests")]
     public class UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicyStory : UnitOfWorkManagesTransactionsStoryBase
     {
         [BddfyFact]
@@ -40,7 +38,6 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     }
 
     [Story]
-    [Collection("Unit of work tests")]
     public class UnitOfWorkManagesTransactionsWithInMemRepositoryStory : UnitOfWorkManagesTransactionsStoryBase
     {
         private InMemoryRepository<TestEntity, int> _repository;
@@ -62,7 +59,8 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                 _repository = new InMemoryRepository<TestEntity, int>(
                     new KeyProvider<TestEntity, int>(
                         new KeyGenerator<TestEntity, int>(() => i++)),
-                    new KeyBinder<TestEntity, int>(m => m.Id, (entity, i1) => entity.Id = i1),
+                    new KeyBinder<TestEntity, int>(m => m.Id, 
+                        (entity, entityId) => entity.Id = entityId),
                     new List<TestEntity>());
 
             }
@@ -74,7 +72,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
     public abstract class UnitOfWorkManagesTransactionsStoryBase
     {
         private string _conString;
-        private static IDapperConfiguration _config;
+        private static readonly IDapperConfiguration _config;
         private SessionFactory _sessionFactory;
         private readonly DateTime _referencedate = new DateTime(2011, 1, 1, 9, 30, 15);
         protected decimal _referenceNumber = 14.12m;

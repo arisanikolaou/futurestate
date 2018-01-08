@@ -85,14 +85,13 @@ namespace FutureState
         }
 
         /// <summary>
-        ///     This gives month from the currentDate to another one
-        ///     Note. gives just whole number of months
+        ///     Gets the number of months between two dates.
         ///     e.g. this Apr 2012, and Another is Mar 2011, should return 11 months
         /// </summary>
         /// <returns></returns>
-        public static int MonthDiff(this DateTime thisDate, DateTime endDate)
+        public static int MonthDiff(this DateTime start, DateTime end)
         {
-            return thisDate.Month - endDate.Month + 12 * (thisDate.Year - endDate.Year);
+            return (end.Month - start.Month) + (12 * (end.Year - start.Year));
         }
     }
 }
