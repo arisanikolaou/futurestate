@@ -12,8 +12,9 @@ using System.Runtime.Serialization;
 
 namespace FutureState
 {
+    //  Taken originally from http://blog.nuclex-games.com/mono-dotnet/fast-deep-cloning/ with some changes.
+
     /// <summary>
-    ///     NOTE: this is originally from http://blog.nuclex-games.com/mono-dotnet/fast-deep-cloning/ with some changes.
     ///     Fast deep clone utility using expression trees.
     /// </summary>
     public static class DeepCloneUtil
@@ -24,14 +25,16 @@ namespace FutureState
                 new ConcurrentDictionary<Type, Func<object, Dictionary<object, object>, object>>();
 
         /// <summary>
-        ///     Creates a deep clone of the specified object, also creating clones of all child objects being referenced
+        ///     Creates a deep clone of the specified object, also creating clones
+        ///  of all child objects being referenced
         /// </summary>
         /// <typeparam name="TCloned">Type of the object that will be cloned</typeparam>
         /// <param name="objectToClone">Object that will be cloned</param>
         /// <returns>A deep clone of the provided object</returns>
-        public static TCloned DeepFieldClone<TCloned>(TCloned objectToClone)
+        public static TCloned CloneDeep<TCloned>(this TCloned objectToClone)
         {
             var creator = GetTypeCloner(typeof(TCloned));
+
             return (TCloned) creator(objectToClone, new Dictionary<object, object>());
         }
 

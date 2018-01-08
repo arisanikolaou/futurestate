@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Dapper;
 using Dapper.Extensions.Linq.Core.Attributes;
 using Dapper.Extensions.Linq.Core.Enums;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Mapper;
+using Dapper.FastCrud;
+using Dapper.FastCrud.Mappings;
 using Dapper.FluentMap.Dommel.Mapping;
 using Humanizer;
 
@@ -25,6 +30,10 @@ namespace FutureState.Data.Sql.Mappings
         private static readonly string _defaultTableName;
         private static readonly string _defaultSchemaName;
         private static readonly PropertyInfo[] _properties;
+        private readonly EntityMapping<TEntity> _fastCrudReg;
+        private static readonly PropertyDescriptor[] _propertyDescriptors;
+        private static readonly string _tableName;
+        private static readonly CustomTypeMap<TEntity> _customTypeMap;
 
         static CustomEntityMap()
         {
@@ -60,8 +69,28 @@ namespace FutureState.Data.Sql.Mappings
             };
 
             // get the writable public properties
-            _properties = typeof(TEntity).GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(m => m.GetSetMethod(false) != null).ToArray();
+            _properties = typeof(TEntity)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m => m.GetSetMethod(false) != null)
+                // ignore
+                .Where(m => !m.GetCustomAttributes(typeof(NotMappedAttribute)).Any())
+                .Where(m => !m.GetCustomAttributes(typeof(IgnoreDataMemberAttribute)).Any())
+                .ToArray();
+
+            var validProperties = _properties.Select(m => m.Name).Distinct().ToList();
+
+            var descriptors = TypeDescriptor.GetProperties(typeof(TEntity));
+
+            _propertyDescriptors = descriptors
+                .OfType<PropertyDescriptor>()
+                .Where(m => validProperties.Contains(m.Name))
+                .ToArray();
+
+            _tableName = _defaultTableName ?? typeof(TEntity).Name.Pluralize();
+
+            // dapper type mapping wrap into custom type map
+            var typeMap = SqlMapper.GetTypeMap(typeof(TEntity));
+            _customTypeMap = new CustomTypeMap<TEntity>(typeMap);
         }
 
         /// <summary>
@@ -69,24 +98,26 @@ namespace FutureState.Data.Sql.Mappings
         /// </summary>
         public CustomEntityMap()
         {
-            // assume pluralized if not assigned a different name.
-            var tableName = _defaultTableName ?? typeof(TEntity).Name.Pluralize();
-
             LinqPropertyMaps = new List<IPropertyMap>();
 
             ToSchema(_defaultSchemaName);
 
             // cascade table name
-            ToTable(tableName);
+            ToTable(_tableName);
 
-            // dapper type mapping wrap into custom type map
-            var customTypeMap = new CustomTypeMap<TEntity>(SqlMapper.GetTypeMap(typeof(TEntity)));
+            // fast crud registration
+            this._fastCrudReg = OrmConfiguration.RegisterEntity<TEntity>()
+                .SetTableName(_tableName);
+
+            if (_propertyDescriptors.Length == 0)
+                throw new InvalidOperationException("Entity contains no valid properties.");
+
+            foreach (var descriptor in _propertyDescriptors)
+                _fastCrudReg.SetProperty(descriptor);
 
             // add all other properties properties
-            _properties.Each(m =>
+            foreach(var m in _properties)
             {
-                var ignore = m.GetCustomAttributes(typeof(NotMappedAttribute)).Any();
-
                 var isKey = m.GetCustomAttributes(typeof(KeyAttribute)).Any();
 
                 // not already assigned
@@ -107,22 +138,59 @@ namespace FutureState.Data.Sql.Mappings
                         : KeyType.Assigned;
 
                     map.IsKey();
+
+                    if (m.GetCustomAttributes(typeof(DatabaseGeneratedAttribute))
+                        .FirstOrDefault() is DatabaseGeneratedAttribute dbGenerated)
+                    {
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        // ReSharper disable once UseNullPropagation
+                        if (dbGenerated != null)
+                        {
+                            if (dbGenerated.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity)
+                            {
+                                map.IsIdentity();
+
+                                _fastCrudReg
+                                    .SetProperty(m.Name,
+                                        prop => prop.SetPrimaryKey()
+                                            .SetDatabaseGenerated(DatabaseGeneratedOption.Identity));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //assume database generated
+                        _fastCrudReg
+                            .SetProperty(m.Name,
+                                prop => prop.SetPrimaryKey()
+                                    .SetDatabaseGenerated(DatabaseGeneratedOption.Identity));
+
+                    }
+
                     linkMap.Key(keyAssignmentType);
                 }
-
-                if (ignore)
-                    map.Ignore();
 
                 PropertyMaps.Add(map);
 
                 //cascade column mapping to dapper property maps
-                customTypeMap.Map(m.Name, columnName);
+                _customTypeMap.Map(m.Name, columnName);
 
                 linkMap.Key(KeyType.Assigned);
+
                 LinqPropertyMaps.Add(linkMap);
-            });
+            }
         }
 
+        /// <summary>
+        ///     Marks a given column as identity generated.
+        /// </summary>
+        public void SetIdentityGenerated<TProperty>(Expression<Func<TEntity, TProperty>> property)
+        {
+            _fastCrudReg
+                .SetProperty(property,
+                    prop => prop.SetPrimaryKey()
+                        .SetDatabaseGenerated(DatabaseGeneratedOption.Identity));
+        }
 
         /// <summary>
         ///     Gets or sets the schema to use when referring to the corresponding table name in the database.

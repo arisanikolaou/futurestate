@@ -1,4 +1,7 @@
-﻿namespace Dapper.FastCrud.Mappings
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+
+namespace Dapper.FastCrud.Mappings
 {
     /// <summary>
     ///     Discovers the orm mapping for a particular entity type.
@@ -21,13 +24,14 @@
                     SetSchemaName(schemaName);
             }
 
-            var entityProperties = currentConventions.GetEntityProperties(EntityType);
-            var entityMap = SqlMapper.GetTypeMap(typeof(TEntity));
+            IEnumerable<PropertyDescriptor> entityProperties = currentConventions.GetEntityProperties(EntityType);
+            SqlMapper.ITypeMap entityMap = SqlMapper.GetTypeMap(typeof(TEntity));
 
-            foreach (var propDescriptor in entityProperties)
+            foreach (PropertyDescriptor propDescriptor in entityProperties)
             {
                 var entityMember = entityMap.GetMember(propDescriptor.Name);
-                var propMapping = SetPropertyInternal(propDescriptor);
+
+                PropertyMapping propMapping = SetPropertyByDescriptor(propDescriptor);
                 if (entityMember != null)
                     propMapping.DatabaseColumnName = entityMember.ColumnName;
 
