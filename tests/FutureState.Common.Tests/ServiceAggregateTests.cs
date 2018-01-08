@@ -13,44 +13,38 @@ namespace FutureState.Common.Tests
         private ServiceAggregate<IInstrumentService> aggregate;
         private IInstrumentService service1;
         private IInstrumentService service2;
-        private Exception error;
 
-        public void GivenAServiceAggregate()
+        protected void GivenAServiceAggregate()
         {
             this.aggregate = new ServiceAggregate<IInstrumentService>(
                 new IInstrumentService[] { new Service1(), new Service2() , new Service2() });
         }
 
-        public void WhenDemandingAServiceType()
+        protected void WhenDemandingAServiceType()
         {
             this.service1 = aggregate.Demand(m => m.Type == typeof(Bond));
         }
 
-        public void WhenDemandingAnotherServiceType()
+        protected void WhenDemandingAnotherServiceType()
         {
             this.service2 = aggregate.Demand(m => m.Type == typeof(Equity));
         }
 
-        public void WhenDemandingANonExistingServiceType()
+        protected void ThenDemandingANonExistingServiceTypeShouldThrowNotSupportedError()
         {
-            Assert.Throws<Exception>(() =>
+            Assert.Throws<NotSupportedException>(() =>
             {
                 aggregate.Demand(m => m.Type == typeof(NonExistant));
             });
         }
 
-        public void ThenServicesShouldBeResolved()
+        protected void ThenServicesShouldBeResolved()
         {
             Assert.NotNull(service1);
             Assert.Equal(typeof(Bond), service1.Type );
 
             Assert.NotNull(service2);
             Assert.Equal(typeof(Equity), service2.Type);
-        }
-
-        public void AndDemandingNonExistingServiceShouldRaiseError()
-        {
-            Assert.NotNull(this.error);
         }
 
         [BddfyFact]
