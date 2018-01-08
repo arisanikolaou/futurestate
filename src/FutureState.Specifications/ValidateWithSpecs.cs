@@ -76,7 +76,7 @@ namespace FutureState.Specifications
 
             if (!(subject is TEntity))
                 throw new InvalidOperationException(
-                    "Can't validate objects not assignable from {0}".Params(typeof(TEntity)));
+                    $"Can't validate objects not assignable from {typeof(TEntity).Name}");
 
             var sb = new StringBuilder();
             var isValid = true;
@@ -98,7 +98,7 @@ namespace FutureState.Specifications
 
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (!string.IsNullOrWhiteSpace(Name))
-                ErrorMessage = "{0} has the following errors: \n {1}".Params(Name, sb);
+                ErrorMessage = $"{Name} has the following errors: \n {sb}";
             else
                 ErrorMessage = sb.ToString();
 
