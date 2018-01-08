@@ -65,30 +65,9 @@ namespace FutureState
             return double.IsNaN(doubleValue) || Math.Abs(doubleValue - 0.0) < Epsilon;
         }
 
-        public static double? Sum(double? a, double? b)
-        {
-            if (!a.HasValue && !b.HasValue)
-                return a;
-
-            var aNum = a ?? 0; // if a has a value, assign it to aNum, if not assign 0 to aNum
-            var bNum = b ?? 0; // same thing for b
-
-            return aNum + bNum;
-        }
-
-        public static double Sum(double? a, double? b, double defualt)
-        {
-            if (!a.HasValue && !b.HasValue)
-                return defualt;
-
-            var aNum = a.HasValue ? a.Value : 0; // if a has a value, assign it to aNum, if not assign 0 to aNum
-            var bNum = b.HasValue ? b.Value : 0; // same thing for b
-
-            return aNum + bNum;
-        }
 
         /// <summary>
-        ///     Parser that processes % and bps
+        ///     Parse value from basis po
         /// </summary>
         public static double ParseEx(string input)
         {

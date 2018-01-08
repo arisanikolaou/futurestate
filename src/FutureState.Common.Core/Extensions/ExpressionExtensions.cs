@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -23,7 +22,7 @@ namespace FutureState
             this Expression<Func<T, bool>> expr1,
             Expression<Func<T, bool>> expr2)
         {
-            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
             return Expression.Lambda<Func<T, bool>>
                 (Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
         }
@@ -36,13 +35,11 @@ namespace FutureState
             var currentExpression = property.Body;
 
             // extract from unary expression
-            var unaryExpression = currentExpression as UnaryExpression;
-            if (unaryExpression != null)
+            if (currentExpression is UnaryExpression unaryExpression)
                 currentExpression = unaryExpression.Operand;
 
             // by this point the expression should be member expression
-            var memberExpression = currentExpression as MemberExpression;
-            if (memberExpression == null)
+            if (!(currentExpression is MemberExpression memberExpression))
                 throw new ArgumentException("MemberExpression cannot be acquired.", nameof(property));
 
             // return the acquired member info from the member expression
@@ -78,7 +75,7 @@ namespace FutureState
             this Expression<Func<T, bool>> expr1,
             Expression<Func<T, bool>> expr2)
         {
-            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters);
             return Expression.Lambda<Func<T, bool>>
                 (Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
         }
