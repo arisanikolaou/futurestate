@@ -50,10 +50,7 @@ namespace FutureState
             if (obj == null)
                 return default(TInput);
 
-            if (!evaluator(obj))
-                return obj;
-
-            return default(TInput);
+            return !evaluator(obj) ? obj : default(TInput);
         }
 
         public static TResult With<TInput, TResult>(this TInput obj, Func<TInput, TResult> evaluator)

@@ -96,6 +96,7 @@
     <Compile Include="DefaultMapperTests.cs" />
     <Compile Include="Diagnostics\AgentAggregateTests.cs" />
     <Compile Include="DictionaryExtensionTests.cs" />
+    <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="EnumHelperExTests.cs" />
     <Compile Include="ExpressionExtensionsTests.cs" />
     <Compile Include="Extension\DateExtensionTests.cs" />
