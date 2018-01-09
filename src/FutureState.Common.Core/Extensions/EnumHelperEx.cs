@@ -9,8 +9,6 @@ using System.Linq;
 
 namespace FutureState
 {
-    // todo: unit test
-
     /// <summary>
     ///     Provides ways of parsing enums from text fields in an optimized way over Enum.Parse
     /// </summary>
@@ -53,32 +51,6 @@ namespace FutureState
                 return DbOfEnumNamesToValues[value];
 
             throw new NotSupportedException($"The value {value} can't be converted into a {typeof(TEnum).FullName} type.");
-        }
-
-        public static TEnum GetEnumFromNameOrDescription(string description, TEnum defaultValue)
-        {
-            description = description.ToLower();
-
-            if (DbOfEnumDescriptionsToValues.ContainsKey(description))
-                return DbOfEnumDescriptionsToValues[description];
-
-            if (DbOfEnumNamesToValues.ContainsKey(description))
-                return DbOfEnumNamesToValues[description];
-
-            return defaultValue;
-        }
-
-        public static TEnum? GetEnumFromNameOrDescriptionOrNull(string description, TEnum? defaultValue)
-        {
-            description = description.ToLower();
-
-            if (DbOfEnumDescriptionsToValues.ContainsKey(description))
-                return DbOfEnumDescriptionsToValues[description];
-
-            if (DbOfEnumNamesToValues.ContainsKey(description))
-                return DbOfEnumNamesToValues[description];
-
-            return defaultValue;
         }
 
         /// <summary>

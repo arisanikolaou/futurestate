@@ -67,8 +67,6 @@
     <Compile Include="DomainEvents.cs" />
     <Compile Include="IExceptionData.cs" />
     <Compile Include="Data\BatchUpdateResult.cs" />
-    <Compile Include="Data\UpdateResult.cs" />
-    <Compile Include="Data\UpdateResult.T1.cs" />
     <Compile Include="Extensions\ErrorEx.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Reflection\SkipDeepCloneAttribute.cs" />
