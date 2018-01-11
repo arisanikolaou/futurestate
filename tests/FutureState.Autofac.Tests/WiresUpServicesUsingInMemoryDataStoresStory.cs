@@ -24,7 +24,7 @@ namespace FutureState.Autofac.Tests
         {
             var cb = new ContainerBuilder();
 
-            cb.RegisterModule(new GenericDataServiceModule());
+            cb.RegisterModule(new GenericDataAccessModule());
             cb.RegisterModule(new InMemoryDataAccessModule());
             cb.RegisterAll(new AppTypeScanner(Environment.CurrentDirectory, "FutureState.Autofac"));
 

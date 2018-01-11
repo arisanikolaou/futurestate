@@ -16,11 +16,11 @@ namespace FutureState.Data
         IRepository<TEntity>
     {
         public InMemoryRepository(
-            IKeyProvider<TEntity, Guid> idGenerator,
+            IKeyProvider<TEntity, Guid> keyProvider,
             IKeyBinder<TEntity, Guid> keyBinder,
             IEnumerable<TEntity> items)
             :
-            base(idGenerator, keyBinder, items)
+            base(keyProvider, keyBinder, items)
         {
         }
 

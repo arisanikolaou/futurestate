@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Autofac;
 using FutureState.Data;
 using FutureState.Data.Providers;
@@ -11,98 +10,6 @@ namespace FutureState.Autofac.Modules
     /// </summary>
     public class InMemoryDataAccessModule : Module
     {
-        private readonly IList<Action<ContainerBuilder>> _builderConfigurators = new List<Action<ContainerBuilder>>();
-
-        /// <summary>
-        ///     Registers functions to resolve a given in memory irepository, ireader and ilinqreader implementation for a given
-        ///     entity type and entity type key.
-        /// </summary>
-        public InMemoryDataAccessModule RegisterRepository<TEntity, TKey>(IKeyProvider<TEntity, TKey> idGenerator)
-            where TEntity : class, new()
-        {
-            //register repository functions
-            Action<ContainerBuilder> buildGetRepositoryFunction = cb =>
-            {
-                cb.Register(
-                        (m, q) =>
-                        {
-                            var cc = m.Resolve<IComponentContext>();
-
-                            var fun = cc.GetRepository(idGenerator);
-
-                            return fun;
-                        })
-                    .As(typeof(Func<ISession, IRepository<TEntity, TKey>>))
-                    .SingleInstance();
-            };
-
-            _builderConfigurators.Add(buildGetRepositoryFunction);
-
-            //register reader - this has to be a different registration than linq reader or repository implementations
-            buildGetRepositoryFunction = cb =>
-            {
-                cb.Register(
-                        (m, q) =>
-                        {
-                            var cc = m.Resolve<IComponentContext>();
-
-                            var fun = cc.GetReader(idGenerator);
-
-                            return fun;
-                        })
-                    .As(typeof(Func<ISession, IReader<TEntity, TKey>>))
-                    .SingleInstance();
-            };
-
-            _builderConfigurators.Add(buildGetRepositoryFunction);
-
-            //register linq reader
-            buildGetRepositoryFunction = cb =>
-            {
-                cb.Register(
-                        (m, q) =>
-                        {
-                            var cc = m.Resolve<IComponentContext>();
-
-                            var fun = cc.GetReader(idGenerator);
-
-                            return fun;
-                        })
-                    .As(typeof(Func<ISession, ILinqReader<TEntity, TKey>>))
-                    .SingleInstance();
-            };
-
-            _builderConfigurators.Add(buildGetRepositoryFunction);
-
-            #region overwrite open generic repositories with an implementaiton that relies on the given id generator
-
-            //build irepository resolution functions
-            buildGetRepositoryFunction = cb =>
-            {
-                cb.Register(
-                        (m, q) =>
-                            new InMemoryRepository<TEntity, TKey>(idGenerator,
-                                new KeyBinderFromAttributes<TEntity, TKey>(),
-                                new TEntity[0]))
-                    .AsSelf()
-                    .As<IRepositoryLinq<TEntity, TKey>>()
-                    .As<IGetter<TEntity, TKey>>()
-                    .As<IReader<TEntity, TKey>>()
-                    .As<IRepository<TEntity, TKey>>()
-                    .As<ILinqReader<TEntity, TKey>>()
-                    .As<IReader<TEntity, TKey>>()
-                    .As<IBulkLinqReader<TEntity, TKey>>()
-                    .SingleInstance();
-            };
-
-            _builderConfigurators.Add(buildGetRepositoryFunction);
-
-            #endregion overwrite open generic repositories with an implementaiton that relies on the given id generator
-
-            return this;
-        }
-
-
         /// <summary>
         ///     Registers a single instance in memory repository for any given entity type and an in memory session into a given
         ///     container.
@@ -111,27 +18,8 @@ namespace FutureState.Autofac.Modules
         {
             base.Load(builder);
 
-            builder.Register(m => new InMemoryRepositoryFactory())
-                .As<IRepositoryFactory>();
-
             builder.Register(m => new CommitPolicyNoOp())
                 .As<ICommitPolicy>();
-
-            builder.RegisterGeneric(typeof(UnitOfWork<,>))
-                .Named("Default", typeof(UnitOfWork<,>))
-                .As(typeof(IUnitOfWork<,>))
-                .SingleInstance()
-                .AsSelf();
-
-            builder.RegisterGeneric(typeof(UnitOfWorkLinq<,>))
-                .Named("Default", typeof(UnitOfWorkLinq<,>))
-                .As(typeof(IUnitOfWorkLinq<,>))
-                .SingleInstance()
-                .AsSelf();
-
-            builder.RegisterGeneric(typeof(ProviderLinq<,>))
-                .AsSelf()
-                .SingleInstance();
 
             builder.Register(m => new InMemorySession())
                 .As<ISession>()
@@ -140,9 +28,6 @@ namespace FutureState.Autofac.Modules
             builder.Register(m => new InMemorySessionFactory())
                 .As<ISessionFactory>()
                 .SingleInstance();
-
-            builder.RegisterGeneric(typeof(KeyProvider<,>))
-                .As(typeof(IKeyProvider<,>));
 
             //in memory repositories
             builder.RegisterGeneric(typeof(InMemoryRepository<>))
@@ -166,10 +51,84 @@ namespace FutureState.Autofac.Modules
                 .Named("Default", typeof(ILinqReader<,>))
                 .SingleInstance();
 
-            //execute all deferred builder actions after default generic types have been registered.
-            _builderConfigurators.Each(builderConfigurator => builderConfigurator(builder));
+            builder.RegisterGeneric(typeof(KeyBinderFromAttributes<,>))
+                .AsSelf()
+                .As(typeof(IKeyBinder<,>))
+                .SingleInstance();
 
-            _builderConfigurators.Clear();
+            // use in memory key generator
+            // override any defaults
+            builder.RegisterGeneric(typeof(KeyGeneratorInMemory<,>))
+                .AsSelf()
+                .As(typeof(IKeyGenerator<,>))
+                .SingleInstance();
+        }
+
+        public class KeyGeneratorInMemory<TEntity, TKey> :
+            KeyGenerator<TEntity, TKey>
+        {
+            public KeyGeneratorInMemory() : base(GetKeyGeneratorFunction())
+            {
+            }
+
+            static Func<TKey> GetKeyGeneratorFunction()
+            {
+                if (typeof(TKey) == typeof(int))
+                {
+                    int i = 0;
+
+                    return () =>
+                    {
+                        i++;
+                        object key = i;
+                        return (TKey)key;
+                    };
+                }
+
+                if (typeof(TKey) == typeof(short))
+                {
+                    short i = 0;
+
+                    return () =>
+                    {
+                        i++;
+                        object key = i;
+                        return (TKey)key;
+                    };
+                }
+
+                if (typeof(TKey) == typeof(long))
+                {
+                    long i = 0;
+
+                    return () =>
+                    {
+                        i++;
+                        object key = i;
+                        return (TKey)key;
+                    };
+                }
+
+                if (typeof(TKey) == typeof(Guid))
+                {
+                    return () =>
+                    {
+                        object key = Guid.NewGuid();
+                        return (TKey)key;
+                    };
+                }
+
+                if (typeof(TKey) == typeof(string))
+                {
+                    return () =>
+                    {
+                        object key = Guid.NewGuid().ToString();
+                        return (TKey)key;
+                    };
+                }
+
+                throw new NotSupportedException("Key type not supported.");
+            }
         }
     }
 }

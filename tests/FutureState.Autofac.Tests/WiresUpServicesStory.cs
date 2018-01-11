@@ -67,7 +67,7 @@ namespace FutureState.Autofac.Tests
 
             var cb = new ContainerBuilder();
 
-            cb.RegisterModule(new GenericDataServiceModule());
+            cb.RegisterModule(new GenericDataAccessModule());
             cb.RegisterModule(new SqlDataModule
             {
                 ConnectionString = _conString

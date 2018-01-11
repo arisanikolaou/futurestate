@@ -10,7 +10,7 @@ namespace FutureState.Autofac.Modules
     ///     Regigsters the basic modules required to
     ///     support the data access architecture.
     /// </summary>
-    public class GenericDataServiceModule : Module
+    public class GenericDataAccessModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
@@ -31,11 +31,23 @@ namespace FutureState.Autofac.Modules
                 .SingleInstance()
                 .PreserveExistingDefaults();
 
+            builder.RegisterGeneric(typeof(UnitOfWork<,>))
+                .Named("Default", typeof(UnitOfWork<,>))
+                .As(typeof(IUnitOfWork<,>))
+                .AsSelf();
+
+            builder.RegisterGeneric(typeof(UnitOfWorkLinq<,>))
+                .Named("Default", typeof(UnitOfWorkLinq<,>))
+                .As(typeof(IUnitOfWorkLinq<,>))
+                .AsSelf();
+
             builder.RegisterGeneric(typeof(KeyProvider<,>))
-                .As(typeof(KeyProvider<,>))
+                .AsSelf()
+                .As(typeof(IKeyProvider<,>))
                 .SingleInstance();
 
             builder.RegisterGeneric(typeof(KeyGenerator<,>))
+                .AsSelf()
                 .As(typeof(IKeyGenerator<,>))
                 .SingleInstance();
         }

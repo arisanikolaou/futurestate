@@ -92,6 +92,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AppTypeScannerTests.cs" />
+    <Compile Include="InMemoryRepositorySupportsIdInsertsStory.cs" />
     <Compile Include="WiresUpServicesUsingInMemoryDataStoresStory.cs" />
     <Compile Include="WiresUpServicesStory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
