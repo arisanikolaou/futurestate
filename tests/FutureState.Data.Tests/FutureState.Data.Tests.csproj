@@ -92,6 +92,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AttributeKeyBinderTests.cs" />
+    <Compile Include="LinqReaderExtensionsCanQuerySingleOrFirstStory.cs" />
     <Compile Include="ExpressionKeyBinderTests.cs" />
     <Compile Include="MemoryResidentRepositoryTests.cs" />
     <Compile Include="PageResponseTests.cs" />
