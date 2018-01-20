@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=6.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CsvHelper.6.1.1\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="EmitMapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EmitMapper.1.0.0\lib\EmitMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -46,8 +52,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ProcessorSingleResult.cs" />
+    <Compile Include="Core\CsvProcessorBase.cs" />
+    <Compile Include="Core\ILoaderState.cs" />
+    <Compile Include="Core\IProcessor.cs" />
+    <Compile Include="Core\IReader.cs" />
+    <Compile Include="Core\ProcessorHandler.cs" />
+    <Compile Include="Core\ProcessOperationResult.cs" />
     <Compile Include="ErrorEvent.cs" />
     <Compile Include="Flow.cs" />
+    <Compile Include="Core\CsvProcesorReader.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="PortSource.cs" />
     <Compile Include="Processor.cs" />
@@ -57,6 +71,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FutureState.Common.Core\FutureState.Common.csproj">
+      <Project>{3ba5fb45-d642-43de-8629-37aa3d7ce5bd}</Project>
+      <Name>FutureState.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -10,6 +10,7 @@ namespace FutureState.Flow
     }
 
     // the data source for a given processsor. this is essentially a data stream connection
+    // this could be a csv reader
 
     /// <summary>
     ///     A prospective data source for any given processor that is capable of

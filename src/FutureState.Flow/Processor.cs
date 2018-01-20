@@ -26,6 +26,11 @@ namespace FutureState.Flow
         public ProcessorConfiguration Configuration { get; set; }
 
         /// <summary>
+        ///     Raised when the processor has completed.
+        /// </summary>
+        public event EventHandler ProcessCompleted;
+
+        /// <summary>
         ///     Creates a new instance.
         /// </summary>
         public Processor(Func<Processor<TEntityOut, TEntityIn>, ProcessState> process)
@@ -49,7 +54,11 @@ namespace FutureState.Flow
 
             // error management
 
-            return _processFunction(this);
+            var result = _processFunction(this);
+
+            ProcessCompleted?.Invoke(this, new EventArgs());
+
+            return result;
         }
 
         public void LoadConfiguration()
