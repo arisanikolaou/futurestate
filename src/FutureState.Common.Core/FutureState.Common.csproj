@@ -93,7 +93,6 @@
     <Compile Include="Extensions\EventHandlerExtensions.cs" />
     <Compile Include="Extensions\ExpressionExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
-    <Compile Include="Extensions\StringComparerExtensions.cs" />
     <Compile Include="Guard.cs" />
     <Compile Include="HashCode.cs" />
     <Compile Include="ICurrentDateProvider.cs" />

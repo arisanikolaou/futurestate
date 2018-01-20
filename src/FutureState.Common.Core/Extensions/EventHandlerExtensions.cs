@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,100 +11,88 @@ using System.Threading.Tasks;
 namespace FutureState
 {
     /// <summary>
-    ///     Code automation class to raise thread safe events.
+    ///     Extensions to how the system can raise events.
     /// </summary>
     public static class EventHandlerExtensions
     {
         [DebuggerStepThrough]
-        public static void AsyncRaiseSafe<T>(this EventHandler<T> del, object sender, T e,
+        public static async Task AsyncRaiseSafe<T>(this EventHandler<T> evt, object sender, T e,
             Action<Exception> exceptionHandler = null) where T : EventArgs
         {
-            var evt = del;
+            if (evt == null)
+                return;
 
-            if (evt != null)
+            // save target invocation list here
+            var methods = evt.GetInvocationList().ToArray();
+
+            var tasks = new List<Task>();
+
+            for (var i = 0; i < methods.Length; i++)
             {
-                // save target invocation list here
-                var methods = evt.GetInvocationList().ToArray();
+                // ReSharper disable once UsePatternMatching
+                var innerMethod = methods[i] as EventHandler<T>;
 
-                for (var i = 0; i < methods.Length; i++)
+                if (innerMethod != null)
                 {
-                    var innerMethod = methods[i] as EventHandler<T>;
-
-                    if (innerMethod != null)
-                        Task.Factory.StartNew(
-                            () =>
+                    tasks.Add(Task.Run(
+                        () =>
+                        {
+                            try
                             {
-                                try
-                                {
-                                    innerMethod.Invoke(sender, e);
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (exceptionHandler != null)
-                                        exceptionHandler(ex);
-                                    else
-                                        throw;
-                                }
-                            });
+                                innerMethod.Invoke(sender, e);
+                            }
+                            catch (Exception ex)
+                            {
+                                if (exceptionHandler != null)
+                                    exceptionHandler(ex);
+                                else
+                                    throw;
+                            }
+                        }));
                 }
             }
+
+            await Task.WhenAll(tasks);
         }
 
         [DebuggerStepThrough]
-        public static void AsyncRaiseSafe(this EventHandler del, object sender, EventArgs e,
+        public static async Task AsyncRaiseSafe(this EventHandler evt, object sender, EventArgs e,
             Action<Exception> exceptionHandler = null)
         {
-            var evt = del;
+            if (evt == null)
+                return;
 
-            if (evt != null)
+            // save target invocation list here
+            var methods = evt.GetInvocationList().ToArray();
+
+            var tasks = new List<Task>();
+
+            for (var i = 0; i < methods.Length; i++)
             {
-                // save target invocation list here
-                var methods = evt.GetInvocationList().ToArray();
+                // ReSharper disable once UsePatternMatching
+                var innerMethod = methods[i] as EventHandler;
 
-                for (var i = 0; i < methods.Length; i++)
+                if (innerMethod != null)
                 {
-                    var innerMethod = methods[i] as EventHandler;
-
-                    if (innerMethod != null)
-                        Task.Factory.StartNew(
-                            () =>
+                    tasks.Add(Task.Run(
+                        () =>
+                        {
+                            try
                             {
-                                try
-                                {
-                                    innerMethod.Invoke(sender, e);
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (exceptionHandler != null)
-                                        exceptionHandler(ex);
-                                    else
-                                        throw;
-                                }
-                            });
+                                innerMethod.Invoke(sender, e);
+                            }
+                            catch (Exception ex)
+                            {
+                                if (exceptionHandler != null)
+                                    exceptionHandler(ex);
+                                else
+                                    throw;
+                            }
+                        }));
                 }
             }
-        }
 
-        /// <summary>
-        ///     Raises an event in a thread safe wayd.
-        /// </summary>
-        public static void Raise(this EventHandler del, object sender, EventArgs e)
-        {
-            var evt = del;
-
-            if (evt != null)
-                evt.Invoke(sender, e);
-        }
-
-        /// <summary>
-        ///     Raises an event in a thread safe way.
-        /// </summary>
-        public static void Raise<T>(this EventHandler<T> del, object sender, T e) where T : EventArgs
-        {
-            var evt = del;
-
-            if (evt != null)
-                evt.Invoke(sender, e);
+            await Task.WhenAll(tasks);
         }
 
         /// <summary>
@@ -115,28 +104,29 @@ namespace FutureState
         {
             var evt = del;
 
-            if (evt != null)
+            if (evt == null)
+                return;
+
+            // save target invocation list here
+            var methods = evt.GetInvocationList().ToArray();
+
+            for (var i = 0; i < methods.Length; i++)
             {
-                // save target invocation list here
-                var methods = evt.GetInvocationList().ToArray();
+                // ReSharper disable once UsePatternMatching
+                var innerMethod = methods[i] as EventHandler;
 
-                for (var i = 0; i < methods.Length; i++)
-                {
-                    var innerMethod = methods[i] as EventHandler;
-
-                    if (innerMethod != null)
-                        try
-                        {
-                            innerMethod.Invoke(sender, e);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (exceptionHandler != null)
-                                exceptionHandler(ex);
-                            else
-                                throw;
-                        }
-                }
+                if (innerMethod != null)
+                    try
+                    {
+                        innerMethod.Invoke(sender, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (exceptionHandler != null)
+                            exceptionHandler(ex);
+                        else
+                            throw;
+                    }
             }
         }
 
@@ -149,29 +139,30 @@ namespace FutureState
         {
             var evt = del;
 
-            if (evt != null)
+            if (evt == null)
+                return;
+
+            // save target invocation list here
+            var methods = evt.GetInvocationList().ToArray();
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < methods.Length; i++)
             {
-                // save target invocation list here
-                var methods = evt.GetInvocationList().ToArray();
+                // ReSharper disable once UsePatternMatching
+                var innerMethod = methods[i] as EventHandler<T>;
 
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < methods.Length; i++)
-                {
-                    var innerMethod = methods[i] as EventHandler<T>;
-
-                    if (innerMethod != null)
-                        try
-                        {
-                            innerMethod.Invoke(sender, e);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (exceptionHandler != null)
-                                exceptionHandler(ex);
-                            else
-                                throw;
-                        }
-                }
+                if (innerMethod != null)
+                    try
+                    {
+                        innerMethod.Invoke(sender, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (exceptionHandler != null)
+                            exceptionHandler(ex);
+                        else
+                            throw;
+                    }
             }
         }
     }
