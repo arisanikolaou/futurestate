@@ -153,21 +153,6 @@ namespace FutureState
         }
 
         /// <summary>
-        ///     Returns a validated not null instance of a given object or throws an argument null exception.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [TargetedPatchingOptOut("Critical to performance.")]
-        [DebuggerNonUserCode]
-        public static T GetNotNull<T>(T obj, string errorMessage = "Parameter cannot be null.")
-            where T : class
-        {
-            if (obj == null)
-                throw new ArgumentNullException(errorMessage);
-
-            return obj;
-        }
-
-        /// <summary>
         ///     Fluently asserts an object is not null before raising a argument null exception.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -186,8 +171,8 @@ namespace FutureState
         {
             if (arg < min ||
                 arg > max)
-                throw new ArgumentOutOfRangeException("Argument {0}={1} must be between {2} and {3}".Params(
-                    argumentName, arg, min, max));
+                throw new ArgumentOutOfRangeException(
+                    $"Argument {argumentName}={arg} must be between {min} and {max}");
         }
     }
 }

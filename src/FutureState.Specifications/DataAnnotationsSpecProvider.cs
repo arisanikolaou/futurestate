@@ -22,7 +22,7 @@ namespace FutureState.Specifications
         static DataAnnotationsSpecProvider()
         {
             // interface data annotations should be considered - they won't be returned with a given flatten hierarchy call
-            var types = new[] {typeof(T)}.Concat(typeof(T).GetInterfaces());
+            var types = new[] { typeof(T) }.Concat(typeof(T).GetInterfaces());
 
             var flattenedProperties = new List<PropertyInfo>();
             types.Each(
@@ -103,9 +103,7 @@ namespace FutureState.Specifications
                         if (value.Length > stringLengthAttribute.MaximumLength)
                         {
                             var msg =
-                                "The length of the '{0}' value is greater than {1} characters.".Params(
-                                    property.Name,
-                                    stringLengthAttribute.MaximumLength);
+                                $"The length of the '{property.Name}' value is greater than {stringLengthAttribute.MaximumLength} characters.";
                             detailedErrorMessage.AppendLine(msg);
 
                             return new SpecResult(false, detailedErrorMessage.ToString());
@@ -113,9 +111,8 @@ namespace FutureState.Specifications
 
                         if (value.Length < stringLengthAttribute.MinimumLength)
                         {
-                            var msg = "The length of the '{0}' value is less than {1} characters.".Params(
-                                property.Name,
-                                stringLengthAttribute.MinimumLength);
+                            var msg =
+                                $"The length of the '{property.Name}' value is less than {stringLengthAttribute.MinimumLength} characters.";
                             detailedErrorMessage.AppendLine(msg);
 
                             return new SpecResult(false, detailedErrorMessage.ToString());
@@ -124,7 +121,7 @@ namespace FutureState.Specifications
                         return SpecResult.Success;
                     },
                     property.Name,
-                    "'{0}' is either too long or too short.".Params(property.Name)); // description
+                        $"'{property.Name}' is either too long or too short."); // description
 
                 return specification;
             }
@@ -150,7 +147,7 @@ namespace FutureState.Specifications
                             // pull from resource file
                             if (!notEmptyAttribute.ErrorMessage.Exists())
                             {
-                                var msg = "'{0}' cannot be null or empty.".Params(property1.Name);
+                                var msg = $"'{property1.Name}' cannot be null or empty.";
 
                                 detailedErrorMessage.AppendLine(msg);
                             }
@@ -183,7 +180,7 @@ namespace FutureState.Specifications
                         if (value == null)
                         {
                             // todo: pull from resource file
-                            var msg = "'{0}' is a required field.".Params(property.Name);
+                            var msg = $"'{property.Name}' is a required field.";
                             detailedErrorMessage.AppendLine(msg);
 
                             return new SpecResult(false, detailedErrorMessage.ToString());
@@ -192,7 +189,7 @@ namespace FutureState.Specifications
                         return SpecResult.Success;
                     },
                     property.Name,
-                    "'{0}' is a required field.".Params(property.Name));
+                        $"'{property.Name}' is a required field.");
 
                 return requiredAttribute;
             }
@@ -218,8 +215,7 @@ namespace FutureState.Specifications
                             if (!expressionAttribute.ErrorMessage.Exists())
                             {
                                 var msg =
-                                    "'{0}' does not meet the required pattern or range. The current value is {1}."
-                                        .Params(property1.Name, value);
+                                    $"'{property1.Name}' does not meet the required pattern or range. The current value is {value}.";
 
                                 detailedErrorMessage.AppendLine(msg);
                             }
@@ -249,29 +245,23 @@ namespace FutureState.Specifications
                     {
                         var detailedErrorMessage = new StringBuilder();
 
-                        var expressionAttribute = attribute1 as RangeAttribute;
+                        var exAttribute = attribute1 as RangeAttribute;
 
                         // null generics will be converted to an empty string
                         var value = property1.GetValue(domainObject, null);
 
-                        if (!expressionAttribute.IsValid(value))
+                        if (!exAttribute.IsValid(value))
                         {
                             // pull from resource file
-                            if (!expressionAttribute.ErrorMessage.Exists())
+                            if (!exAttribute.ErrorMessage.Exists())
                             {
-                                var msg =
-                                    "'{0}' does not meet the required range pattern. The minimum allowed is {1}  and the maximum {2}. The current value is {3}."
-                                        .Params(
-                                            property1.Name,
-                                            expressionAttribute.Minimum,
-                                            expressionAttribute.Maximum,
-                                            value);
+                                var msg = $@"'{property1.Name}' does not meet the required range pattern. The minimum allowed is {exAttribute.Minimum}  and the maximum {exAttribute.Maximum}. The current value is {value}.";
 
                                 detailedErrorMessage.AppendLine(msg);
                             }
                             else
                             {
-                                var formattedErrorMessage = expressionAttribute.FormatErrorMessage(property1.Name);
+                                var formattedErrorMessage = exAttribute.FormatErrorMessage(property1.Name);
                                 detailedErrorMessage.Append(formattedErrorMessage);
                             }
 
@@ -304,9 +294,8 @@ namespace FutureState.Specifications
                             if (!validationAttribute.ErrorMessage.Exists())
                             {
                                 var msg =
-                                    "'{0}' does not meet its requirements. The current value is {1}.".Params(
-                                        property.Name,
-                                        value);
+                                    $@"'{property.Name}' does not meet its requirements. The current value is {value}.";
+
                                 detailedErrorMessage.AppendLine(msg);
                             }
                             else

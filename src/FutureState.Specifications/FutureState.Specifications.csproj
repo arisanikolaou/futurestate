@@ -99,7 +99,6 @@
     <Compile Include="ValidateWithAnnotationsAttribute.cs" />
     <Compile Include="ValidateWithAttribute.cs" />
     <Compile Include="ValidateWithSpecs.cs" />
-    <Compile Include="ValidatorAggregate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

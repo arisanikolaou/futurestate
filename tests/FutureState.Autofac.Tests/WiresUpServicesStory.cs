@@ -29,12 +29,13 @@ namespace FutureState.Autofac.Tests
 
         private string GetLocalDbConString(string dbName)
         {
-            var baseDirectory = Environment.CurrentDirectory;
+            string baseDirectory = Environment.CurrentDirectory;
 
+            string serverName = LocalDbSetup.LocalDbServerName;
             var conString =
-                $@"data source=(LocalDb)\MSSQLLocalDB;AttachDBFilename={baseDirectory}\{dbName}.mdf;initial catalog={
+                $@"data source={serverName};AttachDBFilename={baseDirectory}\{dbName}.mdf;initial catalog={
                         dbName
-                    };integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+                    };integrated security=True;MultipleActiveResultSets=True;App=UnitTests";
 
             return conString;
         }
@@ -47,7 +48,7 @@ namespace FutureState.Autofac.Tests
                 Name = "Name"
             };
 
-            _dbName = "FutureState.Autofac.Tests.Model";
+            _dbName = "WiresUpServicesStory";
             _conString = GetLocalDbConString(_dbName);
 
             using (var dbContext = new TestModel(_conString))
@@ -66,7 +67,7 @@ namespace FutureState.Autofac.Tests
 
             var cb = new ContainerBuilder();
 
-            cb.RegisterModule(new GenericDataServiceModule());
+            cb.RegisterModule(new GenericDataAccessModule());
             cb.RegisterModule(new SqlDataModule
             {
                 ConnectionString = _conString

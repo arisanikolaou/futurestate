@@ -45,32 +45,7 @@ namespace FutureState.Autofac.Modules
                 })
                 .AsSelf()
                 .AsImplementedInterfaces();
-
-            //units of work
-
-            builder.RegisterGeneric(typeof(UnitOfWork<,>))
-                .As(typeof(IUnitOfWork<,>))
-                .AsSelf();
-
-            builder.RegisterGeneric(typeof(UnitOfWorkLinq<,>))
-                .As(typeof(IUnitOfWorkLinq<,>))
-                .AsSelf();
-
-            builder.RegisterGeneric(typeof(UnitOfWork<,>))
-                .Named("Default", typeof(UnitOfWork<,>))
-                .AsSelf();
-
-            builder.RegisterGeneric(typeof(UnitOfWorkLinq<,>))
-                .Named("Default", typeof(UnitOfWorkLinq<,>))
-                .AsSelf();
-
-            builder.RegisterGeneric(typeof(ProviderLinq<,>))
-                .AsSelf()
-                .SingleInstance();
-
-            builder.RegisterGeneric(typeof(KeyProvider<,>))
-                .As(typeof(IKeyProvider<,>));
-
+            
             // guid key'ed entities
             builder.RegisterGeneric(typeof(RepositoryLinq<>))
                 .AsSelf()

@@ -41,8 +41,13 @@
         /// </summary>
         public void Provide(TEntity entity)
         {
-            var key = _getKey.GetNew();
-            _keyBinder.Set(entity, key);
+            TKey key = GetKey(entity);
+            if (key.Equals(default(TKey)))
+            {
+                key = _getKey.GetNew();
+                // assign new key
+                _keyBinder.Set(entity, key);
+            }
         }
 
         /// <summary>

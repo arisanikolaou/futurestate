@@ -76,7 +76,8 @@ namespace FutureState.Specifications
         /// <returns></returns>
         public override string ToString()
         {
-            return @"{0} - {1}".Params(IsValid ? @"Valid" : "InValid", DetailedErrorMessage);
+            var isValid = IsValid ? @"Valid" : "InValid";
+            return $"{isValid} - {DetailedErrorMessage}";
         }
     }
 }

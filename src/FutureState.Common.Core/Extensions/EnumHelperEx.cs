@@ -9,8 +9,6 @@ using System.Linq;
 
 namespace FutureState
 {
-    // todo: unit test
-
     /// <summary>
     ///     Provides ways of parsing enums from text fields in an optimized way over Enum.Parse
     /// </summary>
@@ -45,41 +43,14 @@ namespace FutureState
         {
             if (value == null)
                 throw new NotSupportedException(
-                    "Null can't be converted into a {0} type.".Params(typeof(TEnum).FullName));
+                    $"Null can't be converted into a {typeof(TEnum).FullName} type.");
 
             value = value.Trim().ToLower();
 
             if (DbOfEnumNamesToValues.ContainsKey(value))
                 return DbOfEnumNamesToValues[value];
 
-            throw new NotSupportedException("The value {0} can't be converted into a {1} type.".Params(value,
-                typeof(TEnum).FullName));
-        }
-
-        public static TEnum GetEnumFromNameOrDescription(string description, TEnum defaultValue)
-        {
-            description = description.ToLower();
-
-            if (DbOfEnumDescriptionsToValues.ContainsKey(description))
-                return DbOfEnumDescriptionsToValues[description];
-
-            if (DbOfEnumNamesToValues.ContainsKey(description))
-                return DbOfEnumNamesToValues[description];
-
-            return defaultValue;
-        }
-
-        public static TEnum? GetEnumFromNameOrDescriptionOrNull(string description, TEnum? defaultValue)
-        {
-            description = description.ToLower();
-
-            if (DbOfEnumDescriptionsToValues.ContainsKey(description))
-                return DbOfEnumDescriptionsToValues[description];
-
-            if (DbOfEnumNamesToValues.ContainsKey(description))
-                return DbOfEnumNamesToValues[description];
-
-            return defaultValue;
+            throw new NotSupportedException($"The value {value} can't be converted into a {typeof(TEnum).FullName} type.");
         }
 
         /// <summary>

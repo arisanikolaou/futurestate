@@ -21,7 +21,7 @@ namespace FutureState.Data
         // ReSharper disable once StaticMemberInGenericType
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IKeyProvider<TEntity, TKey> _idGenerator;
+        private readonly IKeyProvider<TEntity, TKey> _keyProvider;
 
         private readonly ConcurrentDictionary<TKey, TEntity> _items;
 
@@ -32,22 +32,22 @@ namespace FutureState.Data
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="idGenerator">Required. A function to return the value of the entity's primary key.</param>
+        /// <param name="keyProvider">Required. A function to return the value of the entity's primary key.</param>
         /// <param name="keyBinder">The binder of the entity's id.</param>
         /// <param name="items">Required. The list of entities to pre-populate the current instance with.</param>
         /// <param name="mapper">Object mapper manager instance</param>
         public InMemoryRepository(
-            IKeyProvider<TEntity, TKey> idGenerator,
+            IKeyProvider<TEntity, TKey> keyProvider,
             IKeyBinder<TEntity, TKey> keyBinder,
             IEnumerable<TEntity> items,
             ObjectMapperManager mapper)
         {
-            Guard.ArgumentNotNull(idGenerator, nameof(idGenerator));
+            Guard.ArgumentNotNull(keyProvider, nameof(keyProvider));
             Guard.ArgumentNotNull(keyBinder, nameof(keyBinder));
             Guard.ArgumentNotNull(items, nameof(items));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
 
-            _idGenerator = idGenerator;
+            _keyProvider = keyProvider;
             _keyBinder = keyBinder;
             _mapper = mapper;
             _items =
@@ -58,14 +58,26 @@ namespace FutureState.Data
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="idGenerator">Required. A function to return the value of the entity's primary key.</param>
+        /// <param name="keyProvider">Required. A function to return the value of the entity's primary key.</param>
         /// <param name="keyBinder">The binder for the entity id.</param>
         /// <param name="items">Required. The list of entities to pre-populate the current instance with.</param>
         public InMemoryRepository(
-            IKeyProvider<TEntity, TKey> idGenerator,
+            IKeyProvider<TEntity, TKey> keyProvider,
             IKeyBinder<TEntity, TKey> keyBinder,
             IEnumerable<TEntity> items)
-            : this(idGenerator, keyBinder, items, ObjectMapperManager.DefaultInstance)
+            : this(keyProvider, keyBinder, items, ObjectMapperManager.DefaultInstance)
+        {
+        }
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="keyProvider">Required. A function to return the value of the entity's primary key.</param>
+        /// <param name="keyBinder">The binder for the entity id.</param>
+        public InMemoryRepository(
+            IKeyProvider<TEntity, TKey> keyProvider,
+            IKeyBinder<TEntity, TKey> keyBinder)
+            : this(keyProvider, keyBinder, Array.Empty<TEntity>(), ObjectMapperManager.DefaultInstance)
         {
         }
 
@@ -165,7 +177,7 @@ namespace FutureState.Data
         {
             Guard.ArgumentNotNull(entity, nameof(entity));
 
-            _idGenerator.Provide(entity);
+            _keyProvider.Provide(entity);
 
             var key = _keyBinder.Get(entity);
 
@@ -199,8 +211,7 @@ namespace FutureState.Data
 
         public void DeleteById(TKey key)
         {
-            TEntity item;
-            if (!_items.TryRemove(key, out item))
+            if (!_items.TryRemove(key, out _))
                 _logger.Trace(@"Item {0} has been deleted or does not exist.", key);
         }
 
@@ -211,7 +222,7 @@ namespace FutureState.Data
 
         public void DeleteAll()
         {
-            GetAll().Each(item => DeleteById(_keyBinder.Get(item)));
+            _items.Clear();
         }
 
         public IEnumerable<TEntity> GetAll()
@@ -333,7 +344,7 @@ namespace FutureState.Data
 
             foreach (var entity in entities)
             {
-                _idGenerator.Provide(entity);
+                _keyProvider.Provide(entity);
 
                 var key = _keyBinder.Get(entity);
 

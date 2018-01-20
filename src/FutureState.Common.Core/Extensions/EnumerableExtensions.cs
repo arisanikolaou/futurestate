@@ -34,25 +34,6 @@ namespace FutureState
             return true;
         }
 
-        /// <summary>
-        ///     Gets whether all elements in the array are convertable to an int.
-        /// </summary>
-        public static bool HasNumericElements(this string[] stringArray)
-        {
-            if (stringArray == null)
-                return false;
-
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var strElement in stringArray)
-            {
-                int i;
-                if (!int.TryParse(strElement, out i))
-                    return false;
-            }
-
-            return true;
-        }
-
         public static bool IsEquivalentTo<T>(this IEnumerable<T> source, IEnumerable<T> other,
             Func<T, T, bool> equals = null)
         {
@@ -76,61 +57,6 @@ namespace FutureState
             return true;
         }
 
-        /// <summary>
-        ///     Similar to AddRange but allows to be called on null and passed null as an argument
-        /// </summary>
-        public static void AddRangeEx<T>(this List<T> list, IEnumerable<T> collectionToAdd)
-        {
-            if (list == null || collectionToAdd == null)
-                return;
-
-            list.AddRange(collectionToAdd);
-        }
-
-        /// <summary>
-        ///     Splits an enumerable sequence into batches which are passed to a handling method.
-        /// </summary>
-        /// <param name="items">The list to batch.</param>
-        /// <param name="maxBatchSize">Must be greater than zero.</param>
-        /// <param name="batching">The method that will handle the batch.</param>
-        public static void BatchUp<T>(this IEnumerable<T> items, int maxBatchSize, Action<IEnumerable<T>> batching)
-        {
-            Guard.ArgumentNotNull(items, nameof(batching));
-            Guard.ArgumentNotNull(batching, nameof(batching));
-
-            if (maxBatchSize < 1)
-                throw new ArgumentOutOfRangeException(
-                    "'maxBatchSize' {0} cannot be less than zero.".Params(maxBatchSize));
-
-            if (maxBatchSize == 0)
-            {
-                batching?.Invoke(new T[0]);
-                return;
-            }
-
-            var itemsToCount = items.Count();
-
-            // lesser of max batch size and items count
-            var batchSize = maxBatchSize > itemsToCount ? itemsToCount : maxBatchSize;
-            var batchedList = items.Take(batchSize);
-
-            // items = 10
-            var recordsCommitted = 0;
-
-            do
-            {
-                batching?.Invoke(batchedList);
-
-                // increment by batch count
-                recordsCommitted += batchSize;
-
-                var itemsToTake = itemsToCount - recordsCommitted;
-
-                // lesser of max batch size and items count
-                batchSize = maxBatchSize > itemsToTake ? itemsToTake : maxBatchSize;
-                batchedList = items.Skip(recordsCommitted).Take(batchSize);
-            } while (recordsCommitted < itemsToCount);
-        }
 
         /// <summary>
         ///     Yields the union of a and b.
@@ -185,7 +111,7 @@ namespace FutureState
         {
             var enumerable = targets as T[] ?? targets.ToArray();
 
-            if (targets == null || !enumerable.Any())
+            if (!enumerable.Any())
                 return true;
 
             var hash = source.ToHashSet();

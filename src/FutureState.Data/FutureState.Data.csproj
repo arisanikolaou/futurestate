@@ -133,8 +133,6 @@
     <Compile Include="KeyBinders\KeyBinderOnAssignables.cs" />
     <Compile Include="KeyBinders\KeyBinderFromAttributes.cs" />
     <Compile Include="InMemory\InMemoryRepository.cs" />
-    <Compile Include="InMemory\InMemoryRepositoryFactory.cs" />
-    <Compile Include="IRepositoryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ProviderLinq.cs" />
     <Compile Include="Providers\ProviderLinqReader.TEntity.TKey.cs" />

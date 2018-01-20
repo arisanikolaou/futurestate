@@ -40,9 +40,9 @@ namespace FutureState.ComponentModel
         ///     Demands a service provider that is capable of handling a given service request.
         /// </summary>
         /// <exception cref="NotSupportedException">If not matching service provider is found.</exception>
-        public T DemandService(Func<T, bool> predicate)
+        public T Demand(Func<T, bool> predicate)
         {
-            var service = SelectService(predicate);
+            var service = Select(predicate);
             if (Equals(service, default(T)))
                 throw new NotSupportedException("The service or entity type is not supported.");
 
@@ -52,7 +52,7 @@ namespace FutureState.ComponentModel
         /// <summary>
         ///     Selects a service provider matching a given set of criteria.
         /// </summary>
-        protected T SelectService(Func<T, bool> predicate)
+        protected T Select(Func<T, bool> predicate)
         {
             return Services.FirstOrDefault(predicate);
         }
