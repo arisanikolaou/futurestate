@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using EmitMapper;
+using FutureState.Specifications;
 using Newtonsoft.Json;
 using NLog;
 
@@ -11,14 +12,21 @@ namespace FutureState.Flow.Core
     /// <summary>
     ///     Processes a single type in income entity data sources into an outgoing data source.
     /// </summary>
-    /// <typeparam name="TEntityIn">The data type of the incoming entity.</typeparam>
-    /// <typeparam name="TEntityOut">The type of the processed entity.</typeparam>
+    /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source..</typeparam>
+    /// <typeparam name="TEntityOut">The type of entity to process results to.</typeparam>
     public class ProcessorSingleResult<TEntityIn, TEntityOut> : IProcessor
-        where TEntityOut : class , new()
+        where TEntityOut : class, new()
     {
         readonly Logger _logger;
         private readonly Func<IEnumerable<TEntityIn>> _reader;
         private readonly ObjectsMapper<TEntityIn, TEntityOut> _mapper;
+        private readonly IEnumerable<ISpecification<TEntityOut>> _rules;
+        private IEnumerable<ISpecification<IEnumerable<TEntityOut>>> _collectionRules;
+
+        /// <summary>
+        ///     Gets or sets the working folder to persist temporary files to.
+        /// </summary>
+        public string WorkingFolder { get; set; }
 
         /// <summary>
         ///     Gets the correlation id.
@@ -33,26 +41,44 @@ namespace FutureState.Flow.Core
         ///     Raised after processing.
         /// </summary>
 
-        public event EventHandler<EventArgs> Processed;
+        public event EventHandler<EventArgs> OnFinishedProcessing;
+
+        /// <summary>
+        ///     Called before processing an incoming dto to an outgoing dto.
+        /// </summary>
+        public Action<TEntityIn, TEntityOut> BeginProcessingItem { get; set; }
+
         /// <summary>
         ///     Get the well known name of the processor type.
         /// </summary>
 
-        public string ProcessorType { get; }
+        public string ProcessName { get; }
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public ProcessorSingleResult(Func<IEnumerable<TEntityIn>> reader, string processorType = null, ObjectsMapper<TEntityIn, TEntityOut>  mapper = null, Logger logger = null)
+        public ProcessorSingleResult(
+            Func<IEnumerable<TEntityIn>> reader,
+            string processorName = null,
+            ObjectsMapper<TEntityIn, TEntityOut> mapper = null,
+            Logger logger = null,
+            IProvideSpecifications<TEntityOut> specProviderForEntity = null,
+            IProvideSpecifications<IEnumerable<TEntityOut>> specProviderForEntityCollection = null)
         {
-            Guard.ArgumentNotNull(reader , nameof(reader));
+            Guard.ArgumentNotNull(reader, nameof(reader));
 
             _logger = logger ?? LogManager.GetCurrentClassLogger();
             _reader = reader;
 
-            ProcessorType = processorType ?? $"{GetType().Name}-{typeof(TEntityOut).Name}";
+            CorrelationId = SeqGuid.Create();
+            BatchId = 1;
+            ProcessName = processorName ?? $"{GetType().Name}-{typeof(TEntityOut).Name}";
 
             _mapper = mapper ?? ObjectMapperManager.DefaultInstance.GetMapper<TEntityIn, TEntityOut>();
+
+            _rules = specProviderForEntity?.GetSpecifications().ToArray() ?? Enumerable.Empty<ISpecification<TEntityOut>>();
+            _collectionRules = specProviderForEntityCollection?.GetSpecifications().ToArray() ?? Enumerable.Empty<ISpecification<IEnumerable<TEntityOut>>>();
+
         }
 
         protected IEnumerable<TEntityIn> Read() => _reader();
@@ -63,59 +89,94 @@ namespace FutureState.Flow.Core
         /// <returns></returns>
         public ProcessorHandler<TEntityIn> CreateProcessHandler()
         {
-            var validProcessItems = new List<TEntityOut>();
+            var processedValidItems = new List<TEntityOut>();
 
-            var pHandler = new ProcessorHandler<TEntityIn>
+            var pHandler = new ProcessorHandler<TEntityIn>(ProcessName,CorrelationId, BatchId)
             {
                 EntitiesReader = Read(),
                 Logger = _logger,
                 OnError = OnError,
-                ProcessItem = (dto) =>
+                ProcessItem = (dtoIn) =>
                 {
-                    var newEntity = new TEntityOut();
+                    // create output entity
+                    var dtoOut = new TEntityOut();
 
                     // apply default mapping
-                    newEntity = _mapper.Map(dto, newEntity);
+                    dtoOut = _mapper.Map(dtoIn, dtoOut);
 
-                    var result = ProcessItem(dto, newEntity);
+                    // prepare entity
+                    BeginProcessingItem?.Invoke(dtoIn, dtoOut); ;
 
-                    if(result ==null)
-                        validProcessItems.Add(newEntity);
+                    ErrorEvent errorEvent = OnItemProcessing(dtoIn, dtoOut);
 
-                    return result;
+                    // validate against business rules
+                    if (errorEvent == null)
+                    {
+                        var errors = _rules.ToErrors(dtoOut);
+                        var e = errors as Error[] ?? errors.ToArray();
+                        if (e.Any())
+                        {
+                            var first = e.First();
+                            errorEvent = new ErrorEvent() { Message = first.Message, Type = first.Type };
+                        }
+                    }
+
+                    if (errorEvent == null)
+                        processedValidItems.Add(dtoOut);
+
+                    return errorEvent;
                 },
-                Commit = () => Commit(validProcessItems)
+                Commit = () =>
+                {
+                    var errors = _collectionRules.ToErrors(processedValidItems);
+                    var enumerable = errors as Error[] ?? errors.ToArray();
+                    if (enumerable.Any())
+                        throw new RuleException("Unable to commit items due to one or more rules. Please see the inner exception for more details.", enumerable);
+
+                    Commit(processedValidItems);
+                }
             };
 
             return pHandler;
         }
 
         /// <summary>
+        ///     Gets the errors encountered processing from the incoming data source.
+        /// </summary>
+        public List<ProcessError<TEntityIn>> ProcessedErrors { get; private set; }
+
+        /// <summary>
         ///     Processes a snapshot from an incoming source.
         /// </summary>
-        /// <returns></returns>
-        public ProcessOperationResult Process()
+        public ProcessResult Process()
         {
-            var pHandler = CreateProcessHandler();
+            if (!Directory.Exists(WorkingFolder))
+                Directory.CreateDirectory(WorkingFolder);
 
-            return Process(pHandler);
+            ProcessorHandler<TEntityIn> handler = CreateProcessHandler();
+
+            return Process(handler);
         }
-
 
         /// <summary>
         ///     Processes a snapshot of data using a process handle from an incoming source.
         /// </summary>
-        /// <param name="pHandler">The handler to use.</param>
+        /// <param name="processHandler">The handler to use.</param>
         /// <returns></returns>
-        public ProcessOperationResult Process(ProcessorHandler<TEntityIn> pHandler)
+        public ProcessResult Process(ProcessorHandler<TEntityIn> processHandler)
         {
-            Guard.ArgumentNotNull(pHandler, nameof(pHandler));
+            Guard.ArgumentNotNull(processHandler, nameof(processHandler));
 
-            this.ProcessorHandler = pHandler;
+            this.ProcessorHandler = processHandler;
 
-            var result = pHandler.Process();
+            this.ProcessedItems = new List<TEntityOut>(); // clear
 
-            Processed?.Invoke(this, EventArgs.Empty);
+            ProcessResult result = processHandler.Process();
+
+            this.ProcessedErrors = processHandler.Errors;
+
+            // raise event
+            OnFinishedProcessing?.Invoke(this, EventArgs.Empty);
 
             return result;
         }
@@ -128,7 +189,7 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Processes a single item and returns and error event.
         /// </summary>
-        public virtual ErrorEvent ProcessItem(TEntityIn dto, TEntityOut entityOut)
+        public virtual ErrorEvent OnItemProcessing(TEntityIn dto, TEntityOut entityOut)
         {
             return null;
         }
@@ -139,27 +200,45 @@ namespace FutureState.Flow.Core
         /// <param name="batch">The results to commit to the system.</param>
         public virtual void Commit(IEnumerable<TEntityOut> batch)
         {
-            // save results to output file
-            var i = 0;
-            var fileName = $"{GetType().Name}-Processed-{CorrelationId}-{BatchId}.json";
-            while (File.Exists(fileName))
-                fileName = $"{GetType().Name}-{CorrelationId}-{BatchId}-{i}.json";
+            // save results to output file - unique
+            var i = 1;
+            var batchAsList = batch.ToList();
 
-            SaveSnapShot(fileName, batch.ToList());
+            var fileName = $@"{WorkingFolder}\{ProcessName}-OnFinishedProcessing-{CorrelationId}-{BatchId}.json";
+            while (File.Exists(fileName))
+                fileName = $@"{WorkingFolder}\{ProcessName}-{CorrelationId}-{BatchId}-{i++}.json";
+
+            SaveSnapShot(fileName, batchAsList);
+
+            this.ProcessedItems = batchAsList;
         }
+
+        /// <summary>
+        ///     Gets the valid items created after processing.
+        /// </summary>
+        public List<TEntityOut> ProcessedItems { get; private set; }
 
         /// <summary>
         ///     Raised whenever an error occured processign the results.
         /// </summary>
-        /// <param name="entityIn"></param>
-        /// <param name="error"></param>
+        /// <param name="entityIn">The entity that was being processing at the time the error was raised.</param>
+        /// <param name="error">The error exception raised.</param>
         public virtual void OnError(TEntityIn entityIn, Exception error)
         {
 
         }
 
-        private void SaveSnapShot<T>(string fileName, List<T> data)
+        /// <summary>
+        ///     Saves a snapshot of the data to a given file.
+        /// </summary>
+        private void SaveSnapShot<T>(string filePath, List<T> data)
         {
+            if (File.Exists(filePath))
+            {
+                // todo: log result
+                File.Delete(filePath);
+            }
+
             var log = new ProcessSnapshot<T>
             {
                 CorrelationId = CorrelationId,
@@ -167,7 +246,8 @@ namespace FutureState.Flow.Core
             };
 
             var body = JsonConvert.SerializeObject(log, new JsonSerializerSettings());
-            File.WriteAllText(fileName, body);
+
+            File.WriteAllText(filePath, body);
         }
     }
 }

@@ -2,8 +2,8 @@
 {
     public interface IProcessor
     {
-        string ProcessorType { get; }
+        string ProcessName { get; }
 
-        ProcessOperationResult Process();
+        ProcessResult Process();
     }
 }

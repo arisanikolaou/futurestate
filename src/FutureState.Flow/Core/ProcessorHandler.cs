@@ -6,19 +6,35 @@ using NLog;
 
 namespace FutureState.Flow.Core
 {
-    public class ProcessorHandler<TEntityDto> : ILoaderState
+    public class ProcessorHandler<TEntityDto> : IProcessorHandler
     {
-        public ProcessorHandler()
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public ProcessorHandler(
+            string processorName = null,
+            Guid? correlationId = null,
+            int batchId = 1)
         {
             StartTime = DateTime.UtcNow;
 
-            CorrelationId = SeqGuid.Create();
+            CorrelationId = correlationId ?? SeqGuid.Create();
+            BatchId = batchId;
             Warnings = new List<string>();
             Errors = new List<ProcessError<TEntityDto>>();
             Processed = new List<TEntityDto>();
-            ProcessName = GetType().Name;
+            ProcessName = processorName ?? GetType().Name;
+            WorkingFolder = Environment.CurrentDirectory;
         }
 
+        /// <summary>
+        ///     Gets or sets the working folder to persist temporary files to.
+        /// </summary>
+        public string WorkingFolder { get; set; }
+
+        /// <summary>
+        ///     Gets/set the processor name.
+        /// </summary>
         public string ProcessName { get; set; }
 
         /// <summary>
@@ -102,9 +118,22 @@ namespace FutureState.Flow.Core
         ///     a summary of the processes' execution status.
         /// </summary>
         /// <returns></returns>
-        public ProcessOperationResult Process()
+        public ProcessResult Process()
         {
             var loaderErrors = new List<Exception>();
+
+            if (!Directory.Exists(WorkingFolder))
+            {
+                try
+                {
+                    Directory.CreateDirectory(WorkingFolder);
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException($"Can't create working exception {WorkingFolder}.", ex);
+                }
+                
+            }
 
             Current = 0;
 
@@ -164,15 +193,35 @@ namespace FutureState.Flow.Core
             }
 
             // update target
-            Commit();
+            try
+            {
+                Commit();
+            }
+            catch (Exception ex)
+            {
+                if(Logger.IsErrorEnabled)
+                    Logger.Error(ex);
+
+                // roll back
+                foreach (var entityDto in processed)
+                {
+                    errors.Add(new ProcessError<TEntityDto>
+                    {
+                        Error = new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" },
+                        Item = entityDto
+                    });
+                }
+
+                processed.Clear();
+            }
 
 
             // log errors to file system
             {
-                var i = 0;
-                var fileName = $"{GetType().Name}-Errors-{CorrelationId}-{BatchId}.json";
+                var i = 1;
+                var fileName = $@"{WorkingFolder}\{ProcessName}-Errors-{CorrelationId}-{BatchId}.json";
                 while (File.Exists(fileName))
-                    fileName = $"{GetType().Name}-{CorrelationId}-{BatchId}-{i}.json";
+                    fileName = $@"{WorkingFolder}\{ProcessName}-Errors-{CorrelationId}-{BatchId}-{i++}.json";
                 SaveSnapShot(fileName, errors);
 
                 ErrorSnapshotFile = fileName;
@@ -181,10 +230,11 @@ namespace FutureState.Flow.Core
 
             // log processed items to be able to roll back
             {
-                var i = 0;
-                var fileName = $"{GetType().Name}-Processed-{CorrelationId}-{BatchId}.json";
+                var i = 1;
+                var fileName = $@"{WorkingFolder}\{ProcessName}-OnFinishedProcessing-{CorrelationId}-{BatchId}.json";
                 while (File.Exists(fileName))
-                    fileName = $"{GetType().Name}-{CorrelationId}-{BatchId}-{i}.json";
+                    fileName = $@"{WorkingFolder}\{ProcessName}-OnFinishedProcessing-{CorrelationId}-{BatchId}-{i++}.json";
+
                 SaveSnapShot(fileName, processed);
 
                 ProcessedSnapshotFile = fileName;
@@ -195,7 +245,7 @@ namespace FutureState.Flow.Core
             if (Logger.IsInfoEnabled)
                 Logger.Info($"Finised processing.");
 
-            return new ProcessOperationResult
+            return new ProcessResult
             {
                 CorrelationId = CorrelationId,
                 BatchId = BatchId,

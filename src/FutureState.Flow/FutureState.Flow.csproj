@@ -55,10 +55,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\InMemoryProcessor.cs" />
     <Compile Include="Data\PackageRepository.cs" />
     <Compile Include="Data\ProcessConfigurationRepository.cs" />
     <Compile Include="Data\ProcessStateRepository.cs" />
     <Compile Include="Data\QueryResponseStateRepository.cs" />
+    <Compile Include="PortSource.cs" />
     <Compile Include="ProcessEntityError.cs" />
     <Compile Include="ProcessError.cs" />
     <Compile Include="ProcessFlow.cs" />
@@ -66,15 +68,14 @@
     <Compile Include="QueryResponse.cs" />
     <Compile Include="QueryResponseState.cs" />
     <Compile Include="Core\ProcessorSingleResult.cs" />
-    <Compile Include="Core\CsvProcessorBase.cs" />
-    <Compile Include="Core\ILoaderState.cs" />
+    <Compile Include="Core\CsvProcessor.cs" />
+    <Compile Include="Core\IProcessorHandler.cs" />
     <Compile Include="Core\IProcessor.cs" />
     <Compile Include="Core\IReader.cs" />
     <Compile Include="Core\ProcessorHandler.cs" />
-    <Compile Include="Core\ProcessOperationResult.cs" />
+    <Compile Include="Core\ProcessResult.cs" />
     <Compile Include="ErrorEvent.cs" />
-    <Compile Include="Flow.cs" />
-    <Compile Include="Core\CsvProcesorReader.cs" />
+    <Compile Include="Core\CsvProcessorReader.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="QuerySource.cs" />
     <Compile Include="Processor.cs" />
@@ -99,10 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processors\" />
-    <Folder Include="Services\" />
-      <Project>{3ba5fb45-d642-43de-8629-37aa3d7ce5bd}</Project>
-      <Name>FutureState.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
