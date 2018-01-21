@@ -22,7 +22,7 @@ namespace FutureState.Flow
             User = Environment.UserName;
             CheckPoint = sequenceTo;
         }
-        
+
 
         /// <summary>
         ///     Gets or sets the flow id.

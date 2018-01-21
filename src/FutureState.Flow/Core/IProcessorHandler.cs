@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NLog;
 
 namespace FutureState.Flow.Core
 {
@@ -18,10 +17,12 @@ namespace FutureState.Flow.Core
         ///     Action to commit a process operation.
         /// </summary>
         Action Commit { get; }
+
         /// <summary>
         ///     Gets the index of the current position processing from a given data source.
         /// </summary>
-        int Current { get;  }
+        int Current { get; }
+
         /// <summary>
         ///     Gets the date, in utc, a process operation was started.
         /// </summary>

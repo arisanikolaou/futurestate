@@ -16,6 +16,5 @@ namespace FutureState.Flow.Core
     /// </summary>
     public interface IReader
     {
-
     }
 }

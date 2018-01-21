@@ -1,5 +1,5 @@
-﻿using NLog;
-using System.IO;
+﻿using System.IO;
+using NLog;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow.Data
@@ -7,8 +7,8 @@ namespace FutureState.Flow.Data
     public class ProcessConfigurationRepository
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly object _syncLock = new object();
         private readonly string _configFilePath;
+        private readonly object _syncLock = new object();
 
         public ProcessConfigurationRepository(string configFilePath)
         {
@@ -21,7 +21,6 @@ namespace FutureState.Flow.Data
         public virtual ProcessorConfiguration Get()
         {
             if (File.Exists(_configFilePath))
-            {
                 lock (_syncLock)
                 {
                     if (_logger.IsTraceEnabled)
@@ -33,7 +32,6 @@ namespace FutureState.Flow.Data
 
                     return deserializer.Deserialize<ProcessorConfiguration>(readOutput);
                 }
-            }
 
             return new ProcessorConfiguration("Default");
         }

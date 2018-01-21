@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
+using NLog;
 
 namespace FutureState.Flow.Data
 {
@@ -12,9 +12,6 @@ namespace FutureState.Flow.Data
         private readonly object _syncLock = new object();
 
 
-        public string BasePath { get; set; }
-
-
         public PackageRepository(string basePath)
         {
             Guard.ArgumentNotNullOrEmptyOrWhiteSpace(basePath, nameof(basePath));
@@ -22,19 +19,24 @@ namespace FutureState.Flow.Data
             BasePath = basePath;
         }
 
+
+        public string BasePath { get; set; }
+
         public virtual void Save(Package<TData> package)
         {
             lock (_syncLock)
             {
                 var serializer = new JsonSerializer();
 
-                string filePath = $@"{BasePath}\processor.data.{typeof(TData).Name}.{package.FlowId}.json";
+                var filePath = $@"{BasePath}\processor.data.{typeof(TData).Name}.{package.FlowId}.json";
 
                 if (File.Exists(filePath))
                     File.Delete(filePath); // delete existing files
 
                 using (var file = File.CreateText(filePath))
+                {
                     serializer.Serialize(file, package);
+                }
             }
         }
 
@@ -48,8 +50,8 @@ namespace FutureState.Flow.Data
             var packages = Get<TEntity>();
 
             foreach (var package in packages)
-                foreach (var item in package.Data)
-                    yield return item;
+            foreach (var item in package.Data)
+                yield return item;
         }
 
         /// <summary>
@@ -62,17 +64,17 @@ namespace FutureState.Flow.Data
             lock (_syncLock)
             {
                 foreach (var filePath in Directory.GetFiles(BasePath, $"processor.data.{typeof(TEntity).Name}.*.json"))
-                {
                     using (var file = File.OpenText(filePath))
                     {
                         Package<TEntity> package = null;
 
                         try
                         {
-                            package = (Package<TEntity>)serializer.Deserialize(file, typeof(Package<TEntity>));
+                            package = (Package<TEntity>) serializer.Deserialize(file, typeof(Package<TEntity>));
 
                             if (package.Data == null)
-                                throw new InvalidOperationException($"Failed to load package data from path: {typeof(TEntity).Name}.");
+                                throw new InvalidOperationException(
+                                    $"Failed to load package data from path: {typeof(TEntity).Name}.");
                         }
                         catch (InvalidOperationException ex)
                         {
@@ -85,9 +87,6 @@ namespace FutureState.Flow.Data
 
                         yield return package;
                     }
-                }
-
-                yield break;
             }
         }
     }

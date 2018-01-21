@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace FutureState.Flow
 {
@@ -11,6 +10,22 @@ namespace FutureState.Flow
     /// </typeparam>
     public class QueryResponse<TEntity>
     {
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public QueryResponse()
+        {
+            // will be required for serializer
+        }
+
+
+        public QueryResponse(Package<TEntity> package, int checkPointLocalTo)
+        {
+            Package = package;
+            CheckPointLocalTo = checkPointLocalTo;
+            CheckPointTo = SeqGuid.Create(); // next check point
+        }
+
         /// <summary>
         ///     Gets the start of the snapshot.
         /// </summary>
@@ -30,22 +45,5 @@ namespace FutureState.Flow
         ///     Gets the package that was assembled to satisfy a request.
         /// </summary>
         public Package<TEntity> Package { get; set; }
-
-
-        /// <summary>
-        ///     Creates a new instance.
-        /// </summary>
-        public QueryResponse()
-        {
-            // will be required for serializer
-        }
-
-
-        public QueryResponse(Package<TEntity> package, int checkPointLocalTo)
-        {
-            Package = package;
-            CheckPointLocalTo = checkPointLocalTo;
-            CheckPointTo = SeqGuid.Create(); // next check point
-        }
     }
 }

@@ -6,13 +6,12 @@ namespace FutureState.Flow.QuerySources
 {
     public class QuerySourceInMemory<TEntity> : QuerySource<TEntity>
     {
-        public QuerySourceInMemory(Guid flowId,IEnumerable<TEntity> entities)
-           : base(flowId, GetFlowFn(flowId, entities.ToList()))
+        public QuerySourceInMemory(Guid flowId, IEnumerable<TEntity> entities)
+            : base(flowId, GetFlowFn(flowId, entities.ToList()))
         {
-
         }
 
-        static Func<int, int, QueryResponse<TEntity>> GetFlowFn(Guid flowId, List<TEntity> entities)
+        private static Func<int, int, QueryResponse<TEntity>> GetFlowFn(Guid flowId, List<TEntity> entities)
         {
             return (checkPointLocal, pageSize) =>
             {

@@ -88,14 +88,14 @@ namespace FutureState.Flow.Core
         public string ErrorSnapshotFile { get; private set; }
 
         /// <summary>
-        ///     Gets the list of warnings accumulated.
-        /// </summary>
-        public List<string> Warnings { get; }
-
-        /// <summary>
         ///     Gets the logger to use.
         /// </summary>
         public Logger Logger { get; set; }
+
+        /// <summary>
+        ///     Gets the list of warnings accumulated.
+        /// </summary>
+        public List<string> Warnings { get; }
 
         /// <summary>
         ///     Action to execute when finished processing.
@@ -123,7 +123,6 @@ namespace FutureState.Flow.Core
             var loaderErrors = new List<Exception>();
 
             if (!Directory.Exists(WorkingFolder))
-            {
                 try
                 {
                     Directory.CreateDirectory(WorkingFolder);
@@ -132,8 +131,6 @@ namespace FutureState.Flow.Core
                 {
                     throw new ApplicationException($"Can't create working exception {WorkingFolder}.", ex);
                 }
-                
-            }
 
             Current = 0;
 
@@ -199,18 +196,17 @@ namespace FutureState.Flow.Core
             }
             catch (Exception ex)
             {
-                if(Logger.IsErrorEnabled)
+                if (Logger.IsErrorEnabled)
                     Logger.Error(ex);
 
                 // roll back
                 foreach (var entityDto in processed)
-                {
                     errors.Add(new ProcessError<TEntityDto>
                     {
-                        Error = new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" },
+                        Error =
+                            new ErrorEvent {Type = "Exception", Message = $"Failed to commit changes: {ex.Message}"},
                         Item = entityDto
                     });
-                }
 
                 processed.Clear();
             }
@@ -233,7 +229,8 @@ namespace FutureState.Flow.Core
                 var i = 1;
                 var fileName = $@"{WorkingFolder}\{ProcessName}-OnFinishedProcessing-{CorrelationId}-{BatchId}.json";
                 while (File.Exists(fileName))
-                    fileName = $@"{WorkingFolder}\{ProcessName}-OnFinishedProcessing-{CorrelationId}-{BatchId}-{i++}.json";
+                    fileName =
+                        $@"{WorkingFolder}\{ProcessName}-OnFinishedProcessing-{CorrelationId}-{BatchId}-{i++}.json";
 
                 SaveSnapShot(fileName, processed);
 

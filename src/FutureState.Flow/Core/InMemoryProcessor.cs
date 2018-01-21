@@ -11,8 +11,6 @@ namespace FutureState.Flow.Core
         /// </summary>
         public InMemoryProcessor(IEnumerable<TEntityIn> dataSource) : base(dataSource.ToList)
         {
-            
         }
-
     }
 }

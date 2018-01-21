@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using NLog;
 
 namespace FutureState.Flow
 {
-    public class Processor : Processor<object,object>
+    public class Processor : Processor<object, object>
     {
         public Processor(Func<Processor<object, object>, ProcessState> process) : base(process)
         {
         }
     }
 
-    public class Processor<TEntityOut,TEntityIn>
+    public class Processor<TEntityOut, TEntityIn>
     {
-        readonly Func<Processor<TEntityOut, TEntityIn>, ProcessState> _processFunction;
+        private readonly Func<Processor<TEntityOut, TEntityIn>, ProcessState> _processFunction;
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public Processor(Func<Processor<TEntityOut, TEntityIn>, ProcessState> process)
+        {
+            _processFunction = process ?? throw new ArgumentNullException(nameof(process));
+        }
 
         /// <summary>
         ///     Gets the port source(s) data driving the current processor.
@@ -29,14 +36,6 @@ namespace FutureState.Flow
         ///     Raised when the processor has completed.
         /// </summary>
         public event EventHandler ProcessCompleted;
-
-        /// <summary>
-        ///     Creates a new instance.
-        /// </summary>
-        public Processor(Func<Processor<TEntityOut, TEntityIn>, ProcessState> process)
-        {
-            _processFunction = process ?? throw new ArgumentNullException(nameof(process));
-        }
 
         public virtual ProcessState Process()
         {

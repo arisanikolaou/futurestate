@@ -1,8 +1,7 @@
-﻿using FutureState.Data;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using NLog;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow.Data
@@ -11,11 +10,9 @@ namespace FutureState.Flow.Data
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly object _syncLock = new object();
-
-        public string BasePath { get; set; }
-
         private readonly Type _entityType;
+
+        private readonly object _syncLock = new object();
 
         public QueryResponseStateRepository(string basePath, Type entityType)
         {
@@ -24,29 +21,31 @@ namespace FutureState.Flow.Data
             _entityType = entityType;
         }
 
+        public string BasePath { get; set; }
+
         public List<QueryResponseState> Get(string processorId)
         {
-            string filePath = $@"{BasePath}\processor.source.{_entityType.Name}.{processorId}.yaml";
+            var filePath = $@"{BasePath}\processor.source.{_entityType.Name}.{processorId}.yaml";
 
             if (File.Exists(filePath))
             {
                 string readOutput = null;
                 lock (_syncLock)
+                {
                     readOutput = File.ReadAllText(filePath);
+                }
 
                 var deserializer = new Deserializer();
 
                 return deserializer.Deserialize<List<QueryResponseState>>(readOutput);
             }
-            else
-            {
-                return new List<QueryResponseState>();
-            }
+
+            return new List<QueryResponseState>();
         }
 
         public void Save(string processorId, List<QueryResponseState> state)
         {
-            string filePath = $@"{BasePath}\processor.source.{_entityType.Name}.{processorId}.yaml";
+            var filePath = $@"{BasePath}\processor.source.{_entityType.Name}.{processorId}.yaml";
 
             if (_logger.IsTraceEnabled)
                 _logger.Trace($"Saving query response state to file {filePath}.");

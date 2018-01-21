@@ -14,13 +14,22 @@ namespace FutureState.Flow
 
     /// <summary>
     ///     A prospective data source for any given processor that is capable of
-    /// playing back messages to a consumer from any given point of time.
+    ///     playing back messages to a consumer from any given point of time.
     /// </summary>
     /// <typeparam name="TEntity">
     /// </typeparam>
     public class PortSource<TEntity>
     {
-        readonly Func<string, int, Guid, ReceiveMessageResponse<TEntity>> _receiveFn;
+        private readonly Func<string, int, Guid, ReceiveMessageResponse<TEntity>> _receiveFn;
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="receiveFn"></param>
+        public PortSource(Func<string, int, Guid, ReceiveMessageResponse<TEntity>> receiveFn)
+        {
+            _receiveFn = receiveFn;
+        }
 
         /// <summary>
         ///     Gets the correlation id.
@@ -33,15 +42,6 @@ namespace FutureState.Flow
         public string Description { get; set; }
 
         /// <summary>
-        ///     Creates a new instance.
-        /// </summary>
-        /// <param name="receiveFn"></param>
-        public PortSource(Func<string,int,Guid, ReceiveMessageResponse<TEntity>> receiveFn)
-        {
-            _receiveFn = receiveFn;
-        }
-
-        /// <summary>
         ///     Creates a new package for a given flow, consumer id.
         /// </summary>
         /// <remarks>
@@ -51,16 +51,16 @@ namespace FutureState.Flow
         ///     The id of the consumer requesting the snapshot data (the package).
         /// </param>
         /// <param name="sequenceFrom">
-        ///     Used to map the starting point to playback messages to the 
-        /// consumer.
+        ///     Used to map the starting point to playback messages to the
+        ///     consumer.
         /// </param>
         /// <param name="entitiesCount">
         ///     The window size to assemble a snapshot for.
         /// </param>
         /// <returns></returns>
         public virtual ReceiveMessageResponse<TEntity> Receive(
-            string consumerId, 
-            Guid sequenceFrom, 
+            string consumerId,
+            Guid sequenceFrom,
             int entitiesCount)
         {
             return _receiveFn(consumerId, entitiesCount, sequenceFrom);

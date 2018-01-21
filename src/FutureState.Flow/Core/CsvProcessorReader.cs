@@ -22,17 +22,16 @@ namespace FutureState.Flow.Core
 
         public IEnumerable<TEntity> Read()
         {
-            if(!File.Exists(_fileName))
+            if (!File.Exists(_fileName))
                 throw new InvalidOperationException($"File {_fileName} does not exist.");
 
-            var config = new Configuration() { HasHeaderRecord = true };
+            var config = new Configuration {HasHeaderRecord = true};
 
             using (var reader = new StreamReader(File.OpenRead(_fileName)))
             {
                 using (var helper = new CsvReader(reader, config))
                 {
                     if (helper.Read())
-                    {
                         try
                         {
                             if (!helper.ReadHeader())
@@ -46,7 +45,6 @@ namespace FutureState.Flow.Core
                         {
                             throw new ApplicationException($"Can't read data from file {_fileName}.", ex);
                         }
-                    }
 
                     while (helper.Read())
                     {

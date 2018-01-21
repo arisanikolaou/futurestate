@@ -13,7 +13,7 @@ namespace FutureState.Flow
 
         public ProcessFlow(Guid flowId, string displayName)
         {
-            this.FlowId = flowId;
+            FlowId = flowId;
             DisplayName = displayName;
             DateCreated = DateTime.UtcNow;
         }
