@@ -71,7 +71,7 @@
     <Compile Include="Flow\QueryResponse.cs" />
     <Compile Include="Flow\QueryResponseState.cs" />
     <Compile Include="Processor.cs" />
-    <Compile Include="IProcessorHandler.cs" />
+    <Compile Include="IProcessorEngine.cs" />
     <Compile Include="IProcessor.cs" />
     <Compile Include="IReader.cs" />
     <Compile Include="ProcessorEngine.cs" />

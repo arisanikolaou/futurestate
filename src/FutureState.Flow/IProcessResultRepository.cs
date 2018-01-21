@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     public interface IProcessResultRepository<T> where T : ProcessResult
     {

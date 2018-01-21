@@ -22,7 +22,7 @@ namespace FutureState.Flow.Tests
         private BatchProcess _batchProcess;
         private ContainerBuilder _cb;
         private IContainer _container;
-        private Core.Processor<DenormalizedEntity, Dto1> _processorA;
+        private Processor<DenormalizedEntity, Dto1> _processorA;
 
         private ProcessResult<DenormalizedEntity, Dto1> _resultA;
         private ProcessResult<Dto1, Dto2> _resultB;
@@ -49,8 +49,8 @@ namespace FutureState.Flow.Tests
                 .As(typeof(SpecProvider<>))
                 .SingleInstance();
 
-            _cb.RegisterGeneric(typeof(Core.Processor<,>))
-                .As(typeof(Core.Processor<,>));
+            _cb.RegisterGeneric(typeof(Processor<,>))
+                .As(typeof(Processor<,>));
 
             _cb.RegisterGeneric(typeof(ProcessorConfiguration<,>))
                 .As(typeof(ProcessorConfiguration<,>));
@@ -144,7 +144,7 @@ namespace FutureState.Flow.Tests
 
         protected void WhenProcessingADenormalizedFileUsingProcessingRules()
         {
-            var processorA = _container.Resolve<Core.Processor<DenormalizedEntity, Dto1>>();
+            var processorA = _container.Resolve<Processor<DenormalizedEntity, Dto1>>();
 
             processorA.BeginProcessingItem = (dtoIn, dtoOut) =>
             {
@@ -169,7 +169,7 @@ namespace FutureState.Flow.Tests
         protected void AndWhenChainingTheProcessedResultsToAnotherProcessor()
         {
             // chain 2
-            var processorB = _container.Resolve<Core.Processor<Dto1, Dto2>>();
+            var processorB = _container.Resolve<Processor<Dto1, Dto2>>();
 
             processorB.BeginProcessingItem = (dtoIn, dtoOut) =>
             {
@@ -213,7 +213,7 @@ namespace FutureState.Flow.Tests
         protected void AndWhenChainingTheProcessedResultsToLastProcessor()
         {
             // chain 2
-            var processorC = _container.Resolve<Core.Processor<Dto2, Address>>();
+            var processorC = _container.Resolve<Processor<Dto2, Address>>();
 
             processorC.CreateOutput = dtoIn => dtoIn.Addresses;
             // save to database
@@ -267,7 +267,7 @@ namespace FutureState.Flow.Tests
         {
             var repo =
                 new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
-            var processorName = Core.Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
+            var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
             var result = repo.Get(processorName, _processId, BatchId);
 

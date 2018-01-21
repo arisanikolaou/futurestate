@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     /// <summary>
     ///     Processes data from an incoming data source.
     /// </summary>
-    public interface IProcessorHandler
+    public interface IProcessorEngine
     {
         /// <summary>
         ///     Gets a list of warnings processing from the incoming data source.

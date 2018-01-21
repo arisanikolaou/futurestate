@@ -70,7 +70,8 @@ namespace FutureState.Flow.Data
 
                         try
                         {
-                            flowPackage = (FlowPackage<TEntity>) serializer.Deserialize(file, typeof(FlowPackage<TEntity>));
+                            flowPackage =
+                                (FlowPackage<TEntity>) serializer.Deserialize(file, typeof(FlowPackage<TEntity>));
 
                             if (flowPackage.Data == null)
                                 throw new InvalidOperationException(

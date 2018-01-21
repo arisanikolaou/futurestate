@@ -4,22 +4,20 @@ using Newtonsoft.Json;
 
 namespace FutureState.Flow.Core
 {
-    public class ProcessResultRepository<T> : IProcessResultRepository<T> where T: ProcessResult
+    public class ProcessResultRepository<T> : IProcessResultRepository<T> where T : ProcessResult
     {
-        private readonly string _workingFolder;
-
-        /// <summary>
-        ///     Gets or sets the working folder to persist temporary files to.
-        /// </summary>
-        public string WorkingFolder => _workingFolder;
-
         /// <summary>
         ///     Create a new results repository.
         /// </summary>
         public ProcessResultRepository(string workingFolder)
         {
-            this._workingFolder = workingFolder;
+            WorkingFolder = workingFolder;
         }
+
+        /// <summary>
+        ///     Gets or sets the working folder to persist temporary files to.
+        /// </summary>
+        public string WorkingFolder { get; }
 
         // keep a log of the entities which errored out or were processed
         public void Save(T data)
@@ -35,10 +33,13 @@ namespace FutureState.Flow.Core
                 }
 
             var i = 1;
-            var fileName = $@"{_workingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{data.BatchProcess.BatchId}.json";
+            var fileName =
+                $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{data.BatchProcess.BatchId}.json";
             while (File.Exists(fileName))
                 fileName =
-                    $@"{_workingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{data.BatchProcess.BatchId}-{i++}.json";
+                    $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{
+                            data.BatchProcess.BatchId
+                        }-{i++}.json";
 
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
 
@@ -47,7 +48,7 @@ namespace FutureState.Flow.Core
 
         public T Get(string processName, Guid correlationId, long batchId)
         {
-            var fileName = $@"{_workingFolder}\{processName}-{correlationId}-{batchId}.json";
+            var fileName = $@"{WorkingFolder}\{processName}-{correlationId}-{batchId}.json";
 
             if (File.Exists(fileName))
             {
@@ -55,10 +56,8 @@ namespace FutureState.Flow.Core
 
                 return JsonConvert.DeserializeObject<T>(body);
             }
-            else
-            {
-                return default(T);
-            }
+
+            return default(T);
         }
     }
 }

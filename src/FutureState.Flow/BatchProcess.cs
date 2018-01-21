@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     /// <summary>
     ///     Represents a batch process or BatchProcess used in a process flow.

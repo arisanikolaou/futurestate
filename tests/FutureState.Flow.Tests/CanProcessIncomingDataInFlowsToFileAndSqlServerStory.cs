@@ -243,7 +243,7 @@ namespace FutureState.Flow.Tests
         protected void AndThenShouldBeAbleToRestoreProcessState()
         {
             var repo = new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
-            var processorName = Core.Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
+            var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
             var result  = repo.Get(processorName, _processId, BatchId);
 

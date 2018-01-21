@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FutureState.Flow.Core;
 using NLog;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     /// <summary>
     ///     Extracts entities from a given data sources in a managed way to use in
     /// </summary>
     /// <typeparam name="TEntityDto">The type of entity to process.</typeparam>
-    public class ProcessorEngine<TEntityDto> : IProcessorHandler
+    public class ProcessorEngine<TEntityDto> : IProcessorEngine
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        readonly IProcessResultRepository<ProcessResult> _repository;
+        private readonly IProcessResultRepository<ProcessResult> _repository;
 
         /// <summary>
         ///     Creates a new instance.
@@ -94,6 +95,7 @@ namespace FutureState.Flow.Core
 
             if (result == null)
                 result = new ProcessResult<TEntityDto>();
+
             result.BatchProcess = process;
 
             Initialize?.Invoke();
@@ -113,14 +115,11 @@ namespace FutureState.Flow.Core
                     var errorsEvents = ProcessItem(dto);
 
                     var errorEvents = errorsEvents as ErrorEvent[] ?? errorsEvents.ToArray();
-                    if(!errorEvents.Any())
+                    if (!errorEvents.Any())
                         processed.Add(dto);
                     else
-                    {
                         foreach (var error in errorEvents)
                             errors.Add(new ProcessError<TEntityDto> {Error = error, Item = dto});
-                    }
-
                 }
                 catch (ApplicationException apex)
                 {
@@ -133,7 +132,7 @@ namespace FutureState.Flow.Core
 
                     errors.Add(new ProcessError<TEntityDto>
                     {
-                        Error = new ErrorEvent { Type = "Exception", Message = apex.Message },
+                        Error = new ErrorEvent {Type = "Exception", Message = apex.Message},
                         Item = dto
                     });
                 }
@@ -148,7 +147,7 @@ namespace FutureState.Flow.Core
 
                     errors.Add(new ProcessError<TEntityDto>
                     {
-                        Error = new ErrorEvent { Type = "Exception", Message = ex.Message },
+                        Error = new ErrorEvent {Type = "Exception", Message = ex.Message},
                         Item = dto
                     });
                 }
@@ -169,7 +168,7 @@ namespace FutureState.Flow.Core
                     errors.Add(new ProcessError<TEntityDto>
                     {
                         Error =
-                            new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" },
+                            new ErrorEvent {Type = "Exception", Message = $"Failed to commit changes: {ex.Message}"},
                         Item = entityDto
                     });
 

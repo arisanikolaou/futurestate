@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     /// <summary>
     ///     Reads data of a given type from a given data source.

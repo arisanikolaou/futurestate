@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using EmitMapper;
+using FutureState.Flow.Core;
 using FutureState.Specifications;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
-    public class ProcessorConfiguration<TEntityIn, TEntityOut> 
+    public class ProcessorConfiguration<TEntityIn, TEntityOut>
         where TEntityOut : class, new()
     {
         public ProcessorConfiguration(
@@ -18,15 +19,15 @@ namespace FutureState.Flow.Core
             Mapper = mapper ?? ObjectMapperManager.DefaultInstance.GetMapper<TEntityIn, TEntityOut>();
 
             Rules = specProviderForEntity?.GetSpecifications().ToArray() ??
-                     Enumerable.Empty<ISpecification<TEntityOut>>();
+                    Enumerable.Empty<ISpecification<TEntityOut>>();
 
             CollectionRules = specProviderForEntityCollection?.GetSpecifications().ToArray() ??
-                               Enumerable.Empty<ISpecification<IEnumerable<TEntityOut>>>();
+                              Enumerable.Empty<ISpecification<IEnumerable<TEntityOut>>>();
 
             Repository = repository ?? new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
-        public IProcessResultRepository<ProcessResult> Repository { get;  }
+        public IProcessResultRepository<ProcessResult> Repository { get; }
 
         public IEnumerable<ISpecification<TEntityOut>> Rules { get; }
 

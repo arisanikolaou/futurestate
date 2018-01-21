@@ -4,7 +4,7 @@ using System.IO;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     /// <summary>
     ///     Reads entities from a csv file into a stream.

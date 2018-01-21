@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow
 {
     /// <summary>
     ///     Gets the result of processing data from an incoming data source.
@@ -32,6 +32,7 @@ namespace FutureState.Flow.Core
         ///     Gets or sets the process name.
         /// </summary>
         public string ProcessName { get; set; }
+
         /// <summary>
         ///     Gets the active BatchProcess used in the processed.
         /// </summary>
@@ -42,11 +43,12 @@ namespace FutureState.Flow.Core
     ///     Gets the result from processing data from a particular type of incoming data source.
     /// </summary>
     public class ProcessResult<TEntityIn> : ProcessResult
-    {        
+    {
         /// <summary>
         ///     Gets the items that were used as the source for procesing.
         /// </summary>
         public List<TEntityIn> Input { get; internal set; }
+
         /// <summary>
         ///     Gets the errors that were encountered processing the incoming entities.
         /// </summary>
@@ -60,7 +62,6 @@ namespace FutureState.Flow.Core
     /// <typeparam name="TEntityOut">The output type.</typeparam>
     public class ProcessResult<TEntityIn, TEntityOut> : ProcessResult<TEntityIn>
     {
-
         /// <summary>
         ///     Gets the valid items created after processing. This is the primary ouput.
         /// </summary>

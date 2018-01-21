@@ -1,4 +1,4 @@
-﻿namespace FutureState.Flow.Core
+﻿namespace FutureState.Flow
 {
     public interface IProcessor
     {
