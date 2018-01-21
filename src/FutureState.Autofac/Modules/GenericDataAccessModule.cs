@@ -50,6 +50,10 @@ namespace FutureState.Autofac.Modules
                 .AsSelf()
                 .As(typeof(IKeyGenerator<,>))
                 .SingleInstance();
+
+            builder.RegisterGeneric(typeof(KeyBinderFromAttributes<,>))
+                .As(typeof(IKeyBinder<,>))
+                .SingleInstance();
         }
     }
 }
