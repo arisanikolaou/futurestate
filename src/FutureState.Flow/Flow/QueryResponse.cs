@@ -19,9 +19,9 @@ namespace FutureState.Flow
         }
 
 
-        public QueryResponse(Package<TEntity> package, int checkPointLocalTo)
+        public QueryResponse(FlowPackage<TEntity> flowPackage, int checkPointLocalTo)
         {
-            Package = package;
+            FlowPackage = flowPackage;
             CheckPointLocalTo = checkPointLocalTo;
             CheckPointTo = SeqGuid.Create(); // next check point
         }
@@ -42,8 +42,8 @@ namespace FutureState.Flow
         public int CheckPointLocalTo { get; set; }
 
         /// <summary>
-        ///     Gets the package that was assembled to satisfy a request.
+        ///     Gets the flowPackage that was assembled to satisfy a request.
         /// </summary>
-        public Package<TEntity> Package { get; set; }
+        public FlowPackage<TEntity> FlowPackage { get; set; }
     }
 }

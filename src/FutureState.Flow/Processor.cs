@@ -17,7 +17,6 @@ namespace FutureState.Flow.Core
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Func<IEnumerable<TEntityIn>> _reader;
         private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _configuration;
         private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
 
@@ -25,21 +24,18 @@ namespace FutureState.Flow.Core
         ///     Creates a new instance.
         /// </summary>
         public Processor(
-            Func<IEnumerable<TEntityIn>> reader,
             ProcessorConfiguration<TEntityIn, TEntityOut> configuration,
             string processorName = null)
         {
-            Guard.ArgumentNotNull(reader, nameof(reader));
-
-            _reader = reader;
+          
             _configuration = configuration;
             processorName = processorName ?? GetProcessName(this);
 
             CreateOutput = (dtoIn) => new[] { new TEntityOut() };
 
             Engine = new ProcessorEngine<TEntityIn>(
-                _configuration.Repository,
-                processorName);
+                processorName,
+                _configuration.Repository);
         }
 
         public static string GetProcessName(IProcessor processor)
@@ -84,11 +80,11 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Processes an incoming data stream to an output.
         /// </summary>
-        public ProcessResult<TEntityIn, TEntityOut> Process(BatchProcess process)
+        public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process)
         {
             var result = new ProcessResult<TEntityIn, TEntityOut>();
 
-            return Process(process, result);
+            return Process(reader, process, result);
         }
 
         /// <summary>
@@ -96,23 +92,16 @@ namespace FutureState.Flow.Core
         /// </summary>
         public event EventHandler<EventArgs> OnFinishedProcessing;
 
-        /// <summary>
-        ///     Reads data from the incoming source to the processor.
-        /// </summary>
-        protected virtual IEnumerable<TEntityIn> Read()
-        {
-            return _reader();
-        }
 
         /// <summary>
         ///     Creates a new process hanlder.
         /// </summary>
         /// <returns></returns>
-        public ProcessorEngine<TEntityIn> BuildProcessEngine(ProcessorEngine<TEntityIn> engine, ProcessResult<TEntityIn, TEntityOut> result)
+        public ProcessorEngine<TEntityIn> BuildProcessEngine(IEnumerable<TEntityIn> reader, ProcessorEngine<TEntityIn> engine, ProcessResult<TEntityIn, TEntityOut> result)
         {
             var processedValidItems = new List<TEntityOut>();
 
-            engine.EntitiesReader = Read();
+            engine.EntitiesReader = reader;
             engine.OnError = OnError;
 
             // curry methods
@@ -189,10 +178,11 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Processes a BatchProcess of data using a process handle from an incoming source.
         /// </summary>
+        /// <param name="reader">The source for the incoming dtos.</param>
         /// <param name="process">The batch process to run.</param>
         /// <param name="resultState">The resultState state from processing.</param>
         /// <returns></returns>
-        public ProcessResult<TEntityIn, TEntityOut> Process(BatchProcess process, ProcessResult<TEntityIn, TEntityOut> resultState)
+        public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process, ProcessResult<TEntityIn, TEntityOut> resultState)
         {
             if (Logger.IsTraceEnabled)
                 Logger.Trace($"Starting to process  {ProcessName} Batch {process.BatchId}.");
@@ -200,7 +190,7 @@ namespace FutureState.Flow.Core
             try
             {
                 // setup the processing engine
-                BuildProcessEngine(Engine, resultState);
+                BuildProcessEngine(reader, Engine, resultState);
 
                 // process all items
                 Engine.Process(process, resultState);
@@ -250,8 +240,5 @@ namespace FutureState.Flow.Core
         public virtual void OnError(TEntityIn entityIn, Exception error)
         {
         }
-
-        // interface implementation
-        ProcessResult IProcessor.Process(BatchProcess process) => Process(process);
     }
 }

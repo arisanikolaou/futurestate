@@ -45,13 +45,13 @@ namespace FutureState.Flow
         public string Id { get; set; }
 
         /// <summary>
-        ///     Creates a new package for a given flow, consumer id.
+        ///     Creates a new flowPackage for a given flow, consumer id.
         /// </summary>
         /// <remarks>
         ///     A consumer id must be unique for a given 'Flow'.
         /// </remarks>
         /// <param name="processorId">
-        ///     The id of the consumer requesting the BatchProcess data (the package).
+        ///     The id of the consumer requesting the BatchProcess data (the flowPackage).
         /// </param>
         /// <param name="sequenceFrom">
         ///     Used to map the starting point to playback messages to the
@@ -77,7 +77,7 @@ namespace FutureState.Flow
                 var response = _receiveFn(localId, pageSize);
 
                 response.CheckPointFrom = sequenceFrom;
-                response.Package.FlowId = FlowId;
+                response.FlowPackage.FlowId = FlowId;
 
                 if (response == null)
                     throw new InvalidOperationException("Response was not received.");

@@ -5,13 +5,13 @@ namespace FutureState.Flow
     /// <summary>
     ///     A well known data flow.
     /// </summary>
-    public class ProcessFlow
+    public class FlowProcess
     {
-        public ProcessFlow()
+        public FlowProcess()
         {
         }
 
-        public ProcessFlow(Guid flowId, string displayName)
+        public FlowProcess(Guid flowId, string displayName)
         {
             FlowId = flowId;
             DisplayName = displayName;

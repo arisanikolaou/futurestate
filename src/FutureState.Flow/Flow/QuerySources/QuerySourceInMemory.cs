@@ -19,11 +19,11 @@ namespace FutureState.Flow.QuerySources
 
                 var outPut = new List<TEntity>();
 
-                // package only the entities requested
+                // flowPackage only the entities requested
                 for (localIndex = checkPointLocal; localIndex < pageSize && localIndex < entities.Count; localIndex++)
                     outPut.Add(entities[localIndex]);
 
-                var package = new Package<TEntity>(flowId)
+                var package = new FlowPackage<TEntity>(flowId)
                 {
                     Data = outPut
                 };

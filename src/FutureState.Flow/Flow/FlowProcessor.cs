@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 namespace FutureState.Flow
 {
-    public class Processor : Processor<object, object>
+    public class FlowProcessor : FlowProcessor<object, object>
     {
-        public Processor(Func<Processor<object, object>, ProcessState> process) : base(process)
+        public FlowProcessor(Func<FlowProcessor<object, object>, FlowProcessState> process) : base(process)
         {
         }
     }
 
-    public class Processor<TEntityOut, TEntityIn>
+    public class FlowProcessor<TEntityOut, TEntityIn>
     {
-        private readonly Func<Processor<TEntityOut, TEntityIn>, ProcessState> _processFunction;
+        private readonly Func<FlowProcessor<TEntityOut, TEntityIn>, FlowProcessState> _processFunction;
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public Processor(Func<Processor<TEntityOut, TEntityIn>, ProcessState> process)
+        public FlowProcessor(Func<FlowProcessor<TEntityOut, TEntityIn>, FlowProcessState> process)
         {
             _processFunction = process ?? throw new ArgumentNullException(nameof(process));
         }
@@ -25,7 +25,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the port source(s) data driving the current processor.
         /// </summary>
-        public List<PortSource<TEntityIn>> PortSources { get; set; } = new List<PortSource<TEntityIn>>();
+        public List<FlowPortSource<TEntityIn>> PortSources { get; set; } = new List<FlowPortSource<TEntityIn>>();
 
         /// <summary>
         ///     Gets the processors configuration.
@@ -37,7 +37,7 @@ namespace FutureState.Flow
         /// </summary>
         public event EventHandler ProcessCompleted;
 
-        public virtual ProcessState Process()
+        public virtual FlowProcessState Process()
         {
             // load configuration
 
@@ -49,7 +49,7 @@ namespace FutureState.Flow
 
             // record any response
 
-            // get next package
+            // get next flowPackage
 
             // error management
 

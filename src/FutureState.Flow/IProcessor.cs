@@ -3,7 +3,5 @@
     public interface IProcessor
     {
         string ProcessName { get; }
-
-        ProcessResult Process(BatchProcess process);
     }
 }

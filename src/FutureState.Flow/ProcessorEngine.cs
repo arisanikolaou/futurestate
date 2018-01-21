@@ -19,10 +19,11 @@ namespace FutureState.Flow.Core
         ///     Creates a new instance.
         /// </summary>
         public ProcessorEngine(
-            IProcessResultRepository<ProcessResult> repository = null,
-            string processorName = null)
+            string processorName,
+            IProcessResultRepository<ProcessResult> repository = null)
         {
             Warnings = new List<string>();
+
             ProcessName = processorName ?? GetType().Name;
 
             _repository = repository ?? new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);

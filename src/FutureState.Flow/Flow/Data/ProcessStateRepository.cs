@@ -22,7 +22,7 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Loads or creates processor state.
         /// </summary>
-        public ProcessState Get()
+        public FlowProcessState Get()
         {
             var filePath = GetFilePath();
 
@@ -36,10 +36,10 @@ namespace FutureState.Flow.Data
                     text = File.ReadAllText(filePath);
                 }
 
-                return deserializer.Deserialize<ProcessState>(text);
+                return deserializer.Deserialize<FlowProcessState>(text);
             }
 
-            return new ProcessState($"Processor-{_entityType.Name}");
+            return new FlowProcessState($"FlowProcessor-{_entityType.Name}");
         }
 
         private string GetFilePath()
@@ -51,7 +51,7 @@ namespace FutureState.Flow.Data
         ///     Saves the state.
         /// </summary>
         /// <param name="state">The state to save.</param>
-        public void Save(ProcessState state)
+        public void Save(FlowProcessState state)
         {
             Guard.ArgumentNotNull(state, nameof(state));
 

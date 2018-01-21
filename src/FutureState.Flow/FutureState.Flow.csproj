@@ -55,40 +55,37 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\InMemoryProcessor.cs" />
-    <Compile Include="Core\IProcessResultRepository.cs" />
-    <Compile Include="Core\ProcessError.cs" />
-    <Compile Include="Core\ProcessorConfiguration.cs" />
-    <Compile Include="Core\ProcessResultRepository.cs" />
-    <Compile Include="Core\BatchProcess.cs" />
-    <Compile Include="Archive\Data\PackageRepository.cs" />
-    <Compile Include="Archive\Data\ProcessConfigurationRepository.cs" />
-    <Compile Include="Archive\Data\ProcessStateRepository.cs" />
-    <Compile Include="Archive\Data\QueryResponseStateRepository.cs" />
-    <Compile Include="Archive\PortSource.cs" />
-    <Compile Include="Archive\ProcessEntityError.cs" />
-    <Compile Include="Archive\ProcessError.cs" />
-    <Compile Include="Archive\ProcessFlow.cs" />
-    <Compile Include="Archive\ProcessFlowState.cs" />
-    <Compile Include="Archive\QueryResponse.cs" />
-    <Compile Include="Archive\QueryResponseState.cs" />
-    <Compile Include="Core\Processor.cs" />
-    <Compile Include="Core\CsvProcessor.cs" />
-    <Compile Include="Core\IProcessorHandler.cs" />
-    <Compile Include="Core\IProcessor.cs" />
-    <Compile Include="Core\IReader.cs" />
-    <Compile Include="Core\ProcessorEngine.cs" />
-    <Compile Include="Core\ProcessResult.cs" />
-    <Compile Include="Archive\ErrorEvent.cs" />
-    <Compile Include="Core\CsvProcessorReader.cs" />
-    <Compile Include="Archive\Package.cs" />
-    <Compile Include="Archive\QuerySource.cs" />
-    <Compile Include="Archive\Processor.cs" />
-    <Compile Include="Archive\ProcessorConfiguration.cs" />
-    <Compile Include="Archive\ProcessState.cs" />
+    <Compile Include="IProcessResultRepository.cs" />
+    <Compile Include="ProcessError.cs" />
+    <Compile Include="ProcessorConfiguration.cs" />
+    <Compile Include="ProcessResultRepository.cs" />
+    <Compile Include="BatchProcess.cs" />
+    <Compile Include="Flow\Data\PackageRepository.cs" />
+    <Compile Include="Flow\Data\ProcessConfigurationRepository.cs" />
+    <Compile Include="Flow\Data\ProcessStateRepository.cs" />
+    <Compile Include="Flow\Data\QueryResponseStateRepository.cs" />
+    <Compile Include="Flow\FlowPortSource.cs" />
+    <Compile Include="Flow\FlowProcessError.cs" />
+    <Compile Include="Flow\FlowProcess.cs" />
+    <Compile Include="Flow\FlowProcessStateCheckPoint.cs" />
+    <Compile Include="Flow\QueryResponse.cs" />
+    <Compile Include="Flow\QueryResponseState.cs" />
+    <Compile Include="Processor.cs" />
+    <Compile Include="IProcessorHandler.cs" />
+    <Compile Include="IProcessor.cs" />
+    <Compile Include="IReader.cs" />
+    <Compile Include="ProcessorEngine.cs" />
+    <Compile Include="ProcessResult.cs" />
+    <Compile Include="ErrorEvent.cs" />
+    <Compile Include="CsvProcessorReader.cs" />
+    <Compile Include="Flow\FlowPackage.cs" />
+    <Compile Include="Flow\QuerySource.cs" />
+    <Compile Include="Flow\FlowProcessor.cs" />
+    <Compile Include="Flow\ProcessorConfiguration.cs" />
+    <Compile Include="Flow\FlowProcessState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Archive\QuerySources\QuerySourceFromPackage.cs" />
-    <Compile Include="Archive\QuerySources\QuerySourceInMemory.cs" />
+    <Compile Include="Flow\QuerySources\QuerySourceFromPackage.cs" />
+    <Compile Include="Flow\QuerySources\QuerySourceInMemory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -103,8 +100,6 @@
       <Name>FutureState.Specifications</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Archive\Processors\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

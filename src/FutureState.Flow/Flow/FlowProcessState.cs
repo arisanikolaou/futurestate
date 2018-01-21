@@ -5,16 +5,16 @@ namespace FutureState.Flow
     /// <summary>
     ///     A container for a set of process flow state transaction records executed by a processor.
     /// </summary>
-    public class ProcessState
+    public class FlowProcessState
     {
-        public ProcessState()
+        public FlowProcessState()
         {
         }
 
-        public ProcessState(string processId)
+        public FlowProcessState(string processId)
         {
             ProcessId = processId;
-            Details = new List<ProcessFlowState>();
+            Details = new List<FlowProcessStateCheckPoint>();
         }
 
         /// <summary>
@@ -25,6 +25,6 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the process flow stae details.
         /// </summary>
-        public List<ProcessFlowState> Details { get; set; }
+        public List<FlowProcessStateCheckPoint> Details { get; set; }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace FutureState.Flow
 {
-    public class PortSource : PortSource<object>
+    public class FlowPortSource : FlowPortSource<object>
     {
-        public PortSource(Func<string, int, Guid, ReceiveMessageResponse<object>> receiveFn) : base(receiveFn)
+        public FlowPortSource(Func<string, int, Guid, ReceiveMessageResponse<object>> receiveFn) : base(receiveFn)
         {
         }
     }
@@ -18,7 +18,7 @@ namespace FutureState.Flow
     /// </summary>
     /// <typeparam name="TEntity">
     /// </typeparam>
-    public class PortSource<TEntity>
+    public class FlowPortSource<TEntity>
     {
         private readonly Func<string, int, Guid, ReceiveMessageResponse<TEntity>> _receiveFn;
 
@@ -26,7 +26,7 @@ namespace FutureState.Flow
         ///     Creates a new instance.
         /// </summary>
         /// <param name="receiveFn"></param>
-        public PortSource(Func<string, int, Guid, ReceiveMessageResponse<TEntity>> receiveFn)
+        public FlowPortSource(Func<string, int, Guid, ReceiveMessageResponse<TEntity>> receiveFn)
         {
             _receiveFn = receiveFn;
         }
@@ -42,13 +42,13 @@ namespace FutureState.Flow
         public string Description { get; set; }
 
         /// <summary>
-        ///     Creates a new package for a given flow, consumer id.
+        ///     Creates a new flowPackage for a given flow, consumer id.
         /// </summary>
         /// <remarks>
         ///     A consumer id must be unique for a given 'Flow'.
         /// </remarks>
         /// <param name="consumerId">
-        ///     The id of the consumer requesting the BatchProcess data (the package).
+        ///     The id of the consumer requesting the BatchProcess data (the flowPackage).
         /// </param>
         /// <param name="sequenceFrom">
         ///     Used to map the starting point to playback messages to the
@@ -86,8 +86,8 @@ namespace FutureState.Flow
         public Guid SequenceTo { get; set; }
 
         /// <summary>
-        ///     Gets the package that was assembled.
+        ///     Gets the flowPackage that was assembled.
         /// </summary>
-        public Package<TEntity> Package { get; set; }
+        public FlowPackage<TEntity> FlowPackage { get; set; }
     }
 }
