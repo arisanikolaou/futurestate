@@ -16,10 +16,16 @@ namespace FutureState.Flow.Tests
     {
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
         private const int CsvItemsToCreate = 10;
+        private readonly Guid _processId = Guid.Parse("523a8558-e5a5-4309-ad20-f3813997e651");
+        private const int BatchId = 1;
 
         private ProcessResult<DenormalizedEntity, Dto1> _resultA;
         private ProcessResult<Dto1, Dto2> _resultB;
         private SpecProvider<Dto1> _specProvider;
+        private CsvProcessor<DenormalizedEntity, Dto1> _processorA;
+        private BatchProcess _batchProcess;
+        private ProcessResult<Dto2, Address> _resultC;
+        private SpecProvider<Address> _specProviderFroAddress;
 
         protected void GivenANewLocalSqlDb()
         {
@@ -33,11 +39,16 @@ namespace FutureState.Flow.Tests
             }
         }
 
-        protected void AndGivenASetOfSpecifications()
+        protected void AndGivenAbatchProcess()
         {
-            this._specProvider = new SpecProvider<Dto1>();
+            _batchProcess = new BatchProcess(_processId, BatchId);
+        }
 
-            this._specProvider.Add(a =>
+        protected void AndGivenASetOfSpecificationsForSource()
+        {
+            _specProvider = new SpecProvider<Dto1>();
+
+            _specProvider.Add(a =>
             {
                 if(a.Source.Key == "Key-5")
                     return new SpecResult("Arbitrary invalid reason.");
@@ -47,6 +58,19 @@ namespace FutureState.Flow.Tests
 
 
             _specProvider.MergeFrom(m => m.Contact, new SpecProvider<Contact>());
+        }
+
+        protected void AndGivenASetOfSpecificationsForAddresses()
+        {
+            _specProviderFroAddress = new SpecProvider<Address>();
+
+            _specProviderFroAddress.Add(a =>
+            {
+                if (a.ContactId == 0)
+                    return new SpecResult("Contact Id has not been assigned.");
+
+                return SpecResult.Success;
+            }, "Key", "Description");
         }
 
         protected void GivenAGeneratedDataSourceCsvFile()
@@ -90,7 +114,7 @@ namespace FutureState.Flow.Tests
 
         protected void WhenProcessingADenormalizedFileUsingProcessingRules()
         {
-            var processorA = new CsvProcessor<DenormalizedEntity, Dto1>(DataFileToCreate, null, 1, _specProvider)
+            var processorA = new CsvProcessor<DenormalizedEntity, Dto1>(DataFileToCreate, new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider))
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
@@ -104,8 +128,10 @@ namespace FutureState.Flow.Tests
                 }
             };
 
+            _processorA = processorA;
+
             // process result state
-            this._resultA = processorA.Process();
+            _resultA = processorA.Process(_batchProcess);
 
             // todo: save to data store
         }
@@ -113,7 +139,7 @@ namespace FutureState.Flow.Tests
         protected void AndWhenChainingTheProcessedResultsToAnotherProcessor()
         {
             // chain 2
-            var processorB = new InMemoryProcessor<Dto1, Dto2>(_resultA.Output)
+            var processorB = new InMemoryProcessor<Dto1, Dto2>(_resultA.Output, new ProcessorConfiguration<Dto1, Dto2>())
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
@@ -134,27 +160,42 @@ namespace FutureState.Flow.Tests
                     };
                 },
                 // save to database
-                OnCommitting = (processedItems) =>
+                OnCommitting = processedItems =>
                 {
-                    // save to database
+                    // save contacts to database
                     using (var db = new TestModel())
                     {
+                        // ReSharper disable once PossibleMultipleEnumeration
                         db.Contacts.AddRange(processedItems.Select(m => m.Contact));
 
                         // save results to update contact idss
                         db.SaveChanges();
-                    }
 
-                    // save addresses now to database and update fk reference obtained above
-                    using (var db = new TestModel())
-                    {
                         // update mappings and fk references
                         processedItems.Each(m =>
                         {
                             m.Addresses.Each(n => { n.ContactId = m.Contact.Id; });
                         });
+                    }
+                }
+            };
 
-                        db.Addresses.AddRange(processedItems.SelectMany(m => m.Addresses));
+            _resultB = processorB.Process(_batchProcess);
+        }
+
+        protected void AndWhenChainingTheProcessedResultsToLastProcessor()
+        {
+            // chain 2
+            var processorC = new InMemoryProcessor<Dto2, Address>(_resultB.Output, new ProcessorConfiguration<Dto2, Address>(_specProviderFroAddress))
+            {
+                CreateOutput = (dtoIn) => dtoIn.Addresses,
+                // save to database
+                OnCommitting = processedItems =>
+                {
+                    // save addresses now to database and update fk reference obtained above
+                    using (var db = new TestModel())
+                    {
+                        db.Addresses.AddRange(processedItems);
 
                         // save results
                         db.SaveChanges();
@@ -162,7 +203,7 @@ namespace FutureState.Flow.Tests
                 }
             };
 
-            this._resultB = processorB.Process();
+            _resultC = processorC.Process(_batchProcess);
         }
 
         protected void ThenResultsShouldBeValid()
@@ -174,7 +215,7 @@ namespace FutureState.Flow.Tests
 
         protected void AndThenDataShouldBePopulatedWithValidDataOnly()
         {
-            Assert.Equal(CsvItemsToCreate, _resultA.ProcessedCount);
+            Assert.Equal(CsvItemsToCreate - 1, _resultA.ProcessedCount);
             Assert.Equal(CsvItemsToCreate - 1, _resultB.ProcessedCount);
             Assert.Single(_resultA.Errors);
 
@@ -183,6 +224,24 @@ namespace FutureState.Flow.Tests
                 // less one as hit the rule
                 Assert.Equal(CsvItemsToCreate - 1, db.Contacts.Count());
             }
+
+            using (var db = new TestModel())
+            {
+                // less one as hit the rule
+                Assert.Equal(CsvItemsToCreate * 2 - 2, db.Addresses.Count());
+            }
+        }
+
+        protected void AndThenShouldBeAbleToRestoreProcessState()
+        {
+            var repo = new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
+            var processorName = Core.Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
+
+            var result  = repo.Get(processorName, _processId, BatchId);
+
+            Assert.NotNull(result);
+            Assert.Equal(CsvItemsToCreate, result.ProcessedCount);
+            Assert.Single(result.Errors);
         }
 
         [BddfyFact]

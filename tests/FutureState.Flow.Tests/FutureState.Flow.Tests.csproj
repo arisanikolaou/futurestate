@@ -121,7 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Archive\ProcessesDataFromInMemQuerySourceBasicStory.cs" />
-    <Compile Include="CsvProcessorUnitTests.cs" />
+    <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />
     <Compile Include="Mock\TestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

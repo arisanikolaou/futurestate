@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
+using System.Linq;
 using NLog;
 
 namespace FutureState.Flow.Core
@@ -12,40 +11,28 @@ namespace FutureState.Flow.Core
     /// <typeparam name="TEntityDto">The type of entity to process.</typeparam>
     public class ProcessorEngine<TEntityDto> : IProcessorHandler
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         readonly IProcessResultRepository<ProcessResult> _repository;
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
         public ProcessorEngine(
-            Guid? correlationId = null,
-            long batchId = 1,
             IProcessResultRepository<ProcessResult> repository = null,
             string processorName = null)
         {
-            CorrelationId = correlationId ?? SeqGuid.Create();
-            BatchId = batchId;
             Warnings = new List<string>();
             ProcessName = processorName ?? GetType().Name;
 
             _repository = repository ?? new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
-        /// <summary>
-        ///     Gets the correlation id.
-        /// </summary>
-        public Guid CorrelationId { get; set; }
-
 
         /// <summary>
         ///     Gets/set the processor name.
         /// </summary>
         public string ProcessName { get; set; }
-
-        /// <summary>
-        ///     Gets the job/batch number.
-        /// </summary>
-        public long BatchId { get; set; }
 
         /// <summary>
         ///     Initializes a new procesor.
@@ -60,17 +47,12 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Gets the action to process one item.
         /// </summary>
-        public Func<TEntityDto, ErrorEvent> ProcessItem { get; set; }
+        public Func<TEntityDto, IEnumerable<ErrorEvent>> ProcessItem { get; set; }
 
         /// <summary>
         ///     Gets the error handler.
         /// </summary>
         public Action<TEntityDto, Exception> OnError { get; set; }
-
-        /// <summary>
-        ///     Gets the logger to use.
-        /// </summary>
-        public Logger Logger { get; set; }
 
         /// <summary>
         ///     Gets the list of warnings accumulated.
@@ -98,8 +80,10 @@ namespace FutureState.Flow.Core
         ///     a summary of the processes' execution status.
         /// </summary>
         /// <returns></returns>
-        public ProcessResult Process(ProcessResult<TEntityDto> result = null)
+        public ProcessResult Process(BatchProcess process, ProcessResult<TEntityDto> result = null)
         {
+            Guard.ArgumentNotNull(process, nameof(process));
+
             StartTime = DateTime.UtcNow;
 
             Current = 0;
@@ -107,6 +91,9 @@ namespace FutureState.Flow.Core
             if (EntitiesReader == null)
                 throw new InvalidOperationException("EntitiesReader has not been assigned.");
 
+            if (result == null)
+                result = new ProcessResult<TEntityDto>();
+            result.BatchProcess = process;
 
             Initialize?.Invoke();
 
@@ -122,12 +109,17 @@ namespace FutureState.Flow.Core
 
                 try
                 {
-                    var error = ProcessItem(dto);
+                    var errorsEvents = ProcessItem(dto);
 
-                    if (error == null)
+                    var errorEvents = errorsEvents as ErrorEvent[] ?? errorsEvents.ToArray();
+                    if(!errorEvents.Any())
                         processed.Add(dto);
                     else
-                        errors.Add(new ProcessError<TEntityDto> { Error = error, Item = dto });
+                    {
+                        foreach (var error in errorEvents)
+                            errors.Add(new ProcessError<TEntityDto> {Error = error, Item = dto});
+                    }
+
                 }
                 catch (ApplicationException apex)
                 {
@@ -188,18 +180,13 @@ namespace FutureState.Flow.Core
             if (Logger.IsInfoEnabled)
                 Logger.Info($"Finised processing.");
 
-            if (result == null)
-                result = new ProcessResult<TEntityDto>();
-
-            result.CorrelationId = CorrelationId;
-            result.BatchId = BatchId;
             result.ProcessName = ProcessName;
-            result.ProcessedCount = Current;
+            result.ProcessedCount = processed.Count;
             result.Errors = errors;
             result.Exceptions = exceptions;
             result.Warnings = Warnings;
             result.Input = processed;
-            result.LoadTime = DateTime.UtcNow - StartTime;
+            result.ProcessTime = DateTime.UtcNow - StartTime;
 
             // save flow
             _repository.Save(result);

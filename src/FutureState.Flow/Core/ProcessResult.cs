@@ -11,7 +11,7 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Gets the time time spent processing from the incoming data source.
         /// </summary>
-        public TimeSpan LoadTime { get; set; }
+        public TimeSpan ProcessTime { get; set; }
 
         /// <summary>
         ///     Gets any errors encountered processing from the incoming data source.
@@ -29,20 +29,13 @@ namespace FutureState.Flow.Core
         public long ProcessedCount { get; set; }
 
         /// <summary>
-        ///     Gets the job id or correlation id.
-        /// </summary>
-        public Guid CorrelationId { get; set; }
-
-        /// <summary>
-        ///     Gets the batch id.
-        /// </summary>
-        public long BatchId { get; set; }
-
-        /// <summary>
         ///     Gets or sets the process name.
         /// </summary>
         public string ProcessName { get; set; }
-
+        /// <summary>
+        ///     Gets the active BatchProcess used in the processed.
+        /// </summary>
+        public BatchProcess BatchProcess { get; set; }
     }
 
     /// <summary>

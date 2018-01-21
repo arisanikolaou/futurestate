@@ -4,6 +4,6 @@
     {
         string ProcessName { get; }
 
-        ProcessResult Process();
+        ProcessResult Process(BatchProcess process);
     }
 }

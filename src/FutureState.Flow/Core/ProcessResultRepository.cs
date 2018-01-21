@@ -35,10 +35,10 @@ namespace FutureState.Flow.Core
                 }
 
             var i = 1;
-            var fileName = $@"{_workingFolder}\{data.ProcessName}-{data.CorrelationId}-{data.BatchId}.json";
+            var fileName = $@"{_workingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{data.BatchProcess.BatchId}.json";
             while (File.Exists(fileName))
                 fileName =
-                    $@"{_workingFolder}\{data.ProcessName}-{data.CorrelationId}-{data.BatchId}-{i++}.json";
+                    $@"{_workingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{data.BatchProcess.BatchId}-{i++}.json";
 
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
 

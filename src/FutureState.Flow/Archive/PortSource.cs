@@ -48,14 +48,14 @@ namespace FutureState.Flow
         ///     A consumer id must be unique for a given 'Flow'.
         /// </remarks>
         /// <param name="consumerId">
-        ///     The id of the consumer requesting the snapshot data (the package).
+        ///     The id of the consumer requesting the BatchProcess data (the package).
         /// </param>
         /// <param name="sequenceFrom">
         ///     Used to map the starting point to playback messages to the
         ///     consumer.
         /// </param>
         /// <param name="entitiesCount">
-        ///     The window size to assemble a snapshot for.
+        ///     The window size to assemble a BatchProcess for.
         /// </param>
         /// <returns></returns>
         public virtual ReceiveMessageResponse<TEntity> Receive(
@@ -76,12 +76,12 @@ namespace FutureState.Flow
     public class ReceiveMessageResponse<TEntity>
     {
         /// <summary>
-        ///     Gets the start of the snapshot.
+        ///     Gets the start of the BatchProcess.
         /// </summary>
         public Guid SequenceFrom { get; set; }
 
         /// <summary>
-        ///     Gets the id of the end of the snapshot. This will be a sequential id.
+        ///     Gets the id of the end of the BatchProcess. This will be a sequential id.
         /// </summary>
         public Guid SequenceTo { get; set; }
 

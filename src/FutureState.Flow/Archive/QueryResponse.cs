@@ -27,12 +27,12 @@ namespace FutureState.Flow
         }
 
         /// <summary>
-        ///     Gets the start of the snapshot.
+        ///     Gets the start of the BatchProcess.
         /// </summary>
         public Guid CheckPointFrom { get; set; }
 
         /// <summary>
-        ///     Gets the id of the end of the snapshot. This will be a sequential id.
+        ///     Gets the id of the end of the BatchProcess. This will be a sequential id.
         /// </summary>
         public Guid CheckPointTo { get; set; }
 

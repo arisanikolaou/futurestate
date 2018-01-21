@@ -51,7 +51,7 @@ namespace FutureState.Flow
         ///     A consumer id must be unique for a given 'Flow'.
         /// </remarks>
         /// <param name="processorId">
-        ///     The id of the consumer requesting the snapshot data (the package).
+        ///     The id of the consumer requesting the BatchProcess data (the package).
         /// </param>
         /// <param name="sequenceFrom">
         ///     Used to map the starting point to playback messages to the

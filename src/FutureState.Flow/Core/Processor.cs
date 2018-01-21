@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EmitMapper;
 using FutureState.Specifications;
 using NLog;
 
@@ -13,49 +12,54 @@ namespace FutureState.Flow.Core
     /// </summary>
     /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source..</typeparam>
     /// <typeparam name="TEntityOut">The type of entity to process results to.</typeparam>
-    public class ProcessorService<TEntityIn, TEntityOut> : IProcessor
+    public class Processor<TEntityIn, TEntityOut> : IProcessor
         where TEntityOut : class, new()
     {
-        private readonly IEnumerable<ISpecification<IEnumerable<TEntityOut>>> _collectionRules;
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ObjectsMapper<TEntityIn, TEntityOut> _mapper;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly Func<IEnumerable<TEntityIn>> _reader;
-        private readonly IEnumerable<ISpecification<TEntityOut>> _rules;
+        private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _configuration;
+        private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public ProcessorService(
+        public Processor(
             Func<IEnumerable<TEntityIn>> reader,
-            Guid? correlationId = null,
-            long batchId = 1,
-            IProvideSpecifications<TEntityOut> specProviderForEntity = null,
-            IProvideSpecifications<IEnumerable<TEntityOut>> specProviderForEntityCollection = null,
-            IProcessResultRepository<ProcessResult> repository = null,
-            ObjectsMapper<TEntityIn, TEntityOut> mapper = null,
+            ProcessorConfiguration<TEntityIn, TEntityOut> configuration,
             string processorName = null)
         {
             Guard.ArgumentNotNull(reader, nameof(reader));
 
             _reader = reader;
+            _configuration = configuration;
+            processorName = processorName ?? GetProcessName(this);
 
-            correlationId = correlationId ?? SeqGuid.Create();
-            processorName = processorName ?? $"{GetType().Name}-{typeof(TEntityOut).Name}";
+            CreateOutput = (dtoIn) => new[] { new TEntityOut() };
 
-            _mapper = mapper ?? ObjectMapperManager.DefaultInstance.GetMapper<TEntityIn, TEntityOut>();
-
-            _rules = specProviderForEntity?.GetSpecifications().ToArray() ??
-                     Enumerable.Empty<ISpecification<TEntityOut>>();
-
-            _collectionRules = specProviderForEntityCollection?.GetSpecifications().ToArray() ??
-                               Enumerable.Empty<ISpecification<IEnumerable<TEntityOut>>>();
-
-            Engine = new ProcessorEngine<TEntityIn>(correlationId, batchId, repository, processorName)
-            {
-                Logger = _logger
-            };
+            Engine = new ProcessorEngine<TEntityIn>(
+                _configuration.Repository,
+                processorName);
         }
 
+        public static string GetProcessName(IProcessor processor)
+        {
+            return $"{processor.GetType().Name}-{typeof(TEntityOut).Name}";
+        }
+
+        /// <summary>
+        ///     Action to create an outgoing dto(s) from an incoming dto.
+        /// </summary>
+        public Func<TEntityIn, IEnumerable<TEntityOut>> CreateOutput
+        {
+            get => _createOutput;
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(CreateOutput));
+
+                _createOutput = value;
+            }
+        }
 
         /// <summary>
         ///     Called before processing an incoming dto to an outgoing dto.
@@ -65,13 +69,13 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Gets/sets the processor handler.
         /// </summary>
-        public ProcessorEngine<TEntityIn> Engine { get;  }
+        public ProcessorEngine<TEntityIn> Engine { get; }
 
         /// <summary>
         ///     Get the well known name of the processor type.
         /// </summary>
-        public string ProcessName => this.Engine.ProcessName;
-        
+        public string ProcessName => Engine.ProcessName;
+
         /// <summary>
         ///     Called while comitting processed changes.
         /// </summary>
@@ -80,11 +84,11 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Processes an incoming data stream to an output.
         /// </summary>
-        public ProcessResult<TEntityIn, TEntityOut> Process()
+        public ProcessResult<TEntityIn, TEntityOut> Process(BatchProcess process)
         {
-            var result = new ProcessResult<TEntityIn,TEntityOut>();
+            var result = new ProcessResult<TEntityIn, TEntityOut>();
 
-            return Process(result);
+            return Process(process, result);
         }
 
         /// <summary>
@@ -122,33 +126,42 @@ namespace FutureState.Flow.Core
                 pItem?.Invoke(dtoIn);
 
                 // create output entity
-                var dtoOut = new TEntityOut();
+                IEnumerable<TEntityOut> itemsToProcess = new[] { new TEntityOut() };
+                if (CreateOutput != null)
+                    itemsToProcess = CreateOutput(dtoIn);
 
-                // apply default mapping
-                dtoOut = _mapper.Map(dtoIn, dtoOut);
-
-                // prepare entity
-                BeginProcessingItem?.Invoke(dtoIn, dtoOut);
-                ;
-
-                var errorEvent = OnItemProcessing(dtoIn, dtoOut);
-
-                // validate against business rules
-                if (errorEvent == null)
+                var errorEvents = new List<ErrorEvent>();
+                foreach (var item in itemsToProcess)
                 {
-                    var errors = _rules.ToErrors(dtoOut);
-                    var e = errors as Error[] ?? errors.ToArray();
-                    if (e.Any())
+                    // apply default mapping
+                    var dtoOut = _configuration.Mapper.Map(dtoIn, item);
+
+                    // prepare entity
+                    BeginProcessingItem?.Invoke(dtoIn, dtoOut);
+
+                    var errorEvent = OnItemProcessing(dtoIn, dtoOut);
+
+                    // validate against business rules
+                    if (errorEvent == null)
                     {
-                        var first = e.First();
-                        errorEvent = new ErrorEvent { Message = first.Message, Type = first.Type };
+                        var errors = _configuration.Rules.ToErrors(dtoOut);
+                        var e = errors as Error[] ?? errors.ToArray();
+                        if (e.Any())
+                        {
+                            foreach (var error in e)
+                            {
+                                errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
+                                errorEvents.Add(errorEvent);
+                            }
+                        }
+                        else
+                        {
+                            processedValidItems.Add(dtoOut);
+                        }
                     }
                 }
 
-                if (errorEvent == null)
-                    processedValidItems.Add(dtoOut);
-
-                return errorEvent;
+                return errorEvents;
             };
             // commit operation for valid processed items
             engine.Commit = () =>
@@ -157,7 +170,7 @@ namespace FutureState.Flow.Core
                 pCommit?.Invoke();
 
                 // validate collection commit
-                var errors = _collectionRules.ToErrors(processedValidItems);
+                var errors = _configuration.CollectionRules.ToErrors(processedValidItems);
 
                 var enumerable = errors as Error[] ?? errors.ToArray();
                 if (enumerable.Any())
@@ -174,14 +187,15 @@ namespace FutureState.Flow.Core
         }
 
         /// <summary>
-        ///     Processes a snapshot of data using a process handle from an incoming source.
+        ///     Processes a BatchProcess of data using a process handle from an incoming source.
         /// </summary>
+        /// <param name="process">The batch process to run.</param>
         /// <param name="resultState">The resultState state from processing.</param>
         /// <returns></returns>
-        public ProcessResult<TEntityIn,TEntityOut> Process(ProcessResult<TEntityIn, TEntityOut> resultState)
+        public ProcessResult<TEntityIn, TEntityOut> Process(BatchProcess process, ProcessResult<TEntityIn, TEntityOut> resultState)
         {
-            if(_logger.IsTraceEnabled)
-                _logger.Trace($"Starting to process  {ProcessName} Batch {Engine.BatchId}.");
+            if (Logger.IsTraceEnabled)
+                Logger.Trace($"Starting to process  {ProcessName} Batch {process.BatchId}.");
 
             try
             {
@@ -189,19 +203,19 @@ namespace FutureState.Flow.Core
                 BuildProcessEngine(Engine, resultState);
 
                 // process all items
-                Engine.Process(resultState);
+                Engine.Process(process, resultState);
 
                 // raise event finished
                 OnFinishedProcessing?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException($"Failed to process {ProcessName} batch {Engine.BatchId} due to an unexpected error.", ex);
+                throw new ApplicationException($"Failed to process {ProcessName} batch {process.BatchId} due to an unexpected error.", ex);
             }
             finally
             {
-                if (_logger.IsTraceEnabled)
-                    _logger.Trace($"Finished processing {ProcessName} batch {Engine.BatchId}.");
+                if (Logger.IsTraceEnabled)
+                    Logger.Trace($"Finished processing {ProcessName} batch {process.BatchId}.");
             }
 
             return resultState;
@@ -237,6 +251,7 @@ namespace FutureState.Flow.Core
         {
         }
 
-        ProcessResult IProcessor.Process() => this.Process();
+        // interface implementation
+        ProcessResult IProcessor.Process(BatchProcess process) => Process(process);
     }
 }
