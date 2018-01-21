@@ -56,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\InMemoryProcessor.cs" />
+    <Compile Include="Core\IProcessResultRepository.cs" />
+    <Compile Include="Core\ProcessError.cs" />
+    <Compile Include="Core\ProcessResultRepository.cs" />
     <Compile Include="Data\PackageRepository.cs" />
     <Compile Include="Data\ProcessConfigurationRepository.cs" />
     <Compile Include="Data\ProcessStateRepository.cs" />
@@ -67,12 +70,12 @@
     <Compile Include="ProcessFlowState.cs" />
     <Compile Include="QueryResponse.cs" />
     <Compile Include="QueryResponseState.cs" />
-    <Compile Include="Core\ProcessorSingleResult.cs" />
+    <Compile Include="Core\ProcessorService.cs" />
     <Compile Include="Core\CsvProcessor.cs" />
     <Compile Include="Core\IProcessorHandler.cs" />
     <Compile Include="Core\IProcessor.cs" />
     <Compile Include="Core\IReader.cs" />
-    <Compile Include="Core\ProcessorHandler.cs" />
+    <Compile Include="Core\ProcessorEngine.cs" />
     <Compile Include="Core\ProcessResult.cs" />
     <Compile Include="ErrorEvent.cs" />
     <Compile Include="Core\CsvProcessorReader.cs" />

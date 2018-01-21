@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CsvHelper;
 using FutureState.Flow.Core;
+using FutureState.Flow.Tests.Mock;
+using FutureState.Specifications;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -11,20 +12,50 @@ using Xunit;
 namespace FutureState.Flow.Tests
 {
     [Story]
-    public class CsvProcessorUnitTests
+    public class CanProcessIncomingDataInFlowsToFileAndSqlServerStory
     {
-        string dataFile = "DataFile.csv";
-        private List<Dto1> _processedItems;
-        private ProcessResult _processBResult;
-        private List<Dto2> _processBItems;
-        private ProcessResult _processResult;
+        private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
+        private const int CsvItemsToCreate = 10;
+
+        private ProcessResult<DenormalizedEntity, Dto1> _resultA;
+        private ProcessResult<Dto1, Dto2> _resultB;
+        private SpecProvider<Dto1> _specProvider;
+
+        protected void GivenANewLocalSqlDb()
+        {
+            using (var db = new TestModel())
+            {
+                if (db.Database.Exists())
+                    db.Database.Delete();
+
+                // save results
+                db.Database.CreateIfNotExists();
+            }
+        }
+
+        protected void AndGivenASetOfSpecifications()
+        {
+            this._specProvider = new SpecProvider<Dto1>();
+
+            this._specProvider.Add(a =>
+            {
+                if(a.Source.Key == "Key-5")
+                    return new SpecResult("Arbitrary invalid reason.");
+
+                return SpecResult.Success;
+            }, "Key", "Description");
+
+
+            _specProvider.MergeFrom(m => m.Contact, new SpecProvider<Contact>());
+        }
 
         protected void GivenAGeneratedDataSourceCsvFile()
         {
-            if (File.Exists(dataFile))
-                File.Delete(dataFile);
+            // always re-create
+            if (File.Exists(DataFileToCreate))
+                File.Delete(DataFileToCreate);
 
-            using (var fs = File.OpenWrite(dataFile))
+            using (var fs = File.OpenWrite(DataFileToCreate))
             {
                 using (var sw = new StreamWriter(fs))
                 {
@@ -36,15 +67,16 @@ namespace FutureState.Flow.Tests
                     csv.Flush();
                     csv.NextRecord();
 
-                    for (var i = 0; i < 50; i++)
+
+                    for (var i = 0; i < CsvItemsToCreate; i++)
                     {
                         var entity = new DenormalizedEntity()
                         {
-                            Key = $"Key{i}",
-                            ContactName = $"Contact{i}",
-                            ContactDescription = $"Contact{i}",
-                            Address1 = $"Address1{i}",
-                            Address2 = $"Address2{i}"
+                            Key = $"Key-{i}",
+                            ContactName = $"Contact-{i}",
+                            ContactDescription = $"Contact-{i}",
+                            Address1 = $"Address-A-{i}",
+                            Address2 = $"Address-B-{i}"
                         };
 
                         csv.WriteRecord(entity);
@@ -56,75 +88,105 @@ namespace FutureState.Flow.Tests
             }
         }
 
-        protected void WhenProcessingADenormalizedFile()
+        protected void WhenProcessingADenormalizedFileUsingProcessingRules()
         {
-            var processorA = new CsvProcessor<DenormalizedEntity, Dto1>(dataFile)
+            var processorA = new CsvProcessor<DenormalizedEntity, Dto1>(DataFileToCreate, null, 1, _specProvider)
             {
-                BeginProcessingItem = (dto1, dto2) =>
+                BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
-                    dto2.Source = dto1;
-                    dto2.Contact = new Contact()
+                    dtoOut.Source = dtoIn;
+                    dtoOut.Contact = new Contact()
                     {
                         Id = 0,
-                        Name = dto1.ContactName,
-                        Description = dto1.ContactDescription
+                        Name = dtoIn.ContactName,
+                        Description = dtoIn.ContactDescription
                     };
-                },
-                WorkingFolder = $@"{Environment.CurrentDirectory}\ProcessedResults"
+                }
             };
 
             // process result state
-            this._processResult = processorA.Process();
-            // processed items
-            this._processedItems = processorA.ProcessedItems;
+            this._resultA = processorA.Process();
 
             // todo: save to data store
         }
 
         protected void AndWhenChainingTheProcessedResultsToAnotherProcessor()
         {
-            // chain
-            var processorB = new InMemoryProcessor<Dto1, Dto2>(_processedItems)
+            // chain 2
+            var processorB = new InMemoryProcessor<Dto1, Dto2>(_resultA.Output)
             {
-                BeginProcessingItem = (dto1, dto2) =>
+                BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
-                    // map object
-                    dto2.Source = dto1.Source;
-                    dto2.Contact = dto1.Contact;
-                    dto2.Address = new[]
+                    // map object and preserve incoming result
+                    dtoOut.Source = dtoIn.Source;
+                    dtoOut.Contact = dtoIn.Contact;
+                    // don't update FK references or database ids
+                    dtoOut.Addresses = new []
                     {
                         new Address()
                         {
-                            Id = 0,
-                            StressName = dto1.Source.Address1
+                            StreetName = dtoIn.Source.Address1
                         },
                         new Address()
                         {
-                            Id = 0,
-                            StressName = dto1.Source.Address2
+                            StreetName = dtoIn.Source.Address2
                         }
                     };
                 },
-                WorkingFolder = $@"{Environment.CurrentDirectory}\ProcessedResults"
+                // save to database
+                OnCommitting = (processedItems) =>
+                {
+                    // save to database
+                    using (var db = new TestModel())
+                    {
+                        db.Contacts.AddRange(processedItems.Select(m => m.Contact));
+
+                        // save results to update contact idss
+                        db.SaveChanges();
+                    }
+
+                    // save addresses now to database and update fk reference obtained above
+                    using (var db = new TestModel())
+                    {
+                        // update mappings and fk references
+                        processedItems.Each(m =>
+                        {
+                            m.Addresses.Each(n => { n.ContactId = m.Contact.Id; });
+                        });
+
+                        db.Addresses.AddRange(processedItems.SelectMany(m => m.Addresses));
+
+                        // save results
+                        db.SaveChanges();
+                    }
+                }
             };
 
-
-            this._processBResult = processorB.Process();
-            this._processBItems = processorB.ProcessedItems;
+            this._resultB = processorB.Process();
         }
 
         protected void ThenResultsShouldBeValid()
         {
-            Assert.NotNull(_processResult);
+            Assert.NotNull(_resultA);
+            Assert.NotNull(_resultB);
+            Assert.NotNull(_resultB.Output.First().Addresses.First().StreetName);
+        }
 
-            Assert.NotNull(_processBResult);
+        protected void AndThenDataShouldBePopulatedWithValidDataOnly()
+        {
+            Assert.Equal(CsvItemsToCreate, _resultA.ProcessedCount);
+            Assert.Equal(CsvItemsToCreate - 1, _resultB.ProcessedCount);
+            Assert.Single(_resultA.Errors);
 
-            Assert.Equal(50, _processBResult.ProcessedCount);
-            Assert.NotNull(_processBItems.First().Address.First().StressName);
+            using (var db = new TestModel())
+            {
+                // less one as hit the rule
+                Assert.Equal(CsvItemsToCreate - 1, db.Contacts.Count());
+            }
         }
 
         [BddfyFact]
-        public void ProcessedDenormalizedResultsInAChain()
+        public void CanProcessIncomingDataInFlowsToFileAndSqlServer()
         {
             this.BDDfy();
         }
@@ -155,22 +217,7 @@ namespace FutureState.Flow.Tests
 
             public Contact Contact { get; set; }
 
-            public Address[] Address { get; set; }
-        }
-
-        public class Contact
-        {
-            public int Id { get; set; }
-
-            public string Name { get; set; }
-            public string Description { get; set; }
-        }
-
-        public class Address
-        {
-            public int Id { get; set; }
-
-            public string StressName { get; set; }
+            public Address[] Addresses { get; set; }
         }
     }
 }

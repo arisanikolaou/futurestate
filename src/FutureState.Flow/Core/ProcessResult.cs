@@ -16,7 +16,7 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Gets any errors encountered processing from the incoming data source.
         /// </summary>
-        public List<Exception> Errors { get; set; }
+        public List<Exception> Exceptions { get; set; }
 
         /// <summary>
         ///     Gets the warnings.
@@ -26,7 +26,7 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Gets the total number of entities processed from the source.
         /// </summary>
-        public int ProcessedCount { get; set; }
+        public long ProcessedCount { get; set; }
 
         /// <summary>
         ///     Gets the job id or correlation id.
@@ -36,6 +36,41 @@ namespace FutureState.Flow.Core
         /// <summary>
         ///     Gets the batch id.
         /// </summary>
-        public int BatchId { get; set; }
+        public long BatchId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the process name.
+        /// </summary>
+        public string ProcessName { get; set; }
+
+    }
+
+    /// <summary>
+    ///     Gets the result from processing data from a particular type of incoming data source.
+    /// </summary>
+    public class ProcessResult<TEntityIn> : ProcessResult
+    {        
+        /// <summary>
+        ///     Gets the items that were used as the source for procesing.
+        /// </summary>
+        public List<TEntityIn> Input { get; internal set; }
+        /// <summary>
+        ///     Gets the errors that were encountered processing the incoming entities.
+        /// </summary>
+        public List<ProcessError<TEntityIn>> Errors { get; set; }
+    }
+
+    /// <summary>
+    ///     The result state from processing data from a particular incoming type to an outgoing type.
+    /// </summary>
+    /// <typeparam name="TEntityIn">The data source type.</typeparam>
+    /// <typeparam name="TEntityOut">The output type.</typeparam>
+    public class ProcessResult<TEntityIn, TEntityOut> : ProcessResult<TEntityIn>
+    {
+
+        /// <summary>
+        ///     Gets the valid items created after processing. This is the primary ouput.
+        /// </summary>
+        public List<TEntityOut> Output { get; internal set; } = new List<TEntityOut>();
     }
 }
