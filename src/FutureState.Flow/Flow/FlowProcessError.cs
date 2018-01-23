@@ -5,14 +5,14 @@ namespace FutureState.Flow
     /// <summary>
     ///     An error encountered processing a single entity.
     /// </summary>
-    public class ProcessEntityError
+    public class FlowProcessError
     {
-        public ProcessEntityError()
+        public FlowProcessError()
         {
             // required by serializer
         }
 
-        public ProcessEntityError(object entity, List<Error> errors)
+        public FlowProcessError(object entity, List<Error> errors)
         {
             Entity = entity;
             Errors = errors;

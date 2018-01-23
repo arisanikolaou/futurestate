@@ -14,17 +14,17 @@ namespace FutureState.Common.Tests
         DomainEvent evt;
         private int hitCount;
 
-        public void GivenAMessagePipe()
+        protected void GivenAMessagePipe()
         {
             this.subject = new MessagePipe();
         }
 
-        public void WhenSendingAMessageWithoutASubscriber()
+        protected void WhenSendingAMessageWithoutASubscriber()
         {
             subject.SendAsync(new DomainEvent() { Name = "Name" }).Wait();
         }
 
-        public void AndWhenSubscribingToAnEvent()
+        protected void AndWhenSubscribingToAnEvent()
         {
             subject.Subscribe<DomainEvent>((received) =>
             {
@@ -33,24 +33,24 @@ namespace FutureState.Common.Tests
             }, this);
         }
 
-        public void AndWhenAMessageSubscribedToIsSent()
+        protected void AndWhenAMessageSubscribedToIsSent()
         {
             subject.SendAsync(new DomainEvent() { Name = "Name" }).Wait();
         }
 
-        public void AndWhenAnotherDerivedMessageTypeIsSent()
+        protected void AndWhenAnotherDerivedMessageTypeIsSent()
         {
             subject.SendAsync(new DomainEvent2() { Name = "Name 2" }).Wait();
         }
 
-        public void ThenSubscribedEventShouldBeReceivedAfterItIsSent()
+        protected void ThenSubscribedEventShouldBeReceivedAfterItIsSent()
         {
             Assert.NotNull(evt);
             Assert.Equal("Name", evt.Name);
             Assert.Equal(1, hitCount);
         }
 
-        public void AndThenShouldBeAbleToUnSubcribeToEvent()
+        protected void AndThenShouldBeAbleToUnSubcribeToEvent()
         {
             subject.UnSubscribe<DomainEvent>(this);
 

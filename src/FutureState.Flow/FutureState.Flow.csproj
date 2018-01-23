@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=6.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CsvHelper.6.1.1\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="EmitMapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EmitMapper.1.0.0\lib\EmitMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -49,24 +55,37 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\PackageRepository.cs" />
-    <Compile Include="Data\ProcessConfigurationRepository.cs" />
-    <Compile Include="Data\ProcessStateRepository.cs" />
-    <Compile Include="Data\QueryResponseStateRepository.cs" />
-    <Compile Include="ProcessEntityError.cs" />
+    <Compile Include="IProcessResultRepository.cs" />
     <Compile Include="ProcessError.cs" />
-    <Compile Include="ProcessFlow.cs" />
-    <Compile Include="ProcessFlowState.cs" />
-    <Compile Include="QueryResponse.cs" />
-    <Compile Include="QueryResponseState.cs" />
-    <Compile Include="Package.cs" />
-    <Compile Include="QuerySource.cs" />
-    <Compile Include="Processor.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
-    <Compile Include="ProcessState.cs" />
+    <Compile Include="ProcessResultRepository.cs" />
+    <Compile Include="BatchProcess.cs" />
+    <Compile Include="Flow\Data\PackageRepository.cs" />
+    <Compile Include="Flow\Data\ProcessConfigurationRepository.cs" />
+    <Compile Include="Flow\Data\ProcessStateRepository.cs" />
+    <Compile Include="Flow\Data\QueryResponseStateRepository.cs" />
+    <Compile Include="Flow\FlowPortSource.cs" />
+    <Compile Include="Flow\FlowProcessError.cs" />
+    <Compile Include="Flow\FlowProcess.cs" />
+    <Compile Include="Flow\FlowProcessStateCheckPoint.cs" />
+    <Compile Include="Flow\QueryResponse.cs" />
+    <Compile Include="Flow\QueryResponseState.cs" />
+    <Compile Include="Processor.cs" />
+    <Compile Include="IProcessorEngine.cs" />
+    <Compile Include="IProcessor.cs" />
+    <Compile Include="IReader.cs" />
+    <Compile Include="ProcessorEngine.cs" />
+    <Compile Include="ProcessResult.cs" />
+    <Compile Include="ErrorEvent.cs" />
+    <Compile Include="CsvProcessorReader.cs" />
+    <Compile Include="Flow\FlowPackage.cs" />
+    <Compile Include="Flow\QuerySource.cs" />
+    <Compile Include="Flow\FlowProcessor.cs" />
+    <Compile Include="Flow\ProcessorConfiguration.cs" />
+    <Compile Include="Flow\FlowProcessState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuerySources\QuerySourceFromPackage.cs" />
-    <Compile Include="QuerySources\QuerySourceInMemory.cs" />
+    <Compile Include="Flow\QuerySources\QuerySourceFromPackage.cs" />
+    <Compile Include="Flow\QuerySources\QuerySourceInMemory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -81,9 +100,6 @@
       <Name>FutureState.Specifications</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Processors\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,19 +1,19 @@
-﻿using FutureState.Flow.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FutureState.Flow.Data;
 
 namespace FutureState.Flow.QuerySources
 {
     public class QuerySourceFromPackage<TEntity> : QuerySource<TEntity>
     {
         public QuerySourceFromPackage(Guid flowId, PackageRepository<TEntity> repository)
-           : base(flowId, GetFlowFn(flowId, repository))
+            : base(flowId, GetFlowFn(flowId, repository))
         {
-
         }
 
-        static Func<int, int, QueryResponse<TEntity>> GetFlowFn(Guid flowId, PackageRepository<TEntity> repository)
+        private static Func<int, int, QueryResponse<TEntity>> GetFlowFn(Guid flowId,
+            PackageRepository<TEntity> repository)
         {
             var entities = repository
                 .GetEntities<TEntity>()
@@ -25,12 +25,12 @@ namespace FutureState.Flow.QuerySources
 
                 var outPut = new List<TEntity>();
 
-                // package only the entities requested
+                // flowPackage only the entities requested
                 for (localIndex = checkPointLocal; localIndex < pageSize && localIndex < entities.Count; localIndex++)
                     outPut.Add(entities[localIndex]);
 
-                // create response package
-                var package = new Package<TEntity>(flowId)
+                // create response flowPackage
+                var package = new FlowPackage<TEntity>(flowId)
                 {
                     Data = outPut
                 };

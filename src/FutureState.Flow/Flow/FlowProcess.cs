@@ -5,15 +5,15 @@ namespace FutureState.Flow
     /// <summary>
     ///     A well known data flow.
     /// </summary>
-    public class ProcessFlow
+    public class FlowProcess
     {
-        public ProcessFlow()
+        public FlowProcess()
         {
         }
 
-        public ProcessFlow(Guid FlowId, string displayName)
+        public FlowProcess(Guid flowId, string displayName)
         {
-            this.FlowId = FlowId;
+            FlowId = flowId;
             DisplayName = displayName;
             DateCreated = DateTime.UtcNow;
         }

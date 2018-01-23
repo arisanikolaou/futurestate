@@ -61,31 +61,31 @@ namespace FutureState.Flow.Tests
                 FlowDirPath = Environment.CurrentDirectory
             };
 
-            this.subject = new Processor<TestOutput, TestInput>((inputEntity) =>
-            {
-                localIndexCount++;
+            //this.subject = new Processor<TestOutput, TestInput>((inputEntity) =>
+            //{
+            //    localIndexCount++;
 
-                // map incoming data to outgoing data
-                var outputEntity = new TestOutput()
-                {
-                    Id = inputEntity.Id,
-                    Name = inputEntity.Name + "_transformed" + localIndexCount,
-                    DateCreated = DateTime.UtcNow,
-                    Description = localIndexCount % 2 == 0 ? null : "Description" + localIndexCount
-                };
+            //    // map incoming data to outgoing data
+            //    var outputEntity = new TestOutput()
+            //    {
+            //        Id = inputEntity.Id,
+            //        Name = inputEntity.Name + "_transformed" + localIndexCount,
+            //        DateCreated = DateTime.UtcNow,
+            //        Description = localIndexCount % 2 == 0 ? null : "Description" + localIndexCount
+            //    };
 
-                return outputEntity;
-            },
-            config, 
-            new SpecProvider<TestOutput>(),
-            new SpecProvider<IEnumerable<TestOutput>>(), 
-            portSource);
+            //    return outputEntity;
+            //},
+            //config, 
+            //new SpecProvider<TestOutput>(),
+            //new SpecProvider<IEnumerable<TestOutput>>(), 
+            //portSource);
         }
 
         public void WhenStartingProcessing()
         {
             // start processing (active)
-            subject.Start();
+            //subject.Start();
 
             // wait to finish processing and for time to elapse
             Thread.Sleep(3000);
@@ -93,8 +93,8 @@ namespace FutureState.Flow.Tests
 
         public void AndWhenSubsequentlyQueryingTheDataProcessed()
         {
-            this.results = subject.GetValidData().ToList();
-            this.invalidData = subject.GetInvalidData().ToList();
+            //this.results = subject.GetValidData().ToList();
+            //this.invalidData = subject.GetInvalidData().ToList();
         }
 
         public void ThenResultsProcessedShouldBePersistedBothValidAndInvalid()
@@ -125,7 +125,7 @@ namespace FutureState.Flow.Tests
 
         public void Dispose()
         {
-            this.subject?.Dispose();
+            //this.subject?.Dispose();
         }
 
         public class TestInput

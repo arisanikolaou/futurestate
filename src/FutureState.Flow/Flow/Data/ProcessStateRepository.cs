@@ -1,7 +1,6 @@
-﻿using NLog;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
+using NLog;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow.Data
@@ -9,8 +8,8 @@ namespace FutureState.Flow.Data
     public class ProcessStateRepository
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly object _syncLock = new object();
         private readonly Type _entityType;
+        private readonly object _syncLock = new object();
 
         public ProcessStateRepository(string basePath, Type entityType)
         {
@@ -23,9 +22,9 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Loads or creates processor state.
         /// </summary>
-        public ProcessState Get()
+        public FlowProcessState Get()
         {
-            string filePath = GetFilePath();
+            var filePath = GetFilePath();
 
             if (File.Exists(filePath))
             {
@@ -33,33 +32,36 @@ namespace FutureState.Flow.Data
 
                 string text = null;
                 lock (_syncLock)
+                {
                     text = File.ReadAllText(filePath);
+                }
 
-                return deserializer.Deserialize<ProcessState>(text);
+                return deserializer.Deserialize<FlowProcessState>(text);
             }
-            else
-            {
-                return new ProcessState($"Processor-{_entityType.Name}");
-            }
+
+            return new FlowProcessState($"FlowProcessor-{_entityType.Name}");
         }
 
-        string GetFilePath() =>  $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
+        private string GetFilePath()
+        {
+            return $@"{BasePath}\processor.state.{_entityType.Name}.yaml";
+        }
 
         /// <summary>
         ///     Saves the state.
         /// </summary>
         /// <param name="state">The state to save.</param>
-        public void Save(ProcessState state)
+        public void Save(FlowProcessState state)
         {
             Guard.ArgumentNotNull(state, nameof(state));
 
-            string filePath = GetFilePath();
+            var filePath = GetFilePath();
 
             var serializer = new Serializer();
 
             lock (_syncLock)
             {
-                string serialize = serializer.Serialize(state);
+                var serialize = serializer.Serialize(state);
 
                 // always overwrite
                 if (File.Exists(filePath))

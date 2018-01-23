@@ -6,14 +6,14 @@ namespace FutureState.Flow
     ///     The execution details of a given flow process. A flow process is the result of reading data from
     ///     incoming sources and transforming them to a target statte.
     /// </summary>
-    public class ProcessFlowState
+    public class FlowProcessStateCheckPoint
     {
-        public ProcessFlowState()
+        public FlowProcessStateCheckPoint()
         {
             // required by serializer
         }
 
-        public ProcessFlowState(Guid flowId, Guid sequenceTo)
+        public FlowProcessStateCheckPoint(Guid flowId, Guid sequenceTo)
         {
             // required by serializer
             FlowId = flowId;
@@ -22,7 +22,7 @@ namespace FutureState.Flow
             User = Environment.UserName;
             CheckPoint = sequenceTo;
         }
-        
+
 
         /// <summary>
         ///     Gets or sets the flow id.

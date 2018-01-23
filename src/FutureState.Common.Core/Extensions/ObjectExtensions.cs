@@ -14,22 +14,6 @@ namespace FutureState
             return obj;
         }
 
-        public static int GetHashCodeSafe<T>(this T obj)
-        {
-            return Equals(obj, default(T)) ? 0 : obj.GetHashCode();
-        }
-
-        public static TInput If<TInput>(this TInput obj, Func<TInput, bool> evaluator) where TInput : class
-        {
-            if (obj == null)
-                return default(TInput);
-
-            if (!evaluator(obj))
-                return default(TInput);
-
-            return obj;
-        }
-
         public static TResult Return<TInput, TResult>(this TInput obj, Func<TInput, TResult> evaluator,
             TResult failureValue) where TInput : class
         {
