@@ -59,8 +59,10 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                 _repository = new InMemoryRepository<TestEntity, int>(
                     new KeyProvider<TestEntity, int>(
                         new KeyGenerator<TestEntity, int>(() => i++)),
+
                     new KeyBinder<TestEntity, int>(m => m.Id, 
                         (entity, entityId) => entity.Id = entityId),
+
                     new List<TestEntity>());
 
             }
@@ -118,7 +120,11 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             using (var repositoryDb = new TestModel(_conString))
             {
                 repositoryDb.MyEntities
-                    .Add(new TestEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber });
+                    .Add(new TestEntity()
+                    {
+                        Id = 1,
+                        Name = "Name", Date = _referencedate, Money = _referenceNumber
+                    });
 
                 repositoryDb.SaveChanges();
             }
@@ -163,6 +169,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             {
                 _db.EntitySet.Writer.Insert(new TestEntity()
                 {
+                    Id = 1,
                     Date = _referencedate,
                     Money = _referenceNumber,
                     Name = "Name"
@@ -171,12 +178,11 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                 TestEntity testEntity2;
                 _db.EntitySet.Writer.Insert(testEntity2 = new TestEntity()
                 {
+                    Id = 2,
                     Date = _referencedate,
                     Money = _referenceNumber,
                     Name = "Name 2"
                 });
-
-                _db.EntitySet.Writer.Insert(testEntity2);
 
                 testEntity2.Name = "Name 3";
 
@@ -201,6 +207,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             {
                 _db.EntitySet.Writer.Insert(new TestEntity()
                 {
+                    Id = 3,
                     Date = _referencedate,
                     Money = _referenceNumber,
                     Name = "Not commited"
