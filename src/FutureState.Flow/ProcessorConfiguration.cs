@@ -7,6 +7,10 @@ using FutureState.Specifications;
 
 namespace FutureState.Flow
 {
+    /// <summary>
+    ///     A configuration setting that can be shared across multiple different
+    ///     processor types.
+    /// </summary>
     public class ProcessorConfiguration<TEntityIn, TEntityOut>
         where TEntityOut : class, new()
     {
@@ -27,8 +31,13 @@ namespace FutureState.Flow
             Repository = repository ?? new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
+        /// <summary>
+        ///     The repository to save flow/process results to.
+        /// </summary>
         public IProcessResultRepository<ProcessResult> Repository { get; }
-
+        /// <summary>
+        ///     Gets the rules to process/validate outgoing entities.
+        /// </summary>
         public IEnumerable<ISpecification<TEntityOut>> Rules { get; }
 
         public ObjectsMapper<TEntityIn, TEntityOut> Mapper { get; }

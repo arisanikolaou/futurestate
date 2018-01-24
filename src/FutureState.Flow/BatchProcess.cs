@@ -7,11 +7,17 @@ namespace FutureState.Flow
     /// </summary>
     public class BatchProcess
     {
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
         public BatchProcess()
         {
             // required for serializer
         }
 
+        /// <summary>
+        ///     Creates a new batch instance against a given process id and a batch id.
+        /// </summary>
         public BatchProcess(Guid processId, int batchId)
         {
             ProcessId = processId;

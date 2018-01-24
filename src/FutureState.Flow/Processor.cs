@@ -7,9 +7,10 @@ using NLog;
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     Processes a single type in income entity data sources into an outgoing data source.
+    ///     Processes a single type of entity from an incoming data 
+    ///     sources into an outgoing data source.
     /// </summary>
-    /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source..</typeparam>
+    /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source.</typeparam>
     /// <typeparam name="TEntityOut">The type of entity to process results to.</typeparam>
     public class Processor<TEntityIn, TEntityOut> : IProcessor
         where TEntityOut : class, new()

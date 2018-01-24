@@ -8,6 +8,7 @@ namespace FutureState.Flow
 {
     /// <summary>
     ///     Extracts entities from a given data sources in a managed way to use in
+    ///     data processing.
     /// </summary>
     /// <typeparam name="TEntityDto">The type of entity to process.</typeparam>
     public class ProcessorEngine<TEntityDto> : IProcessorEngine
