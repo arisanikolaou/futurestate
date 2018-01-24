@@ -13,6 +13,7 @@ using Xunit;
 namespace FutureState.Flow.Tests
 {
     [Story]
+    [Collection("Flow Tests")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory
     {
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
@@ -23,14 +24,13 @@ namespace FutureState.Flow.Tests
         private ContainerBuilder _cb;
         private IContainer _container;
         private Processor<DenormalizedEntity, Dto1> _processorA;
-
         private ProcessResult<DenormalizedEntity, Dto1> _resultA;
         private ProcessResult<Dto1, Dto2> _resultB;
         private ProcessResult<Dto2, Address> _resultC;
 
         protected void GivenANewLocalSqlDb()
         {
-            using (var db = new TestModel2())
+            using (var db = new TestModel())
             {
                 if (db.Database.Exists())
                     db.Database.Delete();
@@ -193,7 +193,7 @@ namespace FutureState.Flow.Tests
             processorB.OnCommitting = processedItems =>
             {
                 // save contacts to database
-                using (var db = new TestModel2())
+                using (var db = new TestModel())
                 {
                     // ReSharper disable once PossibleMultipleEnumeration
                     db.Contacts.AddRange(processedItems.Select(m => m.Contact));
@@ -220,7 +220,7 @@ namespace FutureState.Flow.Tests
             processorC.OnCommitting = processedItems =>
             {
                 // save addresses now to database and update fk reference obtained above
-                using (var db = new TestModel2())
+                using (var db = new TestModel())
                 {
                     db.Addresses.AddRange(processedItems);
 
@@ -245,7 +245,7 @@ namespace FutureState.Flow.Tests
             Assert.Equal(CsvItemsToCreate - 1, _resultB.ProcessedCount);
             Assert.Single(_resultA.Errors);
 
-            using (var db = new TestModel2())
+            using (var db = new TestModel())
             {
                 // less one as hit the rule
                 Assert.Equal(CsvItemsToCreate - 1, db.Contacts.Count());
@@ -254,7 +254,7 @@ namespace FutureState.Flow.Tests
 
         protected void AndThenOnlyAddressWithValidContactsShouldBeInserted()
         {
-            using (var db = new TestModel2())
+            using (var db = new TestModel())
             {
                 // less one as hit the rule
                 Assert.Equal(CsvItemsToCreate * 2 - 2, db.Addresses.Count());

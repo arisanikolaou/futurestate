@@ -28,22 +28,6 @@ namespace FutureState.Flow.Tests.Mock
         public virtual DbSet<Address> Addresses { get; set; }
     }
 
-    public class TestModel2 : DbContext
-    {
-        public TestModel2()
-            : base("name=TestModel2")
-        {
-            this.Database.Initialize(true);
-        }
-
-
-        public virtual DbSet<Contact> Contacts { get; set; }
-
-
-        public virtual DbSet<Address> Addresses { get; set; }
-    }
-
-
     public class Contact
     {
         [Key]
@@ -51,6 +35,7 @@ namespace FutureState.Flow.Tests.Mock
         public int Id { get; set; }
 
         public string Name { get; set; }
+
         public string Description { get; set; }
     }
 

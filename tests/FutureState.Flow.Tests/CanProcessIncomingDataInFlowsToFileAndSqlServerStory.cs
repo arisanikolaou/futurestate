@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Autofac;
 using CsvHelper;
-using FutureState.Flow.Core;
 using FutureState.Flow.Tests.Mock;
 using FutureState.Specifications;
 using TestStack.BDDfy;
@@ -15,10 +13,12 @@ namespace FutureState.Flow.Tests
     using FutureState.Flow.Core;
 
     [Story]
+    [Collection("Flow Tests")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerStory
     {
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
         private const int CsvItemsToCreate = 10;
+
         private readonly Guid _processId = Guid.Parse("523a8558-e5a5-4309-ad20-f3813997e651");
         private const int BatchId = 1;
 
