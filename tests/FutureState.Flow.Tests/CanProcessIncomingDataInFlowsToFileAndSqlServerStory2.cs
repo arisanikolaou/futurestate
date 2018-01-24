@@ -276,7 +276,8 @@ namespace FutureState.Flow.Tests
             Assert.Single(result.Errors);
         }
 
-        [BddfyFact]
+        // ignore
+        // [BddfyFact]
         public void CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofac()
         {
             this.BDDfy();

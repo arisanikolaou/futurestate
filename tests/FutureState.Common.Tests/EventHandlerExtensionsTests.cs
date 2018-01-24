@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Xunit;
 
 namespace FutureState.Common.Tests
@@ -57,6 +58,8 @@ namespace FutureState.Common.Tests
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //1 pass 1 fail
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
+
+            Thread.Sleep(500); //avoid race 
 
             Assert.Equal(5, errors.Count);
             Assert.Equal(1, args.HitCount);
