@@ -112,7 +112,6 @@
     <Compile Include="SeqGuidTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\..\packages\xunit.analyzers.0.8.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
     <Compile Include="ServiceAggregateTests.cs" />
   </ItemGroup>
   <ItemGroup>
