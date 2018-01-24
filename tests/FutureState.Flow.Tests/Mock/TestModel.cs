@@ -15,6 +15,27 @@ namespace FutureState.Flow.Tests.Mock
             this.Database.Initialize(true);
         }
 
+        public TestModel(string conString)
+            : base(conString)
+        {
+            this.Database.Initialize(true);
+        }
+
+
+        public virtual DbSet<Contact> Contacts { get; set; }
+
+
+        public virtual DbSet<Address> Addresses { get; set; }
+    }
+
+    public class TestModel2 : DbContext
+    {
+        public TestModel2()
+            : base("name=TestModel2")
+        {
+            this.Database.Initialize(true);
+        }
+
 
         public virtual DbSet<Contact> Contacts { get; set; }
 

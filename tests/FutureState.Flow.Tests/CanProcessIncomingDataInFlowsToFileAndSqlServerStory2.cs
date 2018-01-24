@@ -30,7 +30,7 @@ namespace FutureState.Flow.Tests
 
         protected void GivenANewLocalSqlDb()
         {
-            using (var db = new TestModel())
+            using (var db = new TestModel2())
             {
                 if (db.Database.Exists())
                     db.Database.Delete();
@@ -193,7 +193,7 @@ namespace FutureState.Flow.Tests
             processorB.OnCommitting = processedItems =>
             {
                 // save contacts to database
-                using (var db = new TestModel())
+                using (var db = new TestModel2())
                 {
                     // ReSharper disable once PossibleMultipleEnumeration
                     db.Contacts.AddRange(processedItems.Select(m => m.Contact));
@@ -220,7 +220,7 @@ namespace FutureState.Flow.Tests
             processorC.OnCommitting = processedItems =>
             {
                 // save addresses now to database and update fk reference obtained above
-                using (var db = new TestModel())
+                using (var db = new TestModel2())
                 {
                     db.Addresses.AddRange(processedItems);
 
@@ -245,7 +245,7 @@ namespace FutureState.Flow.Tests
             Assert.Equal(CsvItemsToCreate - 1, _resultB.ProcessedCount);
             Assert.Single(_resultA.Errors);
 
-            using (var db = new TestModel())
+            using (var db = new TestModel2())
             {
                 // less one as hit the rule
                 Assert.Equal(CsvItemsToCreate - 1, db.Contacts.Count());
@@ -254,7 +254,7 @@ namespace FutureState.Flow.Tests
 
         protected void AndThenOnlyAddressWithValidContactsShouldBeInserted()
         {
-            using (var db = new TestModel())
+            using (var db = new TestModel2())
             {
                 // less one as hit the rule
                 Assert.Equal(CsvItemsToCreate * 2 - 2, db.Addresses.Count());
@@ -276,8 +276,7 @@ namespace FutureState.Flow.Tests
             Assert.Single(result.Errors);
         }
 
-        // ignore
-        // [BddfyFact]
+        [BddfyFact]
         public void CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofac()
         {
             this.BDDfy();
