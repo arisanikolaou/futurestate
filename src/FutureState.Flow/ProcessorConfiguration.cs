@@ -39,9 +39,13 @@ namespace FutureState.Flow
         ///     Gets the rules to process/validate outgoing entities.
         /// </summary>
         public IEnumerable<ISpecification<TEntityOut>> Rules { get; }
-
+        /// <summary>
+        ///     Gets the default mapper to use to map incoming entities to outgoing entities.
+        /// </summary>
         public ObjectsMapper<TEntityIn, TEntityOut> Mapper { get; }
-
+        /// <summary>
+        ///     Gets the rules to use to validate a collection of entities.
+        /// </summary>
         public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules { get; }
     }
 }

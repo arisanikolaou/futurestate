@@ -2,10 +2,22 @@
 
 namespace FutureState.Flow
 {
-    public interface IProcessResultRepository<T> where T : ProcessResult
+    /// <summary>
+    ///     Saves and gets a given process result to an underlying data store.
+    /// </summary>
+    /// <typeparam name="TProcessResult">The type of process result to save.</typeparam>
+    public interface IProcessResultRepository<TProcessResult> where TProcessResult : ProcessResult
     {
-        T Get(string processName, Guid processId, long batchId);
+        /// <summary>
+        ///     Gets/loads a process result from an underlying data store that matches a given process name, process id as well as batch id.
+        /// </summary>
+        /// <returns></returns>
+        TProcessResult Get(string processName, Guid processId, long batchId);
 
-        void Save(T data);
+        /// <summary>
+        ///     Saves the process result.
+        /// </summary>
+        /// <param name="data">The data to save.</param>
+        void Save(TProcessResult data);
     }
 }

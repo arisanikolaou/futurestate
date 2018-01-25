@@ -87,6 +87,7 @@ namespace FutureState.Flow
         {
             Guard.ArgumentNotNull(process, nameof(process));
 
+            // record processor time
             StartTime = DateTime.UtcNow;
 
             Current = 0;
