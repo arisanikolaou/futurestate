@@ -22,33 +22,36 @@ namespace FutureState
             if (evt == null)
                 return;
 
-            // save target invocation list here
-            var methods = evt.GetInvocationList().ToArray();
-
             var tasks = new List<Task>();
 
-            for (var i = 0; i < methods.Length; i++)
+            // save target invocation list here
+            lock (evt)
             {
-                // ReSharper disable once UsePatternMatching
-                var innerMethod = methods[i] as EventHandler<T>;
-
-                if (innerMethod != null)
+                var methods = evt.GetInvocationList().ToArray();
+                
+                for (var i = 0; i < methods.Length; i++)
                 {
-                    tasks.Add(Task.Run(
-                        () =>
-                        {
-                            try
+                    // ReSharper disable once UsePatternMatching
+                    var innerMethod = methods[i] as EventHandler<T>;
+
+                    if (innerMethod != null)
+                    {
+                        tasks.Add(Task.Run(
+                            () =>
                             {
-                                innerMethod.Invoke(sender, e);
-                            }
-                            catch (Exception ex)
-                            {
-                                if (exceptionHandler != null)
-                                    exceptionHandler(ex);
-                                else
-                                    throw;
-                            }
-                        }));
+                                try
+                                {
+                                    innerMethod.Invoke(sender, e);
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (exceptionHandler != null)
+                                        exceptionHandler(ex);
+                                    else
+                                        throw;
+                                }
+                            }));
+                    }
                 }
             }
 

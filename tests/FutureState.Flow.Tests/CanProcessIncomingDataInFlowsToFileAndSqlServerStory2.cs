@@ -13,6 +13,7 @@ using Xunit;
 namespace FutureState.Flow.Tests
 {
     [Story]
+    [Collection("TestModel")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory
     {
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";

@@ -15,6 +15,7 @@ namespace FutureState.Flow.Tests
     using FutureState.Flow.Core;
 
     [Story]
+    [Collection("TestModel")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerStory
     {
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";

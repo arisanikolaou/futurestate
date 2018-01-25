@@ -56,13 +56,17 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             {
                 int i = 1; // todo: should be auto generated from class mappers
 
+                Func<int> createKey = () =>
+                {
+                    return i++;
+                };
+
                 _repository = new InMemoryRepository<TestEntity, int>(
                     new KeyProvider<TestEntity, int>(
-                        new KeyGenerator<TestEntity, int>(() => i++)),
-                    new KeyBinder<TestEntity, int>(m => m.Id, 
+                        new KeyGenerator<TestEntity, int>(createKey)),
+                    new KeyBinder<TestEntity, int>(m => m.Id,
                         (entity, entityId) => entity.Id = entityId),
                     new List<TestEntity>());
-
             }
 
             return _repository;
@@ -118,7 +122,12 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             using (var repositoryDb = new TestModel(_conString))
             {
                 repositoryDb.MyEntities
-                    .Add(new TestEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber });
+                    .Add(new TestEntity()
+                    {
+                        Name = "Name",
+                        Date = _referencedate,
+                        Money = _referenceNumber
+                    });
 
                 repositoryDb.SaveChanges();
             }
@@ -175,8 +184,6 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                     Money = _referenceNumber,
                     Name = "Name 2"
                 });
-
-                _db.EntitySet.Writer.Insert(testEntity2);
 
                 testEntity2.Name = "Name 3";
 
