@@ -14,7 +14,7 @@ namespace FutureState.Data.Tests
         private TestEntity _first;
         private TestEntity _single;
 
-        public void GivenALinqReaderWithData()
+        protected void GivenALinqReaderWithData()
         {
             var repo = new InMemoryRepository<TestEntity, Guid>();
             _reader = repo;
@@ -33,24 +33,24 @@ namespace FutureState.Data.Tests
             });
         }
 
-        public void WhenQueryingFirst()
+        protected void WhenQueryingFirst()
         {
             _first = _reader.First(m => m.Name == "Name");
         }
 
-        public void WhenQueringSingle()
+        protected void WhenQueringSingle()
         {
             _single = _reader.Single(m => m.Name == "Name");
         }
 
 
-        public void ThenFirstAndSingleShouldReturnValidResults()
+        protected void ThenFirstAndSingleShouldReturnValidResults()
         {
             Assert.NotNull(_first);
             Assert.NotNull(_single);
         }
 
-        public void ThenShouldThrowInvalidOperationExceptionWhenNotResultsFound()
+        protected void ThenShouldThrowInvalidOperationExceptionWhenNotResultsFound()
         {
             Assert.Throws<InvalidOperationException>(() => _reader.First(m => m.Name == null));
             Assert.Throws<InvalidOperationException>(() => _reader.Single(m => m.Name == null));
