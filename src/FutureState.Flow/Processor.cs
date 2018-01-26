@@ -7,9 +7,10 @@ using NLog;
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     Processes a single type in income entity data sources into an outgoing data source.
+    ///     Processes a single type of entity from an incoming data 
+    ///     sources into an outgoing data source.
     /// </summary>
-    /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source..</typeparam>
+    /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source.</typeparam>
     /// <typeparam name="TEntityOut">The type of entity to process results to.</typeparam>
     public class Processor<TEntityIn, TEntityOut> : IProcessor
         where TEntityOut : class, new()
@@ -18,6 +19,8 @@ namespace FutureState.Flow
 
         private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _configuration;
         private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
+        private Action<TEntityIn, TEntityOut> _beginProcessingItem;
+        private Action<IEnumerable<TEntityOut>> _onCommitting;
 
         /// <summary>
         ///     Creates a new instance.
@@ -27,6 +30,7 @@ namespace FutureState.Flow
             string processorName = null)
         {
             _configuration = configuration;
+
             processorName = processorName ?? GetProcessName(this);
 
             CreateOutput = dtoIn => new[] {new TEntityOut()};
@@ -53,7 +57,16 @@ namespace FutureState.Flow
         /// <summary>
         ///     Called before processing an incoming dto to an outgoing dto.
         /// </summary>
-        public Action<TEntityIn, TEntityOut> BeginProcessingItem { get; set; }
+        public Action<TEntityIn, TEntityOut> BeginProcessingItem
+        {
+            get => _beginProcessingItem;
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(BeginProcessingItem));
+
+                _beginProcessingItem = value;
+            }
+        }
 
         /// <summary>
         ///     Gets/sets the processor handler.
@@ -63,13 +76,27 @@ namespace FutureState.Flow
         /// <summary>
         ///     Called while comitting processed changes.
         /// </summary>
-        public Action<IEnumerable<TEntityOut>> OnCommitting { get; set; }
+        public Action<IEnumerable<TEntityOut>> OnCommitting
+        {
+            get => _onCommitting;
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(OnCommitting));
+
+                _onCommitting = value;
+            }
+        }
 
         /// <summary>
         ///     Get the well known name of the processor type.
         /// </summary>
         public string ProcessName => Engine.ProcessName;
 
+        /// <summary>
+        ///     Gets the default processor name.
+        /// </summary>
+        /// <param name="processor">The processor instance to calculate a name for.</param>
+        /// <returns></returns>
         public static string GetProcessName(IProcessor processor)
         {
             return $"{processor.GetType().Name}-{typeof(TEntityOut).Name}";
@@ -92,7 +119,7 @@ namespace FutureState.Flow
 
 
         /// <summary>
-        ///     Creates a new process hanlder.
+        ///     Creates a new process engine instance using a given entity reader and core engine.
         /// </summary>
         /// <returns></returns>
         public ProcessorEngine<TEntityIn> BuildProcessEngine(IEnumerable<TEntityIn> reader,

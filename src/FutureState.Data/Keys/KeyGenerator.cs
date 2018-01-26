@@ -35,6 +35,9 @@ namespace FutureState.Data
         /// <summary>
         ///     Gets a new key for a given entity.
         /// </summary>
-        public TKey GetNew() => _getGet();
+        public TKey GetNew()
+        {
+            return _getGet();
+        }
     }
 }

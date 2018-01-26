@@ -66,6 +66,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                         new KeyGenerator<TestEntity, int>(createKey)),
                     new KeyBinder<TestEntity, int>(m => m.Id,
                         (entity, entityId) => entity.Id = entityId),
+
                     new List<TestEntity>());
             }
 
@@ -172,6 +173,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             {
                 _db.EntitySet.Writer.Insert(new TestEntity()
                 {
+                    Id = 1,
                     Date = _referencedate,
                     Money = _referenceNumber,
                     Name = "Name"
@@ -180,6 +182,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                 TestEntity testEntity2;
                 _db.EntitySet.Writer.Insert(testEntity2 = new TestEntity()
                 {
+                    Id = 2,
                     Date = _referencedate,
                     Money = _referenceNumber,
                     Name = "Name 2"
@@ -208,6 +211,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             {
                 _db.EntitySet.Writer.Insert(new TestEntity()
                 {
+                    Id = 3,
                     Date = _referencedate,
                     Money = _referenceNumber,
                     Name = "Not commited"

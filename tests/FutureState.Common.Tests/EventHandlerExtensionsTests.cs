@@ -23,7 +23,10 @@ namespace FutureState.Common.Tests
             var errors = new List<Exception>();
 
             // ReSharper disable once ConvertToLocalFunction
-            Action<Exception> handler = exception => { errors.Add(exception); };
+            Action<Exception> handler = exception => {
+                lock(this)
+                    errors.Add(exception);
+            };
 
             // act
             Event1.AsyncRaiseSafe(this, args, handler).Wait(); //1 pass 1 fail
@@ -60,6 +63,8 @@ namespace FutureState.Common.Tests
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //1 pass 1 fail
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
+
+            Thread.Sleep(500); //avoid race 
 
             Assert.Equal(5, errors.Count);
             Assert.Equal(1, args.HitCount);

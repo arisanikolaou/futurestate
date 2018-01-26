@@ -119,7 +119,8 @@ namespace FutureState.Data.Sql
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"Failed to assign default class mapper for {actualType.FullName} due to an unexpected error.",
+                        throw new Exception(
+                            $"Failed to assign default class mapper for {actualType.FullName} due to an unexpected error.",
                             ex);
                     }
                 }

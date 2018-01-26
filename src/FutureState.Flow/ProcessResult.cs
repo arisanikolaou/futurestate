@@ -45,7 +45,7 @@ namespace FutureState.Flow
     public class ProcessResult<TEntityIn> : ProcessResult
     {
         /// <summary>
-        ///     Gets the items that were used as the source for procesing.
+        ///     Gets the items that were used as the source for procesing such as the items in a csv file.
         /// </summary>
         public List<TEntityIn> Input { get; internal set; }
 

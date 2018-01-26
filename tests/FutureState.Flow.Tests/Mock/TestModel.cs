@@ -15,13 +15,18 @@ namespace FutureState.Flow.Tests.Mock
             this.Database.Initialize(true);
         }
 
+        public TestModel(string conString)
+            : base(conString)
+        {
+            this.Database.Initialize(true);
+        }
+
 
         public virtual DbSet<Contact> Contacts { get; set; }
 
 
         public virtual DbSet<Address> Addresses { get; set; }
     }
-
 
     public class Contact
     {
@@ -30,6 +35,7 @@ namespace FutureState.Flow.Tests.Mock
         public int Id { get; set; }
 
         public string Name { get; set; }
+
         public string Description { get; set; }
     }
 
