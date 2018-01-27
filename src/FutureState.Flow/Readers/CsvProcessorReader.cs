@@ -11,23 +11,16 @@ namespace FutureState.Flow
     /// </summary>
     public class CsvProcessorReader<TEntity> : IReader<TEntity>
     {
-        private readonly string _fileName;
-
-        public CsvProcessorReader(string fileName)
+        public IEnumerable<TEntity> Read(string fileName)
         {
             Guard.ArgumentNotNullOrEmptyOrWhiteSpace(fileName, nameof(fileName));
 
-            _fileName = fileName;
-        }
-
-        public IEnumerable<TEntity> Read()
-        {
-            if (!File.Exists(_fileName))
-                throw new InvalidOperationException($"File {_fileName} does not exist.");
+            if (!File.Exists(fileName))
+                throw new InvalidOperationException($"File {fileName} does not exist.");
 
             var config = new Configuration {HasHeaderRecord = true};
 
-            using (var reader = new StreamReader(File.OpenRead(_fileName)))
+            using (var reader = new StreamReader(File.OpenRead(fileName)))
             {
                 using (var helper = new CsvReader(reader, config))
                 {
@@ -35,7 +28,7 @@ namespace FutureState.Flow
                         try
                         {
                             if (!helper.ReadHeader())
-                                throw new ApplicationException($"Can't read header of file {_fileName}.");
+                                throw new ApplicationException($"Can't read header of file {fileName}.");
                         }
                         catch (ApplicationException)
                         {
@@ -43,7 +36,7 @@ namespace FutureState.Flow
                         }
                         catch (Exception ex)
                         {
-                            throw new ApplicationException($"Can't read data from file {_fileName}.", ex);
+                            throw new ApplicationException($"Can't read data from file {fileName}.", ex);
                         }
 
                     while (helper.Read())

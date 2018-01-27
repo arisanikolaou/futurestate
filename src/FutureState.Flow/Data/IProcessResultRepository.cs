@@ -15,6 +15,12 @@ namespace FutureState.Flow
         TProcessResult Get(string processName, Guid processId, long batchId);
 
         /// <summary>
+        ///     Gets the process results found on a given network file path or internet address.
+        /// </summary>
+        /// <returns></returns>
+        TProcessResult Get(string dataSource);
+
+        /// <summary>
         ///     Saves the process result.
         /// </summary>
         /// <param name="data">The data to save.</param>

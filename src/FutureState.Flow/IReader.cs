@@ -8,7 +8,7 @@ namespace FutureState.Flow
     /// <typeparam name="TEntity">The entity type read from the underlying data source.</typeparam>
     public interface IReader<out TEntity> : IReader
     {
-        IEnumerable<TEntity> Read();
+        IEnumerable<TEntity> Read(string dataSource);
     }
 
     /// <summary>

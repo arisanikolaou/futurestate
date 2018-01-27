@@ -65,6 +65,6 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the valid items created after processing. This is the primary ouput.
         /// </summary>
-        public List<TEntityOut> Output { get; internal set; } = new List<TEntityOut>();
+        public List<TEntityOut> Output { get; set; } = new List<TEntityOut>();
     }
 }

@@ -21,14 +21,11 @@ namespace FutureState.Flow
         ///     Creates a new instance.
         /// </summary>
         public ProcessorEngine(
-            string processorName,
-            IProcessResultRepository<ProcessResult> repository = null)
+            string processorName = null)
         {
             Warnings = new List<string>();
 
             ProcessName = processorName ?? GetType().Name;
-
-            _repository = repository ?? new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
 
@@ -189,9 +186,6 @@ namespace FutureState.Flow
             result.Warnings = Warnings;
             result.Input = processed;
             result.ProcessTime = DateTime.UtcNow - StartTime;
-
-            // save flow
-            _repository.Save(result);
 
             return result;
         }

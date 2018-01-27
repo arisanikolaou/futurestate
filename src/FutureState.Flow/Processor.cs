@@ -27,17 +27,22 @@ namespace FutureState.Flow
         /// </summary>
         public Processor(
             ProcessorConfiguration<TEntityIn, TEntityOut> configuration,
+            ProcessorEngine<TEntityIn> engine,
             string processorName = null)
         {
+            Guard.ArgumentNotNull(configuration, nameof(configuration));
+            Guard.ArgumentNotNull(engine, nameof(engine));
+
             _configuration = configuration;
 
             processorName = processorName ?? GetProcessName(this);
 
-            CreateOutput = dtoIn => new[] {new TEntityOut()};
+            CreateOutput = dtoIn => new[] { new TEntityOut() };
 
-            Engine = new ProcessorEngine<TEntityIn>(
-                processorName,
-                _configuration.Repository);
+            Engine = engine;
+
+            if (!string.IsNullOrWhiteSpace(processorName))
+                Engine.ProcessName = processorName;
         }
 
         /// <summary>
@@ -141,7 +146,7 @@ namespace FutureState.Flow
                 pItem?.Invoke(dtoIn);
 
                 // create output entity
-                IEnumerable<TEntityOut> itemsToProcess = new[] {new TEntityOut()};
+                IEnumerable<TEntityOut> itemsToProcess = new[] { new TEntityOut() };
                 if (CreateOutput != null)
                     itemsToProcess = CreateOutput(dtoIn);
 
@@ -164,7 +169,7 @@ namespace FutureState.Flow
                         if (e.Any())
                             foreach (var error in e)
                             {
-                                errorEvent = new ErrorEvent {Message = error.Message, Type = error.Type};
+                                errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
                                 errorEvents.Add(errorEvent);
                             }
                         else

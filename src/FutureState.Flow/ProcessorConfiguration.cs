@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EmitMapper;
-using FutureState.Flow.Core;
 using FutureState.Specifications;
 
 namespace FutureState.Flow
@@ -17,7 +15,6 @@ namespace FutureState.Flow
         public ProcessorConfiguration(
             IProvideSpecifications<TEntityOut> specProviderForEntity = null,
             IProvideSpecifications<IEnumerable<TEntityOut>> specProviderForEntityCollection = null,
-            IProcessResultRepository<ProcessResult> repository = null,
             ObjectsMapper<TEntityIn, TEntityOut> mapper = null)
         {
             Mapper = mapper ?? ObjectMapperManager.DefaultInstance.GetMapper<TEntityIn, TEntityOut>();
@@ -27,14 +24,8 @@ namespace FutureState.Flow
 
             CollectionRules = specProviderForEntityCollection?.GetSpecifications().ToArray() ??
                               Enumerable.Empty<ISpecification<IEnumerable<TEntityOut>>>();
-
-            Repository = repository ?? new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
-        /// <summary>
-        ///     The repository to save flow/process results to.
-        /// </summary>
-        public IProcessResultRepository<ProcessResult> Repository { get; }
         /// <summary>
         ///     Gets the rules to process/validate outgoing entities.
         /// </summary>

@@ -29,6 +29,7 @@ namespace FutureState.Flow.Tests
         private BatchProcess _batchProcess;
         private ProcessResult<Dto2, Address> _resultC;
         private SpecProvider<Address> _specProviderFroAddress;
+        private ProcessResultRepository<ProcessResult> _repository;
 
         protected void GivenANewLocalSqlDb()
         {
@@ -40,6 +41,11 @@ namespace FutureState.Flow.Tests
                 // save results
                 db.Database.CreateIfNotExists();
             }
+        }
+
+        protected void AndGivenAProcessorResultsRepository()
+        {
+            _repository = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
         protected void AndGivenAbatchProcess()
@@ -117,7 +123,9 @@ namespace FutureState.Flow.Tests
 
         protected void WhenProcessingADenormalizedFileUsingProcessingRules()
         {
-            var processorA = new Processor<DenormalizedEntity, Dto1>(new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider))
+            var processorA = new Processor<DenormalizedEntity, Dto1>(
+                new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider),
+                new ProcessorEngine<DenormalizedEntity>())
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
@@ -134,8 +142,10 @@ namespace FutureState.Flow.Tests
             _processorA = processorA;
 
             // process from csv
-            var enumeration = new CsvProcessorReader<DenormalizedEntity>(DataFileToCreate).Read();
+            var enumeration = new CsvProcessorReader<DenormalizedEntity>().Read(DataFileToCreate);
             _resultA = processorA.Process(enumeration, _batchProcess);
+
+            _repository.Save(_resultA);
 
             // todo: save to data store
         }
@@ -143,7 +153,9 @@ namespace FutureState.Flow.Tests
         protected void AndWhenChainingTheProcessedResultsToAnotherProcessor()
         {
             // chain 2
-            var processorB = new Processor<Dto1, Dto2>(new ProcessorConfiguration<Dto1, Dto2>())
+            var processorB = new Processor<Dto1, Dto2>(
+                new ProcessorConfiguration<Dto1, Dto2>(),
+                new ProcessorEngine<Dto1>())
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
@@ -185,12 +197,16 @@ namespace FutureState.Flow.Tests
             };
 
             _resultB = processorB.Process(_resultA.Output, _batchProcess);
+
+            _repository.Save(_resultB);
         }
 
         protected void AndWhenChainingTheProcessedResultsToLastProcessor()
         {
             // chain 2
-            var processorC = new Processor<Dto2, Address>(new ProcessorConfiguration<Dto2, Address>(_specProviderFroAddress))
+            var processorC = new Processor<Dto2, Address>(
+                new ProcessorConfiguration<Dto2, Address>(_specProviderFroAddress),
+                new ProcessorEngine<Dto2>())
             {
                 CreateOutput = (dtoIn) => dtoIn.Addresses,
                 // save to database
@@ -208,6 +224,7 @@ namespace FutureState.Flow.Tests
             };
 
             _resultC = processorC.Process(_resultB.Output, _batchProcess);
+            _repository.Save(_resultC);
         }
 
         protected void ThenResultsShouldBeValid()

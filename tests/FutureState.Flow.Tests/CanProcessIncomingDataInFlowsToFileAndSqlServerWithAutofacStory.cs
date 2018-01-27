@@ -27,6 +27,7 @@ namespace FutureState.Flow.Tests
         private ProcessResult<DenormalizedEntity, Dto1> _resultA;
         private ProcessResult<Dto1, Dto2> _resultB;
         private ProcessResult<Dto2, Address> _resultC;
+        private ProcessResultRepository<ProcessResult> _repository;
 
         protected void GivenANewLocalSqlDb()
         {
@@ -38,6 +39,10 @@ namespace FutureState.Flow.Tests
                 // save results
                 db.Database.CreateIfNotExists();
             }
+        }
+        protected void AndGivenAProcessorResultsRepository()
+        {
+            _repository = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
         }
 
         protected void AndGivenAWiredUpContainer()
@@ -51,6 +56,9 @@ namespace FutureState.Flow.Tests
 
             _cb.RegisterGeneric(typeof(Processor<,>))
                 .As(typeof(Processor<,>));
+
+            _cb.RegisterGeneric(typeof(ProcessorEngine<>))
+                .As(typeof(ProcessorEngine<>));
 
             _cb.RegisterGeneric(typeof(ProcessorConfiguration<,>))
                 .As(typeof(ProcessorConfiguration<,>));
@@ -160,10 +168,10 @@ namespace FutureState.Flow.Tests
             _processorA = processorA;
 
             // process from csv
-            var enumeration = new CsvProcessorReader<DenormalizedEntity>(DataFileToCreate).Read();
+            var enumeration = new CsvProcessorReader<DenormalizedEntity>().Read(DataFileToCreate);
             _resultA = processorA.Process(enumeration, _batchProcess);
 
-            // todo: save to data store
+            _repository.Save(_resultA);
         }
 
         protected void AndWhenChainingTheProcessedResultsToAnotherProcessor()
@@ -208,6 +216,8 @@ namespace FutureState.Flow.Tests
             };
 
             _resultB = processorB.Process(_resultA.Output, _batchProcess);
+
+            _repository.Save(_resultB);
         }
 
         protected void AndWhenChainingTheProcessedResultsToLastProcessor()
@@ -230,6 +240,8 @@ namespace FutureState.Flow.Tests
             };
 
             _resultC = processorC.Process(_resultB.Output, _batchProcess);
+
+            _repository.Save(_resultC);
         }
 
         protected void ThenResultsShouldBeValid()
@@ -267,6 +279,7 @@ namespace FutureState.Flow.Tests
         {
             var repo =
                 new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
+
             var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
             var result = repo.Get(processorName, _processId, BatchId);
