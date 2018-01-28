@@ -53,10 +53,10 @@ namespace FutureState.Flow.Core
 
             var i = 1;
             var fileName =
-                $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{data.BatchProcess.BatchId}.json";
+                $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{data.BatchProcess.BatchId}.json";
             while (File.Exists(fileName))
                 fileName =
-                    $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.ProcessId}-{
+                    $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{
                             data.BatchProcess.BatchId
                         }-{i++}.json";
 

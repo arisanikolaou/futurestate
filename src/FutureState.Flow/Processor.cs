@@ -17,7 +17,7 @@ namespace FutureState.Flow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _configuration;
+        private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _config;
         private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
         private Action<TEntityIn, TEntityOut> _beginProcessingItem;
         private Action<IEnumerable<TEntityOut>> _onCommitting;
@@ -26,23 +26,16 @@ namespace FutureState.Flow
         ///     Creates a new instance.
         /// </summary>
         public Processor(
-            ProcessorConfiguration<TEntityIn, TEntityOut> configuration,
-            ProcessorEngine<TEntityIn> engine,
-            string processorName = null)
+            ProcessorConfiguration<TEntityIn, TEntityOut> config,
+            ProcessorEngine<TEntityIn> engine = null)
         {
-            Guard.ArgumentNotNull(configuration, nameof(configuration));
-            Guard.ArgumentNotNull(engine, nameof(engine));
+            Guard.ArgumentNotNull(config, nameof(config));
 
-            _configuration = configuration;
-
-            processorName = processorName ?? GetProcessName(this);
+            _config = config;
 
             CreateOutput = dtoIn => new[] { new TEntityOut() };
-
-            Engine = engine;
-
-            if (!string.IsNullOrWhiteSpace(processorName))
-                Engine.ProcessName = processorName;
+            ProcessName = GetProcessName(this);
+            Engine = engine ?? new ProcessorEngine<TEntityIn>();
         }
 
         /// <summary>
@@ -95,7 +88,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Get the well known name of the processor type.
         /// </summary>
-        public string ProcessName => Engine.ProcessName;
+        public string ProcessName { get; }
 
         /// <summary>
         ///     Gets the default processor name.
@@ -104,7 +97,7 @@ namespace FutureState.Flow
         /// <returns></returns>
         public static string GetProcessName(IProcessor processor)
         {
-            return $"{processor.GetType().Name}-{typeof(TEntityOut).Name}";
+            return $"{processor.GetType().Name.Replace("`2", "")}-{typeof(TEntityIn).Name}-{typeof(TEntityOut).Name}";
         }
 
         /// <summary>
@@ -112,7 +105,10 @@ namespace FutureState.Flow
         /// </summary>
         public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process)
         {
-            var result = new ProcessResult<TEntityIn, TEntityOut>();
+            var result = new ProcessResult<TEntityIn, TEntityOut>()
+            {
+                ProcessName = ProcessName
+            };
 
             return Process(reader, process, result);
         }
@@ -154,7 +150,7 @@ namespace FutureState.Flow
                 foreach (var item in itemsToProcess)
                 {
                     // apply default mapping
-                    var dtoOut = _configuration.Mapper.Map(dtoIn, item);
+                    var dtoOut = _config.Mapper.Map(dtoIn, item);
 
                     // prepare entity
                     BeginProcessingItem?.Invoke(dtoIn, dtoOut);
@@ -164,7 +160,7 @@ namespace FutureState.Flow
                     // validate against business rules
                     if (errorEvent == null)
                     {
-                        var errors = _configuration.Rules.ToErrors(dtoOut);
+                        var errors = _config.Rules.ToErrors(dtoOut);
                         var e = errors as Error[] ?? errors.ToArray();
                         if (e.Any())
                             foreach (var error in e)
@@ -186,7 +182,7 @@ namespace FutureState.Flow
                 pCommit?.Invoke();
 
                 // validate collection commit
-                var errors = _configuration.CollectionRules.ToErrors(processedValidItems);
+                var errors = _config.CollectionRules.ToErrors(processedValidItems);
 
                 var enumerable = errors as Error[] ?? errors.ToArray();
                 if (enumerable.Any())
@@ -213,7 +209,7 @@ namespace FutureState.Flow
             ProcessResult<TEntityIn, TEntityOut> resultState)
         {
             if (Logger.IsTraceEnabled)
-                Logger.Trace($"Starting to process  {ProcessName} Batch {process.BatchId}.");
+                Logger.Trace($"Starting to process  {ProcessName} batch {process.BatchId}.");
 
             try
             {

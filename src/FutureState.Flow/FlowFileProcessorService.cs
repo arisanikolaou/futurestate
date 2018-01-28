@@ -96,7 +96,7 @@ namespace FutureState.Flow
                 // reate a new batch process
                 var batchProcess = new BatchProcess()
                 {
-                    ProcessId = FlowFileBatchController.FlowId,
+                    FlowId = FlowFileBatchController.FlowId,
                     BatchId = flowFileLog.BatchId
                 };
 

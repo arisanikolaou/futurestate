@@ -20,6 +20,16 @@ namespace FutureState.Flow
         Guid FlowId { get; }
 
         /// <summary>
+        ///     Gets the input directory or port.
+        /// </summary>
+        string InDirectory { get; }
+
+        /// <summary>
+        ///     Gets the output directory or port.
+        /// </summary>
+        string OutDirectory { get; }
+
+        /// <summary>
         ///     Processes a batch of data from an incoming flow file within a batch process.
         /// </summary>
         /// <param name="flowFile">The flow file to process.</param>

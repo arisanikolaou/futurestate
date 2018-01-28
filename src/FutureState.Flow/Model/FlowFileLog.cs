@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FutureState.Flow.Model
 {
     /// <summary>
-    /// 
+    ///     A log of all the flow file processed in a distinct flow id.
     /// </summary>
     public class FlowFileLog
     {

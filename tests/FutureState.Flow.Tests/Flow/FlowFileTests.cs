@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using CsvHelper;
 using FutureState.Flow.BatchControllers;
-using FutureState.Flow.Core;
 using FutureState.Flow.Data;
 using Newtonsoft.Json;
 using TestStack.BDDfy;
@@ -31,7 +29,6 @@ namespace FutureState.Flow.Tests.Flow
         private FlowFileLogRepository _logRepository;
         public Guid FlowId { get; set; }
         private bool _flowFileProcessed;
-        private ProcessResultRepository<ProcessResult<TSourceEntity, TargetEntity2>> _repository;
         private bool _flowFile1Processed;
 
         [BddfyFact]
@@ -49,11 +46,6 @@ namespace FutureState.Flow.Tests.Flow
 
             this._inDirectory = $@"{_baseDirectory}\{_processName}\In";
             this._outDirectory = $@"{_baseDirectory}\{_processName}\Out";
-        }
-
-        protected void AndGivenAProcessResultRepo()
-        {
-            _repository = new ProcessResultRepository<ProcessResult<TSourceEntity, TargetEntity2>>(_outDirectory);
         }
 
         protected void AndGivenAGeneratedDataSourceCsvFile()
@@ -74,7 +66,7 @@ namespace FutureState.Flow.Tests.Flow
                     var csv = new CsvWriter(sw);
                     csv.Configuration.HasHeaderRecord = true; //this should be the default value
 
-                    csv.WriteHeader<TSourceEntity>();
+                    csv.WriteHeader<Enitity1>();
 
                     csv.Flush();
                     csv.NextRecord();
@@ -82,7 +74,7 @@ namespace FutureState.Flow.Tests.Flow
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
-                        var entity = new TSourceEntity
+                        var entity = new Enitity1
                         {
                             Name = $"Key-{i}"
                         };
@@ -174,19 +166,13 @@ namespace FutureState.Flow.Tests.Flow
             Assert.True(_flowFile1Processed);
         }
 
-        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileFlowFileBatchController<TSourceEntity, TargetEntity2>
+        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileFlowFileBatchController<Enitity1, Entity2>
         {
-            public override Processor<TSourceEntity, TargetEntity2> GetProcessor()
+            public override Processor<Enitity1, Entity2> GetProcessor()
             {
-                var config = new ProcessorConfiguration<TSourceEntity, TargetEntity2>();
-
-                // where results will be posted to
-                // create engine to save results to out directory
-                var engine = new ProcessorEngine<TSourceEntity>(ControllerName);
-
                 int i = 0;
                 // preocessor service
-                return new Processor<TSourceEntity, TargetEntity2>(config, engine)
+                return new Processor<Enitity1, Entity2>(Config)
                 {
                     BeginProcessingItem = (dtoIn, dtoOut) =>
                     {
@@ -200,19 +186,13 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<TargetEntity2, TargetEntity3>
+        public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<Entity2, Entity3>
         {
-            public override Processor<TargetEntity2, TargetEntity3> GetProcessor()
+            public override Processor<Entity2, Entity3> GetProcessor()
             {
-                var config = new ProcessorConfiguration<TargetEntity2, TargetEntity3>();
-
-                // where results will be posted to
-                // create engine to save results to out directory
-                var engine = new ProcessorEngine<TargetEntity2>(ControllerName);
-
                 int i = 0;
                 // preocessor service
-                return new Processor<TargetEntity2, TargetEntity3>(config, engine)
+                return new Processor<Entity2, Entity3>(Config)
                 {
                     BeginProcessingItem = (dtoIn, dtoOut) =>
                     {
@@ -221,6 +201,7 @@ namespace FutureState.Flow.Tests.Flow
 
                         dtoOut.Name = dtoIn.Name;
                         dtoOut.Id = ++i + dtoIn.Id;
+                        dtoOut.DateProcessed = DateTime.UtcNow;
                     }
                 };
             }
@@ -228,23 +209,26 @@ namespace FutureState.Flow.Tests.Flow
 
 
 
-        public class TSourceEntity
+        public class Enitity1
         {
             public string Name { get; set; }
         }
 
-        public class TargetEntity2
+        public class Entity2
         {
             public string Name { get; set; }
 
             public int Id { get; set; }
         }
 
-        public class TargetEntity3
+        public class Entity3
         {
             public string Name { get; set; }
 
             public int Id { get; set; }
+
+
+            public DateTime DateProcessed { get; set; }
         }
     }
 }

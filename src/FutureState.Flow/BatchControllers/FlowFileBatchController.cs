@@ -13,13 +13,14 @@ namespace FutureState.Flow.BatchControllers
     /// </summary>
     /// <typeparam name="TIn"></typeparam>
     /// <typeparam name="TOut"></typeparam>
-    public abstract class FlowFileFlowFileBatchController<TIn,TOut> : IFlowFileBatchController
+    public class FlowFileFlowFileBatchController<TIn,TOut> : IFlowFileBatchController
         where TOut : class, new()
     {
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _outDirectory;
         private string _inDirectory;
+        private readonly Func<IFlowFileBatchController, Processor<TIn, TOut>> _getProcessor;
         private readonly IReader<TIn> _reader;
 
         /// <summary>
@@ -33,9 +34,29 @@ namespace FutureState.Flow.BatchControllers
         public Guid FlowId { get; set; }
 
 
-        protected FlowFileFlowFileBatchController(IReader<TIn> reader)
+        /// <summary>
+        ///     Gets the configuration to use to setup of a processor.
+        /// </summary>
+        public ProcessorConfiguration<TIn, TOut> Config { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader">The reader to read incoming results from.</param>
+        /// <param name="getProcessor">Function to create a new procesor.</param>
+        /// <param name="config">Processor configuration settings.</param>
+        public FlowFileFlowFileBatchController(
+            IReader<TIn> reader, 
+            Func<IFlowFileBatchController, Processor<TIn, TOut>> getProcessor = null, 
+            ProcessorConfiguration<TIn, TOut> config = null)
         {
             Guard.ArgumentNotNull(reader, nameof(reader));
+
+            _getProcessor = getProcessor;
+            if (_getProcessor == null)
+                _getProcessor = controller => throw new NotImplementedException();
+
+            Config = config ?? new ProcessorConfiguration<TIn, TOut>();
 
             OutDirectory = Environment.CurrentDirectory;
             InDirectory = Environment.CurrentDirectory;
@@ -47,7 +68,10 @@ namespace FutureState.Flow.BatchControllers
             _reader = reader;
         }
 
-        public abstract Processor<TIn, TOut> GetProcessor();
+        public virtual Processor<TIn, TOut> GetProcessor()
+        {
+            return _getProcessor(this);
+        }
 
         /// <summary>
         ///     Gets the flow files associated with the current directory.
@@ -83,7 +107,6 @@ namespace FutureState.Flow.BatchControllers
         {
             return _reader.Read(flowFile.FullName);
         }
-
 
         public virtual ProcessResult Process(FileInfo flowFile, BatchProcess process)
         {

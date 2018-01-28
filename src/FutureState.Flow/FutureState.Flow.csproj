@@ -68,14 +68,14 @@
     <Compile Include="ProcessorConfiguration.cs" />
     <Compile Include="Readers\GenericResultReader.cs" />
     <Compile Include="Data\ProcessResultRepository.cs" />
-    <Compile Include="BatchProcess.cs" />
+    <Compile Include="Model\BatchProcess.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="IProcessorEngine.cs" />
     <Compile Include="IProcessor.cs" />
     <Compile Include="Readers\IReader.cs" />
     <Compile Include="ProcessorEngine.cs" />
     <Compile Include="ProcessResult.cs" />
-    <Compile Include="ErrorEvent.cs" />
+    <Compile Include="Model\ErrorEvent.cs" />
     <Compile Include="Readers\CsvProcessorReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

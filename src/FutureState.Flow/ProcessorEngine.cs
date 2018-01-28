@@ -18,19 +18,15 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public ProcessorEngine(
-            string processorName = null)
+        public ProcessorEngine()
         {
             Warnings = new List<string>();
-
-            ProcessName = processorName ?? $"{GetType().Name.Replace("`1","")}-{typeof(TEntityDto).Name}";
         }
 
-
-        /// <summary>
-        ///     Gets/set the processor name.
-        /// </summary>
-        public string ProcessName { get; set; }
+        string GetDefaultProcessName()
+        {
+            return $"{GetType().Name.Replace("`1", "")}-{typeof(TEntityDto).Name}";
+        }
 
         /// <summary>
         ///     Initializes a new procesor.
@@ -91,7 +87,13 @@ namespace FutureState.Flow
                 throw new InvalidOperationException("EntitiesReader has not been assigned.");
 
             if (result == null)
-                result = new ProcessResult<TEntityDto>();
+            {
+                // create a new instance and assign default name
+                result = new ProcessResult<TEntityDto>()
+                {
+                    ProcessName = GetDefaultProcessName()
+                };
+            }
 
             result.BatchProcess = process;
 
@@ -177,7 +179,6 @@ namespace FutureState.Flow
             if (Logger.IsInfoEnabled)
                 Logger.Info($"Finised processing.");
 
-            result.ProcessName = ProcessName;
             result.ProcessedCount = processed.Count;
             result.Errors = errors;
             result.Exceptions = exceptions;

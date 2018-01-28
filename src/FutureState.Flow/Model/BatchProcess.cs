@@ -18,16 +18,16 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new batch instance against a given process id and a batch id.
         /// </summary>
-        public BatchProcess(Guid processId, int batchId)
+        public BatchProcess(Guid flowId, int batchId)
         {
-            ProcessId = processId;
+            FlowId = flowId;
             BatchId = batchId;
         }
 
         /// <summary>
         ///     Gets the process id.
         /// </summary>
-        public Guid ProcessId { get; set; }
+        public Guid FlowId { get; set; }
 
         /// <summary>
         ///     Gets the job/batch number.
