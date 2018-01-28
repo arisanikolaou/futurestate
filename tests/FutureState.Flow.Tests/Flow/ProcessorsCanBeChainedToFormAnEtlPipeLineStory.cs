@@ -43,6 +43,8 @@ namespace FutureState.Flow.Tests.Flow
             this._processName = @"MyProcess";
 
             this._baseDirectory = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}";
+            if(Directory.Exists(_baseDirectory))
+                Directory.Delete(_baseDirectory, true);
 
             this._inDirectory = $@"{_baseDirectory}\{_processName}\In";
             this._outDirectory = $@"{_baseDirectory}\{_processName}\Out";
@@ -98,7 +100,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenAConsistentProcessId()
         {
-            this.FlowId = SeqGuid.Create();
+            this.FlowId = Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c859");
         }
 
 
