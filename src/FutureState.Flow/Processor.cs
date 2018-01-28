@@ -7,7 +7,7 @@ using NLog;
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     Processes a single type of entity from an incoming data 
+    ///     Processes a single type of entity from an incoming data
     ///     sources into an outgoing data source.
     /// </summary>
     /// <typeparam name="TEntityIn">The data type of the incoming entity read from an underlying data source.</typeparam>
@@ -18,8 +18,8 @@ namespace FutureState.Flow
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _config;
-        private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
         private Action<TEntityIn, TEntityOut> _beginProcessingItem;
+        private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
         private Action<IEnumerable<TEntityOut>> _onCommitting;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace FutureState.Flow
 
             _config = config;
 
-            CreateOutput = dtoIn => new[] { new TEntityOut() };
+            CreateOutput = dtoIn => new[] {new TEntityOut()};
             ProcessName = GetProcessName(this);
             Engine = engine ?? new ProcessorEngine<TEntityIn>();
         }
@@ -105,7 +105,7 @@ namespace FutureState.Flow
         /// </summary>
         public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process)
         {
-            var result = new ProcessResult<TEntityIn, TEntityOut>()
+            var result = new ProcessResult<TEntityIn, TEntityOut>
             {
                 ProcessName = ProcessName
             };
@@ -142,19 +142,20 @@ namespace FutureState.Flow
                 pItem?.Invoke(dtoIn);
 
                 // create output entity
-                IEnumerable<TEntityOut> itemsToProcess = new[] { new TEntityOut() };
+                IEnumerable<TEntityOut> itemsToProcess = new[] {new TEntityOut()};
                 if (CreateOutput != null)
                     itemsToProcess = CreateOutput(dtoIn);
 
                 var errorEvents = new List<ErrorEvent>();
-                foreach (var item in itemsToProcess)
+                foreach (var dtoOutDefault in itemsToProcess)
                 {
                     // apply default mapping
-                    var dtoOut = _config.Mapper.Map(dtoIn, item);
+                    var dtoOut = _config.Mapper.Map(dtoIn, dtoOutDefault);
 
                     // prepare entity
                     BeginProcessingItem?.Invoke(dtoIn, dtoOut);
 
+                    // validate
                     var errorEvent = OnItemProcessing(dtoIn, dtoOut);
 
                     // validate against business rules
@@ -165,7 +166,7 @@ namespace FutureState.Flow
                         if (e.Any())
                             foreach (var error in e)
                             {
-                                errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
+                                errorEvent = new ErrorEvent {Message = error.Message, Type = error.Type};
                                 errorEvents.Add(errorEvent);
                             }
                         else

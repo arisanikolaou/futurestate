@@ -13,15 +13,14 @@ namespace FutureState.Flow.BatchControllers
     {
         public ProcessResultFlowFileBatchController(
             Func<IFlowFileBatchController, Processor<TIn, TOut>> getProcessor = null,
-            ProcessorConfiguration<TIn, TOut> config = null) 
+            ProcessorConfiguration<TIn, TOut> config = null)
             : base(GetReader(), getProcessor, config)
         {
-
         }
 
-        static IReader<TIn> GetReader()
+        private static IReader<TIn> GetReader()
         {
-            return new GenericResultReader<TIn>((flowFileSource) =>
+            return new GenericResultReader<TIn>(flowFileSource =>
             {
                 var repoository = new ProcessResultRepository<ProcessResult<TOut, TIn>>(flowFileSource);
 

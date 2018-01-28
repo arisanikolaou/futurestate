@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace FutureState.Flow.BatchControllers
 {
@@ -13,10 +12,9 @@ namespace FutureState.Flow.BatchControllers
     {
         public CsvFlowFileFlowFileBatchController(
             Func<IFlowFileBatchController, Processor<TIn, TOut>> getProcessor = null,
-            ProcessorConfiguration<TIn, TOut> config = null) 
+            ProcessorConfiguration<TIn, TOut> config = null)
             : base(new CsvProcessorReader<TIn>(), getProcessor, config)
         {
-
         }
     }
 }

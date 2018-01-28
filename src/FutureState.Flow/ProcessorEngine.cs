@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FutureState.Flow.Core;
 using NLog;
 
 namespace FutureState.Flow
@@ -21,11 +20,6 @@ namespace FutureState.Flow
         public ProcessorEngine()
         {
             Warnings = new List<string>();
-        }
-
-        string GetDefaultProcessName()
-        {
-            return $"{GetType().Name.Replace("`1", "")}-{typeof(TEntityDto).Name}";
         }
 
         /// <summary>
@@ -68,6 +62,11 @@ namespace FutureState.Flow
         /// </summary>
         public DateTime StartTime { get; private set; }
 
+        private string GetDefaultProcessName()
+        {
+            return $"{GetType().Name.Replace("`1", "")}-{typeof(TEntityDto).Name}";
+        }
+
         /// <summary>
         ///     Processes all  data from the incoming source and records. Will record to file and memory the entities that were and
         ///     were not processed and returns
@@ -87,13 +86,10 @@ namespace FutureState.Flow
                 throw new InvalidOperationException("EntitiesReader has not been assigned.");
 
             if (result == null)
-            {
-                // create a new instance and assign default name
-                result = new ProcessResult<TEntityDto>()
+                result = new ProcessResult<TEntityDto>
                 {
                     ProcessName = GetDefaultProcessName()
                 };
-            }
 
             result.BatchProcess = process;
 

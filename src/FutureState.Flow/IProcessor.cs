@@ -1,5 +1,4 @@
-﻿
-namespace FutureState.Flow
+﻿namespace FutureState.Flow
 {
     /// <summary>
     ///     Process data from a given incoming source.

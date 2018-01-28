@@ -11,13 +11,13 @@ namespace FutureState.Flow
     /// <typeparam name="TEntityIn">The entity type that was read in to produce the output.</typeparam>
     /// <typeparam name="TEntityOut">The output entity type.</typeparam>
     public class ProcessResultReader<TProcessResult, TEntityIn, TEntityOut> : IReader<TEntityIn>
-        where TProcessResult  : ProcessResult<TEntityIn, TEntityOut>
+        where TProcessResult : ProcessResult<TEntityIn, TEntityOut>
     {
         public IEnumerable<TEntityIn> Read(string dataSource)
         {
             var repoository = new ProcessResultRepository<TProcessResult>(dataSource);
 
-            var processResult =  repoository.Get(dataSource);
+            var processResult = repoository.Get(dataSource);
 
             return processResult.Input;
         }
@@ -32,6 +32,9 @@ namespace FutureState.Flow
             _get = get;
         }
 
-        public IEnumerable<TEntityOut> Read(string dataSource) => _get(dataSource);
+        public IEnumerable<TEntityOut> Read(string dataSource)
+        {
+            return _get(dataSource);
+        }
     }
 }

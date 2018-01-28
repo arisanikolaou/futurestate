@@ -30,21 +30,6 @@ namespace FutureState.Flow.Core
             }
         }
 
-        void CreateDirIfNotExists()
-        {
-            if (!Directory.Exists(WorkingFolder))
-            {
-                try
-                {
-                    Directory.CreateDirectory(WorkingFolder);
-                }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException($"Can't create working folder {WorkingFolder}.", ex);
-                }
-            }
-        }
-
         // keep a log of the entities which errored out or were processed
         public void Save(T data)
         {
@@ -75,7 +60,6 @@ namespace FutureState.Flow.Core
             var body = File.ReadAllText(fileName);
 
             return JsonConvert.DeserializeObject<T>(body);
-
         }
 
         public T Get(string dataSource)
@@ -86,7 +70,19 @@ namespace FutureState.Flow.Core
             var body = File.ReadAllText(dataSource);
 
             return JsonConvert.DeserializeObject<T>(body);
+        }
 
+        private void CreateDirIfNotExists()
+        {
+            if (!Directory.Exists(WorkingFolder))
+                try
+                {
+                    Directory.CreateDirectory(WorkingFolder);
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException($"Can't create working folder {WorkingFolder}.", ex);
+                }
         }
     }
 }

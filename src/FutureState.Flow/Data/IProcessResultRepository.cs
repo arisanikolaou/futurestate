@@ -9,7 +9,8 @@ namespace FutureState.Flow
     public interface IProcessResultRepository<TProcessResult> where TProcessResult : ProcessResult
     {
         /// <summary>
-        ///     Gets/loads a process result from an underlying data store that matches a given process name, process id as well as batch id.
+        ///     Gets/loads a process result from an underlying data store that matches a given process name, process id as well as
+        ///     batch id.
         /// </summary>
         /// <returns></returns>
         TProcessResult Get(string processName, Guid processId, long batchId);

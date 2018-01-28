@@ -59,7 +59,6 @@ namespace FutureState.Flow.Data
             Guard.ArgumentNotNull(data, nameof(data));
 
             if (!Directory.Exists(WorkingFolder))
-            {
                 try
                 {
                     Directory.CreateDirectory(WorkingFolder);
@@ -68,7 +67,6 @@ namespace FutureState.Flow.Data
                 {
                     throw new ApplicationException($"Can't create working folder {WorkingFolder}.", ex);
                 }
-            }
 
             var fileName =
                 $@"{WorkingFolder}\FlowLog-{data.FlowId}.json";
@@ -93,7 +91,6 @@ namespace FutureState.Flow.Data
             var body = File.ReadAllText(fileName);
 
             return JsonConvert.DeserializeObject<FlowFileLog>(body);
-
         }
     }
 }
