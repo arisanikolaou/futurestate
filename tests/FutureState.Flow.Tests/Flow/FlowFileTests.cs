@@ -29,7 +29,7 @@ namespace FutureState.Flow.Tests.Flow
         private string _outDirectory2;
         private FlowFileLogRepository _logRepository;
 
-        [BddfyFact]
+        // [BddfyFact]
         public void Tests()
         {
             this.BDDfy();
@@ -147,7 +147,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void ThenProcessResultsShouldBeSaved()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(10));
+            Thread.Sleep(TimeSpan.FromSeconds(15));
 
             Assert.True(Directory.GetFiles(_outDirectory).Any());
             Assert.True(Directory.GetFiles(_outDirectory2).Any());

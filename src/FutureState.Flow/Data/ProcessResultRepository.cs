@@ -30,8 +30,7 @@ namespace FutureState.Flow.Core
             }
         }
 
-        // keep a log of the entities which errored out or were processed
-        public void Save(T data)
+        void CreateDirIfNotExists()
         {
             if (!Directory.Exists(WorkingFolder))
             {
@@ -44,6 +43,12 @@ namespace FutureState.Flow.Core
                     throw new ApplicationException($"Can't create working folder {WorkingFolder}.", ex);
                 }
             }
+        }
+
+        // keep a log of the entities which errored out or were processed
+        public void Save(T data)
+        {
+            CreateDirIfNotExists();
 
 
             var i = 1;
@@ -64,26 +69,24 @@ namespace FutureState.Flow.Core
         {
             var fileName = $@"{WorkingFolder}\{processName}-{correlationId}-{batchId}.json";
 
-            if (File.Exists(fileName))
-            {
-                var body = File.ReadAllText(fileName);
+            if (!File.Exists(fileName))
+                return default(T);
 
-                return JsonConvert.DeserializeObject<T>(body);
-            }
+            var body = File.ReadAllText(fileName);
 
-            return default(T);
+            return JsonConvert.DeserializeObject<T>(body);
+
         }
 
         public T Get(string dataSource)
         {
-            if (File.Exists(dataSource))
-            {
-                var body = File.ReadAllText(dataSource);
+            if (!File.Exists(dataSource))
+                return default(T);
 
-                return JsonConvert.DeserializeObject<T>(body);
-            }
+            var body = File.ReadAllText(dataSource);
 
-            return default(T);
+            return JsonConvert.DeserializeObject<T>(body);
+
         }
     }
 }
