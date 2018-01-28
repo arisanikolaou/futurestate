@@ -1,14 +1,27 @@
 ﻿using System;
 using System.IO;
+using FutureState.Flow.Model;
 using Newtonsoft.Json;
 
-namespace FutureState.Flow.Flow
+namespace FutureState.Flow.Data
 {
+    /// <summary>
+    ///     Saves/loads the flow transasction log from an underlying data store.
+    /// </summary>
     public interface IFlowFileLogRepository
     {
+        /// <summary>
+        ///     Upserts the data to the underlying data store.
+        /// </summary>
+        /// <param name="data"></param>
         void Save(FlowFileLog data);
 
-        FlowFileLog Get(Guid processId);
+        /// <summary>
+        ///     Loads the load data given a flow id.
+        /// </summary>
+        /// <param name="flowId">The id of the flow.</param>
+        /// <returns></returns>
+        FlowFileLog Get(Guid flowId);
     }
 
     public class FlowFileLogRepository : IFlowFileLogRepository
@@ -43,6 +56,8 @@ namespace FutureState.Flow.Flow
 
         public void Save(FlowFileLog data)
         {
+            Guard.ArgumentNotNull(data, nameof(data));
+
             if (!Directory.Exists(WorkingFolder))
             {
                 try
@@ -56,7 +71,7 @@ namespace FutureState.Flow.Flow
             }
 
             var fileName =
-                $@"{WorkingFolder}\{data.ProcessId}.json";
+                $@"{WorkingFolder}\FlowLog-{data.FlowId}.json";
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
@@ -66,20 +81,15 @@ namespace FutureState.Flow.Flow
             File.WriteAllText(fileName, body);
         }
 
-        public FlowFileLog Get(Guid processId)
+        public FlowFileLog Get(Guid flowId)
         {
             var fileName =
-                $@"{WorkingFolder}\{processId}.json";
+                $@"{WorkingFolder}\FlowLog-{flowId}.json";
 
             if (!File.Exists(fileName))
-            {
-                return new FlowFileLog()
-                {
-                    ProcessId = processId
-                };
-            }
-            // else
+                return new FlowFileLog(flowId);
 
+            // else
             var body = File.ReadAllText(fileName);
 
             return JsonConvert.DeserializeObject<FlowFileLog>(body);

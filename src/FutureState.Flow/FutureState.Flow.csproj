@@ -55,11 +55,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Flow\CsvFlowFileBatchProcessor.cs" />
-    <Compile Include="Flow\FlowFileBatchProcessor.cs" />
-    <Compile Include="Flow\ProcessResultFlowFileBatchProcessor.cs" />
+    <Compile Include="BatchControllers\CsvFlowFileBatchController.cs" />
+    <Compile Include="BatchControllers\FlowFileBatchController.cs" />
+    <Compile Include="BatchControllers\ProcessResultFlowFileBatchProcessor.cs" />
+    <Compile Include="BatchControllers\IFlowFileBatchController.cs" />
     <Compile Include="Model\FlowFileLog.cs" />
-    <Compile Include="Flow\FlowFileProcessor.cs" />
+    <Compile Include="FlowFileProcessorService.cs" />
     <Compile Include="Model\FlowFileLogEntry.cs" />
     <Compile Include="Data\FlowFileLogRepository.cs" />
     <Compile Include="Data\IProcessResultRepository.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="Processor.cs" />
     <Compile Include="IProcessorEngine.cs" />
     <Compile Include="IProcessor.cs" />
-    <Compile Include="IReader.cs" />
+    <Compile Include="Readers\IReader.cs" />
     <Compile Include="ProcessorEngine.cs" />
     <Compile Include="ProcessResult.cs" />
     <Compile Include="ErrorEvent.cs" />

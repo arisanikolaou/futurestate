@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using CsvHelper;
+using FutureState.Flow.BatchControllers;
 using FutureState.Flow.Core;
-using FutureState.Flow.Flow;
+using FutureState.Flow.Data;
 using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
@@ -14,7 +16,7 @@ using Xunit;
 namespace FutureState.Flow.Tests.Flow
 {
     [Story]
-    public class ReadsFlowFilesAsAServiceStory
+    public class ProcessorsCanBeChainedToFormAnEtlPipeLineStory
     {
         private int CsvItemsToCreate = 25;
 
@@ -23,14 +25,17 @@ namespace FutureState.Flow.Tests.Flow
         private string _baseDirectory;
         private string _inDirectory;
         private string _outDirectory;
-        private ProcessResultRepository<ProcessResult<TSourceEntity, TargetEntity2>> _repository;
         private string _baseDirectoryName;
         private string _processName2;
         private string _outDirectory2;
         private FlowFileLogRepository _logRepository;
+        public Guid FlowId { get; set; }
+        private bool _flowFileProcessed;
+        private ProcessResultRepository<ProcessResult<TSourceEntity, TargetEntity2>> _repository;
+        private bool _flowFile1Processed;
 
-        // [BddfyFact]
-        public void Tests()
+        [BddfyFact]
+        public void ProcessorsCanBeChainedToFormAnEtlPipeLine()
         {
             this.BDDfy();
         }
@@ -40,9 +45,10 @@ namespace FutureState.Flow.Tests.Flow
             this._baseDirectoryName = "Flow";
             this._processName = @"MyProcess";
 
-            this._baseDirectory = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}\{_processName}";
-            this._inDirectory = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}\{_processName}\In";
-            this._outDirectory = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}\{_processName}\Out";
+            this._baseDirectory = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}";
+
+            this._inDirectory = $@"{_baseDirectory}\{_processName}\In";
+            this._outDirectory = $@"{_baseDirectory}\{_processName}\Out";
         }
 
         protected void AndGivenAProcessResultRepo()
@@ -55,7 +61,7 @@ namespace FutureState.Flow.Tests.Flow
             if (!Directory.Exists(_inDirectory))
                 Directory.CreateDirectory(_inDirectory);
 
-            _dataFileToCreate = $@"{_inDirectory}\DataFileToCreate";
+            _dataFileToCreate = $@"{_inDirectory}\{_dataFileToCreate}";
 
             // always re-create
             if (File.Exists(_dataFileToCreate))
@@ -100,24 +106,27 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenAConsistentProcessId()
         {
-            this.ProcessId = SeqGuid.Create();
+            this.FlowId = SeqGuid.Create();
         }
-
-        public Guid ProcessId { get; set; }
 
 
         protected void WhenStartingAProcessorService()
         {
-            var batchProcessor = new CsvFlowFileBatchProcessor2()
+            var batchProcessor = new TestCsvFlowFileFlowFileBatchController()
             {
                 InDirectory = _inDirectory,
-                OutDirectory = _outDirectory
+                OutDirectory = _outDirectory,
+                FlowId = FlowId,
             };
 
-            var processor = new FlowFileProcessor(_logRepository, batchProcessor)
+            var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
             {
-                ProcessId = ProcessId,
                 Interval = TimeSpan.FromSeconds(2)
+            };
+
+            processor.FlowFileProcessed += (o, e) =>
+            {
+                _flowFile1Processed = true;
             };
 
             processor.Start();
@@ -127,41 +136,53 @@ namespace FutureState.Flow.Tests.Flow
         {
             this._processName2 = @"MyProcess2";
 
-            this._outDirectory2 = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}\{_processName2}\Out";
+            this._outDirectory2 = $@"{_baseDirectory}\{_processName2}\Out";
 
 
-            var batchProcessor = new ProcessResultBatchProcessor2()
+            var batchProcessor = new TestProcessResultFlowFileBatchController()
             {
                 InDirectory = _outDirectory,
-                OutDirectory = _outDirectory2
+                OutDirectory = _outDirectory2,
+                FlowId = FlowId,
             };
 
-            var processor = new FlowFileProcessor(_logRepository, batchProcessor)
+            var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
             {
-                ProcessId = ProcessId,
                 Interval = TimeSpan.FromSeconds(2)
+            };
+
+            processor.FlowFileProcessed += (o, e) =>
+            {
+                _flowFileProcessed = true;
             };
 
             processor.Start();
         }
 
+
         protected void ThenProcessResultsShouldBeSaved()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(15));
+            // wait for jobs to finish processing
+            var sw = new Stopwatch();
+            sw.Start();
+            while (!(_flowFile1Processed && _flowFileProcessed) && sw.Elapsed.TotalSeconds < 15)
+                Thread.Sleep(TimeSpan.FromSeconds(1));
 
             Assert.True(Directory.GetFiles(_outDirectory).Any());
             Assert.True(Directory.GetFiles(_outDirectory2).Any());
+            Assert.True(_flowFileProcessed);
+            Assert.True(_flowFile1Processed);
         }
 
-        public class CsvFlowFileBatchProcessor2 : CsvFlowFileBatchProcessor<TSourceEntity, TargetEntity2>
+        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileFlowFileBatchController<TSourceEntity, TargetEntity2>
         {
-            public override Processor<TSourceEntity, TargetEntity2> Configure()
+            public override Processor<TSourceEntity, TargetEntity2> GetProcessor()
             {
                 var config = new ProcessorConfiguration<TSourceEntity, TargetEntity2>();
 
                 // where results will be posted to
                 // create engine to save results to out directory
-                var engine = new ProcessorEngine<TSourceEntity>(Name);
+                var engine = new ProcessorEngine<TSourceEntity>(ControllerName);
 
                 int i = 0;
                 // preocessor service
@@ -179,15 +200,15 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public class ProcessResultBatchProcessor2 : ProcessResultBatchProcessor<TargetEntity2, TargetEntity3>
+        public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<TargetEntity2, TargetEntity3>
         {
-            public override Processor<TargetEntity2, TargetEntity3> Configure()
+            public override Processor<TargetEntity2, TargetEntity3> GetProcessor()
             {
                 var config = new ProcessorConfiguration<TargetEntity2, TargetEntity3>();
 
                 // where results will be posted to
                 // create engine to save results to out directory
-                var engine = new ProcessorEngine<TargetEntity2>(Name);
+                var engine = new ProcessorEngine<TargetEntity2>(ControllerName);
 
                 int i = 0;
                 // preocessor service

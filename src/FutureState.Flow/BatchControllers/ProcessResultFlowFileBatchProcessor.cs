@@ -1,11 +1,16 @@
 ﻿using FutureState.Flow.Core;
 
-namespace FutureState.Flow.Flow
+namespace FutureState.Flow.BatchControllers
 {
-    public abstract class ProcessResultBatchProcessor<TIn, TOut> : FlowFileBatchProcessor<TIn, TOut>
+    /// <summary>
+    ///     Reads the entities successfully processed by another processor.
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TOut"></typeparam>
+    public abstract class ProcessResultFlowFileBatchController<TIn, TOut> : FlowFileFlowFileBatchController<TIn, TOut>
         where TOut : class, new()
     {
-        protected ProcessResultBatchProcessor() : base(GetReader())
+        protected ProcessResultFlowFileBatchController() : base(GetReader())
         {
 
 

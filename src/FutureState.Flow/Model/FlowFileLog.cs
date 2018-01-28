@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FutureState.Flow.Flow
+namespace FutureState.Flow.Model
 {
     /// <summary>
     /// 
     /// </summary>
     public class FlowFileLog
     {
+        public FlowFileLog()
+        {
+            // required by serializer
+        }
+
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowFileLog()
+        public FlowFileLog(Guid flowId)
         {
             Entries = new List<FlowFileLogEntry>();
-            ProcessId = SeqGuid.Create();
+            FlowId = flowId;
         }
 
-        public Guid ProcessId { get; set; }
+        public Guid FlowId { get; set; }
 
         public int BatchId { get; set; }
 

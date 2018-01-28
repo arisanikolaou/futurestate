@@ -15,8 +15,6 @@ namespace FutureState.Flow
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IProcessResultRepository<ProcessResult> _repository;
-
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
@@ -25,7 +23,7 @@ namespace FutureState.Flow
         {
             Warnings = new List<string>();
 
-            ProcessName = processorName ?? GetType().Name;
+            ProcessName = processorName ?? $"{GetType().Name.Replace("`1","")}-{typeof(TEntityDto).Name}";
         }
 
 

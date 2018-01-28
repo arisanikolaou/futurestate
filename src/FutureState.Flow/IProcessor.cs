@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using FutureState.Flow.Flow;
-
+﻿
 namespace FutureState.Flow
 {
     /// <summary>
@@ -9,13 +6,9 @@ namespace FutureState.Flow
     /// </summary>
     public interface IProcessor
     {
+        /// <summary>
+        ///     Gets the process display name.
+        /// </summary>
         string ProcessName { get; }
-    }
-    
-    public interface IBatchProcessor
-    {
-        ProcessResult Process(FileInfo flowFile, BatchProcess process);
-
-        FileInfo GetNextFlowFile(FlowFileLog log);
     }
 }
