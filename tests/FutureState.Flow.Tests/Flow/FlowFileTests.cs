@@ -117,7 +117,7 @@ namespace FutureState.Flow.Tests.Flow
             var processor = new FlowFileProcessor(_logRepository, batchProcessor)
             {
                 ProcessId = ProcessId,
-                Interval = TimeSpan.FromSeconds(5)
+                Interval = TimeSpan.FromSeconds(2)
             };
 
             processor.Start();
@@ -139,7 +139,7 @@ namespace FutureState.Flow.Tests.Flow
             var processor = new FlowFileProcessor(_logRepository, batchProcessor)
             {
                 ProcessId = ProcessId,
-                Interval = TimeSpan.FromSeconds(5)
+                Interval = TimeSpan.FromSeconds(2)
             };
 
             processor.Start();
@@ -147,7 +147,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void ThenProcessResultsShouldBeSaved()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(30));
+            Thread.Sleep(TimeSpan.FromSeconds(10));
 
             Assert.True(Directory.GetFiles(_outDirectory).Any());
             Assert.True(Directory.GetFiles(_outDirectory2).Any());
