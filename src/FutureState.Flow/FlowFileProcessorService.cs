@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Timers;
+using FutureState.Flow.BatchControllers;
 using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
@@ -24,7 +25,8 @@ namespace FutureState.Flow
         /// </summary>
         /// <param name="logRepository">The repositoro to update transaction log details to.</param>
         /// <param name="flowFileBatchController">The batch processor implementation.</param>
-        public FlowFileProcessorService(IFlowFileLogRepository logRepository,
+        public FlowFileProcessorService(
+            IFlowFileLogRepository logRepository,
             IFlowFileBatchController flowFileBatchController)
         {
             Guard.ArgumentNotNull(logRepository, nameof(logRepository));
@@ -100,7 +102,7 @@ namespace FutureState.Flow
             if (flowFile == null)
             {
                 if (_logger.IsDebugEnabled)
-                    _logger.Debug("No new data is available from the given flow controller.");
+                    _logger.Debug($"No new data is available from the given flow controller {FlowFileBatchController.ControllerName}.");
 
                 return;
             }
@@ -118,33 +120,33 @@ namespace FutureState.Flow
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileBatchController.FlowId}.");
+                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileBatchController.FlowId} by batch controller {FlowFileBatchController.ControllerName}.");
 
                 // run processor
                 var result = FlowFileBatchController.Process(flowFile, batchProcess);
 
-                if (result != null)
+                if (result == null)
+                    return;
+
+                // update entry
+                var processLogEntry = new FlowFileLogEntry
                 {
-                    // update entry
-                    var processLogEntry = new FlowFileLogEntry
-                    {
-                        FlowFileProcessed = flowFile.FullName,
-                        ControllerName = FlowFileBatchController.ControllerName,
-                        BatchId = flowFileLog.BatchId
-                    };
+                    FlowFileProcessed = flowFile.FullName,
+                    ControllerName = FlowFileBatchController.ControllerName,
+                    BatchId = flowFileLog.BatchId
+                };
 
-                    flowFileLog.Entries.Add(processLogEntry);
+                flowFileLog.Entries.Add(processLogEntry);
 
-                    if (_logger.IsInfoEnabled)
-                        _logger.Info(
-                            $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileBatchController.FlowId}.");
+                if (_logger.IsInfoEnabled)
+                    _logger.Info(
+                        $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileBatchController.FlowId}.");
 
-                    // update database
-                    _logRepository.Save(flowFileLog);
+                // update database
+                _logRepository.Save(flowFileLog);
 
-                    if (_logger.IsInfoEnabled)
-                        _logger.Info($"Flow {FlowFileBatchController.FlowId} transaction log updated.");
-                }
+                if (_logger.IsInfoEnabled)
+                    _logger.Info($"Flow {FlowFileBatchController.FlowId} transaction log updated.");
             }
             catch (Exception ex)
             {

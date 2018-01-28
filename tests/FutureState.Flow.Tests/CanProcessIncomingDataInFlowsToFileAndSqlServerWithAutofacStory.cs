@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Autofac;
 using CsvHelper;
-using FutureState.Flow.Core;
+using FutureState.Flow.Data;
 using FutureState.Flow.Tests.Mock;
 using FutureState.Specifications;
 using TestStack.BDDfy;

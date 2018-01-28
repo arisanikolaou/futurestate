@@ -2,7 +2,7 @@
 using System.IO;
 using FutureState.Flow.Model;
 
-namespace FutureState.Flow
+namespace FutureState.Flow.BatchControllers
 {
     /// <summary>
     ///     Controls how batches of data flow into batch processors for processing (loading and/or transformation).
@@ -12,22 +12,22 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the display name of the processor.
         /// </summary>
-        string ControllerName { get; }
+        string ControllerName { get; set; }
 
         /// <summary>
         ///     Gets the process id.
         /// </summary>
-        Guid FlowId { get; }
+        Guid FlowId { get; set; }
 
         /// <summary>
         ///     Gets the input directory or port.
         /// </summary>
-        string InDirectory { get; }
+        string InDirectory { get; set; }
 
         /// <summary>
         ///     Gets the output directory or port.
         /// </summary>
-        string OutDirectory { get; }
+        string OutDirectory { get; set; }
 
         /// <summary>
         ///     Processes a batch of data from an incoming flow file within a batch process.

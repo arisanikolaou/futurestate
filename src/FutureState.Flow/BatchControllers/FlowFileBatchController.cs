@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.Core;
+using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
 
@@ -11,7 +11,7 @@ namespace FutureState.Flow.BatchControllers
     /// <summary>
     ///     Controls the flow of data from an incoming batch source to a downstream processor.
     /// </summary>
-    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TIn">The incoming data type to </typeparam>
     /// <typeparam name="TOut"></typeparam>
     public class FlowFileFlowFileBatchController<TIn, TOut> : IFlowFileBatchController
         where TOut : class, new()
@@ -45,7 +45,8 @@ namespace FutureState.Flow.BatchControllers
             InDirectory = Environment.CurrentDirectory;
 
             // assign name from type name by default
-            ControllerName = GetType().Name;
+            ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
+            //create default flow it
             FlowId = SeqGuid.Create();
 
             _reader = reader;
@@ -79,19 +80,28 @@ namespace FutureState.Flow.BatchControllers
             // this enumerate working folder
             var flowFiles = new DirectoryInfo(InDirectory)
                 .GetFiles()
-                .OrderBy(m => m.CreationTimeUtc);
+                .OrderBy(m => m.CreationTimeUtc)
+                .ToList();
 
-            foreach (var flowFile in flowFiles)
+            if (flowFiles.Any())
             {
-                // determine if the file was processed by the given processor
-                var processLogEntry = log.Entries.FirstOrDefault(
-                    m => string.Equals(flowFile.FullName, m.FlowFileProcessed,
-                             StringComparison.OrdinalIgnoreCase)
-                         && string.Equals(ControllerName, m.ControllerName,
-                             StringComparison.OrdinalIgnoreCase));
+                foreach (var flowFile in flowFiles)
+                {
+                    // determine if the file was processed by the given processor
+                    var processLogEntry = log.Entries.FirstOrDefault(
+                        m => string.Equals(flowFile.FullName, m.FlowFileProcessed,
+                                 StringComparison.OrdinalIgnoreCase)
+                             && string.Equals(ControllerName, m.ControllerName,
+                                 StringComparison.OrdinalIgnoreCase));
 
-                if (processLogEntry == null)
-                    return flowFile;
+                    if (processLogEntry == null)
+                        return flowFile;
+                }
+            }
+            else
+            {
+                if(_logger.IsWarnEnabled)
+                    _logger.Warn($"No files were discovered under {InDirectory}.");
             }
 
             return null;
@@ -102,10 +112,10 @@ namespace FutureState.Flow.BatchControllers
             try
             {
                 // read the incoming batch of data
-                var incomingData = Read(flowFile);
+                IEnumerable<TIn> incomingData = Read(flowFile);
 
                 // create the processor to batch process it
-                var processor = GetProcessor();
+                Processor<TIn, TOut> processor = GetProcessor();
 
                 var result = processor.Process(incomingData, process);
 

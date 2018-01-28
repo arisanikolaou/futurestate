@@ -124,6 +124,9 @@
   <ItemGroup>
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.cs" />
+    <Compile Include="Flow\FlowController.cs" />
+    <Compile Include="Flow\FlowModule.cs" />
+    <Compile Include="Flow\ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory.cs" />
     <Compile Include="Flow\ProcessorsCanBeChainedToFormAnEtlPipeLineStory.cs" />
     <Compile Include="Mock\TestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

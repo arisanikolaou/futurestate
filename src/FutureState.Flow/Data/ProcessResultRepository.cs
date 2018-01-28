@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
+using NLog;
 
-namespace FutureState.Flow.Core
+namespace FutureState.Flow.Data
 {
     public class ProcessResultRepository<T> : IProcessResultRepository<T> where T : ProcessResult
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private string _workingFolder;
 
         /// <summary>
@@ -45,9 +48,15 @@ namespace FutureState.Flow.Core
                             data.BatchProcess.BatchId
                         }-{i++}.json";
 
+            if (_logger.IsInfoEnabled)
+                _logger.Info(($"Saving process output to {fileName}."));
+
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
 
             File.WriteAllText(fileName, body);
+
+            if(_logger.IsInfoEnabled)
+                _logger.Info(($"Saved process output to {fileName}."));
         }
 
         public T Get(string processName, Guid correlationId, long batchId)
@@ -57,9 +66,17 @@ namespace FutureState.Flow.Core
             if (!File.Exists(fileName))
                 return default(T);
 
+            if (_logger.IsInfoEnabled)
+                _logger.Info(($"Reading process output from {fileName}."));
+
             var body = File.ReadAllText(fileName);
 
-            return JsonConvert.DeserializeObject<T>(body);
+            var result =  JsonConvert.DeserializeObject<T>(body);
+
+            if (_logger.IsInfoEnabled)
+                _logger.Info(($"Read process output from {fileName}."));
+
+            return result;
         }
 
         public T Get(string dataSource)

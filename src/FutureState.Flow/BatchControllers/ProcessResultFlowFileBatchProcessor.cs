@@ -1,5 +1,5 @@
 ﻿using System;
-using FutureState.Flow.Core;
+using FutureState.Flow.Data;
 
 namespace FutureState.Flow.BatchControllers
 {

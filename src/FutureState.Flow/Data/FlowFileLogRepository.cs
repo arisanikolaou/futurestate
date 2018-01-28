@@ -2,6 +2,7 @@
 using System.IO;
 using FutureState.Flow.Model;
 using Newtonsoft.Json;
+using NLog;
 
 namespace FutureState.Flow.Data
 {
@@ -26,6 +27,8 @@ namespace FutureState.Flow.Data
 
     public class FlowFileLogRepository : IFlowFileLogRepository
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private string _workingFolder;
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace FutureState.Flow.Data
         /// </param>
         public FlowFileLogRepository(string workingFolder = null)
         {
-            WorkingFolder = workingFolder ?? Environment.CurrentDirectory;
+            _workingFolder = workingFolder ?? Environment.CurrentDirectory;
         }
 
         /// <summary>
@@ -74,9 +77,15 @@ namespace FutureState.Flow.Data
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
+            if(_logger.IsInfoEnabled)
+                _logger.Info($"Saving flow file transaction log to {fileName}.");
+
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
 
             File.WriteAllText(fileName, body);
+
+            if (_logger.IsInfoEnabled)
+                _logger.Info($"Saved flow file transaction log to {fileName}.");
         }
 
         public FlowFileLog Get(Guid flowId)

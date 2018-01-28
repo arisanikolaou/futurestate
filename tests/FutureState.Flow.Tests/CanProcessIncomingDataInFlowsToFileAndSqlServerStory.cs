@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using CsvHelper;
+using FutureState.Flow.Data;
 using FutureState.Flow.Tests.Mock;
 using FutureState.Specifications;
 using TestStack.BDDfy;
@@ -10,8 +11,6 @@ using Xunit;
 
 namespace FutureState.Flow.Tests
 {
-    using FutureState.Flow.Core;
-
     [Story]
     [Collection("Flow Tests")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerStory

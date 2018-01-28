@@ -27,7 +27,7 @@ namespace FutureState.Flow.Tests.Flow
         private string _processName2;
         private string _outDirectory2;
         private FlowFileLogRepository _logRepository;
-        public Guid FlowId { get; set; }
+        public Guid _flowId;
         private bool _flowFileProcessed;
         private bool _flowFile1Processed;
 
@@ -100,7 +100,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenAConsistentProcessId()
         {
-            this.FlowId = Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c859");
+            this._flowId = Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c859");
         }
 
 
@@ -110,7 +110,7 @@ namespace FutureState.Flow.Tests.Flow
             {
                 InDirectory = _inDirectory,
                 OutDirectory = _outDirectory,
-                FlowId = FlowId,
+                FlowId = _flowId,
             };
 
             var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
@@ -137,7 +137,7 @@ namespace FutureState.Flow.Tests.Flow
             {
                 InDirectory = _outDirectory,
                 OutDirectory = _outDirectory2,
-                FlowId = FlowId,
+                FlowId = _flowId,
             };
 
             var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
