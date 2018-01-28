@@ -73,7 +73,7 @@ namespace FutureState.Data.Sql
                     // ReSharper disable once PossibleNullReferenceException
                     MethodInfo generic = method.MakeGenericMethod(entityType);
 
-                    generic.Invoke(config, new object[] {newCustomEntityMap});
+                    generic.Invoke(config, new object[] { newCustomEntityMap });
                 }
 
                 // interogate container for entity maps and update
@@ -100,11 +100,27 @@ namespace FutureState.Data.Sql
                         // ReSharper disable once PossibleNullReferenceException
                         var generic = method.MakeGenericMethod(actualType);
 
-                        generic.Invoke(config, new object[] {newCustomEntityMap});
+                        try
+                        {
+                            generic.Invoke(config, new object[] { newCustomEntityMap });
+                        }
+                        catch (TargetInvocationException tex)
+                        {
+                            if (tex.InnerException != null)
+                            {
+                                if (!tex.InnerException.Message.Contains("The type already exists."))
+                                    throw;
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"Failed to assign default class mapper for {actualType.FullName} due to an unexpected error.",
+                        throw new Exception(
+                            $"Failed to assign default class mapper for {actualType.FullName} due to an unexpected error.",
                             ex);
                     }
                 }

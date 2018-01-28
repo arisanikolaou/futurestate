@@ -162,5 +162,17 @@ namespace FutureState.Specifications
 
             return this;
         }
+
+        /// <summary>
+        ///     Merges specs from a part of the entity or serve into the current instance.
+        /// </summary>
+        /// <typeparam name="TPart">The complex part type to evaluate.</typeparam>
+        /// <param name="partGetter">Function to get the part instance.</param>
+        /// <param name="source"></param>
+        public void MergeFrom<TPart>(Func<TEntityOrService, TPart> partGetter, IProvideSpecifications<TPart> source)
+        {
+            foreach (var specification in source.GetSpecifications())
+                Add((a) => specification.Evaluate(partGetter(a)), specification.Key, specification.Description);
+        }
     }
 }

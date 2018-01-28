@@ -182,7 +182,7 @@ namespace FutureState.Data
             var key = _keyBinder.Get(entity);
 
             if (!_items.TryAdd(key, entity))
-                throw new InvalidOperationException($"Specified entity already exists with the key {key}.");
+                throw new InvalidOperationException($"An entity already exists with the key {key}.");
         }
 
         public void Update(TEntity entity)

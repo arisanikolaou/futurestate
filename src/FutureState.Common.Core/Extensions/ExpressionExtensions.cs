@@ -55,8 +55,8 @@ namespace FutureState
         public static string GetPropertyName<T>(this Expression<Func<T, object>> property)
         {
             // get member expression if it is inside unary expression
-            var memberExpression = property.Body is UnaryExpression
-                ? ((UnaryExpression) property.Body).Operand
+            var memberExpression = property.Body is UnaryExpression expression
+                ? expression.Operand
                 : property.Body;
 
             // get its name

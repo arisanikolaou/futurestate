@@ -1,59 +1,40 @@
 ﻿using System;
 using System.Linq.Expressions;
-using TestStack.BDDfy;
-using TestStack.BDDfy.Xunit;
 using Xunit;
 
 namespace FutureState.Common.Tests
 {
     public class ExpressionExtensionsTests
     {
-        private Expression<Func<TestEntity, bool>> _expression;
-        private Expression<Func<TestEntity, bool>> _expressionOr;
-        private Expression<Func<TestEntity, bool>> _expressionAnd;
-
-        protected void GivenAnExpression()
+        [Fact]
+        public void GetsPropertyInfoFromExpression()
         {
-            _expression = e => e.Name == "Name";
+            Expression<Func<TestEntity, int>> expression = entity => entity.Id;
+
+            var propertyInfo = expression.GetMemberInfo();
+
+            Assert.NotNull(propertyInfo);
+            Assert.Equal("Id", propertyInfo.Name);
         }
 
-        protected void WhenOrIngAnExpression()
+        [Fact]
+        public void GetsNameFromPropertyExpression()
         {
-            _expressionOr = _expression.Or(m => m.Name == "Name 2");
-        }
+            Expression<Func<TestEntity, object>> expression = entity => entity.Id;
 
-        protected void WhenAndingIngAnExpression()
-        {
-            _expressionAnd = _expression.And(m => m.Id == 1);
-        }
+            var name = expression.GetPropertyName();
 
-        protected void ThenOrExpressionShouldBeValid()
-        {
-
-            var ex = _expressionOr.Compile();
-
-            Assert.True(ex.Invoke(new TestEntity() { Name = "Name" }));
-            Assert.False(ex.Invoke(new TestEntity() { Name = "Name 3" }));
-        }
-
-        protected void ThenAndExpressionShouldBeValid()
-        {
-            var ex = _expressionAnd.Compile();
-
-            Assert.True(ex.Invoke(new TestEntity() { Name = "Name", Id = 1 }));
-            Assert.False(ex.Invoke(new TestEntity() { Name = "Name 3", Id = 2 }));
-        }
-
-        [BddfyFact]
-        public void OrAndTests()
-        {
-            this.BDDfy();
+            Assert.Equal("Id", name);
         }
 
         public class TestEntity
         {
             public int Id { get; set; }
-            public string Name { get; set; }
+
+            public void Method1()
+            {
+
+            }
         }
     }
 }

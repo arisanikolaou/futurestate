@@ -9,9 +9,9 @@ namespace FutureState.Data.Tests
 {
     public class MemoryResidentRepositoryTests
     {
-        private int allItemsCount;
-        private int idCurrent;
-        private TestEntity insertedItem;
+        private int _allItemsCount;
+        private int _idItemsCount;
+        private TestEntity _insertedEntity;
         private InMemoryRepository<TestEntity, int> subject;
 
         internal void GivenAnInMemoryDb()
@@ -20,7 +20,7 @@ namespace FutureState.Data.Tests
                 e => e.Id,
                 (e, k) => e.Id = k);
 
-            var keyGenerator = new KeyGenerator<TestEntity, int>(() => ++idCurrent);
+            var keyGenerator = new KeyGenerator<TestEntity, int>(() => ++_idItemsCount);
 
             var entityIdProvider = new KeyProvider<TestEntity, int>(
                 keyGenerator,
@@ -37,24 +37,24 @@ namespace FutureState.Data.Tests
 
         internal void WhenQueringAllItems()
         {
-            allItemsCount = subject.GetAll().Count();
+            _allItemsCount = subject.GetAll().Count();
         }
 
         internal void AndWhenAddingNewItems()
         {
             subject.Insert(new TestEntity {Name = "Name2"});
 
-            insertedItem = subject.Where(m => m.Name == "Name2").FirstOrDefault();
+            _insertedEntity = subject.Where(m => m.Name == "Name2").FirstOrDefault();
         }
 
         internal void ThenShouldBeAbleToQueryAllItems()
         {
-            Assert.Equal(1, allItemsCount);
+            Assert.Equal(1, _allItemsCount);
         }
 
         internal void AndThenInsertedItemsShouldHaveIdAssigned()
         {
-            Assert.Equal(1, insertedItem.Id);
+            Assert.Equal(1, _insertedEntity.Id);
         }
 
         [BddfyFact]

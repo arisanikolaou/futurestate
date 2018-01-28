@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=6.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CsvHelper.6.1.1\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="EmitMapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EmitMapper.1.0.0\lib\EmitMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -44,19 +50,50 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="YamlDotNet, Version=4.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\YamlDotNet.4.2.3\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ErrorEvent.cs" />
-    <Compile Include="Flow.cs" />
-    <Compile Include="Package.cs" />
-    <Compile Include="PortSource.cs" />
-    <Compile Include="Processor.cs" />
+    <Compile Include="BatchControllers\CsvFlowFileBatchController.cs" />
+    <Compile Include="BatchControllers\FlowFileBatchController.cs" />
+    <Compile Include="BatchControllers\ProcessResultFlowFileBatchProcessor.cs" />
+    <Compile Include="BatchControllers\IFlowFileBatchController.cs" />
+    <Compile Include="FlowConfiguration.cs" />
+    <Compile Include="Model\FlowFileLog.cs" />
+    <Compile Include="FlowFileProcessorService.cs" />
+    <Compile Include="Model\FlowFileLogEntry.cs" />
+    <Compile Include="Data\FlowFileLogRepository.cs" />
+    <Compile Include="Data\IProcessResultRepository.cs" />
+    <Compile Include="ProcessError.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
-    <Compile Include="ProcessState.cs" />
+    <Compile Include="Readers\GenericResultReader.cs" />
+    <Compile Include="Data\ProcessResultRepository.cs" />
+    <Compile Include="Model\BatchProcess.cs" />
+    <Compile Include="Processor.cs" />
+    <Compile Include="IProcessorEngine.cs" />
+    <Compile Include="IProcessor.cs" />
+    <Compile Include="Readers\IReader.cs" />
+    <Compile Include="ProcessorEngine.cs" />
+    <Compile Include="ProcessResult.cs" />
+    <Compile Include="Model\ErrorEvent.cs" />
+    <Compile Include="Readers\CsvProcessorReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FutureState.Flow.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FutureState.Common.Core\FutureState.Common.csproj">
+      <Project>{3BA5FB45-D642-43DE-8629-37AA3D7CE5BD}</Project>
+      <Name>FutureState.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FutureState.Specifications\FutureState.Specifications.csproj">
+      <Project>{96B0A895-7A34-411D-BDE6-FC0B222AA18D}</Project>
+      <Name>FutureState.Specifications</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
