@@ -70,6 +70,9 @@ namespace FutureState.Flow.Flow
 
             ProcessResult<TIn, TOut> result = Configure().Process(incomingData, process);
 
+            if (!Directory.Exists(OutDirectory))
+                Directory.CreateDirectory(OutDirectory);
+
             var outputRepository = new ProcessResultRepository<ProcessResult>(OutDirectory);
 
             outputRepository.Save(result);

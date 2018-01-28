@@ -55,7 +55,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Flow\CsvFlowFileBatchProcessor.cs" />
     <Compile Include="Flow\FlowFileBatchProcessor.cs" />
+    <Compile Include="Flow\ProcessResultFlowFileBatchProcessor.cs" />
     <Compile Include="Model\FlowFileLog.cs" />
     <Compile Include="Flow\FlowFileProcessor.cs" />
     <Compile Include="Model\FlowFileLogEntry.cs" />

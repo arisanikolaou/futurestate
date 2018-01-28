@@ -147,7 +147,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void ThenProcessResultsShouldBeSaved()
         {
-            Thread.Sleep(TimeSpan.FromMinutes(5));
+            Thread.Sleep(TimeSpan.FromSeconds(30));
 
             Assert.True(Directory.GetFiles(_outDirectory).Any());
             Assert.True(Directory.GetFiles(_outDirectory2).Any());
@@ -205,36 +205,7 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public abstract class CsvFlowFileBatchProcessor<TIn, TOut> : FlowFileBatchProcessor<TIn, TOut> 
-            where TOut : class, new()
-        {
-            protected CsvFlowFileBatchProcessor() : base(new CsvProcessorReader<TIn>())
-            {
 
-            }
-        }
-
-        public abstract class ProcessResultBatchProcessor<TIn, TOut> : FlowFileBatchProcessor<TIn, TOut>
-            where TOut : class, new()
-        {
-            public ProcessResultBatchProcessor() : base(GetReader())
-            {
-
-
-            }
-
-            static IReader<TIn> GetReader()
-            {
-                return new GenericResultReader<TIn>((dataSource) =>
-                {
-                    var repoository = new ProcessResultRepository<ProcessResult<TOut, TIn>>(dataSource);
-
-                    var processResult = repoository.Get(dataSource);
-
-                    return processResult.Output;
-                });
-            }
-        }
 
         public class TSourceEntity
         {
