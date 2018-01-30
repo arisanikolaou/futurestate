@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -104,15 +103,15 @@ namespace FutureState.Flow.Tests.Flow
             _container = cb.Build();
         }
 
-        public void AndGivenAFlowControllerUsingThisConfiguration()
+        protected void AndGivenAFlowControllerUsingThisConfiguration()
         {
-            _flowController = new FlowController(_flowConfig, _container);
+            _flowController = _container.Resolve<FlowController>();
         }
 
 
         protected void WhenRunningTheFlowController()
         {
-            _flowController.Start();
+            _flowController.Start(_flowConfig);
         }
 
         protected void AndWhenSavingTheFlowConfig()
@@ -136,7 +135,8 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndThenShouldBeAbleToRepeatProcessingFromConfiguration()
         {
-            var controller = FlowController.Load(@"Flow\flow-config.yaml", _container);
+            var config = FlowConfiguration.Load(@"Flow\flow-config.yaml");
+            var controller = _container.Resolve<FlowController>();
 
             // clear prior results
             Directory.Delete(_flowConfig.BasePath, true);
@@ -145,7 +145,7 @@ namespace FutureState.Flow.Tests.Flow
             AndGivenAGeneratedDataSourceCsvFile();
 
             // start
-            controller.Start();
+            controller.Start(config);
 
             // wait for jobs to finish processing
             var sw = new Stopwatch();

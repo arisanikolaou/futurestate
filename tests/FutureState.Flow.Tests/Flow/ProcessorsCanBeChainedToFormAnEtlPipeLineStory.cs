@@ -113,7 +113,7 @@ namespace FutureState.Flow.Tests.Flow
                 FlowId = _flowId,
             };
 
-            var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
+            var processor = new FlowFileControllerService(_logRepository, batchProcessor)
             {
                 Interval = TimeSpan.FromSeconds(2)
             };
@@ -140,7 +140,7 @@ namespace FutureState.Flow.Tests.Flow
                 FlowId = _flowId,
             };
 
-            var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
+            var processor = new FlowFileControllerService(_logRepository, batchProcessor)
             {
                 Interval = TimeSpan.FromSeconds(2)
             };

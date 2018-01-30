@@ -12,7 +12,7 @@ namespace FutureState.Flow
     /// <summary>
     ///     Ensures that only unique batches of data sourced from a controller are processed every N minutes.
     /// </summary>
-    public class FlowFileProcessorService : IDisposable
+    public class FlowFileControllerService : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly IFlowFileLogRepository _logRepository;
@@ -25,7 +25,7 @@ namespace FutureState.Flow
         /// </summary>
         /// <param name="logRepository">The repositoro to update transaction log details to.</param>
         /// <param name="flowFileBatchController">The batch processor implementation.</param>
-        public FlowFileProcessorService(
+        public FlowFileControllerService(
             IFlowFileLogRepository logRepository,
             IFlowFileBatchController flowFileBatchController)
         {
@@ -62,7 +62,7 @@ namespace FutureState.Flow
         /// </summary>
         public event EventHandler FlowFileProcessed;
 
-        ~FlowFileProcessorService()
+        ~FlowFileControllerService()
         {
             Dispose(false);
         }
