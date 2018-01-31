@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using Autofac;
 using CsvHelper;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
@@ -51,7 +51,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenAGeneratedDataSourceCsvFile()
         {
-            var baseDir = this._flowConfig.Controllers.First().InputDirectory;
+            var baseDir = this._flowConfig.Controllers.First().Input;
             if (!Directory.Exists(baseDir))
                 Directory.CreateDirectory(baseDir);
 
@@ -108,7 +108,6 @@ namespace FutureState.Flow.Tests.Flow
             _flowController = _container.Resolve<FlowController>();
         }
 
-
         protected void WhenRunningTheFlowController()
         {
             _flowController.Start(_flowConfig);
@@ -116,6 +115,8 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndWhenSavingTheFlowConfig()
         {
+            _flowConfig.Controllers.FirstOrDefault().ConfigurationDetails.Add("Item1", "Value1");
+
             _flowConfig.Save();
         }
 
@@ -128,7 +129,7 @@ namespace FutureState.Flow.Tests.Flow
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
             foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
-                Assert.True(Directory.GetFiles(flowControllerDefinition.OutputDirectory).Length == 1);
+                Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
 
             Assert.True(_flowController.Processed == 2);
         }
@@ -157,10 +158,10 @@ namespace FutureState.Flow.Tests.Flow
             _flowConfig.Save();
 
             foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
-                Assert.True(Directory.GetFiles(flowControllerDefinition.OutputDirectory).Length == 1);
+                Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }
 
-        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileFlowFileBatchController<EnitityA, EntityB>
+        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileController<EnitityA, EntityB>
         {
             public override Processor<EnitityA, EntityB> GetProcessor()
             {

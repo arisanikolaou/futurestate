@@ -2,13 +2,18 @@
 using System.IO;
 using FutureState.Flow.Model;
 
-namespace FutureState.Flow.BatchControllers
+namespace FutureState.Flow.Controllers
 {
     /// <summary>
     ///     Controls how batches of data flow into batch processors for processing (loading and/or transformation).
     /// </summary>
-    public interface IFlowFileBatchController
+    public interface IFlowFileController
     {
+        /// <summary>
+        ///     Gets the type of entity being processed.
+        /// </summary>
+        Type InputType { get; }
+
         /// <summary>
         ///     Gets the display name of the processor.
         /// </summary>

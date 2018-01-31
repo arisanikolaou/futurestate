@@ -55,14 +55,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BatchControllers\CsvFlowFileBatchController.cs" />
-    <Compile Include="BatchControllers\FlowFileBatchController.cs" />
-    <Compile Include="BatchControllers\ProcessResultFlowFileBatchProcessor.cs" />
-    <Compile Include="BatchControllers\IFlowFileBatchController.cs" />
+    <Compile Include="Controllers\CsvFlowFileController.cs" />
+    <Compile Include="Controllers\FlowFileController.cs" />
+    <Compile Include="Controllers\ProcessResultFlowFileBatchProcessor.cs" />
+    <Compile Include="Controllers\IFlowFileController.cs" />
     <Compile Include="FlowConfiguration.cs" />
     <Compile Include="FlowController.cs" />
     <Compile Include="Model\FlowFileLog.cs" />
-    <Compile Include="FlowFileProcessorService.cs" />
+    <Compile Include="FlowControllerService.cs" />
     <Compile Include="Model\FlowFileLogEntry.cs" />
     <Compile Include="Data\FlowFileLogRepository.cs" />
     <Compile Include="Data\IProcessResultRepository.cs" />

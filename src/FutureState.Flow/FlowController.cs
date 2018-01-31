@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 
-namespace FutureState.Flow.Tests.Flow
+namespace FutureState.Flow
 {
-    using YamlDotNet.Serialization;
+    using FutureState.Specifications;
 
-    public interface IFlowFileBatchControllerFactory
+    public interface IFlowFileControllerFactory
     {
-        IFlowFileBatchController Create(Type type);
+        IFlowFileController Create(Type type);
     }
 
     public interface IFlowFileLogRepositoryFactory
@@ -21,7 +21,7 @@ namespace FutureState.Flow.Tests.Flow
 
     public interface IFlowFileControllerServiceFactory
     {
-        FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileBatchController controller);
+        FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller);
     }
 
     public class FlowController : IDisposable
@@ -32,25 +32,31 @@ namespace FutureState.Flow.Tests.Flow
         public long Processed { get; private set; }
 
         private FlowConfiguration _config;
-        private readonly IFlowFileBatchControllerFactory _flowControllerFactory;
+        private readonly IFlowFileControllerFactory _flowControllerFactory;
         private readonly IFlowFileLogRepositoryFactory _flowFileLogFactory;
         private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
+        private readonly ISpecProviderFactory _specProviderFactory;
 
         public List<IDisposable> Services { get; }
 
         public FlowController(
-            IFlowFileBatchControllerFactory flowControllerFactory,
+            IFlowFileControllerFactory flowControllerFactory,
             IFlowFileLogRepositoryFactory flowFileLogFactory,
-            IFlowFileControllerServiceFactory flowControllerServiceFactory) //todo: remove container
+            IFlowFileControllerServiceFactory flowControllerServiceFactory,
+            ISpecProviderFactory specProviderFactor) 
         {
             _flowControllerFactory = flowControllerFactory;
             _flowFileLogFactory = flowFileLogFactory;
             _flowControllerServiceFactory = flowControllerServiceFactory;
+            _specProviderFactory = specProviderFactor;
 
             Services = new List<IDisposable>();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
         public void Start(FlowConfiguration config)
         {
             _config = config;
@@ -58,10 +64,10 @@ namespace FutureState.Flow.Tests.Flow
             // initialize directories
             foreach (var definition in _config.Controllers)
             {
-                if (!Directory.Exists(definition.InputDirectory))
-                    Directory.CreateDirectory(definition.InputDirectory);
-                if (!Directory.Exists(definition.OutputDirectory))
-                    Directory.CreateDirectory(definition.OutputDirectory);
+                if (!Directory.Exists(definition.Input))
+                    Directory.CreateDirectory(definition.Input);
+                if (!Directory.Exists(definition.Output))
+                    Directory.CreateDirectory(definition.Output);
             }
 
             foreach (var flowControllerDefinitionse in _config.Controllers.OrderBy(m => m.DateCreated))
@@ -70,23 +76,48 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void StartController(FlowControllerDefinition definition)
         {
-            var batchControllerType = Type.GetType(definition.BatchControllerType);
+            var batchControllerType = Type.GetType(definition.TypeName);
 
             // ReSharper disable once UsePatternMatching
-            var batchProcessor = _flowControllerFactory.Create(batchControllerType);
-            if (batchProcessor == null)
-                throw new InvalidOperationException($"Controller type does not implement {typeof(IFlowFileBatchController).Name}");
+            IFlowFileController flowController = _flowControllerFactory.Create(batchControllerType);
+            if (flowController == null)
+                throw new InvalidOperationException($"Controller type does not implement {typeof(IFlowFileController).Name}");
+
+            // TODO add rules
+            //if(definition.FieldValidationRules != null)
+            //    foreach (FlowFieldValidation rule in definition.FieldValidationRules)
+            //        flowController.AddRule(rule);
+            
 
             // configure
-            batchProcessor.InDirectory = definition.InputDirectory;
-            batchProcessor.OutDirectory = definition.OutputDirectory;
-            batchProcessor.FlowId = _config.FlowId;
-            batchProcessor.ControllerName = definition.ControllerName;
+            flowController.InDirectory = definition.Input;
+            flowController.OutDirectory = definition.Output;
+            flowController.FlowId = _config.FlowId;
+            flowController.ControllerName = definition.ControllerName;
 
+            // apply controller configuration details
+            if (definition.ConfigurationDetails != null)
+            {
+                Type type = flowController.GetType();
+
+                foreach (var configDetail in definition.ConfigurationDetails)
+                {
+                    var property = type.GetProperty(configDetail.Key);
+                    if(property != null)
+                    {
+                        if (property.GetSetMethod() != null)
+                        {
+                            property.SetValue(flowController, configDetail.Value);
+                        }
+                    }
+                }
+            }
+
+            // resolve repository to store flow file process details
             var logRepository = _flowFileLogFactory.Get();
             logRepository.WorkingFolder = _config.BasePath;
 
-            FlowFileControllerService processor = _flowControllerServiceFactory.Get(logRepository, batchProcessor);
+            FlowFileControllerService processor = _flowControllerServiceFactory.Get(logRepository, flowController);
 
             // configure polling internval
             processor.Interval = TimeSpan.FromSeconds(definition.PollInterval);
@@ -99,8 +130,8 @@ namespace FutureState.Flow.Tests.Flow
 
             Services.Add(processor);
 
+            // start reading from incoming data source
             processor.Start();
-
         }
 
         public void Stop()

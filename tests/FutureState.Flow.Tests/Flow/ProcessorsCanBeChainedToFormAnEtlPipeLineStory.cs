@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using CsvHelper;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using Newtonsoft.Json;
 using TestStack.BDDfy;
@@ -168,7 +168,7 @@ namespace FutureState.Flow.Tests.Flow
             Assert.True(_flowFile1Processed);
         }
 
-        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileFlowFileBatchController<Enitity1, Entity2>
+        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileController<Enitity1, Entity2>
         {
             public override Processor<Enitity1, Entity2> GetProcessor()
             {

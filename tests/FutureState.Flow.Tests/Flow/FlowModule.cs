@@ -1,7 +1,9 @@
 ﻿using System;
 using Autofac;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
+using FutureState.Specifications;
+
 
 namespace FutureState.Flow.Tests.Flow
 {
@@ -11,23 +13,29 @@ namespace FutureState.Flow.Tests.Flow
         {
             base.Load(cb);
 
-            cb.RegisterType<FlowFileBatchControllerFactory>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<FlowFileBatchControllerFactory>()
+                .AsSelf().AsImplementedInterfaces();
 
-            cb.RegisterType<FlowFileLogRepositoryFactory>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<FlowFileLogRepositoryFactory>()
+                .AsSelf().AsImplementedInterfaces();
 
-            cb.RegisterType<FlowFileControllerServiceFactory>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<FlowFileControllerServiceFactory>()
+                .AsSelf().AsImplementedInterfaces();
 
-            cb.RegisterType<FlowController>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<FlowController>()
+                .AsSelf().AsImplementedInterfaces();
 
-            cb.RegisterType<FlowFileLogRepository>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<FlowFileLogRepository>()
+                .AsSelf().AsImplementedInterfaces();
 
-            cb.RegisterType<FlowFileControllerService>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<FlowFileControllerService>()
+                .AsSelf().AsImplementedInterfaces();
 
             cb.RegisterGeneric(typeof(ProcessorConfiguration<,>))
                 .AsSelf()
                 .AsImplementedInterfaces();
             
-            cb.RegisterGeneric(typeof(FlowFileFlowFileBatchController<,>))
+            cb.RegisterGeneric(typeof(FlowFileController<,>))
                 .AsSelf();
 
             cb.RegisterGeneric(typeof(Processor<,>))
@@ -35,9 +43,33 @@ namespace FutureState.Flow.Tests.Flow
 
             cb.RegisterGeneric(typeof(ProcessorEngine<>))
                 .AsSelf();
+
+            cb.RegisterGeneric(typeof(SpecProvider<>))
+                .AsSelf()
+                .SingleInstance();
+
+            cb.RegisterType<SpecProviderFactory>()
+                .AsSelf()
+                .AsImplementedInterfaces()
+                .SingleInstance();
         }
 
-        public class FlowFileBatchControllerFactory : IFlowFileBatchControllerFactory
+        public class SpecProviderFactory : ISpecProviderFactory
+        {
+            private readonly IComponentContext _context;
+
+            public SpecProviderFactory(IComponentContext context)
+            {
+                _context = context;
+            }
+
+            public SpecProvider<TEntityOrService> Get<TEntityOrService>()
+            {
+                return _context.Resolve<SpecProvider<TEntityOrService>>();
+            }
+        }
+
+        public class FlowFileBatchControllerFactory : IFlowFileControllerFactory
         {
             private readonly IComponentContext _context;
 
@@ -46,12 +78,12 @@ namespace FutureState.Flow.Tests.Flow
                 this._context = context;
             }
 
-            public IFlowFileBatchController Create(Type type)
+            public IFlowFileController Create(Type type)
             {
                 // ReSharper disable once UsePatternMatching
-                var batchProcessor = _context.Resolve(type) as IFlowFileBatchController;
+                var batchProcessor = _context.Resolve(type) as IFlowFileController;
                 if (batchProcessor == null)
-                    throw new InvalidOperationException($"Controller type does not implement {typeof(IFlowFileBatchController).Name}");
+                    throw new InvalidOperationException($"Controller type does not implement {typeof(IFlowFileController).Name}");
 
                 return batchProcessor;
             }
@@ -81,11 +113,11 @@ namespace FutureState.Flow.Tests.Flow
                 this._context = context;
             }
 
-            public FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileBatchController controller)
+            public FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller)
             {
                 return _context.Resolve<FlowFileControllerService>(
                     new TypedParameter(typeof(IFlowFileLogRepository), repository),
-                    new TypedParameter(typeof(IFlowFileBatchController), controller));
+                    new TypedParameter(typeof(IFlowFileController), controller));
             }
         }
     }

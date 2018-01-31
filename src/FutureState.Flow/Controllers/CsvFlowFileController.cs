@@ -1,17 +1,17 @@
 ﻿using System;
 
-namespace FutureState.Flow.BatchControllers
+namespace FutureState.Flow.Controllers
 {
     /// <summary>
     ///     Uses csv files to create batchs of data to process.
     /// </summary>
     /// <typeparam name="TIn">The input entity type.</typeparam>
     /// <typeparam name="TOut">The entity type to produce.</typeparam>
-    public class CsvFlowFileFlowFileBatchController<TIn, TOut> : FlowFileFlowFileBatchController<TIn, TOut>
+    public class CsvFlowFileController<TIn, TOut> : FlowFileController<TIn, TOut>
         where TOut : class, new()
     {
-        public CsvFlowFileFlowFileBatchController(
-            Func<IFlowFileBatchController, Processor<TIn, TOut>> getProcessor = null,
+        public CsvFlowFileController(
+            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null,
             ProcessorConfiguration<TIn, TOut> config = null)
             : base(new CsvProcessorReader<TIn>(), getProcessor, config)
         {

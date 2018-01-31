@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Timers;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
@@ -27,7 +27,7 @@ namespace FutureState.Flow
         /// <param name="flowFileBatchController">The batch processor implementation.</param>
         public FlowFileControllerService(
             IFlowFileLogRepository logRepository,
-            IFlowFileBatchController flowFileBatchController)
+            IFlowFileController flowFileBatchController)
         {
             Guard.ArgumentNotNull(logRepository, nameof(logRepository));
             Guard.ArgumentNotNull(flowFileBatchController, nameof(flowFileBatchController));
@@ -44,7 +44,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the controller that gets/loads data from a source to a processor.
         /// </summary>
-        public IFlowFileBatchController FlowFileBatchController { get; }
+        public IFlowFileController FlowFileBatchController { get; }
 
         /// <summary>
         ///     Gets how frequently to poll new data sourced from a batch controller.

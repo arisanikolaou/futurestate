@@ -6,31 +6,36 @@ using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
 
-namespace FutureState.Flow.BatchControllers
+namespace FutureState.Flow.Controllers
 {
     /// <summary>
     ///     Controls the flow of data from an incoming batch source to a downstream processor.
     /// </summary>
     /// <typeparam name="TIn">The incoming data type to </typeparam>
     /// <typeparam name="TOut"></typeparam>
-    public class FlowFileFlowFileBatchController<TIn, TOut> : IFlowFileBatchController
+    public class FlowFileController<TIn, TOut> : IFlowFileController
         where TOut : class, new()
     {
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly Func<IFlowFileBatchController, Processor<TIn, TOut>> _getProcessor;
+        private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getProcessor;
         private readonly IReader<TIn> _reader;
         private string _inDirectory;
-
         private string _outDirectory;
 
         /// <summary>
+        ///     Gets the type of entity being processed.
+        /// </summary>
+        public Type InputType { get { return typeof(TIn); } }
+
+        /// <summary>
+        ///     Creates a new instance.
         /// </summary>
         /// <param name="reader">The reader to read incoming results from.</param>
         /// <param name="getProcessor">Function to create a new procesor.</param>
         /// <param name="config">Processor configuration settings.</param>
-        public FlowFileFlowFileBatchController(
+        public FlowFileController(
             IReader<TIn> reader,
-            Func<IFlowFileBatchController, Processor<TIn, TOut>> getProcessor = null,
+            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null,
             ProcessorConfiguration<TIn, TOut> config = null)
         {
             Guard.ArgumentNotNull(reader, nameof(reader));

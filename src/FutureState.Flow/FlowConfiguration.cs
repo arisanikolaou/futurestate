@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow
@@ -38,22 +38,22 @@ namespace FutureState.Flow
         }
 
         public FlowControllerDefinition AddController<T>(string controllerName)
-            where T : IFlowFileBatchController
+            where T : IFlowFileController
         {
             FlowControllerDefinition def;
 
             if (Controllers == null)
                 Controllers = new List<FlowControllerDefinition>();
 
-            var lastOutputDirectory = Controllers.LastOrDefault()?.OutputDirectory;
+            var lastOutputDirectory = Controllers.LastOrDefault()?.Output;
 
             Controllers.Add(def = new FlowControllerDefinition()
             {
                 ControllerName = controllerName,
-                BatchControllerType = typeof(T).AssemblyQualifiedName,
+                TypeName = typeof(T).AssemblyQualifiedName,
                 // the last output directory will be the input to this one
-                InputDirectory = lastOutputDirectory ?? $@"{BasePath}\{controllerName}\In",
-                OutputDirectory = $@"{BasePath}\{controllerName}\Out",
+                Input = lastOutputDirectory ?? $@"{BasePath}\{controllerName}\In",
+                Output = $@"{BasePath}\{controllerName}\Out",
                 PollInterval = 2, // seconds
                 DateCreated = DateTime.UtcNow
             });
@@ -95,13 +95,9 @@ namespace FutureState.Flow
     public class FlowControllerDefinition
     {
         /// <summary>
-        ///     Gets the frequency, in secondss, to poll for new data files.
-        /// </summary>
-        public int PollInterval { get; set; }
-        /// <summary>
         ///     Gets the assembly qualified name of the batch controller to use to process the data.
         /// </summary>
-        public string BatchControllerType { get; set; }
+        public string TypeName { get; set; }
         /// <summary>
         ///     Gets the display name of the controller.
         /// </summary>
@@ -109,14 +105,44 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the port source for data.
         /// </summary>
-        public string InputDirectory { get; set; }
+        public string Input { get; set; }
         /// <summary>
         ///     Gets the output path for processed data.
         /// </summary>
-        public string OutputDirectory { get; set; }
+        public string Output { get; set; }
+        /// <summary>
+        ///     Gets the frequency, in secondss, to poll for new data files.
+        /// </summary>
+        public int PollInterval { get; set; }
+        /// <summary>
+        ///     
+        /// </summary>
+        public List<FlowFieldValidation> FieldValidationRules { get; set; } = new List<FlowFieldValidation>();
+
         /// <summary>
         ///     Gets the date the entry was recorded.
         /// </summary>
         public DateTime DateCreated { get; set; }
+
+        /// <summary>
+        ///     Configuration details.
+        /// </summary>
+        public Dictionary<string, string> ConfigurationDetails { get; set; } = new Dictionary<string, string>();
+    }
+
+    public class FlowFieldValidation
+    {
+        /// <summary>
+        ///     Gets the name of the field to validate.
+        /// </summary>
+        public string FieldName { get; set; }
+        /// <summary>
+        ///     Gets the regular expression to run.
+        /// </summary>
+        public string RegEx { get; set; }
+        /// <summary>
+        ///     Gets the error message to display.
+        /// </summary>
+        public string ErrorMessage { get; set; }
     }
 }
