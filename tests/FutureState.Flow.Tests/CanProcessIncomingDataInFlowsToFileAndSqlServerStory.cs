@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CsvHelper;
@@ -123,7 +124,8 @@ namespace FutureState.Flow.Tests
         protected void WhenProcessingADenormalizedFileUsingProcessingRules()
         {
             var processorA = new Processor<DenormalizedEntity, Dto1>(
-                new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider),
+                new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider, 
+                new SpecProvider<IEnumerable<Dto1>>()),
                 new ProcessorEngine<DenormalizedEntity>())
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
@@ -153,7 +155,9 @@ namespace FutureState.Flow.Tests
         {
             // chain 2
             var processorB = new Processor<Dto1, Dto2>(
-                new ProcessorConfiguration<Dto1, Dto2>(),
+                new ProcessorConfiguration<Dto1, Dto2>(
+                    new SpecProvider<Dto2>(),
+                    new SpecProvider<IEnumerable<Dto2>>()),
                 new ProcessorEngine<Dto1>())
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
@@ -204,7 +208,9 @@ namespace FutureState.Flow.Tests
         {
             // chain 2
             var processorC = new Processor<Dto2, Address>(
-                new ProcessorConfiguration<Dto2, Address>(_specProviderFroAddress),
+                new ProcessorConfiguration<Dto2, Address>(
+                    _specProviderFroAddress,
+                    new SpecProvider<IEnumerable<Address>>()),
                 new ProcessorEngine<Dto2>())
             {
                 CreateOutput = (dtoIn) => dtoIn.Addresses,

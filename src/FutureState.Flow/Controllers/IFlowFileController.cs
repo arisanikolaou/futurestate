@@ -7,12 +7,17 @@ namespace FutureState.Flow.Controllers
     /// <summary>
     ///     Controls how batches of data flow into batch processors for processing (loading and/or transformation).
     /// </summary>
-    public interface IFlowFileController
+    public interface IFlowFileController : IDisposable
     {
         /// <summary>
         ///     Gets the type of entity being processed.
         /// </summary>
         Type InputType { get; }
+
+        /// <summary>
+        ///     Gets the output type.
+        /// </summary>
+        Type OutputType { get; }
 
         /// <summary>
         ///     Gets the display name of the processor.
@@ -48,5 +53,10 @@ namespace FutureState.Flow.Controllers
         /// <param name="log">The log containing the list of files processed.</param>
         /// <returns></returns>
         FileInfo GetNextFlowFile(FlowFileLog log);
+
+        /// <summary>
+        ///     Initializes the controller.
+        /// </summary>
+        void Initialize();
     }
 }

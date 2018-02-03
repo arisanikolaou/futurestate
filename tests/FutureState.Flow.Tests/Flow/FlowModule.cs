@@ -32,6 +32,7 @@ namespace FutureState.Flow.Tests.Flow
                 .AsSelf().AsImplementedInterfaces();
 
             cb.RegisterGeneric(typeof(ProcessorConfiguration<,>))
+                .SingleInstance() // make singleton
                 .AsSelf()
                 .AsImplementedInterfaces();
             
@@ -46,6 +47,7 @@ namespace FutureState.Flow.Tests.Flow
 
             cb.RegisterGeneric(typeof(SpecProvider<>))
                 .AsSelf()
+                .As(typeof(IProvideSpecifications<>))
                 .SingleInstance();
 
             cb.RegisterType<SpecProviderFactory>()

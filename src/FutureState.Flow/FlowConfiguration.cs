@@ -25,11 +25,14 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowConfiguration()
+        public FlowConfiguration() 
         {
-
+            // required by serializer
         }
 
+        /// <summary>
+        ///     Creates a new instance using a given flow id.
+        /// </summary>
         public FlowConfiguration(Guid flowId)
         {
             FlowId = flowId;
@@ -55,7 +58,7 @@ namespace FutureState.Flow
                 Input = lastOutputDirectory ?? $@"{BasePath}\{controllerName}\In",
                 Output = $@"{BasePath}\{controllerName}\Out",
                 PollInterval = 2, // seconds
-                DateCreated = DateTime.UtcNow
+                ExecutionOrder = Controllers.Count
             });
 
             return def;
@@ -115,22 +118,23 @@ namespace FutureState.Flow
         /// </summary>
         public int PollInterval { get; set; }
         /// <summary>
-        ///     
+        ///     Gets the list of validation rules to apply to outgoing entities.
         /// </summary>
-        public List<FlowFieldValidation> FieldValidationRules { get; set; } = new List<FlowFieldValidation>();
-
+        public List<ValidationRule> FieldValidationRules { get; set; } = new List<ValidationRule>();
         /// <summary>
-        ///     Gets the date the entry was recorded.
-        /// </summary>
-        public DateTime DateCreated { get; set; }
-
-        /// <summary>
-        ///     Configuration details.
+        ///     Flow controller configuration details.
         /// </summary>
         public Dictionary<string, string> ConfigurationDetails { get; set; } = new Dictionary<string, string>();
+        /// <summary>
+        ///     Gets the relative execution order to the associated controller.
+        /// </summary>
+        public int ExecutionOrder { get; set; }
     }
 
-    public class FlowFieldValidation
+    /// <summary>
+    ///     Defines the rules to use to validate a given entity.
+    /// </summary>
+    public class ValidationRule
     {
         /// <summary>
         ///     Gets the name of the field to validate.

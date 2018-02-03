@@ -16,6 +16,7 @@ namespace FutureState.Autofac.Modules
             builder.RegisterType<SpecProviderFactory>()
                 .AsSelf()
                 .AsImplementedInterfaces()
+                // single instance for aapp
                 .SingleInstance();
         }
 

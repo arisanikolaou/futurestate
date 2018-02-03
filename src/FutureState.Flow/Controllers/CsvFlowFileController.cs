@@ -11,9 +11,9 @@ namespace FutureState.Flow.Controllers
         where TOut : class, new()
     {
         public CsvFlowFileController(
-            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null,
-            ProcessorConfiguration<TIn, TOut> config = null)
-            : base(new CsvProcessorReader<TIn>(), getProcessor, config)
+            ProcessorConfiguration<TIn, TOut> config,
+            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null)
+            : base(config, new CsvProcessorReader<TIn>(), getProcessor)
         {
         }
     }

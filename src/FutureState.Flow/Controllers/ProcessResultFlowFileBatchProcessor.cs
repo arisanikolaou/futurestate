@@ -11,13 +11,22 @@ namespace FutureState.Flow.Controllers
     public class ProcessResultFlowFileBatchController<TIn, TOut> : FlowFileController<TIn, TOut>
         where TOut : class, new()
     {
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="config">The configuration to use to map, configure incoming to outgoing entities.</param>
+        /// <param name="getProcessor">How to get processors.</param>
         public ProcessResultFlowFileBatchController(
-            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null,
-            ProcessorConfiguration<TIn, TOut> config = null)
-            : base(GetReader(), getProcessor, config)
+            ProcessorConfiguration<TIn, TOut> config,
+            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null)
+            : base(config, GetReader(), getProcessor)
         {
         }
 
+        /// <summary>
+        ///     Gets the reader function.
+        /// </summary>
+        /// <returns></returns>
         private static IReader<TIn> GetReader()
         {
             return new GenericResultReader<TIn>(flowFileSource =>

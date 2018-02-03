@@ -15,6 +15,7 @@ namespace FutureState.Flow
     public class FlowFileControllerService : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly IFlowFileLogRepository _logRepository;
         private readonly object _syncLock = new object();
         private readonly Timer _timer;
@@ -24,19 +25,20 @@ namespace FutureState.Flow
         ///     Creates a new instance.
         /// </summary>
         /// <param name="logRepository">The repositoro to update transaction log details to.</param>
-        /// <param name="flowFileBatchController">The batch processor implementation.</param>
+        /// <param name="flowFileController">The batch processor implementation.</param>
         public FlowFileControllerService(
             IFlowFileLogRepository logRepository,
-            IFlowFileController flowFileBatchController)
+            IFlowFileController flowFileController)
         {
             Guard.ArgumentNotNull(logRepository, nameof(logRepository));
-            Guard.ArgumentNotNull(flowFileBatchController, nameof(flowFileBatchController));
+            Guard.ArgumentNotNull(flowFileController, nameof(flowFileController));
 
-            FlowFileBatchController = flowFileBatchController;
+            FlowFileController = flowFileController;
             Interval = TimeSpan.FromSeconds(30);
 
             _logRepository = logRepository;
 
+            // the time to poll for incoming data
             _timer = new Timer();
             _timer.Elapsed += _timer_Elapsed;
         }
@@ -44,13 +46,16 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the controller that gets/loads data from a source to a processor.
         /// </summary>
-        public IFlowFileController FlowFileBatchController { get; }
+        public IFlowFileController FlowFileController { get; }
 
         /// <summary>
         ///     Gets how frequently to poll new data sourced from a batch controller.
         /// </summary>
         public TimeSpan Interval { get; set; }
 
+        /// <summary>
+        ///     Disposes the current instance.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -62,12 +67,17 @@ namespace FutureState.Flow
         /// </summary>
         public event EventHandler FlowFileProcessed;
 
+        /// <summary>
+        /// /   Destructor.
+        /// </summary>
         ~FlowFileControllerService()
         {
             Dispose(false);
         }
 
-
+        /// <summary>
+        ///     Processing incoming data.
+        /// </summary>
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             lock (_syncLock)
@@ -91,18 +101,20 @@ namespace FutureState.Flow
 
         private void BeginProcesFlowFiles()
         {
-            if (FlowFileBatchController == null)
+            if (FlowFileController == null)
                 throw new InvalidOperationException("Batch processor has not been configured or assigned.");
 
             // load transaction log db
-            var flowFileLog = _logRepository.Get(FlowFileBatchController.FlowId);
+            var flowFileLog = _logRepository.Get(FlowFileController.FlowId);
 
-            var flowFile = FlowFileBatchController.GetNextFlowFile(flowFileLog);
+            // get next available flow file
+            var flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
 
+            // flow file
             if (flowFile == null)
             {
                 if (_logger.IsDebugEnabled)
-                    _logger.Debug($"No new data is available from the given flow controller {FlowFileBatchController.ControllerName}.");
+                    _logger.Debug($"No new data is available from the given flow controller {FlowFileController.ControllerName}.");
 
                 return;
             }
@@ -114,25 +126,25 @@ namespace FutureState.Flow
                 // reate a new batch process
                 var batchProcess = new BatchProcess
                 {
-                    FlowId = FlowFileBatchController.FlowId,
+                    FlowId = FlowFileController.FlowId,
                     BatchId = flowFileLog.BatchId
                 };
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileBatchController.FlowId} by batch controller {FlowFileBatchController.ControllerName}.");
+                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileController.FlowId} by batch controller {FlowFileController.ControllerName}.");
 
                 // run processor
-                var result = FlowFileBatchController.Process(flowFile, batchProcess);
+                var result = FlowFileController.Process(flowFile, batchProcess);
 
                 if (result == null)
-                    return;
+                    return; // no work to do
 
-                // update entry
+                // update flow transaction log
                 var processLogEntry = new FlowFileLogEntry
                 {
                     FlowFileProcessed = flowFile.FullName,
-                    ControllerName = FlowFileBatchController.ControllerName,
+                    ControllerName = FlowFileController.ControllerName,
                     BatchId = flowFileLog.BatchId
                 };
 
@@ -140,18 +152,18 @@ namespace FutureState.Flow
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileBatchController.FlowId}.");
+                        $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileController.FlowId}.");
 
                 // update database
                 _logRepository.Save(flowFileLog);
 
                 if (_logger.IsInfoEnabled)
-                    _logger.Info($"Flow {FlowFileBatchController.FlowId} transaction log updated.");
+                    _logger.Info($"Flow {FlowFileController.FlowId} transaction log updated.");
             }
             catch (Exception ex)
             {
                 var msg =
-                    $"Failed to process flow file {flowFile.Name}. {ex.Message}. Batch controller is {FlowFileBatchController.GetType().Name}.";
+                    $"Failed to process flow file {flowFile.Name}. {ex.Message}. Batch controller is {FlowFileController.GetType().Name}.";
 
                 if (_logger.IsErrorEnabled)
                     _logger.Error(ex, msg);

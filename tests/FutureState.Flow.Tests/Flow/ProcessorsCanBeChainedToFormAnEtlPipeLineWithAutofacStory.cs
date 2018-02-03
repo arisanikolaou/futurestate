@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -6,10 +7,12 @@ using System.Threading;
 using Autofac;
 using CsvHelper;
 using FutureState.Flow.Controllers;
+using FutureState.Specifications;
 using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
+using IContainer = Autofac.IContainer;
 
 namespace FutureState.Flow.Tests.Flow
 {
@@ -32,7 +35,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void GivenAnInitializedFlowConfig()
         {
-            var baseDirectoryName = "Flow";
+            var baseDirectoryName = "Flow2";
 
             var baseDirectory = $@"{Environment.CurrentDirectory}\{baseDirectoryName}";
             if (Directory.Exists(baseDirectory))
@@ -43,7 +46,17 @@ namespace FutureState.Flow.Tests.Flow
                 BasePath = baseDirectory,
             };
 
-            flowConfig.AddController<TestCsvFlowFileFlowFileBatchController>("ProcessorA");
+            var def1 = flowConfig.AddController<TestCsvFlowController>("ProcessorA");
+            def1.FieldValidationRules.Add(new ValidationRule()
+            {
+                FieldName = "Value",
+                ErrorMessage = "Value must be numeric",
+                RegEx = "^[0-9]*$"
+            });
+
+            // configuration path
+            def1.ConfigurationDetails.Add("ValueToConfigure", "http://helplnk.etc");
+
             flowConfig.AddController<TestProcessResultFlowFileBatchController>("ProcessorB");
 
             this._flowConfig = flowConfig;
@@ -97,7 +110,7 @@ namespace FutureState.Flow.Tests.Flow
             cb.RegisterModule(new FlowModule());
 
             // register controllers
-            cb.RegisterType<TestCsvFlowFileFlowFileBatchController>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<TestCsvFlowController>().AsSelf().AsImplementedInterfaces();
             cb.RegisterType<TestProcessResultFlowFileBatchController>().AsSelf().AsImplementedInterfaces();
 
             _container = cb.Build();
@@ -113,9 +126,18 @@ namespace FutureState.Flow.Tests.Flow
             _flowController.Start(_flowConfig);
         }
 
-        protected void AndWhenSavingTheFlowConfig()
+        protected void AndWhenSavingTheFlowConfigAndUsingControllerFriendlyNames()
         {
-            _flowConfig.Controllers.FirstOrDefault().ConfigurationDetails.Add("Item1", "Value1");
+            // ReSharper disable once PossibleNullReferenceException
+            var lastController = _flowConfig.Controllers.LastOrDefault();
+            Assert.NotNull(lastController);
+
+            lastController
+                .ConfigurationDetails.Add("Item1", "Value1");
+            lastController.TypeName = "";
+
+            // should match the display name of the controller type
+            lastController.ControllerName = "ProcessorB";
 
             _flowConfig.Save();
         }
@@ -125,13 +147,39 @@ namespace FutureState.Flow.Tests.Flow
             // wait for jobs to finish processing
             var sw = new Stopwatch();
             sw.Start();
-            while (_flowController.Processed <= 2 && sw.Elapsed.TotalSeconds < 15)
+
+            // spin wait for background work to finish
+            while (_flowController.Processed <= 20 && sw.Elapsed.TotalSeconds < 15)
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
             foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
 
             Assert.True(_flowController.Processed == 2);
+        }
+
+        protected void ThenConfigurationSystemShouldBuildValidators()
+        {
+            var specs = _container
+                .Resolve<IProvideSpecifications<EntityB>>()
+                .GetSpecifications().ToArray();
+
+            // regex validator should be set
+            Assert.Single(specs);
+        }
+
+        protected void AndThenFlowCustomConfigurationShouldBeSet()
+        {
+            // flow conrtroller should configure all controllers
+            IFlowFileController[] controllers = _flowController.GetControllers();
+            foreach(var controller in controllers)
+            {
+                if(controller is TestCsvFlowController)
+                {
+                    var testCsv = controller as TestCsvFlowController;
+                    Assert.Equal("http://helplnk.etc", testCsv.ValueToConfigure);
+                }
+            }
         }
 
         protected void AndThenShouldBeAbleToRepeatProcessingFromConfiguration()
@@ -151,6 +199,8 @@ namespace FutureState.Flow.Tests.Flow
             // wait for jobs to finish processing
             var sw = new Stopwatch();
             sw.Start();
+
+            // spin wait
             while (controller.Processed <= 2 && sw.Elapsed.TotalSeconds < 15)
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
@@ -161,8 +211,16 @@ namespace FutureState.Flow.Tests.Flow
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }
 
-        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileController<EnitityA, EntityB>
+        public class TestCsvFlowController : CsvFlowFileController<EnitityA, EntityB>
         {
+            public string ValueToConfigure { get; set; }
+
+            public TestCsvFlowController(ProcessorConfiguration<EnitityA, EntityB> config)
+                : base(config)
+            {
+
+            }
+
             public override Processor<EnitityA, EntityB> GetProcessor()
             {
                 int i = 0;
@@ -176,13 +234,26 @@ namespace FutureState.Flow.Tests.Flow
 
                         dtoOut.Name = dtoIn.Name;
                         dtoOut.Id = ++i;
+
+                        if(i % 2 == 0)
+                            dtoOut.Value = "A"; // should not be valid
+                        else
+                            dtoOut.Value = "123"; // should not be valid
                     }
                 };
             }
         }
 
+        // used in file configuration
+        [DisplayName("ProcessorB")]
         public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<EntityB, EntityC>
         {
+            public TestProcessResultFlowFileBatchController(ProcessorConfiguration<EntityB, EntityC> config)
+       : base(config)
+            {
+
+            }
+
             public override Processor<EntityB, EntityC> GetProcessor()
             {
                 int i = 0;
@@ -212,6 +283,8 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
+
+            public string Value { get; set; }
         }
 
         public class EntityC

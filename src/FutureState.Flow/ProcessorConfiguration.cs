@@ -12,24 +12,39 @@ namespace FutureState.Flow
     public class ProcessorConfiguration<TEntityIn, TEntityOut>
         where TEntityOut : class, new()
     {
+        private readonly IProvideSpecifications<TEntityOut> _specProviderForEntity;
+        private readonly IProvideSpecifications<IEnumerable<TEntityOut>> _specProviderForEntityCollection;
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="specProviderForEntity"></param>
+        /// <param name="specProviderForEntityCollection"></param>
+        /// <param name="mapper">The mapper to use to map incoming entities to outgoing entities.</param>
         public ProcessorConfiguration(
-            IProvideSpecifications<TEntityOut> specProviderForEntity = null,
-            IProvideSpecifications<IEnumerable<TEntityOut>> specProviderForEntityCollection = null,
+            IProvideSpecifications<TEntityOut> specProviderForEntity,
+            IProvideSpecifications<IEnumerable<TEntityOut>> specProviderForEntityCollection,
             ObjectsMapper<TEntityIn, TEntityOut> mapper = null)
         {
+            Guard.ArgumentNotNull(specProviderForEntity, nameof(specProviderForEntity));
+            Guard.ArgumentNotNull(specProviderForEntityCollection, nameof(specProviderForEntityCollection));
+
+            _specProviderForEntity = specProviderForEntity;
+            _specProviderForEntityCollection = specProviderForEntityCollection;
+
             Mapper = mapper ?? ObjectMapperManager.DefaultInstance.GetMapper<TEntityIn, TEntityOut>();
-
-            Rules = specProviderForEntity?.GetSpecifications().ToArray() ??
-                    Enumerable.Empty<ISpecification<TEntityOut>>();
-
-            CollectionRules = specProviderForEntityCollection?.GetSpecifications().ToArray() ??
-                              Enumerable.Empty<ISpecification<IEnumerable<TEntityOut>>>();
         }
 
         /// <summary>
         ///     Gets the rules to process/validate outgoing entities.
         /// </summary>
-        public IEnumerable<ISpecification<TEntityOut>> Rules { get; }
+        public IEnumerable<ISpecification<TEntityOut>> Rules
+        {
+            get
+            {
+                return _specProviderForEntity.GetSpecifications();
+            }
+        }
 
         /// <summary>
         ///     Gets the default mapper to use to map incoming entities to outgoing entities.
@@ -37,8 +52,14 @@ namespace FutureState.Flow
         public ObjectsMapper<TEntityIn, TEntityOut> Mapper { get; }
 
         /// <summary>
-        ///     Gets the rules to use to validate a collection of entities.
+        ///     Gets the rules to use to validate a collection of materialized entities.
         /// </summary>
-        public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules { get; }
+        public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules
+        {
+            get
+            {
+                return _specProviderForEntityCollection.GetSpecifications();
+            }
+        }
     }
 }

@@ -111,10 +111,14 @@ namespace FutureState.Flow
 
                     var errorEvents = errorsEvents as ErrorEvent[] ?? errorsEvents.ToArray();
                     if (!errorEvents.Any())
+                    {
                         processed.Add(dto);
+                    }
                     else
+                    {
                         foreach (var error in errorEvents)
-                            errors.Add(new ProcessError<TEntityDto> {Error = error, Item = dto});
+                            errors.Add(new ProcessError<TEntityDto> { Error = error, SourceItem = dto });
+                    }
                 }
                 catch (ApplicationException apex)
                 {
@@ -128,13 +132,13 @@ namespace FutureState.Flow
                     errors.Add(new ProcessError<TEntityDto>
                     {
                         Error = new ErrorEvent {Type = "Exception", Message = apex.Message},
-                        Item = dto
+                        SourceItem = dto
                     });
                 }
                 catch (Exception ex)
                 {
                     if (Logger.IsErrorEnabled)
-                        Logger.Error(ex, $"Can't process row {Current} due to an unexpected error.");
+                        Logger.Error(ex, $"Can't process entity at index {Current} due to an unexpected error.");
 
                     onError(dto, ex);
 
@@ -143,7 +147,7 @@ namespace FutureState.Flow
                     errors.Add(new ProcessError<TEntityDto>
                     {
                         Error = new ErrorEvent {Type = "Exception", Message = ex.Message},
-                        Item = dto
+                        SourceItem = dto
                     });
                 }
             }
@@ -160,12 +164,14 @@ namespace FutureState.Flow
 
                 // roll back items into an error state
                 foreach (var entityDto in processed)
+                {
                     errors.Add(new ProcessError<TEntityDto>
                     {
                         Error =
-                            new ErrorEvent {Type = "Exception", Message = $"Failed to commit changes: {ex.Message}"},
-                        Item = entityDto
+                            new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" },
+                        SourceItem = entityDto
                     });
+                }
 
                 //reset items
                 processed.Clear();
@@ -177,7 +183,9 @@ namespace FutureState.Flow
 
             result.ProcessedCount = processed.Count;
             result.Errors = errors;
+#if DEBUG
             result.Exceptions = exceptions;
+#endif
             result.Warnings = Warnings;
             result.Input = processed;
             result.ProcessTime = DateTime.UtcNow - StartTime;
