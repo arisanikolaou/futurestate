@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
+using Newtonsoft.Json;
+using NLog;
 
 namespace FutureState.Flow.Data
 {
@@ -38,6 +38,7 @@ namespace FutureState.Flow.Data
         {
             CreateDirIfNotExists();
 
+
             var i = 1;
             var fileName =
                 $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{data.BatchProcess.BatchId}.json";
@@ -48,14 +49,14 @@ namespace FutureState.Flow.Data
                         }-{i++}.json";
 
             if (_logger.IsInfoEnabled)
-                _logger.Info(($"Saving process output to {fileName}."));
+                _logger.Info($"Saving process output to {fileName}.");
 
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
 
             File.WriteAllText(fileName, body);
 
             if (_logger.IsInfoEnabled)
-                _logger.Info(($"Saved process output to {fileName}."));
+                _logger.Info($"Saved process output to {fileName}.");
         }
 
         public T Get(string processName, Guid correlationId, long batchId)
@@ -66,14 +67,14 @@ namespace FutureState.Flow.Data
                 return default(T);
 
             if (_logger.IsInfoEnabled)
-                _logger.Info(($"Reading process output from {fileName}."));
+                _logger.Info($"Reading process output from {fileName}.");
 
             var body = File.ReadAllText(fileName);
 
             var result = JsonConvert.DeserializeObject<T>(body);
 
             if (_logger.IsInfoEnabled)
-                _logger.Info(($"Read process output from {fileName}."));
+                _logger.Info($"Read process output from {fileName}.");
 
             return result;
         }

@@ -1,16 +1,15 @@
-﻿using Dapper.Extensions.Linq.Core.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using Dapper.Extensions.Linq.Core.Enums;
 using Dapper.Extensions.Linq.Core.Implementor;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Core.Predicates;
 using Dapper.Extensions.Linq.Core.Sql;
 using Dapper.Extensions.Linq.Predicates;
 using FutureState;
-using FutureState.Data;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Dynamic;
-using System.Linq;
 
 namespace Dapper.Extensions.Linq.Implementor
 {
@@ -41,12 +40,12 @@ namespace Dapper.Extensions.Linq.Implementor
             var properties = classMap.LinqPropertyMaps.Where(p => p.KeyType != KeyType.NotAKey).ToList();
 
             foreach (var e in entities)
-                foreach (var column in properties)
-                    if (column.KeyType == KeyType.Guid)
-                    {
-                        var comb = SeqGuid.Create();
-                        column.PropertyInfo.SetValue(e, comb, null);
-                    }
+            foreach (var column in properties)
+                if (column.KeyType == KeyType.Guid)
+                {
+                    var comb = SeqGuid.Create();
+                    column.PropertyInfo.SetValue(e, comb, null);
+                }
 
             var sql = SqlGenerator.Insert(classMap);
 

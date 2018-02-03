@@ -2,7 +2,7 @@
 {
     /// <summary>
     ///     An object whose state is expected to persist across application
-    /// sessions.
+    ///     sessions.
     /// </summary>
     public interface IEntity
     {

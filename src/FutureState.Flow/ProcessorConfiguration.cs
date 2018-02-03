@@ -1,6 +1,6 @@
-﻿using EmitMapper;
+﻿using System.Collections.Generic;
+using EmitMapper;
 using FutureState.Specifications;
-using System.Collections.Generic;
 
 namespace FutureState.Flow
 {
@@ -37,13 +37,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the rules to process/validate outgoing entities.
         /// </summary>
-        public IEnumerable<ISpecification<TEntityOut>> Rules
-        {
-            get
-            {
-                return _specProviderForEntity.GetSpecifications();
-            }
-        }
+        public IEnumerable<ISpecification<TEntityOut>> Rules => _specProviderForEntity.GetSpecifications();
 
         /// <summary>
         ///     Gets the default mapper to use to map incoming entities to outgoing entities.
@@ -53,12 +47,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the rules to use to validate a collection of materialized entities.
         /// </summary>
-        public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules
-        {
-            get
-            {
-                return _specProviderForEntityCollection.GetSpecifications();
-            }
-        }
+        public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules =>
+            _specProviderForEntityCollection.GetSpecifications();
     }
 }

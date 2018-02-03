@@ -1,9 +1,9 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using NLog;
 
 namespace FutureState.Reflection
 {
@@ -32,7 +32,6 @@ namespace FutureState.Reflection
         /// <param name="assemblyProbePath">Defaults to current directory.</param>
         /// <param name="assemblyScanPrefix">The prefix of the assemblies to filter out.</param>
         public AppTypeScanner(
-
             string assemblyProbePath = null, string assemblyScanPrefix = "FutureState")
         {
             _basePath = assemblyProbePath ?? Environment.CurrentDirectory;

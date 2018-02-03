@@ -22,7 +22,7 @@ namespace FutureState.Specifications
     /// </summary>
     /// <remarks>
     ///     Will automatically accumulate all specifications from an entity based on
-    /// its data annotations.
+    ///     its data annotations.
     /// </remarks>
     /// <typeparam name="TEntityOrService">
     ///     The entity or service to validate.
@@ -180,7 +180,7 @@ namespace FutureState.Specifications
         public void MergeFrom<TPart>(Func<TEntityOrService, TPart> partGetter, IProvideSpecifications<TPart> source)
         {
             foreach (var specification in source.GetSpecifications())
-                Add((a) => specification.Evaluate(partGetter(a)), specification.Key, specification.Description);
+                Add(a => specification.Evaluate(partGetter(a)), specification.Key, specification.Description);
         }
     }
 }

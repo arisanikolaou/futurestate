@@ -1,14 +1,14 @@
-﻿using Autofac;
-using CsvHelper;
-using FutureState.Flow.Controllers;
-using FutureState.Specifications;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Autofac;
+using CsvHelper;
+using FutureState.Flow.Controllers;
+using FutureState.Specifications;
+using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -19,13 +19,12 @@ namespace FutureState.Flow.Tests.Flow
     [Story]
     public class ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory
     {
-        private int CsvItemsToCreate = 25;
-
         private readonly string DataFileName = @"TestData.csv";
 
         private IContainer _container;
         private FlowConfiguration _flowConfig;
         private FlowController _flowController;
+        private readonly int CsvItemsToCreate = 25;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac()
@@ -43,11 +42,11 @@ namespace FutureState.Flow.Tests.Flow
 
             var flowConfig = new FlowConfiguration(Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c860"))
             {
-                BasePath = baseDirectory,
+                BasePath = baseDirectory
             };
 
             var def1 = flowConfig.AddController<TestCsvFlowController>("ProcessorA");
-            def1.FieldValidationRules.Add(new ValidationRule()
+            def1.FieldValidationRules.Add(new ValidationRule
             {
                 FieldName = "Value",
                 ErrorMessage = "Value must be numeric",
@@ -59,16 +58,16 @@ namespace FutureState.Flow.Tests.Flow
 
             flowConfig.AddController<TestProcessResultFlowFileBatchController>("ProcessorB");
 
-            this._flowConfig = flowConfig;
+            _flowConfig = flowConfig;
         }
 
         protected void AndGivenAGeneratedDataSourceCsvFile()
         {
-            var baseDir = this._flowConfig.Controllers.First().Input;
+            var baseDir = _flowConfig.Controllers.First().Input;
             if (!Directory.Exists(baseDir))
                 Directory.CreateDirectory(baseDir);
 
-            string csvFilePath = $@"{baseDir}\{DataFileName}";
+            var csvFilePath = $@"{baseDir}\{DataFileName}";
 
             // always re-create
             if (File.Exists(csvFilePath))
@@ -85,6 +84,7 @@ namespace FutureState.Flow.Tests.Flow
 
                     csv.Flush();
                     csv.NextRecord();
+
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -151,7 +151,7 @@ namespace FutureState.Flow.Tests.Flow
             while (_flowController.Processed <= 20 && sw.Elapsed.TotalSeconds < 15)
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
-            foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
+            foreach (var flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
 
             Assert.True(_flowController.Processed == 2);
@@ -170,15 +170,13 @@ namespace FutureState.Flow.Tests.Flow
         protected void AndThenFlowCustomConfigurationShouldBeSet()
         {
             // flow conrtroller should configure all controllers
-            IFlowFileController[] controllers = _flowController.GetControllers();
+            var controllers = _flowController.GetControllers();
             foreach (var controller in controllers)
-            {
                 if (controller is TestCsvFlowController)
                 {
                     var testCsv = controller as TestCsvFlowController;
                     Assert.Equal("http://helplnk.etc", testCsv.ValueToConfigure);
                 }
-            }
         }
 
         protected void AndThenShouldBeAbleToRepeatProcessingFromConfiguration()
@@ -206,22 +204,22 @@ namespace FutureState.Flow.Tests.Flow
             // resave
             _flowConfig.Save();
 
-            foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
+            foreach (var flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }
 
         public class TestCsvFlowController : CsvFlowFileController<EnitityA, EntityB>
         {
-            public string ValueToConfigure { get; set; }
-
             public TestCsvFlowController(ProcessorConfiguration<EnitityA, EntityB> config)
                 : base(config)
             {
             }
 
+            public string ValueToConfigure { get; set; }
+
             public override Processor<EnitityA, EntityB> GetProcessor()
             {
-                int i = 0;
+                var i = 0;
                 // preocessor service
                 return new Processor<EnitityA, EntityB>(Config)
                 {
@@ -247,13 +245,13 @@ namespace FutureState.Flow.Tests.Flow
         public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<EntityB, EntityC>
         {
             public TestProcessResultFlowFileBatchController(ProcessorConfiguration<EntityB, EntityC> config)
-       : base(config)
+                : base(config)
             {
             }
 
             public override Processor<EntityB, EntityC> GetProcessor()
             {
-                int i = 0;
+                var i = 0;
                 // preocessor service
                 return new Processor<EntityB, EntityC>(Config)
                 {
@@ -289,6 +287,7 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
+
 
             public DateTime DateProcessed { get; set; }
         }

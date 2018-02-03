@@ -6,7 +6,7 @@ namespace FutureState.Data
 {
     /// <summary>
     ///     Adapts a repository to write entities via a repository
-    /// throgh a consistent data store session.
+    ///     throgh a consistent data store session.
     /// </summary>
     public class EntitySetWriter<TEntity, TKey> : IWriter<TEntity, TKey>
     {
@@ -27,6 +27,7 @@ namespace FutureState.Data
         /// </summary>
         private IWriter<TEntity, TKey> Writer => _repositoryFunc.Invoke(_uow.Session);
 
+
         public void Delete(TEntity entity)
         {
             ValidateAction();
@@ -34,6 +35,7 @@ namespace FutureState.Data
             _uow._executionQueue.Enqueue(() => Writer.Delete(entity));
             _uow._deleted.Add(entity);
         }
+
 
         public void DeleteAll()
         {
@@ -92,6 +94,7 @@ namespace FutureState.Data
             _uow._executionQueue.Enqueue(() => Writer.Update(entityList));
             entityList.Each(entity => _uow._modified.Add(entity));
         }
+
 
         private void ValidateAction()
         {

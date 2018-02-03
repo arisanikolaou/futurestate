@@ -111,14 +111,10 @@ namespace FutureState.Flow
 
                     var errorEvents = errorsEvents as ErrorEvent[] ?? errorsEvents.ToArray();
                     if (!errorEvents.Any())
-                    {
                         processed.Add(dto);
-                    }
                     else
-                    {
                         foreach (var error in errorEvents)
-                            errors.Add(new ProcessError<TEntityDto> { Error = error, SourceItem = dto });
-                    }
+                            errors.Add(new ProcessError<TEntityDto> {Error = error, SourceItem = dto});
                 }
                 catch (ApplicationException apex)
                 {
@@ -164,14 +160,12 @@ namespace FutureState.Flow
 
                 // roll back items into an error state
                 foreach (var entityDto in processed)
-                {
                     errors.Add(new ProcessError<TEntityDto>
                     {
                         Error =
-                            new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" },
+                            new ErrorEvent {Type = "Exception", Message = $"Failed to commit changes: {ex.Message}"},
                         SourceItem = entityDto
                     });
-                }
 
                 //reset items
                 processed.Clear();

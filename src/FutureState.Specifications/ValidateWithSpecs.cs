@@ -34,12 +34,10 @@ namespace FutureState.Specifications
         static ValidateWithSpecs()
         {
             if (_logger.IsDebugEnabled)
-            {
                 _logger.Debug(
                     "Activating {0} to get list of specifications for entity or service {1}.",
                     typeof(TSpecProvider).FullName,
                     typeof(TEntity).FullName);
-            }
 
             // activate only once when the assembly is loaded
             _specs = Activator.CreateInstance<TSpecProvider>()

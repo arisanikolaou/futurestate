@@ -9,10 +9,14 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
 [assembly: ComVisible(false)]
+
 [assembly: Guid("041a1ba9-ab82-4c2e-95a1-1ecfd0b6cfa0")]
 
 // [assembly: AssemblyVersion("0.1.0.0")]
 [assembly: AssemblyVersion("0.1.0.0")]
 [assembly: AssemblyFileVersion("0.1.0.0")]
-[assembly: AssemblyInformationalVersion("0.1.0-unstable.123+Branch.develop.Sha.cfbd27a6dac43e9d7fbc93077ea962059b31e4e8")]
+
+[assembly:
+    AssemblyInformationalVersion("0.1.0-unstable.162+Branch.develop.Sha.856799374f55833073df6c8506879ff5222ea034")]

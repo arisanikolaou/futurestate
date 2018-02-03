@@ -9,14 +9,14 @@ namespace FutureState.Specifications.Tests
     [Story]
     public class DiscoversAndBuildsCustomValidationRulesStory
     {
-        private ISpecification<TestClass>[] _rules;
         private IEnumerable<Error> _errorsTestingCustomRules;
         private IEnumerable<Error> _errorsTestingDefaultAnnotations;
+        private ISpecification<TestClass>[] _rules;
 
         protected void GivenASpecProviderWithCustomRules()
         {
             var specProvider = new SpecProvider<TestClass>();
-            specProvider.Add((s) =>
+            specProvider.Add(s =>
             {
                 // ReSharper disable once ConvertIfStatementToReturnStatement
                 if (s.Name == "John")
@@ -25,24 +25,24 @@ namespace FutureState.Specifications.Tests
                 return SpecResult.Success;
             }, "NameNotJohn", "Name can't be john for some reason defined by the business");
 
-            this._rules = specProvider.GetSpecifications().ToArray();
+            _rules = specProvider.GetSpecifications().ToArray();
         }
 
         protected void WhenTestingASubjettWithCustomRule()
         {
-            var entity = new TestClass()
+            var entity = new TestClass
             {
                 Name = "John"
             };
 
             // fails custom rule
-            this._errorsTestingCustomRules = _rules.ToErrors(entity);
+            _errorsTestingCustomRules = _rules.ToErrors(entity);
         }
 
         protected void AndWhenTestingWithDatAnnotations()
         {
             // can't be empty
-            this._errorsTestingDefaultAnnotations = _rules.ToErrors(new TestClass());
+            _errorsTestingDefaultAnnotations = _rules.ToErrors(new TestClass());
         }
 
         protected void ThenAllRulesShouldEvaluateAndBeValid()

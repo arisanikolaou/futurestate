@@ -91,7 +91,7 @@ namespace FutureState
         /// <returns></returns>
         public static int MonthDiff(this DateTime start, DateTime end)
         {
-            return (end.Month - start.Month) + (12 * (end.Year - start.Year));
+            return end.Month - start.Month + 12 * (end.Year - start.Year);
         }
     }
 }

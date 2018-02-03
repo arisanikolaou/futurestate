@@ -20,17 +20,17 @@ namespace FutureState.Common.Tests
         }
 
         [Fact]
-        public void GetEnumTestsThrowsExceptionWhenAskedForNonExistingEnum()
-        {
-            Assert.Throws<NotSupportedException>(() => { EnumHelperEx<Numbers>.GetEnum("Three"); });
-        }
-
-        [Fact]
         public void GetEnumTests2()
         {
             var res = EnumHelperEx<Numbers>.GetEnumOrDefault("NonExisting");
 
             Assert.Equal(default(Numbers), res);
+        }
+
+        [Fact]
+        public void GetEnumTestsThrowsExceptionWhenAskedForNonExistingEnum()
+        {
+            Assert.Throws<NotSupportedException>(() => { EnumHelperEx<Numbers>.GetEnum("Three"); });
         }
     }
 }

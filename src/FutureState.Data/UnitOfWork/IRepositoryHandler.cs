@@ -4,7 +4,7 @@ namespace FutureState.Data
 {
     /// <summary>
     ///     A handler to implement a chain of responsibility for any repository,
-    /// or Ilinqreader implementation.
+    ///     or Ilinqreader implementation.
     /// </summary>
     public interface IRepositoryHandler : ILinqReaderHandler
     {

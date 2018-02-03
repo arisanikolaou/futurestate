@@ -21,11 +21,11 @@ namespace FutureState.Data
         // ReSharper disable once StaticMemberInGenericType
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IKeyProvider<TEntity, TKey> _keyProvider;
-
         private readonly ConcurrentDictionary<TKey, TEntity> _items;
 
         private readonly IKeyBinder<TEntity, TKey> _keyBinder;
+
+        private readonly IKeyProvider<TEntity, TKey> _keyProvider;
 
         private readonly ObjectMapperManager _mapper;
 

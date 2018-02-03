@@ -26,7 +26,7 @@ namespace FutureState
 
         /// <summary>
         ///     Creates a deep clone of the specified object, also creating clones
-        ///  of all child objects being referenced
+        ///     of all child objects being referenced
         /// </summary>
         /// <typeparam name="TCloned">Type of the object that will be cloned</typeparam>
         /// <param name="objectToClone">Object that will be cloned</param>

@@ -16,35 +16,36 @@ namespace FutureState.Specifications.Tests
         {
             var specProvider = new SpecProvider<TestEntity>();
 
-            this._entitySpecs = specProvider.GetSpecifications().ToArray();
+            _entitySpecs = specProvider.GetSpecifications().ToArray();
         }
 
         protected void WhenValidatingAEntityWithAnInValidEmailAttribute()
         {
-            var invalidEntity = new TestEntity()
+            var invalidEntity = new TestEntity
             {
                 Email = "invalidentity"
             };
 
             // errors
-            this._errorsFromInvalidEntities = _entitySpecs.ToErrors(invalidEntity).ToArray();
+            _errorsFromInvalidEntities = _entitySpecs.ToErrors(invalidEntity).ToArray();
         }
 
         protected void WhenValidatingAEntityWithAnValidEmailAttribute()
         {
-            var validEntity = new TestEntity()
+            var validEntity = new TestEntity
             {
                 Email = "name@address.com"
             };
 
             // errors
-            this._errorsFromValidEntity = _entitySpecs.ToErrors(validEntity).ToArray();
+            _errorsFromValidEntity = _entitySpecs.ToErrors(validEntity).ToArray();
         }
 
         protected void ThenResultsShouldBeValid()
         {
             Assert.True(_errorsFromInvalidEntities.Length > 0);
-            Assert.Contains(_errorsFromInvalidEntities, m => m.Message.Contains("'Email' does not meet the required pattern or range."));
+            Assert.Contains(_errorsFromInvalidEntities,
+                m => m.Message.Contains("'Email' does not meet the required pattern or range."));
 
             Assert.True(_errorsFromValidEntity.Length == 0);
         }
@@ -57,8 +58,7 @@ namespace FutureState.Specifications.Tests
 
         public class TestEntity
         {
-            [EmailAddress]
-            public string Email { get; set; }
+            [EmailAddress] public string Email { get; set; }
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
-using System;
 
 namespace FutureState.Flow.Tests.Flow
 {
@@ -76,7 +76,7 @@ namespace FutureState.Flow.Tests.Flow
 
             public FlowFileBatchControllerFactory(IComponentContext context)
             {
-                this._context = context;
+                _context = context;
             }
 
             public IFlowFileController Create(Type type)
@@ -84,7 +84,8 @@ namespace FutureState.Flow.Tests.Flow
                 // ReSharper disable once UsePatternMatching
                 var batchProcessor = _context.Resolve(type) as IFlowFileController;
                 if (batchProcessor == null)
-                    throw new InvalidOperationException($"Controller type does not implement {typeof(IFlowFileController).Name}");
+                    throw new InvalidOperationException(
+                        $"Controller type does not implement {typeof(IFlowFileController).Name}");
 
                 return batchProcessor;
             }
@@ -96,7 +97,7 @@ namespace FutureState.Flow.Tests.Flow
 
             public FlowFileLogRepositoryFactory(IComponentContext context)
             {
-                this._context = context;
+                _context = context;
             }
 
             public FlowFileLogRepository Get()
@@ -111,7 +112,7 @@ namespace FutureState.Flow.Tests.Flow
 
             public FlowFileControllerServiceFactory(IComponentContext context)
             {
-                this._context = context;
+                _context = context;
             }
 
             public FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller)

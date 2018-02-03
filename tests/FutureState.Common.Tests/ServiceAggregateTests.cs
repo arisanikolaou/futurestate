@@ -1,6 +1,6 @@
-﻿using FutureState.ComponentModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using FutureState.ComponentModel;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -16,26 +16,23 @@ namespace FutureState.Common.Tests
 
         protected void GivenAServiceAggregate()
         {
-            this._aggregate = new ServiceAggregate<IInstrumentService>(
-                new IInstrumentService[] { new Service1(), new Service2(), new Service2() });
+            _aggregate = new ServiceAggregate<IInstrumentService>(
+                new IInstrumentService[] {new Service1(), new Service2(), new Service2()});
         }
 
         protected void WhenDemandingAServiceType()
         {
-            this._service1 = _aggregate.Demand(m => m.Type == typeof(Bond));
+            _service1 = _aggregate.Demand(m => m.Type == typeof(Bond));
         }
 
         protected void WhenDemandingAnotherServiceType()
         {
-            this._service2 = _aggregate.Demand(m => m.Type == typeof(Equity));
+            _service2 = _aggregate.Demand(m => m.Type == typeof(Equity));
         }
 
         protected void ThenDemandingANonExistingServiceTypeShouldThrowNotSupportedError()
         {
-            Assert.Throws<NotSupportedException>(() =>
-            {
-                _aggregate.Demand(m => m.Type == typeof(NonExistant));
-            });
+            Assert.Throws<NotSupportedException>(() => { _aggregate.Demand(m => m.Type == typeof(NonExistant)); });
         }
 
         protected void ThenServicesShouldBeResolved()
@@ -55,9 +52,8 @@ namespace FutureState.Common.Tests
 
         public interface IInstrumentService
         {
-            IEnumerable<object> Select();
-
             Type Type { get; }
+            IEnumerable<object> Select();
         }
 
         public class Service1 : IInstrumentService

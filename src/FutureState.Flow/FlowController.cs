@@ -1,17 +1,16 @@
-﻿using FutureState.Flow.Controllers;
-using FutureState.Flow.Data;
-using FutureState.Reflection;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using FutureState.Flow.Controllers;
+using FutureState.Flow.Data;
+using FutureState.Reflection;
+using FutureState.Specifications;
+using NLog;
 
 namespace FutureState.Flow
 {
-    using FutureState.Specifications;
-
     public interface IFlowFileControllerFactory
     {
         IFlowFileController Create(Type type);
@@ -33,28 +32,23 @@ namespace FutureState.Flow
     public class FlowController : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        ///     Gets the number of flow file processed.
-        /// </summary>
-        public long Processed { get; private set; }
+        private static readonly Dictionary<string, Type> _dictTypes;
+        private readonly IFlowFileControllerFactory _flowControllerFactory;
+        private readonly List<IFlowFileController> _flowControllers;
+        private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
+        private readonly IFlowFileLogRepositoryFactory _flowFileLogFactory;
+        private readonly ISpecProviderFactory _specProviderFactory;
 
         private FlowConfiguration _config;
         private FlowFileControllerService _processor;
-        private readonly List<IFlowFileController> _flowControllers;
-        private readonly IFlowFileControllerFactory _flowControllerFactory;
-        private readonly IFlowFileLogRepositoryFactory _flowFileLogFactory;
-        private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
-        private readonly ISpecProviderFactory _specProviderFactory;
         private bool _started;
-        private static readonly Dictionary<string, Type> _dictTypes;
 
         static FlowController()
         {
             // scan assemblies
-            AppTypeScanner appTypeScanner = AppTypeScanner.Default;
+            var appTypeScanner = AppTypeScanner.Default;
 
-            List<Lazy<Type>> controllerTypes = appTypeScanner
+            var controllerTypes = appTypeScanner
                 .GetTypes<IFlowFileController>()
                 .ToList();
 
@@ -94,6 +88,16 @@ namespace FutureState.Flow
             _specProviderFactory = specProviderFactor;
 
             _flowControllers = new List<IFlowFileController>();
+        }
+
+        /// <summary>
+        ///     Gets the number of flow file processed.
+        /// </summary>
+        public long Processed { get; private set; }
+
+        public void Dispose()
+        {
+            Stop();
         }
 
         /// <summary>
@@ -147,7 +151,7 @@ namespace FutureState.Flow
                 flowControllerType = Type.GetType(definition.TypeName);
 
             // ReSharper disable once UsePatternMatching
-            IFlowFileController flowController = _flowControllerFactory
+            var flowController = _flowControllerFactory
                 .Create(flowControllerType);
             if (flowController == null)
                 throw new InvalidOperationException(
@@ -178,12 +182,8 @@ namespace FutureState.Flow
                 {
                     var property = type.GetProperty(configDetail.Key);
                     if (property != null)
-                    {
                         if (property.GetSetMethod() != null)
-                        {
                             property.SetValue(flowController, configDetail.Value);
-                        }
-                    }
                 }
             }
 
@@ -196,16 +196,13 @@ namespace FutureState.Flow
             var logRepository = _flowFileLogFactory.Get();
             logRepository.WorkingFolder = _config.BasePath;
 
-            FlowFileControllerService processor = _flowControllerServiceFactory.Get(logRepository, flowController);
+            var processor = _flowControllerServiceFactory.Get(logRepository, flowController);
 
             // configure polling internval
             processor.Interval = TimeSpan.FromSeconds(definition.PollInterval);
 
             // log how many files were processed
-            processor.FlowFileProcessed += (o, e) =>
-            {
-                Processed++;
-            };
+            processor.FlowFileProcessed += (o, e) => { Processed++; };
 
             // start reading from incoming data source
             processor.Start();
@@ -226,21 +223,16 @@ namespace FutureState.Flow
                 return; // already stopped
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Stopping flow {this._config.FlowId}.");
+                _logger.Debug($"Stopping flow {_config.FlowId}.");
 
             _processor?.Dispose();
 
             _flowControllers.Each(m => m.Dispose());
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Stopped flow {this._config.FlowId}.");
+                _logger.Debug($"Stopped flow {_config.FlowId}.");
 
             _started = false;
-        }
-
-        public void Dispose()
-        {
-            Stop();
         }
     }
 }

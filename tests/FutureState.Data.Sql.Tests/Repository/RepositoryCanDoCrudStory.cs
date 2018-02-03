@@ -1,10 +1,10 @@
-﻿using Dapper.Extensions.Linq.Core.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data.Sql.Mappings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -14,25 +14,28 @@ namespace FutureState.Data.Sql.Tests.Repository
     [Story]
     public class RepositoryCanDoCrudStory
     {
-        private string _conString;
-        private IDapperConfiguration _config;
-        private SessionFactory _sessionFactory;
-        private MyEntity[] _resultAfterInitialGetAll;
-        private MyEntity[] _resultsAfterInserted;
-        private MyEntity _whereQueryByName;
-        private MyEntity _entityQueriedByKey;
-        private MyEntity _updatedResult;
-        private MyEntity _deletedEntity;
-        private MyEntity[] _resultsAfterDeleted;
-        private IEnumerable<ProjectedItem> _projectedItem;
         private readonly DateTime _referencedate = new DateTime(2011, 1, 1, 9, 30, 15);
+        private IDapperConfiguration _config;
+        private string _conString;
+        private MyEntity _deletedEntity;
+        private MyEntity _entityQueriedByKey;
+        private IEnumerable<ProjectedItem> _projectedItem;
         public decimal _referenceNumber = 14.12m;
+        private MyEntity[] _resultAfterInitialGetAll;
+        private MyEntity[] _resultsAfterDeleted;
+        private MyEntity[] _resultsAfterInserted;
+        private SessionFactory _sessionFactory;
+        private MyEntity _updatedResult;
+        private MyEntity _whereQueryByName;
 
         protected void GivenANewTestSqlDbWithASingleEntity()
         {
-            string dbServerName = LocalDbSetup.LocalDbServerName;
-            string dbName = "RepositoryCanDoCrudStory";
-            this._conString = $@"data source={dbServerName};initial catalog={dbName};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+            var dbServerName = LocalDbSetup.LocalDbServerName;
+            var dbName = "RepositoryCanDoCrudStory";
+            _conString =
+                $@"data source={dbServerName};initial catalog={
+                        dbName
+                    };integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
 
             // delete any existing databases
             var dbSetup = new LocalDbSetup(Environment.CurrentDirectory, dbName);
@@ -42,7 +45,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             using (var repositoryDb = new TestModel(_conString))
             {
                 repositoryDb.MyEntities
-                    .Add(new MyEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber });
+                    .Add(new MyEntity {Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber});
 
                 repositoryDb.SaveChanges();
             }
@@ -60,14 +63,14 @@ namespace FutureState.Data.Sql.Tests.Repository
         protected void AndGivenADapperConfiguration()
         {
             // instance be application scope
-            this._config = DapperConfiguration
+            _config = DapperConfiguration
                 .Use()
                 .UseSqlDialect(new SqlServerDialect());
 
             var classMapper = new CustomEntityMap<MyEntity>();
             classMapper.SetIdentityGenerated(m => m.Id);
 
-            var classMappers = new List<IClassMapper>()
+            var classMappers = new List<IClassMapper>
             {
                 classMapper
             };
@@ -77,7 +80,7 @@ namespace FutureState.Data.Sql.Tests.Repository
 
         protected void AndGivenAValidSessionFactory()
         {
-            this._sessionFactory = new SessionFactory(_conString, _config);
+            _sessionFactory = new SessionFactory(_conString, _config);
 
             using (var session = _sessionFactory.Create())
             {
@@ -92,13 +95,13 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new Repository<MyEntity, int>(session);
 
-                this._resultAfterInitialGetAll = repo.GetAll().ToArray();
+                _resultAfterInitialGetAll = repo.GetAll().ToArray();
 
                 Assert.True(_resultAfterInitialGetAll.Length > 0);
 
-                repo.Insert(new MyEntity() { Name = "Name 2", Date = _referencedate, Money = _referenceNumber });
+                repo.Insert(new MyEntity {Name = "Name 2", Date = _referencedate, Money = _referenceNumber});
 
-                this._resultsAfterInserted = repo.GetAll().ToArray();
+                _resultsAfterInserted = repo.GetAll().ToArray();
             }
         }
 
@@ -108,7 +111,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
-                this._whereQueryByName = repo
+                _whereQueryByName = repo
                     .Where(m => m.Name == "Name 2")
                     .FirstOrDefault();
             }
@@ -120,7 +123,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new Repository<MyEntity, int>(session);
 
-                this._entityQueriedByKey = repo.Get(1);
+                _entityQueriedByKey = repo.Get(1);
             }
         }
 
@@ -130,14 +133,8 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
-                this._projectedItem = repo.Select<ProjectedItem>(m => m.Id == 1);
+                _projectedItem = repo.Select<ProjectedItem>(m => m.Id == 1);
             }
-        }
-
-        // has to be public
-        public class ProjectedItem
-        {
-            public string Name { get; set; }
         }
 
         protected void AndWhenUpdating()
@@ -156,7 +153,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
-                this._updatedResult = repo.Where(m => m.Name == "Updated Name").FirstOrDefault();
+                _updatedResult = repo.Where(m => m.Name == "Updated Name").FirstOrDefault();
             }
         }
 
@@ -173,7 +170,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new RepositoryLinq<MyEntity, int>(session);
 
-                this._deletedEntity = repo.Get(1);
+                _deletedEntity = repo.Get(1);
             }
         }
 
@@ -190,7 +187,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             {
                 var repo = new Repository<MyEntity, int>(session);
 
-                this._resultsAfterDeleted = repo.GetAll().ToArray();
+                _resultsAfterDeleted = repo.GetAll().ToArray();
             }
         }
 
@@ -223,6 +220,12 @@ namespace FutureState.Data.Sql.Tests.Repository
         protected void RepositoryCanDoCrud()
         {
             this.BDDfy();
+        }
+
+        // has to be public
+        public class ProjectedItem
+        {
+            public string Name { get; set; }
         }
     }
 }

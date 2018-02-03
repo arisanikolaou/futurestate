@@ -74,7 +74,7 @@ namespace FutureState.ComponentModel
         }
 
         /// <summary>
-        /// Registers a new consumer of the given message and all its subclasses.
+        ///     Registers a new consumer of the given message and all its subclasses.
         /// </summary>
         /// <param name="consumer">The consumer or owner of the event.</param>
         /// <param name="action">The action to execute.</param>

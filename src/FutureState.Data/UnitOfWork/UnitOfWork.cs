@@ -138,7 +138,7 @@ namespace FutureState.Data
         /// </summary>
         public override string ToString()
         {
-            return $@"UnitOfWork {GetType().Name} : {(Id ?? GetSessionFactory().ToString())}";
+            return $@"UnitOfWork {GetType().Name} : {Id ?? GetSessionFactory().ToString()}";
         }
 
         /// <summary>

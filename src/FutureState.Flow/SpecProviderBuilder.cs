@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using FutureState.Specifications;
+using Magnum.Reflection;
 
 namespace FutureState.Flow
 {
-    using FutureState.Specifications;
-    using Magnum.Reflection;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
-
     public class SpecProviderBuilder
     {
         private readonly ISpecProviderFactory _specProviderFactory;
@@ -20,13 +19,13 @@ namespace FutureState.Flow
 
         public void Build(Type type, IList<ValidationRule> rules)
         {
-            this.FastInvoke(new Type[] { type }, "Build", rules);
+            this.FastInvoke(new[] {type}, "Build", rules);
         }
 
         public void Build<TEntity>(IList<ValidationRule> rules)
         {
             // should be shared instance across application space
-            SpecProvider<TEntity> provider = _specProviderFactory.Get<TEntity>();
+            var provider = _specProviderFactory.Get<TEntity>();
 
             var properties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -35,7 +34,6 @@ namespace FutureState.Flow
                 var property = properties.FirstOrDefault(m => m.Name == rule.FieldName);
 
                 if (property != null)
-                {
                     provider.Add(m =>
                     {
                         // convert to string
@@ -49,7 +47,6 @@ namespace FutureState.Flow
                         // failure
                         return new SpecResult($"Field {property.Name} does not have a valid value: {value}.");
                     }, rule.FieldName, rule.ErrorMessage);
-                }
             }
         }
     }

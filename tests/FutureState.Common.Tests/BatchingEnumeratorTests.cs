@@ -1,5 +1,5 @@
-﻿using FutureState.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using FutureState.IO;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -9,15 +9,15 @@ namespace FutureState.Common.Tests
     [Story]
     public class BatchingEnumeratorTests
     {
-        private List<TestEntity> _list;
         private int _batches;
+        private List<TestEntity> _list;
         private int _totalItems;
 
         protected void GivenAEnumeration()
         {
-            this._list = new List<TestEntity>();
-            for (int i = 0; i < 100; i++)
-                _list.Add(new TestEntity { Id = i });
+            _list = new List<TestEntity>();
+            for (var i = 0; i < 100; i++)
+                _list.Add(new TestEntity {Id = i});
         }
 
         protected void WhenRequestingBatchesOfNotMoreThanXUnits()
@@ -48,6 +48,7 @@ namespace FutureState.Common.Tests
         {
             this.BDDfy();
         }
+
 
         public class TestEntity
         {

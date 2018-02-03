@@ -1,29 +1,14 @@
-﻿using FutureState.Flow.Controllers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FutureState.Flow.Controllers;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow
 {
     public class FlowConfiguration
     {
-        /// <summary>
-        ///     Gets the flow's unique identifier.
-        /// </summary>
-        public Guid FlowId { get; set; }
-
-        /// <summary>
-        ///     Gets the working directory for the flow.
-        /// </summary>
-        public string BasePath { get; set; }
-
-        /// <summary>
-        ///     Gets the controller to start/stop.
-        /// </summary>
-        public List<FlowControllerDefinition> Controllers { get; set; }
-
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
@@ -42,6 +27,21 @@ namespace FutureState.Flow
             Controllers = new List<FlowControllerDefinition>();
         }
 
+        /// <summary>
+        ///     Gets the flow's unique identifier.
+        /// </summary>
+        public Guid FlowId { get; set; }
+
+        /// <summary>
+        ///     Gets the working directory for the flow.
+        /// </summary>
+        public string BasePath { get; set; }
+
+        /// <summary>
+        ///     Gets the controller to start/stop.
+        /// </summary>
+        public List<FlowControllerDefinition> Controllers { get; set; }
+
         public FlowControllerDefinition AddController<T>(string controllerName)
             where T : IFlowFileController
         {
@@ -52,7 +52,7 @@ namespace FutureState.Flow
 
             var lastOutputDirectory = Controllers.LastOrDefault()?.Output;
 
-            Controllers.Add(def = new FlowControllerDefinition()
+            Controllers.Add(def = new FlowControllerDefinition
             {
                 ControllerName = controllerName,
                 TypeName = typeof(T).AssemblyQualifiedName,
@@ -72,7 +72,7 @@ namespace FutureState.Flow
 
             // save yaml config
             var serializer = new Serializer();
-            string yamlFile = $@"{BasePath}\{fileName}";
+            var yamlFile = $@"{BasePath}\{fileName}";
             if (File.Exists(yamlFile))
                 File.Delete(yamlFile);
 
@@ -93,7 +93,9 @@ namespace FutureState.Flow
 
             var deserializer = new Deserializer();
             using (var fs = new StreamReader(filePath))
+            {
                 return deserializer.Deserialize<FlowConfiguration>(fs);
+            }
         }
     }
 

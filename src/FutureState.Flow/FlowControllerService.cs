@@ -68,7 +68,7 @@ namespace FutureState.Flow
         public event EventHandler FlowFileProcessed;
 
         /// <summary>
-        /// /   Destructor.
+        ///     /   Destructor.
         /// </summary>
         ~FlowFileControllerService()
         {
@@ -114,7 +114,8 @@ namespace FutureState.Flow
             if (flowFile == null)
             {
                 if (_logger.IsDebugEnabled)
-                    _logger.Debug($"No new data is available from the given flow controller {FlowFileController.ControllerName}.");
+                    _logger.Debug(
+                        $"No new data is available from the given flow controller {FlowFileController.ControllerName}.");
 
                 return;
             }

@@ -1,11 +1,11 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Autofac;
 using FutureState.Autofac.Modules;
 using FutureState.Data;
 using FutureState.Data.Providers;
 using FutureState.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -14,12 +14,12 @@ namespace FutureState.Autofac.Tests
 {
     public class WiresUpServicesStory : IDisposable
     {
-        private int contactId = 0;
         private string _conString;
         private IContainer _container;
         private string _dbName;
         private IEnumerable<Contact> _items;
         private IEnumerable<Address> _itemsFromGuidKeyedEntity;
+        private int contactId;
 
         public void Dispose()
         {
@@ -29,9 +29,9 @@ namespace FutureState.Autofac.Tests
 
         private string GetLocalDbConString(string dbName)
         {
-            string baseDirectory = Environment.CurrentDirectory;
+            var baseDirectory = Environment.CurrentDirectory;
 
-            string serverName = LocalDbSetup.LocalDbServerName;
+            var serverName = LocalDbSetup.LocalDbServerName;
             var conString =
                 $@"data source={serverName};AttachDBFilename={baseDirectory}\{dbName}.mdf;initial catalog={
                         dbName

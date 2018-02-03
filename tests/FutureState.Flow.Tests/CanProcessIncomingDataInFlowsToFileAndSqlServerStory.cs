@@ -1,11 +1,11 @@
-﻿using CsvHelper;
-using FutureState.Flow.Data;
-using FutureState.Flow.Tests.Mock;
-using FutureState.Specifications;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CsvHelper;
+using FutureState.Flow.Data;
+using FutureState.Flow.Tests.Mock;
+using FutureState.Specifications;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -18,18 +18,18 @@ namespace FutureState.Flow.Tests
     {
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
         private const int CsvItemsToCreate = 10;
+        private const int BatchId = 1;
 
         private readonly Guid _processId = Guid.Parse("523a8558-e5a5-4309-ad20-f3813997e651");
-        private const int BatchId = 1;
+        private BatchProcess _batchProcess;
+        private Processor<DenormalizedEntity, Dto1> _processorA;
+        private ProcessResultRepository<ProcessResult> _repository;
 
         private ProcessResult<DenormalizedEntity, Dto1> _resultA;
         private ProcessResult<Dto1, Dto2> _resultB;
-        private SpecProvider<Dto1> _specProvider;
-        private Processor<DenormalizedEntity, Dto1> _processorA;
-        private BatchProcess _batchProcess;
         private ProcessResult<Dto2, Address> _resultC;
+        private SpecProvider<Dto1> _specProvider;
         private SpecProvider<Address> _specProviderFroAddress;
-        private ProcessResultRepository<ProcessResult> _repository;
 
         protected void GivenANewLocalSqlDb()
         {
@@ -65,6 +65,7 @@ namespace FutureState.Flow.Tests
                 return SpecResult.Success;
             }, "Key", "Description");
 
+
             _specProvider.MergeFrom(m => m.Contact, new SpecProvider<Contact>());
         }
 
@@ -99,9 +100,10 @@ namespace FutureState.Flow.Tests
                     csv.Flush();
                     csv.NextRecord();
 
+
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
-                        var entity = new DenormalizedEntity()
+                        var entity = new DenormalizedEntity
                         {
                             Key = $"Key-{i}",
                             ContactName = $"Contact-{i}",
@@ -123,13 +125,13 @@ namespace FutureState.Flow.Tests
         {
             var processorA = new Processor<DenormalizedEntity, Dto1>(
                 new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider,
-                new SpecProvider<IEnumerable<Dto1>>()),
+                    new SpecProvider<IEnumerable<Dto1>>()),
                 new ProcessorEngine<DenormalizedEntity>())
             {
                 BeginProcessingItem = (dtoIn, dtoOut) =>
                 {
                     dtoOut.Source = dtoIn;
-                    dtoOut.Contact = new Contact()
+                    dtoOut.Contact = new Contact
                     {
                         Id = 0,
                         Name = dtoIn.ContactName,
@@ -166,11 +168,11 @@ namespace FutureState.Flow.Tests
                     // don't update FK references or database ids
                     dtoOut.Addresses = new[]
                     {
-                        new Address()
+                        new Address
                         {
                             StreetName = dtoIn.Source.Address1
                         },
-                        new Address()
+                        new Address
                         {
                             StreetName = dtoIn.Source.Address2
                         }
@@ -189,10 +191,7 @@ namespace FutureState.Flow.Tests
                         db.SaveChanges();
 
                         // update mappings and fk references
-                        processedItems.Each(m =>
-                        {
-                            m.Addresses.Each(n => { n.ContactId = m.Contact.Id; });
-                        });
+                        processedItems.Each(m => { m.Addresses.Each(n => { n.ContactId = m.Contact.Id; }); });
                     }
                 }
             };
@@ -211,7 +210,7 @@ namespace FutureState.Flow.Tests
                     new SpecProvider<IEnumerable<Address>>()),
                 new ProcessorEngine<Dto2>())
             {
-                CreateOutput = (dtoIn) => dtoIn.Addresses,
+                CreateOutput = dtoIn => dtoIn.Addresses,
                 // save to database
                 OnCommitting = processedItems =>
                 {
@@ -257,12 +256,14 @@ namespace FutureState.Flow.Tests
                 // less one as hit the rule
                 Assert.Equal(CsvItemsToCreate * 2 - 2, db.Addresses.Count());
             }
+
             Assert.Equal(CsvItemsToCreate - 1, _resultC.ProcessedCount);
         }
 
         protected void AndThenShouldBeAbleToRestoreProcessState()
         {
-            var repo = new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
+            var repo =
+                new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
             var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
             var result = repo.Get(processorName, _processId, BatchId);
