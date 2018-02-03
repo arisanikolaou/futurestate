@@ -109,7 +109,8 @@ namespace FutureState.Flow
             _config = config;
 
             // start controllers in sequential order
-            foreach (var flowControllerDefinitionse in _config.Controllers.OrderBy(m => m.DateCreated))
+            foreach (var flowControllerDefinitionse in _config.Controllers
+                .OrderBy(m => m.ExecutionOrder))
                 StartController(flowControllerDefinitionse);
 
             _started = true;
