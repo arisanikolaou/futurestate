@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Dapper.FastCrud.Validations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using Dapper.FastCrud.Validations;
-using FutureState;
 
 namespace Dapper.FastCrud.Mappings
 {
@@ -118,10 +117,10 @@ namespace Dapper.FastCrud.Mappings
         {
             var propNamesMappingsToRemove = new List<string>(_propertyMappings.Count);
             propNamesMappingsToRemove.AddRange(from propMapping in PropertyMappings
-                where
-                    exclude && !paramNames.Contains(propMapping.Value.PropertyName) ||
-                    !exclude && paramNames.Contains(propMapping.Value.PropertyName)
-                select propMapping.Key);
+                                               where
+                                                   exclude && !paramNames.Contains(propMapping.Value.PropertyName) ||
+                                                   !exclude && paramNames.Contains(propMapping.Value.PropertyName)
+                                               select propMapping.Key);
 
             foreach (var propName in propNamesMappingsToRemove)
                 RemoveProperty(propName);
@@ -211,7 +210,6 @@ namespace Dapper.FastCrud.Mappings
                                 .OfType<PropertyDescriptor>()
                                 .SingleOrDefault(propDescriptor =>
                                     propDescriptor.Name == referencingEntityPropertyName);
-
 
                         return new EntityMappingRelationship(groupedRelMappings.Key,
                             groupedRelMappings.OrderBy(propMapping => propMapping.ColumnOrder).ToArray(),
@@ -322,7 +320,7 @@ namespace Dapper.FastCrud.Mappings
         {
             ValidateState();
 
-            var propName = ((MemberExpression) property.Body).Member.Name;
+            var propName = ((MemberExpression)property.Body).Member.Name;
             var propMapping = SetPropertyByName(propName);
             propertySetupFct?.Invoke(propMapping);
             return this;
@@ -430,7 +428,7 @@ namespace Dapper.FastCrud.Mappings
         /// <param name="property">Name of the property (e.g. user => user.LastName ) </param>
         public PropertyMapping GetProperty<TProperty>(Expression<Func<TEntity, TProperty>> property)
         {
-            var propName = ((MemberExpression) property.Body).Member.Name;
+            var propName = ((MemberExpression)property.Body).Member.Name;
             return GetProperty(propName);
         }
 
@@ -453,8 +451,8 @@ namespace Dapper.FastCrud.Mappings
         {
             ValidateState();
 
-            var propName = ((MemberExpression) property.Body).Member.Name;
-            RemoveProperties(new[] {propName}, false);
+            var propName = ((MemberExpression)property.Body).Member.Name;
+            RemoveProperties(new[] { propName }, false);
             return this;
         }
 

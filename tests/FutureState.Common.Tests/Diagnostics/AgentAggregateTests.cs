@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using FutureState.Diagnostics;
+﻿using FutureState.Diagnostics;
+using System.Collections.Generic;
 using Xunit;
 
 namespace FutureState.Common.Tests.Diagnostics
@@ -45,7 +45,7 @@ namespace FutureState.Common.Tests.Diagnostics
         [Fact]
         public void AgentAggregateCanStartAndStop()
         {
-            var agents = new List<IAgent> {new TestAgent(), new TestAgent2()};
+            var agents = new List<IAgent> { new TestAgent(), new TestAgent2() };
 
             // should not run two agents of the same type
             var agentAggregate = new AgentAggregate(agents);

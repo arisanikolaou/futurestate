@@ -1,6 +1,6 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using FutureState.Data;
+using System;
 
 namespace FutureState.Autofac.Modules
 {
@@ -70,7 +70,7 @@ namespace FutureState.Autofac.Modules
             {
             }
 
-            static Func<TKey> GetKeyGeneratorFunction()
+            private static Func<TKey> GetKeyGeneratorFunction()
             {
                 if (typeof(TKey) == typeof(int))
                 {

@@ -11,7 +11,7 @@ namespace FutureState.Common.Tests
     public class SendsReceivesDomainMessagesInProcessStory
     {
         private MessagePipe subject;
-        DomainEvent evt;
+        private DomainEvent evt;
         private int hitCount;
 
         protected void GivenAMessagePipe()

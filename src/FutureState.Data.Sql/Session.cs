@@ -1,6 +1,6 @@
-﻿using System.Data;
+﻿using Dapper.Extensions.Linq.Core.Configuration;
+using System.Data;
 using System.Data.SqlClient;
-using Dapper.Extensions.Linq.Core.Configuration;
 
 namespace FutureState.Data.Sql
 {

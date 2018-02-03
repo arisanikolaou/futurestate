@@ -3,7 +3,7 @@
 namespace FutureState.Data
 {
     /// <summary>
-    ///     A policy of relying on an underlying data session to 
+    ///     A policy of relying on an underlying data session to
     /// manage datat store transactions. This is the default commit policy.
     /// </summary>
     public class CommitPolicy : ICommitPolicy

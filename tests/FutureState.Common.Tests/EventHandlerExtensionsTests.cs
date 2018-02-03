@@ -7,15 +7,18 @@ namespace FutureState.Common.Tests
 {
     public class EventHandlerExtensionsTests
     {
-        event EventHandler<MyEventArgs> Event1;
-        event EventHandler Event2;
-        event EventHandler<MyEventArgs> Event3;
-        event EventHandler Event4;
+        private event EventHandler<MyEventArgs> Event1;
+
+        private event EventHandler Event2;
+
+        private event EventHandler<MyEventArgs> Event3;
+
+        private event EventHandler Event4;
 
         [Fact]
         public void RaisesEventsToAllSubscribersSpecialized()
         {
-            // arrange 
+            // arrange
             Event1 += EventHandlerExtensionsTestsEvent1;
             Event1 += AlwaysThrowException;
 
@@ -23,8 +26,9 @@ namespace FutureState.Common.Tests
             var errors = new List<Exception>();
 
             // ReSharper disable once ConvertToLocalFunction
-            Action<Exception> handler = exception => {
-                lock(this)
+            Action<Exception> handler = exception =>
+            {
+                lock (this)
                     errors.Add(exception);
             };
 
@@ -75,7 +79,6 @@ namespace FutureState.Common.Tests
 
             Assert.Equal(1, args.HitCount);
         }
-
 
         [Fact]
         public void RaisesEventsToAllSubscribersSync()
@@ -134,8 +137,7 @@ namespace FutureState.Common.Tests
             Assert.Equal(1, args.HitCount);
         }
 
-
-        void EventHandlerExtensionsTestsEvent1(object sender, EventArgs evtArgs)
+        private void EventHandlerExtensionsTestsEvent1(object sender, EventArgs evtArgs)
         {
             MyEventArgs args = evtArgs as MyEventArgs;
 
@@ -145,7 +147,7 @@ namespace FutureState.Common.Tests
             args.HitCount++;
         }
 
-        void EventHandlerExtensionsTestsEvent1(object sender, MyEventArgs args)
+        private void EventHandlerExtensionsTestsEvent1(object sender, MyEventArgs args)
         {
             if (args.ThrowExceptionAfterHitCount == args.HitCount)
                 throw new Exception($"Exception {args.HitCount}.");
@@ -153,7 +155,7 @@ namespace FutureState.Common.Tests
             args.HitCount++;
         }
 
-        void AlwaysThrowException(object sender, EventArgs args)
+        private void AlwaysThrowException(object sender, EventArgs args)
         {
             throw new NotImplementedException();
         }

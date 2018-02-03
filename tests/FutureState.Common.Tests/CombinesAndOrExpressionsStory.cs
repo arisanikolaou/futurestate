@@ -30,7 +30,6 @@ namespace FutureState.Common.Tests
 
         protected void ThenOrExpressionShouldBeValid()
         {
-
             var ex = _expressionOr.Compile();
 
             Assert.True(ex.Invoke(new TestEntity() { Name = "Name" }));

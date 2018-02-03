@@ -1,6 +1,6 @@
+using Dapper.Extensions.Linq.Core.Predicates;
 using System;
 using System.Linq.Expressions;
-using Dapper.Extensions.Linq.Core.Predicates;
 
 namespace Dapper.Extensions.Linq.Core.Builder
 {

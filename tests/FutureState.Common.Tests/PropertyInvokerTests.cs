@@ -13,7 +13,7 @@ namespace FutureState.Common.Tests
 
             Name = "Value";
 
-            var value = (string) getter(this);
+            var value = (string)getter(this);
 
             Assert.Equal("Value", value);
         }

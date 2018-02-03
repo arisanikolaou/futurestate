@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CsvHelper;
+﻿using CsvHelper;
 using FutureState.Flow.Data;
 using FutureState.Flow.Tests.Mock;
 using FutureState.Specifications;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -59,12 +59,11 @@ namespace FutureState.Flow.Tests
 
             _specProvider.Add(a =>
             {
-                if(a.Source.Key == "Key-5")
+                if (a.Source.Key == "Key-5")
                     return new SpecResult("Arbitrary invalid reason.");
 
                 return SpecResult.Success;
             }, "Key", "Description");
-
 
             _specProvider.MergeFrom(m => m.Contact, new SpecProvider<Contact>());
         }
@@ -100,7 +99,6 @@ namespace FutureState.Flow.Tests
                     csv.Flush();
                     csv.NextRecord();
 
-
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
                         var entity = new DenormalizedEntity()
@@ -124,7 +122,7 @@ namespace FutureState.Flow.Tests
         protected void WhenProcessingADenormalizedFileUsingProcessingRules()
         {
             var processorA = new Processor<DenormalizedEntity, Dto1>(
-                new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider, 
+                new ProcessorConfiguration<DenormalizedEntity, Dto1>(_specProvider,
                 new SpecProvider<IEnumerable<Dto1>>()),
                 new ProcessorEngine<DenormalizedEntity>())
             {
@@ -166,7 +164,7 @@ namespace FutureState.Flow.Tests
                     dtoOut.Source = dtoIn.Source;
                     dtoOut.Contact = dtoIn.Contact;
                     // don't update FK references or database ids
-                    dtoOut.Addresses = new []
+                    dtoOut.Addresses = new[]
                     {
                         new Address()
                         {
@@ -267,7 +265,7 @@ namespace FutureState.Flow.Tests
             var repo = new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
             var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
-            var result  = repo.Get(processorName, _processId, BatchId);
+            var result = repo.Get(processorName, _processId, BatchId);
 
             Assert.NotNull(result);
             Assert.Equal(CsvItemsToCreate - 1, result.ProcessedCount);

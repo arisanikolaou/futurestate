@@ -28,7 +28,7 @@ namespace FutureState.Specifications.Tests
 
             // errors
             this._errorsFromInvalidEntities = _entitySpecs.ToErrors(invalidEntity).ToArray();
-       }
+        }
 
         protected void WhenValidatingAEntityWithAnValidEmailAttribute()
         {

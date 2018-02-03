@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FutureState.Data;
 
 #endregion
 
@@ -11,7 +10,6 @@ namespace FutureState
 {
     public static class DictionaryExtensions
     {
-
         public static TValue Get<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
             dictionary.TryGetValue(key, out var value);
@@ -63,7 +61,6 @@ namespace FutureState
         {
             return left.Concat(right).ToUniqueDictionary(p => p.Key, p => p.Value);
         }
-
 
         /// <summary>
         ///     Builds a dictionary populated with unique keys based an an enumerable set of entities.

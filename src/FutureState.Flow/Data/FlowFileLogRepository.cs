@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
-using FutureState.Flow.Model;
+﻿using FutureState.Flow.Model;
 using Newtonsoft.Json;
 using NLog;
+using System;
+using System.IO;
 
 namespace FutureState.Flow.Data
 {
@@ -56,7 +56,6 @@ namespace FutureState.Flow.Data
             }
         }
 
-
         public void Save(FlowFileLog data)
         {
             Guard.ArgumentNotNull(data, nameof(data));
@@ -77,7 +76,7 @@ namespace FutureState.Flow.Data
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
-            if(_logger.IsInfoEnabled)
+            if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving flow file transaction log to {fileName}.");
 
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());

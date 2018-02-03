@@ -35,7 +35,7 @@ namespace FutureState
         {
             var creator = GetTypeCloner(typeof(TCloned));
 
-            return (TCloned) creator(objectToClone, new Dictionary<object, object>());
+            return (TCloned)creator(objectToClone, new Dictionary<object, object>());
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace FutureState
                 typeof(Dictionary<object, object>).GetMethod("get_Item");
 
             private static readonly MethodInfo _fieldInfoSetValueMethod = typeof(FieldInfo).GetMethod("SetValue",
-                new[] {typeof(object), typeof(object)});
+                new[] { typeof(object), typeof(object) });
 
             private static readonly MethodInfo _getTypeClonerMethodInfo =
                 typeof(DeepCloneUtil).GetMethod(nameof(GetTypeCloner), BindingFlags.NonPublic | BindingFlags.Static);

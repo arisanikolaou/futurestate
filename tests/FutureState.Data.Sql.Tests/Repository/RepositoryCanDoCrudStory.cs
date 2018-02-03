@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Dapper.Extensions.Linq.Core.Configuration;
+﻿using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data.Sql.Mappings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -42,7 +42,7 @@ namespace FutureState.Data.Sql.Tests.Repository
             using (var repositoryDb = new TestModel(_conString))
             {
                 repositoryDb.MyEntities
-                    .Add(new MyEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber});
+                    .Add(new MyEntity() { Id = 1, Name = "Name", Date = _referencedate, Money = _referenceNumber });
 
                 repositoryDb.SaveChanges();
             }
@@ -99,7 +99,6 @@ namespace FutureState.Data.Sql.Tests.Repository
                 repo.Insert(new MyEntity() { Name = "Name 2", Date = _referencedate, Money = _referenceNumber });
 
                 this._resultsAfterInserted = repo.GetAll().ToArray();
-
             }
         }
 

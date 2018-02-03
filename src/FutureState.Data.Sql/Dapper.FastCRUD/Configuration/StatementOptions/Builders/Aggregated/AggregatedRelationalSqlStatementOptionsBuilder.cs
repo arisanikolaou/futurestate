@@ -1,6 +1,6 @@
-﻿using System;
-using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
+﻿using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
 using Dapper.FastCrud.Mappings;
+using System;
 
 namespace Dapper.FastCrud.Configuration.StatementOptions.Builders.Aggregated
 {

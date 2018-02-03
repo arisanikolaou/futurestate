@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using Autofac;
+﻿using Autofac;
 using CsvHelper;
 using FutureState.Flow.Data;
 using FutureState.Flow.Tests.Mock;
 using FutureState.Specifications;
+using System;
+using System.IO;
+using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -40,6 +40,7 @@ namespace FutureState.Flow.Tests
                 db.Database.CreateIfNotExists();
             }
         }
+
         protected void AndGivenAProcessorResultsRepository()
         {
             _repository = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
@@ -76,7 +77,6 @@ namespace FutureState.Flow.Tests
                     return SpecResult.Success;
                 }, "Key", "Description");
 
-
                 s.MergeFrom(mq => mq.Contact, m.Resolve<SpecProvider<Contact>>());
                 return s;
             }).AsSelf().AsImplementedInterfaces();
@@ -95,7 +95,6 @@ namespace FutureState.Flow.Tests
                 return s;
             }).AsSelf().AsImplementedInterfaces();
 
-
             _cb.Register(m =>
             {
                 var s = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
@@ -109,7 +108,6 @@ namespace FutureState.Flow.Tests
         {
             _batchProcess = new BatchProcess(_processId, BatchId);
         }
-
 
         protected void GivenAGeneratedDataSourceCsvFile()
         {
@@ -128,7 +126,6 @@ namespace FutureState.Flow.Tests
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {

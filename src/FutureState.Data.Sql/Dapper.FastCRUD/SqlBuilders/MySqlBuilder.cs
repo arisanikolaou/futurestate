@@ -1,6 +1,6 @@
-﻿using System;
-using Dapper.FastCrud.EntityDescriptors;
+﻿using Dapper.FastCrud.EntityDescriptors;
 using Dapper.FastCrud.Mappings;
+using System;
 
 namespace Dapper.FastCrud.SqlBuilders
 {
@@ -25,7 +25,6 @@ namespace Dapper.FastCrud.SqlBuilders
                 if (KeyProperties.Length == 0)
                     throw new NotSupportedException(
                         $"Entity '{EntityMapping.EntityType.Name}' has database generated fields but no primary key to retrieve them with after insertion.");
-
 
                 // we have an identity column, so we can fetch the rest of them
                 if (InsertKeyDatabaseGeneratedProperties.Length == 1 && RefreshOnInsertProperties.Length == 1)
@@ -70,7 +69,7 @@ namespace Dapper.FastCrud.SqlBuilders
             if (skipRowsCount.HasValue)
                 sql +=
                     ResolveWithCultureInvariantFormatter(
-                        $" LIMIT {skipRowsCount},{limitRowsCount ?? (int?) int.MaxValue}");
+                        $" LIMIT {skipRowsCount},{limitRowsCount ?? (int?)int.MaxValue}");
             else if (limitRowsCount.HasValue)
                 sql += ResolveWithCultureInvariantFormatter($" LIMIT {limitRowsCount}");
 

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FutureState.Flow.Controllers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.Controllers;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow
@@ -13,10 +13,12 @@ namespace FutureState.Flow
         ///     Gets the flow's unique identifier.
         /// </summary>
         public Guid FlowId { get; set; }
+
         /// <summary>
         ///     Gets the working directory for the flow.
         /// </summary>
         public string BasePath { get; set; }
+
         /// <summary>
         ///     Gets the controller to start/stop.
         /// </summary>
@@ -25,7 +27,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowConfiguration() 
+        public FlowConfiguration()
         {
             // required by serializer
         }
@@ -101,30 +103,37 @@ namespace FutureState.Flow
         ///     Gets the assembly qualified name of the batch controller to use to process the data.
         /// </summary>
         public string TypeName { get; set; }
+
         /// <summary>
         ///     Gets the display name of the controller.
         /// </summary>
         public string ControllerName { get; set; }
+
         /// <summary>
         ///     Gets the port source for data.
         /// </summary>
         public string Input { get; set; }
+
         /// <summary>
         ///     Gets the output path for processed data.
         /// </summary>
         public string Output { get; set; }
+
         /// <summary>
         ///     Gets the frequency, in secondss, to poll for new data files.
         /// </summary>
         public int PollInterval { get; set; }
+
         /// <summary>
         ///     Gets the list of validation rules to apply to outgoing entities.
         /// </summary>
         public List<ValidationRule> FieldValidationRules { get; set; } = new List<ValidationRule>();
+
         /// <summary>
         ///     Flow controller configuration details.
         /// </summary>
         public Dictionary<string, string> ConfigurationDetails { get; set; } = new Dictionary<string, string>();
+
         /// <summary>
         ///     Gets the relative execution order to the associated controller.
         /// </summary>
@@ -140,10 +149,12 @@ namespace FutureState.Flow
         ///     Gets the name of the field to validate.
         /// </summary>
         public string FieldName { get; set; }
+
         /// <summary>
         ///     Gets the regular expression to run.
         /// </summary>
         public string RegEx { get; set; }
+
         /// <summary>
         ///     Gets the error message to display.
         /// </summary>

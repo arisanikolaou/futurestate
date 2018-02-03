@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dapper;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using Dapper;
-using Newtonsoft.Json;
 
 namespace FutureState.Data.Sql.Mappings
 {

@@ -26,7 +26,7 @@ namespace FutureState.Specifications
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value is DateTime)
-                if ((DateTime) value == default(DateTime))
+                if ((DateTime)value == default(DateTime))
                     return new ValidationResult($"'{_fieldName}' must not be a default date time value.");
 
             // else

@@ -65,7 +65,7 @@ namespace FutureState.Specifications.Tests
         public class TestClass
         {
             [NotEmpty("Name can't be empty or null.")]
-            public string Name { get; set; }   
+            public string Name { get; set; }
         }
     }
 }

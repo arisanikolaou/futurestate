@@ -28,7 +28,7 @@ namespace FutureState
             lock (evt)
             {
                 var methods = evt.GetInvocationList().ToArray();
-                
+
                 for (var i = 0; i < methods.Length; i++)
                 {
                     // ReSharper disable once UsePatternMatching

@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Dapper.FastCrud.Configuration.StatementOptions;
+using Dapper.FastCrud.EntityDescriptors;
+using Dapper.FastCrud.Formatters;
+using Dapper.FastCrud.Mappings;
+using Dapper.FastCrud.Validations;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,11 +11,6 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using Dapper.FastCrud.Configuration.StatementOptions;
-using Dapper.FastCrud.EntityDescriptors;
-using Dapper.FastCrud.Formatters;
-using Dapper.FastCrud.Mappings;
-using Dapper.FastCrud.Validations;
 
 namespace Dapper.FastCrud.SqlBuilders
 {
@@ -42,7 +42,6 @@ namespace Dapper.FastCrud.SqlBuilders
 
         // regular statement formatter to be used for parameter resolution.
         private readonly SqlStatementFormatter _regularStatementFormatter;
-
 
         protected GenericStatementSqlBuilder(
             EntityDescriptor entityDescriptor,
@@ -117,7 +116,6 @@ namespace Dapper.FastCrud.SqlBuilders
                 LazyThreadSafetyMode.PublicationOnly);
         }
 
-
         public EntityDescriptor EntityDescriptor { get; }
         public EntityMapping EntityMapping { get; }
 
@@ -154,7 +152,7 @@ namespace Dapper.FastCrud.SqlBuilders
         public string GetColumnName<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> property,
             string tableAlias = null)
         {
-            var propName = ((MemberExpression) property.Body).Member.Name;
+            var propName = ((MemberExpression)property.Body).Member.Name;
             return GetColumnName(propName, tableAlias);
         }
 
@@ -557,9 +555,11 @@ namespace Dapper.FastCrud.SqlBuilders
                         case SqlJoinType.NotSpecified:
                             fromClauseBuilder.Append(" LEFT OUTER JOIN ");
                             break;
+
                         case SqlJoinType.InnerJoin:
                             fromClauseBuilder.Append(" JOIN ");
                             break;
+
                         default:
                             throw new NotSupportedException($"Join '{secondEntityFinalJoinType}' is not supported");
                     }

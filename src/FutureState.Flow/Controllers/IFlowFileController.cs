@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FutureState.Flow.Model;
+using System;
 using System.IO;
-using FutureState.Flow.Model;
 
 namespace FutureState.Flow.Controllers
 {

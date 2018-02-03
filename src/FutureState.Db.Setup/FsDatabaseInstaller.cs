@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Data.SqlClient;
 using System.IO;
-using NLog;
 
 namespace FutureState.Db.Setup
 {
@@ -83,7 +83,6 @@ namespace FutureState.Db.Setup
 
             var fileName = $@"{deploymentDir}\{dbName}.mdf";
             var logFileName = $@"{deploymentDir}\{dbName}_log.ldf";
-
 
             // ReSharper disable once PossibleNullReferenceException
             File.Copy(_modelDbSetup.DbInfo.DbFileName, fileName, true);

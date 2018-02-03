@@ -51,7 +51,7 @@ namespace FutureState
                         AppDomain.CurrentDomain.SetData("result", funcToInvoke());
                     });
 
-                return (T) domain.GetData("result");
+                return (T)domain.GetData("result");
             }
             finally
             {
@@ -88,7 +88,7 @@ namespace FutureState
 
             try
             {
-                var instance = (T) domain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
+                var instance = (T)domain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
 
                 action?.Invoke(instance);
             }
@@ -104,7 +104,7 @@ namespace FutureState
         /// </summary>
         public static void Run(Action func)
         {
-            Run(new ActionDelegateWrapper {_func = func}.Invoke);
+            Run(new ActionDelegateWrapper { _func = func }.Invoke);
         }
 
         private static AppDomainSetup GetDefaultAppDomainSetup()

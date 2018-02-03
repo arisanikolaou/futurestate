@@ -1,8 +1,8 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using FutureState.Autofac.Modules;
 using FutureState.Data;
 using FutureState.Reflection;
+using System;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;

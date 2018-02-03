@@ -1,9 +1,9 @@
 ﻿#region
 
+using NLog;
 using System;
 using System.Linq;
 using System.Text;
-using NLog;
 
 #endregion
 
@@ -83,7 +83,7 @@ namespace FutureState.Specifications
 
             foreach (var spec in _specs)
             {
-                var result = spec.Evaluate((TEntity) subject);
+                var result = spec.Evaluate((TEntity)subject);
 
                 if (result.IsValid)
                     continue;

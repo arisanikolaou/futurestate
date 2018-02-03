@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using Dapper.Extensions.Linq.Core.Builder;
 using Dapper.Extensions.Linq.Core.Implementor;
 using Dapper.Extensions.Linq.Core.Predicates;
 using Dapper.Extensions.Linq.Core.Sessions;
 using Dapper.Extensions.Linq.Predicates;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Dapper.Extensions.Linq.Builder
 {

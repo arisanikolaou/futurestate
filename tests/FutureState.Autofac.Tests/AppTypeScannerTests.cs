@@ -1,6 +1,5 @@
-﻿using System;
+﻿using FutureState.Reflection;
 using System.Linq;
-using FutureState.Reflection;
 using Xunit;
 
 namespace FutureState.Autofac.Tests

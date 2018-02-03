@@ -119,8 +119,8 @@ namespace FutureState
             // string checking
             if (@object is string)
                 if (checkForWhiteSpace
-                    ? string.IsNullOrWhiteSpace((string) @object)
-                    : string.IsNullOrEmpty((string) @object))
+                    ? string.IsNullOrWhiteSpace((string)@object)
+                    : string.IsNullOrEmpty((string)@object))
                 {
                     message = message ?? "Null or white space string.";
                     throw new ArgumentException(message, expression.GetParameterName());
@@ -129,7 +129,7 @@ namespace FutureState
             // collection checking
             if (checkForEmptyCollection && @object is IEnumerable && !(@object is string))
             {
-                var enumerator = ((IEnumerable) @object).GetEnumerator();
+                var enumerator = ((IEnumerable)@object).GetEnumerator();
                 if (!enumerator.MoveNext())
                 {
                     message = message ?? "Collection has no items.";

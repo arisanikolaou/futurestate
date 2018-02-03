@@ -1,5 +1,5 @@
-﻿using System;
-using FutureState.Reflection;
+﻿using FutureState.Reflection;
+using System;
 using Xunit;
 
 namespace FutureState.Common.Tests

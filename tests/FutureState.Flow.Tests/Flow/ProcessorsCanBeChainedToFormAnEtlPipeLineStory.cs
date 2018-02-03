@@ -1,14 +1,14 @@
-﻿using System;
+﻿using CsvHelper;
+using FutureState.Flow.Controllers;
+using FutureState.Flow.Data;
+using FutureState.Specifications;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using CsvHelper;
-using FutureState.Flow.Controllers;
-using FutureState.Flow.Data;
-using FutureState.Specifications;
-using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -75,7 +75,6 @@ namespace FutureState.Flow.Tests.Flow
                     csv.Flush();
                     csv.NextRecord();
 
-
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
                         var entity = new Enitity1
@@ -105,7 +104,6 @@ namespace FutureState.Flow.Tests.Flow
             this._flowId = Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c859");
         }
 
-
         protected void WhenStartingAProcessorService()
         {
             var batchProcessor = new TestCsvFlowFileFlowFileBatchController(GetConfig<Enitity1, Entity2>())
@@ -128,12 +126,12 @@ namespace FutureState.Flow.Tests.Flow
             processor.Start();
         }
 
-        ProcessorConfiguration<TEntityIn, TEntityOut> GetConfig<TEntityIn, TEntityOut>
-            () where TEntityOut: class, new()
+        private ProcessorConfiguration<TEntityIn, TEntityOut> GetConfig<TEntityIn, TEntityOut>
+            () where TEntityOut : class, new()
         {
             var spec = new SpecProvider<TEntityOut>();
 
-            var col  = new SpecProvider<IEnumerable<TEntityOut>>();
+            var col = new SpecProvider<IEnumerable<TEntityOut>>();
 
             return new ProcessorConfiguration<TEntityIn, TEntityOut>(spec, col);
         }
@@ -165,7 +163,6 @@ namespace FutureState.Flow.Tests.Flow
             processor.Start();
         }
 
-
         protected void ThenProcessResultsShouldBeSaved()
         {
             // wait for jobs to finish processing
@@ -186,7 +183,6 @@ namespace FutureState.Flow.Tests.Flow
                 ProcessorConfiguration<Enitity1, Entity2> config) :
                 base(config)
             {
-
             }
 
             public override Processor<Enitity1, Entity2> GetProcessor()
@@ -212,7 +208,6 @@ namespace FutureState.Flow.Tests.Flow
             public TestProcessResultFlowFileBatchController(ProcessorConfiguration<Entity2, Entity3> config) :
        base(config)
             {
-
             }
 
             public override Processor<Entity2, Entity3> GetProcessor()
@@ -234,8 +229,6 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-
-
         public class Enitity1
         {
             public string Name { get; set; }
@@ -253,7 +246,6 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
-
 
             public DateTime DateProcessed { get; set; }
         }

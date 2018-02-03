@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Mapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Dapper.Extensions.Linq.Core.Mapper;
 
 namespace Dapper.Extensions.Linq
 {
@@ -35,19 +35,19 @@ namespace Dapper.Extensions.Linq
         public static MemberInfo GetProperty(LambdaExpression lambda)
         {
             Expression expr = lambda;
-            for (;;)
+            for (; ; )
                 switch (expr.NodeType)
                 {
                     case ExpressionType.Lambda:
-                        expr = ((LambdaExpression) expr).Body;
+                        expr = ((LambdaExpression)expr).Body;
                         break;
 
                     case ExpressionType.Convert:
-                        expr = ((UnaryExpression) expr).Operand;
+                        expr = ((UnaryExpression)expr).Operand;
                         break;
 
                     case ExpressionType.MemberAccess:
-                        var memberExpression = (MemberExpression) expr;
+                        var memberExpression = (MemberExpression)expr;
                         var mi = memberExpression.Member;
                         return mi;
 

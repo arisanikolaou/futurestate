@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using FutureState.Flow.Controllers;
+﻿using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Reflection;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 
 namespace FutureState.Flow
 {
@@ -69,7 +68,6 @@ namespace FutureState.Flow
                 if (attribute != null)
                     _dictTypes[attribute.DisplayName] = controllerType.Value;
             }
-
         }
 
         /// <summary>
@@ -115,7 +113,7 @@ namespace FutureState.Flow
 
             _started = true;
 
-            if(_logger.IsDebugEnabled)
+            if (_logger.IsDebugEnabled)
                 _logger.Debug($"Started all controllers.");
         }
 
@@ -135,7 +133,7 @@ namespace FutureState.Flow
         {
             Guard.ArgumentNotNull(definition, nameof(definition));
 
-            if(_logger.IsDebugEnabled)
+            if (_logger.IsDebugEnabled)
                 _logger.Debug($"Starting controller {definition.ControllerName}");
 
             //flow controller type

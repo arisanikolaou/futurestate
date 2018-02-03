@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dapper.FastCrud.Configuration.StatementOptions.Builders;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Dapper.FastCrud.Configuration.StatementOptions.Builders;
 
 namespace Dapper.FastCrud
 {

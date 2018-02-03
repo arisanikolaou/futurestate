@@ -29,7 +29,7 @@ namespace FutureState
             if (fi == null)
                 return string.Empty;
 
-            var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : name;
         }
 
@@ -43,7 +43,7 @@ namespace FutureState
             where TEnum : struct
         {
             var fi = typeof(TEnum).GetField(value.ToString());
-            var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : value.ToString();
         }
 
@@ -75,7 +75,7 @@ namespace FutureState
                 var attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
 
                 if (attrs.Length > 0)
-                    return ((DescriptionAttribute) attrs[0]).Description;
+                    return ((DescriptionAttribute)attrs[0]).Description;
             }
 
             return value.ToString();
@@ -235,7 +235,7 @@ namespace FutureState
         {
             var targetType = typeof(TTargetType);
             var fi = targetType.GetField(targetValue.ToString());
-            var attributes = (EnumListAttribute[]) fi.GetCustomAttributes(typeof(EnumListAttribute), false);
+            var attributes = (EnumListAttribute[])fi.GetCustomAttributes(typeof(EnumListAttribute), false);
             foreach (var attr in attributes)
                 if (attr.EnumType == typeof(TEnumType))
                     return attr.Values.OfType<TEnumType>().ToList();
@@ -274,7 +274,7 @@ namespace FutureState
                 foreach (var name in names)
                     if (string.Compare(name, newValue, ignoreCase) == 0)
                     {
-                        result = (TEnum) Enum.Parse(typeof(TEnum), name);
+                        result = (TEnum)Enum.Parse(typeof(TEnum), name);
                         break;
                     }
             }
@@ -314,13 +314,13 @@ namespace FutureState
         public static IEnumerable<Tuple<Enum, string>> GetEnumValueDescriptionTuple(Type type)
         {
             return from Enum enumValue in GetValues(type)
-                select new Tuple<Enum, string>(enumValue, GetDescription(enumValue));
+                   select new Tuple<Enum, string>(enumValue, GetDescription(enumValue));
         }
 
         public static IEnumerable<Tuple<TEnum, string>> GetEnumValueDescriptionTuple<TEnum>() where TEnum : struct
         {
             return from TEnum enumValue in GetValues(typeof(TEnum)).OfType<TEnum>()
-                select new Tuple<TEnum, string>(enumValue, GetDescription(enumValue));
+                   select new Tuple<TEnum, string>(enumValue, GetDescription(enumValue));
         }
 
         /// <summary>
@@ -372,7 +372,7 @@ namespace FutureState
 
         public static T Parse<T>(string value)
         {
-            return (T) Enum.Parse(typeof(T), value, false);
+            return (T)Enum.Parse(typeof(T), value, false);
         }
 
         /// <summary>
@@ -458,7 +458,7 @@ namespace FutureState
             if (fieldInfo == null)
                 return Enumerable.Empty<T>();
 
-            return (T[]) fieldInfo.GetCustomAttributes(typeof(T), false);
+            return (T[])fieldInfo.GetCustomAttributes(typeof(T), false);
         }
 
         /// <summary>
@@ -559,7 +559,7 @@ namespace FutureState
             var fis = value.GetFields();
             foreach (var fi in fis)
             {
-                var attributes = (DescriptionAttribute[]) fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
                 if (attributes.Length > 0)
                     if (attributes[0].Description == description)
                         return fi.GetValue(fi.Name);
@@ -574,7 +574,7 @@ namespace FutureState
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string)
-                return GetEnumValueFromDescription(context.PropertyDescriptor.PropertyType, (string) value);
+                return GetEnumValueFromDescription(context.PropertyDescriptor.PropertyType, (string)value);
 
             return base.ConvertFrom(context, culture, value);
         }

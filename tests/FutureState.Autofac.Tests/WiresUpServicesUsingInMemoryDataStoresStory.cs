@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autofac;
+﻿using Autofac;
 using FutureState.Autofac.Modules;
-using FutureState.Data;
 using FutureState.Data.Providers;
 using FutureState.Reflection;
+using System;
+using System.Collections.Generic;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -18,7 +16,6 @@ namespace FutureState.Autofac.Tests
         private IContainer _container;
         private IEnumerable<Contact> _items;
         private IEnumerable<Address> _itemsFromGuidKeyedEntity;
-
 
         protected void GivenAnInMemoryDrivenApp()
         {

@@ -24,7 +24,6 @@ namespace FutureState.Data
         /// </summary>
         public KeyGenerator() : this(() => default(TKey))
         {
-            
         }
 
         /// <summary>

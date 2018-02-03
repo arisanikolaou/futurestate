@@ -1,9 +1,9 @@
-﻿using System;
-using System.Timers;
-using FutureState.Flow.Controllers;
+﻿using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
+using System;
+using System.Timers;
 
 namespace FutureState.Flow
 {

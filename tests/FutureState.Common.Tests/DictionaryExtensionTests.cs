@@ -22,7 +22,6 @@ namespace FutureState.Common.Tests
             Assert.Equal("Name", dict.Values.First());
         }
 
-
         [Fact]
         public void CanMergeDictionaries()
         {
@@ -62,7 +61,6 @@ namespace FutureState.Common.Tests
             Assert.False(dict.IsEquivalentTo(dict2));
         }
 
-
         [Fact]
         public void ComparesDictionariesFalse()
         {
@@ -93,7 +91,6 @@ namespace FutureState.Common.Tests
             Assert.Equal(2, dict.Get("Name 2"));
             Assert.Equal(0, dict.Get("Name 3"));
         }
-
 
         public class TestClass
         {

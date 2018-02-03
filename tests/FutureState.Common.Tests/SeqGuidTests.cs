@@ -6,7 +6,7 @@ namespace FutureState.Common.Tests
 {
     public class SeqGuidTests
     {
-       [Fact]
+        [Fact]
         public void GeneratesUniqueSeqGuids()
         {
             // arrange
@@ -19,7 +19,7 @@ namespace FutureState.Common.Tests
             {
                 for (int j = i + 1; j < list.Count; j++)
                 {
-                    if(list[i] == list[j])
+                    if (list[i] == list[j])
                         throw new Exception("Generated guids are not unique.");
                 }
             }

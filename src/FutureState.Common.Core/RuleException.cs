@@ -49,7 +49,6 @@ namespace FutureState
         /// </summary>
         public Error[] Errors { get; }
 
-
         // deserialize
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

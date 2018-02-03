@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FutureState.Flow.Tests.Mock
 {
-    using System;
     using System.ComponentModel.DataAnnotations;
     using System.Data.Entity;
-    using System.Linq;
 
     public class TestModel : DbContext
     {
@@ -21,9 +19,7 @@ namespace FutureState.Flow.Tests.Mock
             this.Database.Initialize(true);
         }
 
-
         public virtual DbSet<Contact> Contacts { get; set; }
-
 
         public virtual DbSet<Address> Addresses { get; set; }
     }

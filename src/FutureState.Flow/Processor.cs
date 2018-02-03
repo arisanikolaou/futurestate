@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FutureState.Specifications;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using FutureState.Specifications;
-using NLog;
 
 namespace FutureState.Flow
 {
@@ -39,7 +39,7 @@ namespace FutureState.Flow
 
             _config = config;
 
-            CreateOutput = dtoIn => new[] {new TEntityOut()};
+            CreateOutput = dtoIn => new[] { new TEntityOut() };
             ProcessName = GetProcessName(this);
             Engine = engine ?? new ProcessorEngine<TEntityIn>();
         }
@@ -124,7 +124,6 @@ namespace FutureState.Flow
         /// </summary>
         public event EventHandler<EventArgs> OnFinishedProcessing;
 
-
         /// <summary>
         ///     Creates a new process engine instance using a given entity reader and core engine.
         /// </summary>
@@ -148,7 +147,7 @@ namespace FutureState.Flow
                 pItem?.Invoke(dtoIn);
 
                 // create output entity
-                IEnumerable<TEntityOut> itemsToProcess = new[] {new TEntityOut()};
+                IEnumerable<TEntityOut> itemsToProcess = new[] { new TEntityOut() };
                 if (CreateOutput != null)
                     itemsToProcess = CreateOutput(dtoIn);
 

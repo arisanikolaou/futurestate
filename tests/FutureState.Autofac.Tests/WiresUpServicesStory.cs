@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autofac;
+﻿using Autofac;
 using FutureState.Autofac.Modules;
 using FutureState.Data;
 using FutureState.Data.Providers;
 using FutureState.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -14,7 +14,7 @@ namespace FutureState.Autofac.Tests
 {
     public class WiresUpServicesStory : IDisposable
     {
-        int contactId = 0;
+        private int contactId = 0;
         private string _conString;
         private IContainer _container;
         private string _dbName;
@@ -74,7 +74,7 @@ namespace FutureState.Autofac.Tests
             });
 
             cb.RegisterAll(new AppTypeScanner(Environment.CurrentDirectory, "FutureState.Autofac"));
-            
+
             cb.Register(m => new KeyGenerator<Contact, int>(() => contactId++))
                 .AsSelf().AsImplementedInterfaces().SingleInstance();
 

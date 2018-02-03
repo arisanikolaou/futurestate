@@ -1,8 +1,8 @@
 ﻿#region
 
+using NLog;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using NLog;
 
 #endregion
 

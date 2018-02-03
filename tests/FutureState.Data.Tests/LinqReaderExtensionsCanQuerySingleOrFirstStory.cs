@@ -43,7 +43,6 @@ namespace FutureState.Data.Tests
             _single = _reader.Single(m => m.Name == "Name");
         }
 
-
         protected void ThenFirstAndSingleShouldReturnValidResults()
         {
             Assert.NotNull(_first);

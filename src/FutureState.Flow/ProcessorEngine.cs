@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 
 namespace FutureState.Flow
 {
@@ -131,7 +131,7 @@ namespace FutureState.Flow
 
                     errors.Add(new ProcessError<TEntityDto>
                     {
-                        Error = new ErrorEvent {Type = "Exception", Message = apex.Message},
+                        Error = new ErrorEvent { Type = "Exception", Message = apex.Message },
                         SourceItem = dto
                     });
                 }
@@ -146,7 +146,7 @@ namespace FutureState.Flow
 
                     errors.Add(new ProcessError<TEntityDto>
                     {
-                        Error = new ErrorEvent {Type = "Exception", Message = ex.Message},
+                        Error = new ErrorEvent { Type = "Exception", Message = ex.Message },
                         SourceItem = dto
                     });
                 }

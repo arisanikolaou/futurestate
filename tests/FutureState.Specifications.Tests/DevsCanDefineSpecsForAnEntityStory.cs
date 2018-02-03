@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestStack.BDDfy;
+﻿using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
 
@@ -37,6 +32,7 @@ namespace FutureState.Specifications.Tests
             var validEntity = new TestClass() { Name = null };
             this.resultInvalid = spec.Evaluate(validEntity);
         }
+
         public void ThenResultsShouldBeValid()
         {
             Assert.True(resultValid == SpecResult.Success);

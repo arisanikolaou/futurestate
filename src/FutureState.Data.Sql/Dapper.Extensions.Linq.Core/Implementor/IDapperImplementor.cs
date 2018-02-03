@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.Data;
 using Dapper.Extensions.Linq.Core.Predicates;
 using Dapper.Extensions.Linq.Core.Sql;
+using System.Collections.Generic;
+using System.Data;
 
 namespace Dapper.Extensions.Linq.Core.Implementor
 {

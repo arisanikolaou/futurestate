@@ -1,5 +1,4 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace FutureState.Common.Tests
 {
@@ -11,9 +10,9 @@ namespace FutureState.Common.Tests
             bool hitLine = false;
 
             var result = new DomainObject()
-                {
-                    Name = "Name"
-                }
+            {
+                Name = "Name"
+            }
                 .Do(m =>
                 {
                     hitLine = true;
@@ -29,15 +28,14 @@ namespace FutureState.Common.Tests
         public void ReturnsAfterWithTests()
         {
             var result = new DomainObject()
-                {
-                    Name = "Name"
-                }
+            {
+                Name = "Name"
+            }
                 .With(m => m.Name)
                 .Return(m => m[0]);
 
             Assert.Equal('N', result);
         }
-
 
         public class DomainObject
         {

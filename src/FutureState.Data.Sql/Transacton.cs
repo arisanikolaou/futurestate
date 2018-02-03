@@ -21,7 +21,7 @@ namespace FutureState.Data.Sql
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public IDbTransaction UnderlyingTransaction { get; }
 

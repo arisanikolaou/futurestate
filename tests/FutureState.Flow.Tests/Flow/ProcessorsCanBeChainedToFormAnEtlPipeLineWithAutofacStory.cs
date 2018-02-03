@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Autofac;
+using CsvHelper;
+using FutureState.Flow.Controllers;
+using FutureState.Specifications;
+using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Autofac;
-using CsvHelper;
-using FutureState.Flow.Controllers;
-using FutureState.Specifications;
-using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -85,7 +85,6 @@ namespace FutureState.Flow.Tests.Flow
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -172,9 +171,9 @@ namespace FutureState.Flow.Tests.Flow
         {
             // flow conrtroller should configure all controllers
             IFlowFileController[] controllers = _flowController.GetControllers();
-            foreach(var controller in controllers)
+            foreach (var controller in controllers)
             {
-                if(controller is TestCsvFlowController)
+                if (controller is TestCsvFlowController)
                 {
                     var testCsv = controller as TestCsvFlowController;
                     Assert.Equal("http://helplnk.etc", testCsv.ValueToConfigure);
@@ -218,7 +217,6 @@ namespace FutureState.Flow.Tests.Flow
             public TestCsvFlowController(ProcessorConfiguration<EnitityA, EntityB> config)
                 : base(config)
             {
-
             }
 
             public override Processor<EnitityA, EntityB> GetProcessor()
@@ -235,7 +233,7 @@ namespace FutureState.Flow.Tests.Flow
                         dtoOut.Name = dtoIn.Name;
                         dtoOut.Id = ++i;
 
-                        if(i % 2 == 0)
+                        if (i % 2 == 0)
                             dtoOut.Value = "A"; // should not be valid
                         else
                             dtoOut.Value = "123"; // should not be valid
@@ -251,7 +249,6 @@ namespace FutureState.Flow.Tests.Flow
             public TestProcessResultFlowFileBatchController(ProcessorConfiguration<EntityB, EntityC> config)
        : base(config)
             {
-
             }
 
             public override Processor<EntityB, EntityC> GetProcessor()
@@ -292,7 +289,6 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
-
 
             public DateTime DateProcessed { get; set; }
         }

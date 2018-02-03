@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Dapper.FastCrud.Validations;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using Dapper.FastCrud.Validations;
 
 namespace Dapper.FastCrud.Mappings
 {
@@ -243,18 +243,21 @@ namespace Dapper.FastCrud.Mappings
                     IsRefreshedOnInserts = true;
                     IsRefreshedOnUpdates = true;
                     break;
+
                 case DatabaseGeneratedOption.Identity:
                     IsExcludedFromInserts = true;
                     IsExcludedFromUpdates = true;
                     IsRefreshedOnInserts = true;
                     IsRefreshedOnUpdates = false;
                     break;
+
                 case DatabaseGeneratedOption.None:
                     IsExcludedFromInserts = false;
                     IsExcludedFromUpdates = false;
                     IsRefreshedOnInserts = false;
                     IsRefreshedOnUpdates = false;
                     break;
+
                 default:
                     throw new NotSupportedException($"Option {option} is not supported.");
             }
@@ -406,7 +409,7 @@ namespace Dapper.FastCrud.Mappings
                 return true;
             if (obj.GetType() != GetType())
                 return false;
-            return Equals((PropertyMapping) obj);
+            return Equals((PropertyMapping)obj);
         }
 
         /// <summary>

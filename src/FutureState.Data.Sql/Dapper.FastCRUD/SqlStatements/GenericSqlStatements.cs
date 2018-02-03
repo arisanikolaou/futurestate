@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
+using Dapper.FastCrud.Mappings;
+using Dapper.FastCrud.SqlBuilders;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
-using Dapper.FastCrud.Mappings;
-using Dapper.FastCrud.SqlBuilders;
 
 namespace Dapper.FastCrud.SqlStatements
 {
@@ -45,7 +45,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullSingleSelectStatement(),
                 keyEntity,
                 statementOptions.Transaction,
-                commandTimeout: (int?) statementOptions.CommandTimeout?.TotalSeconds).SingleOrDefault();
+                commandTimeout: (int?)statementOptions.CommandTimeout?.TotalSeconds).SingleOrDefault();
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullSingleSelectStatement(),
                 keyEntity,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds)).SingleOrDefault();
+                (int?)statementOptions.CommandTimeout?.TotalSeconds)).SingleOrDefault();
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Dapper.FastCrud.SqlStatements
                             insertStatement,
                             entity,
                             statementOptions.Transaction,
-                            commandTimeout: (int?) statementOptions.CommandTimeout?.TotalSeconds)
+                            commandTimeout: (int?)statementOptions.CommandTimeout?.TotalSeconds)
                         .FirstOrDefault();
 
                 // copy all the database generated props back onto our entity
@@ -90,7 +90,7 @@ namespace Dapper.FastCrud.SqlStatements
                     SqlBuilder.ConstructFullInsertStatement(),
                     entity,
                     statementOptions.Transaction,
-                    (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                    (int?)statementOptions.CommandTimeout?.TotalSeconds);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Dapper.FastCrud.SqlStatements
                         SqlBuilder.ConstructFullInsertStatement(),
                         entity,
                         statementOptions.Transaction,
-                        (int?) statementOptions.CommandTimeout?.TotalSeconds)).FirstOrDefault();
+                        (int?)statementOptions.CommandTimeout?.TotalSeconds)).FirstOrDefault();
                 // copy all the database generated props back onto our entity
                 CopyEntity(insertedEntity, entity, SqlBuilder.RefreshOnInsertProperties);
             }
@@ -119,7 +119,7 @@ namespace Dapper.FastCrud.SqlStatements
                     SqlBuilder.ConstructFullInsertStatement(),
                     entity,
                     statementOptions.Transaction,
-                    (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                    (int?)statementOptions.CommandTimeout?.TotalSeconds);
             }
         }
 
@@ -136,7 +136,7 @@ namespace Dapper.FastCrud.SqlStatements
                     SqlBuilder.ConstructFullSingleUpdateStatement(),
                     keyEntity,
                     statementOptions.Transaction,
-                    commandTimeout: (int?) statementOptions.CommandTimeout?.TotalSeconds).FirstOrDefault();
+                    commandTimeout: (int?)statementOptions.CommandTimeout?.TotalSeconds).FirstOrDefault();
 
                 if (updatedEntity != null)
                     CopyEntity(updatedEntity, keyEntity, SqlBuilder.RefreshOnUpdateProperties);
@@ -148,7 +148,7 @@ namespace Dapper.FastCrud.SqlStatements
                        SqlBuilder.ConstructFullSingleUpdateStatement(),
                        keyEntity,
                        statementOptions.Transaction,
-                       (int?) statementOptions.CommandTimeout?.TotalSeconds) > 0;
+                       (int?)statementOptions.CommandTimeout?.TotalSeconds) > 0;
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Dapper.FastCrud.SqlStatements
                     SqlBuilder.ConstructFullSingleUpdateStatement(),
                     keyEntity,
                     statementOptions.Transaction,
-                    (int?) statementOptions.CommandTimeout?.TotalSeconds)).FirstOrDefault();
+                    (int?)statementOptions.CommandTimeout?.TotalSeconds)).FirstOrDefault();
 
                 if (updatedEntity != null)
                     CopyEntity(updatedEntity, keyEntity, SqlBuilder.RefreshOnUpdateProperties);
@@ -176,7 +176,7 @@ namespace Dapper.FastCrud.SqlStatements
                        SqlBuilder.ConstructFullSingleUpdateStatement(),
                        keyEntity,
                        statementOptions.Transaction,
-                       (int?) statementOptions.CommandTimeout?.TotalSeconds) > 0;
+                       (int?)statementOptions.CommandTimeout?.TotalSeconds) > 0;
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullBatchUpdateStatement(statementOptions.WhereClause),
                 entity,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullBatchUpdateStatement(statementOptions.WhereClause),
                 entity,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Dapper.FastCrud.SqlStatements
                        SqlBuilder.ConstructFullSingleDeleteStatement(),
                        keyEntity,
                        statementOptions.Transaction,
-                       (int?) statementOptions.CommandTimeout?.TotalSeconds) > 0;
+                       (int?)statementOptions.CommandTimeout?.TotalSeconds) > 0;
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Dapper.FastCrud.SqlStatements
                        SqlBuilder.ConstructFullSingleDeleteStatement(),
                        keyEntity,
                        statementoptions.Transaction,
-                       (int?) statementoptions.CommandTimeout?.TotalSeconds) > 0;
+                       (int?)statementoptions.CommandTimeout?.TotalSeconds) > 0;
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullBatchDeleteStatement(statementOptions.WhereClause),
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullBatchDeleteStatement(statementOptions.WhereClause),
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullCountStatement(statementOptions.WhereClause),
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace Dapper.FastCrud.SqlStatements
                 SqlBuilder.ConstructFullCountStatement(statementOptions.WhereClause),
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace Dapper.FastCrud.SqlStatements
                 statementOptions.Parameters,
                 buffered: !statementOptions.ForceStreamResults,
                 transaction: statementOptions.Transaction,
-                commandTimeout: (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                commandTimeout: (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -322,7 +322,7 @@ namespace Dapper.FastCrud.SqlStatements
                     statementOptions.LimitResults),
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

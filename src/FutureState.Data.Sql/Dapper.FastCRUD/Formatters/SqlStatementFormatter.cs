@@ -1,8 +1,8 @@
-﻿using System;
-using System.Globalization;
-using Dapper.FastCrud.EntityDescriptors;
+﻿using Dapper.FastCrud.EntityDescriptors;
 using Dapper.FastCrud.Mappings;
 using Dapper.FastCrud.Validations;
+using System;
+using System.Globalization;
 
 namespace Dapper.FastCrud.Formatters
 {
@@ -83,10 +83,13 @@ namespace Dapper.FastCrud.Formatters
                             "{0}.{1}",
                             MainEntitySqlBuilder.GetTableName(),
                             MainEntitySqlBuilder.GetColumnName(stringArg));
+
                     case "T":
                         return MainEntitySqlBuilder.GetTableName();
+
                     case "C":
                         return MainEntitySqlBuilder.GetColumnName(stringArg);
+
                     case "I":
                         return MainEntitySqlBuilder.GetDelimitedIdentifier(stringArg);
                 }

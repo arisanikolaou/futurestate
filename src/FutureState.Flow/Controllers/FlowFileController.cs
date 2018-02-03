@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FutureState.Flow.Data;
+using FutureState.Flow.Model;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.Data;
-using FutureState.Flow.Model;
-using NLog;
 
 namespace FutureState.Flow.Controllers
 {
@@ -58,7 +58,7 @@ namespace FutureState.Flow.Controllers
 
             // assign name from type name by default
             ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
-            
+
             //create default flow id
             FlowId = SeqGuid.Create();
 
@@ -83,7 +83,6 @@ namespace FutureState.Flow.Controllers
                     ex);
             }
         }
-
 
         /// <summary>
         ///     Gets the configuration to use to setup of a processor.
@@ -132,7 +131,7 @@ namespace FutureState.Flow.Controllers
             }
             else
             {
-                if(_logger.IsWarnEnabled)
+                if (_logger.IsWarnEnabled)
                     _logger.Warn($"No files were discovered under {InDirectory}.");
             }
 
@@ -216,7 +215,6 @@ namespace FutureState.Flow.Controllers
 
         protected virtual void Dispose(bool disposing)
         {
-
         }
     }
 }

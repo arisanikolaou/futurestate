@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FutureState.Flow.Data;
+using System;
 using System.Collections.Generic;
-using FutureState.Flow.Data;
 
 namespace FutureState.Flow
 {

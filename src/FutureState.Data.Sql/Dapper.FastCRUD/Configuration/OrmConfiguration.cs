@@ -1,13 +1,13 @@
 ﻿// ReSharper disable once CheckNamespace (the namespace is intentionally not in sync with the file location)
 
-using System;
-using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using Dapper.FastCrud.Configuration;
 using Dapper.FastCrud.EntityDescriptors;
 using Dapper.FastCrud.Mappings;
 using Dapper.FastCrud.SqlStatements;
 using Dapper.FastCrud.Validations;
+using System;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 namespace Dapper.FastCrud
 {
@@ -98,7 +98,6 @@ namespace Dapper.FastCrud
             return mappings;
         }
 
-
         /// <summary>
         ///     Returns an SQL builder helpful for constructing verbatim SQL queries.
         /// </summary>
@@ -123,7 +122,7 @@ namespace Dapper.FastCrud
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static ISqlStatements<TEntity> GetSqlStatements<TEntity>(EntityMapping entityMapping = null)
         {
-            return (ISqlStatements<TEntity>) GetEntityDescriptor<TEntity>().GetSqlStatements(entityMapping);
+            return (ISqlStatements<TEntity>)GetEntityDescriptor<TEntity>().GetSqlStatements(entityMapping);
         }
     }
 }

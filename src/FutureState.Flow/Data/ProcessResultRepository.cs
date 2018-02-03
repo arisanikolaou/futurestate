@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
+using System;
+using System.IO;
 
 namespace FutureState.Flow.Data
 {
@@ -38,7 +38,6 @@ namespace FutureState.Flow.Data
         {
             CreateDirIfNotExists();
 
-
             var i = 1;
             var fileName =
                 $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{data.BatchProcess.BatchId}.json";
@@ -55,7 +54,7 @@ namespace FutureState.Flow.Data
 
             File.WriteAllText(fileName, body);
 
-            if(_logger.IsInfoEnabled)
+            if (_logger.IsInfoEnabled)
                 _logger.Info(($"Saved process output to {fileName}."));
         }
 
@@ -71,7 +70,7 @@ namespace FutureState.Flow.Data
 
             var body = File.ReadAllText(fileName);
 
-            var result =  JsonConvert.DeserializeObject<T>(body);
+            var result = JsonConvert.DeserializeObject<T>(body);
 
             if (_logger.IsInfoEnabled)
                 _logger.Info(($"Read process output from {fileName}."));

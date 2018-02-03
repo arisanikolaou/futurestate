@@ -1,8 +1,8 @@
 ﻿#region
 
+using NLog;
 using System;
 using System.Threading;
-using NLog;
 
 #endregion
 

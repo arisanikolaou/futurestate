@@ -1,8 +1,8 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using Dapper.FastCrud.Formatters;
+﻿using Dapper.FastCrud.Formatters;
 using Dapper.FastCrud.Mappings;
 using Dapper.FastCrud.Validations;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace Dapper.FastCrud
 {

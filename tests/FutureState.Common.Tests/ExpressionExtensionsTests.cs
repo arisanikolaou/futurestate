@@ -33,7 +33,6 @@ namespace FutureState.Common.Tests
 
             public void Method1()
             {
-
             }
         }
     }

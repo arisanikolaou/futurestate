@@ -1,9 +1,8 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
-
+using System;
 
 namespace FutureState.Flow.Tests.Flow
 {
@@ -35,7 +34,7 @@ namespace FutureState.Flow.Tests.Flow
                 .SingleInstance() // make singleton
                 .AsSelf()
                 .AsImplementedInterfaces();
-            
+
             cb.RegisterGeneric(typeof(FlowFileController<,>))
                 .AsSelf();
 
@@ -106,7 +105,7 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public class FlowFileControllerServiceFactory:  IFlowFileControllerServiceFactory
+        public class FlowFileControllerServiceFactory : IFlowFileControllerServiceFactory
         {
             private readonly IComponentContext _context;
 

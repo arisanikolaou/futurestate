@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Sql;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using Dapper.Extensions.Linq.Core.Sql;
 
 namespace Dapper.Extensions.Linq.Sql
 {

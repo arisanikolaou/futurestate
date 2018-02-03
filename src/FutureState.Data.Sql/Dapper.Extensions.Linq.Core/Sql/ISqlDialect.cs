@@ -11,6 +11,7 @@ namespace Dapper.Extensions.Linq.Core.Sql
         bool SupportsMultipleStatements { get; }
         char ParameterPrefix { get; }
         string EmptyExpression { get; }
+
         IDbConnection GetConnection(string connectionString);
 
         string GetTableName(string schemaName, string tableName, string alias);

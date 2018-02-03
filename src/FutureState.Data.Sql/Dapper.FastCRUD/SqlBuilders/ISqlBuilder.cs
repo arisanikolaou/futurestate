@@ -1,4 +1,4 @@
-﻿// ReSharper disable once CheckNamespace (the namespace is intentionally not in sync with the file location) 
+﻿// ReSharper disable once CheckNamespace (the namespace is intentionally not in sync with the file location)
 
 using System;
 using System.Linq.Expressions;

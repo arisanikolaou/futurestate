@@ -1,7 +1,7 @@
+using NLog;
 using System;
 using System.Data.SqlClient;
 using System.IO;
-using NLog;
 
 namespace FutureState.Data
 {
@@ -133,7 +133,7 @@ namespace FutureState.Data
                         {
                             var cmd = connection.CreateCommand();
                             cmd.CommandText = $"select count(*) from sysdatabases where name = '{dbName}'";
-                            if ((int) cmd.ExecuteScalar() == 0)
+                            if ((int)cmd.ExecuteScalar() == 0)
                                 return true;
                         }
 
@@ -143,7 +143,6 @@ namespace FutureState.Data
                             cmd.CommandText = $"alter database [{dbName}] set offline with rollback immediate";
                             cmd.ExecuteNonQuery();
                         }
-
 
                         // detach
                         {

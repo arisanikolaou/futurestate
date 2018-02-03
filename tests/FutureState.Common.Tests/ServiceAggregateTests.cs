@@ -17,7 +17,7 @@ namespace FutureState.Common.Tests
         protected void GivenAServiceAggregate()
         {
             this._aggregate = new ServiceAggregate<IInstrumentService>(
-                new IInstrumentService[] { new Service1(), new Service2() , new Service2() });
+                new IInstrumentService[] { new Service1(), new Service2(), new Service2() });
         }
 
         protected void WhenDemandingAServiceType()
@@ -41,7 +41,7 @@ namespace FutureState.Common.Tests
         protected void ThenServicesShouldBeResolved()
         {
             Assert.NotNull(_service1);
-            Assert.Equal(typeof(Bond), _service1.Type );
+            Assert.Equal(typeof(Bond), _service1.Type);
 
             Assert.NotNull(_service2);
             Assert.Equal(typeof(Equity), _service2.Type);
@@ -82,22 +82,18 @@ namespace FutureState.Common.Tests
 
         public class Instrument
         {
-
         }
 
         public class Bond
         {
-
         }
 
         public class Equity
         {
-
         }
 
         public class NonExistant
         {
-
         }
     }
 }

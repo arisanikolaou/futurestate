@@ -1,9 +1,9 @@
-using System;
-using System.Linq.Expressions;
 using Dapper.Extensions.Linq.Builder;
 using Dapper.Extensions.Linq.Core.Sessions;
 using Dapper.Extensions.Linq.Implementor;
 using Dapper.Extensions.Linq.Sql;
+using System;
+using System.Linq.Expressions;
 
 namespace FutureState.Data.Sql
 {

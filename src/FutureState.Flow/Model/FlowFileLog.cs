@@ -26,7 +26,6 @@ namespace FutureState.Flow.Model
 
         public int BatchId { get; set; }
 
-
         public List<FlowFileLogEntry> Entries { get; set; }
     }
 }

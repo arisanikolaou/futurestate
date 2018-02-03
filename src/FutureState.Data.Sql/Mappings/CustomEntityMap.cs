@@ -1,4 +1,13 @@
-﻿using System;
+﻿using Dapper;
+using Dapper.Extensions.Linq.Core.Attributes;
+using Dapper.Extensions.Linq.Core.Enums;
+using Dapper.Extensions.Linq.Core.Mapper;
+using Dapper.Extensions.Linq.Mapper;
+using Dapper.FastCrud;
+using Dapper.FastCrud.Mappings;
+using Dapper.FluentMap.Dommel.Mapping;
+using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -8,15 +17,6 @@ using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Dapper;
-using Dapper.Extensions.Linq.Core.Attributes;
-using Dapper.Extensions.Linq.Core.Enums;
-using Dapper.Extensions.Linq.Core.Mapper;
-using Dapper.Extensions.Linq.Mapper;
-using Dapper.FastCrud;
-using Dapper.FastCrud.Mappings;
-using Dapper.FluentMap.Dommel.Mapping;
-using Humanizer;
 
 // ReSharper disable StaticMemberInGenericType
 
@@ -148,7 +148,7 @@ namespace FutureState.Data.Sql.Mappings
             }
         }
 
-        static void AdaptToFastCrud(EntityMapping<TEntity> mapping, SqlMapper.ITypeMap entityMap)
+        private static void AdaptToFastCrud(EntityMapping<TEntity> mapping, SqlMapper.ITypeMap entityMap)
         {
             var currentConventions = OrmConfiguration.Conventions;
 
@@ -192,7 +192,7 @@ namespace FutureState.Data.Sql.Mappings
                 this.LinqPropertyMaps.Add(linqPropertyMap);
         }
 
-        static void SetupIfIdentity(PropertyInfo property, DommelPropertyMap map)
+        private static void SetupIfIdentity(PropertyInfo property, DommelPropertyMap map)
         {
             if (property.GetCustomAttributes(typeof(DatabaseGeneratedAttribute))
                 .FirstOrDefault() is DatabaseGeneratedAttribute dbGenerated)
@@ -219,7 +219,6 @@ namespace FutureState.Data.Sql.Mappings
                     .SetProperty(property.Name,
                         prop => prop.SetPrimaryKey()
                             .SetDatabaseGenerated(DatabaseGeneratedOption.Identity));
-
             }
         }
 

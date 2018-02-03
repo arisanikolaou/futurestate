@@ -1,5 +1,5 @@
-﻿using System;
-using FutureState.Flow.Data;
+﻿using FutureState.Flow.Data;
+using System;
 
 namespace FutureState.Flow.Controllers
 {
