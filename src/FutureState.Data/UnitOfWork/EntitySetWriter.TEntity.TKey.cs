@@ -5,8 +5,8 @@ using System.Linq;
 namespace FutureState.Data
 {
     /// <summary>
-    ///     Adapts a repository to write entities via a repository 
-    /// throgh a consistent data store session.
+    ///     Adapts a repository to write entities via a repository
+    ///     throgh a consistent data store session.
     /// </summary>
     public class EntitySetWriter<TEntity, TKey> : IWriter<TEntity, TKey>
     {

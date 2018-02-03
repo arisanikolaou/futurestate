@@ -17,12 +17,11 @@ namespace FutureState.Data.Sql.Tests.Repository
 
     public class MyEntity : IEntity<int>
     {
-        [Key] public int Id { get; set; }
-
         public string Name { get; set; }
 
         public DateTime Date { get; set; }
 
         public decimal Money { get; set; }
+        [Key] public int Id { get; set; }
     }
 }

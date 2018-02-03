@@ -15,7 +15,7 @@ namespace FutureState.Reflection
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        static readonly Lazy<AppTypeScanner> _default = new Lazy<AppTypeScanner>(() => new AppTypeScanner());
+        private static readonly Lazy<AppTypeScanner> _default = new Lazy<AppTypeScanner>(() => new AppTypeScanner());
         private readonly string _basePath;
         private readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
 
@@ -32,7 +32,6 @@ namespace FutureState.Reflection
         /// <param name="assemblyProbePath">Defaults to current directory.</param>
         /// <param name="assemblyScanPrefix">The prefix of the assemblies to filter out.</param>
         public AppTypeScanner(
-            
             string assemblyProbePath = null, string assemblyScanPrefix = "FutureState")
         {
             _basePath = assemblyProbePath ?? Environment.CurrentDirectory;
@@ -46,7 +45,7 @@ namespace FutureState.Reflection
         ///     Gets the assembly prefixes to filter type scanning results to.
         /// </summary>
         public string AssemblyFilterPrefix { get; }
-        
+
         /// <summary>
         ///     Gets the default app type scanner.
         /// </summary>
@@ -103,7 +102,7 @@ namespace FutureState.Reflection
                 catch (Exception ex)
                 {
                     if (_logger.IsErrorEnabled)
-                        _logger.Error(ex,$"Can't scan assembly {m.Name} due to an unexpected error.");
+                        _logger.Error(ex, $"Can't scan assembly {m.Name} due to an unexpected error.");
                 }
             });
 

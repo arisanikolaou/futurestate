@@ -20,7 +20,8 @@ namespace FutureState.Data
         /// <param name="reader"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public static TEntity First<TEntity, TKey>(this ILinqReader<TEntity, TKey> reader, Expression<Func<TEntity, bool>> predicate)
+        public static TEntity First<TEntity, TKey>(this ILinqReader<TEntity, TKey> reader,
+            Expression<Func<TEntity, bool>> predicate)
             where TEntity : class
         {
             Guard.ArgumentNotNull(reader, nameof(reader));
@@ -48,7 +49,8 @@ namespace FutureState.Data
         /// <summary>
         ///     Gets a single result from a linq reader.
         /// </summary>
-        public static TEntity Single<TEntity, TKey>(this ILinqReader<TEntity, TKey> reader, Expression<Func<TEntity, bool>> predicate)
+        public static TEntity Single<TEntity, TKey>(this ILinqReader<TEntity, TKey> reader,
+            Expression<Func<TEntity, bool>> predicate)
             where TEntity : class
         {
             Guard.ArgumentNotNull(reader, nameof(reader));

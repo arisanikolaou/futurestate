@@ -170,17 +170,13 @@ namespace FutureState.Flow
                         var errors = _config.Rules.ToErrors(dtoOut);
                         var e = errors as Error[] ?? errors.ToArray();
                         if (e.Any())
-                        {
                             foreach (var error in e)
                             {
-                                errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
+                                errorEvent = new ErrorEvent {Message = error.Message, Type = error.Type};
                                 errorEvents.Add(errorEvent);
                             }
-                        }
                         else
-                        {
                             processedValidItems.Add(dtoOut);
-                        }
                     }
                     else
                     {

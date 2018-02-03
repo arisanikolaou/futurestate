@@ -7,13 +7,13 @@ namespace FutureState.Specifications.Tests
     [Story]
     public class DevsCanDefineSpecsForAnEntityStory
     {
-        private Specification<TestClass> _spec;
-        private SpecResult _resultValid;
         private SpecResult _resultInvalid;
+        private SpecResult _resultValid;
+        private Specification<TestClass> _spec;
 
         protected void GivenASpecification()
         {
-            this._spec = new Specification<TestClass>((b) =>
+            _spec = new Specification<TestClass>(b =>
             {
                 if (string.IsNullOrWhiteSpace(b.Name))
                     return new SpecResult($"Test class {b.Id} must have an id.");
@@ -23,15 +23,16 @@ namespace FutureState.Specifications.Tests
 
         protected void WhenTestingAValidEntity()
         {
-            var validEntity = new TestClass() { Name = "Name" };
-            this._resultValid = _spec.Evaluate(validEntity);
+            var validEntity = new TestClass {Name = "Name"};
+            _resultValid = _spec.Evaluate(validEntity);
         }
 
         protected void WhenTestingAnInValidEntity()
         {
-            var validEntity = new TestClass() { Name = null };
-            this._resultInvalid = _spec.Evaluate(validEntity);
+            var validEntity = new TestClass {Name = null};
+            _resultInvalid = _spec.Evaluate(validEntity);
         }
+
         protected void ThenResultsShouldBeValid()
         {
             Assert.True(_resultValid == SpecResult.Success);

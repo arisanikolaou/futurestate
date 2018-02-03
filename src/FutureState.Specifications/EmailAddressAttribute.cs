@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FutureState.Specifications
 {
-
     /// <summary>
     ///     Requires a string value to translate to an e-mail address.
     /// </summary>

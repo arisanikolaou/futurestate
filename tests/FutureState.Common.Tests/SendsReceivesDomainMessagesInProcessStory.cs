@@ -10,23 +10,23 @@ namespace FutureState.Common.Tests
         SoThat = "So that i can manage loosely coupled yet reactive services within an app.")]
     public class SendsReceivesDomainMessagesInProcessStory
     {
-        private MessagePipe subject;
-        DomainEvent evt;
+        private DomainEvent evt;
         private int hitCount;
+        private MessagePipe subject;
 
         protected void GivenAMessagePipe()
         {
-            this.subject = new MessagePipe();
+            subject = new MessagePipe();
         }
 
         protected void WhenSendingAMessageWithoutASubscriber()
         {
-            subject.SendAsync(new DomainEvent() { Name = "Name" }).Wait();
+            subject.SendAsync(new DomainEvent {Name = "Name"}).Wait();
         }
 
         protected void AndWhenSubscribingToAnEvent()
         {
-            subject.Subscribe<DomainEvent>((received) =>
+            subject.Subscribe<DomainEvent>(received =>
             {
                 hitCount++;
                 evt = received;
@@ -35,12 +35,12 @@ namespace FutureState.Common.Tests
 
         protected void AndWhenAMessageSubscribedToIsSent()
         {
-            subject.SendAsync(new DomainEvent() { Name = "Name" }).Wait();
+            subject.SendAsync(new DomainEvent {Name = "Name"}).Wait();
         }
 
         protected void AndWhenAnotherDerivedMessageTypeIsSent()
         {
-            subject.SendAsync(new DomainEvent2() { Name = "Name 2" }).Wait();
+            subject.SendAsync(new DomainEvent2 {Name = "Name 2"}).Wait();
         }
 
         protected void ThenSubscribedEventShouldBeReceivedAfterItIsSent()
@@ -54,7 +54,7 @@ namespace FutureState.Common.Tests
         {
             subject.UnSubscribe<DomainEvent>(this);
 
-            subject.SendAsync(new DomainEvent() { Name = "Name 2" }).Wait();
+            subject.SendAsync(new DomainEvent {Name = "Name 2"}).Wait();
 
             // should be the same
             Assert.Equal("Name", evt.Name);

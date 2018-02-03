@@ -77,7 +77,7 @@ namespace FutureState.Flow.Data
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
-            if(_logger.IsInfoEnabled)
+            if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving flow file transaction log to {fileName}.");
 
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());

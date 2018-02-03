@@ -13,7 +13,7 @@ namespace FutureState.Data.Sql.Mappings
 
         public MemberMap(MemberInfo member, string columnName)
         {
-            this._member = member;
+            _member = member;
             ColumnName = columnName;
         }
 

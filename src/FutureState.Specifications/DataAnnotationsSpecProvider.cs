@@ -22,7 +22,7 @@ namespace FutureState.Specifications
         static DataAnnotationsSpecProvider()
         {
             // interface data annotations should be considered - they won't be returned with a given flatten hierarchy call
-            var types = new[] { typeof(T) }.Concat(typeof(T).GetInterfaces());
+            var types = new[] {typeof(T)}.Concat(typeof(T).GetInterfaces());
 
             var flattenedProperties = new List<PropertyInfo>();
             types.Each(
@@ -121,7 +121,7 @@ namespace FutureState.Specifications
                         return SpecResult.Success;
                     },
                     property.Name,
-                        $"'{property.Name}' is either too long or too short."); // description
+                    $"'{property.Name}' is either too long or too short."); // description
 
                 return specification;
             }
@@ -189,7 +189,7 @@ namespace FutureState.Specifications
                         return SpecResult.Success;
                     },
                     property.Name,
-                        $"'{property.Name}' is a required field.");
+                    $"'{property.Name}' is a required field.");
 
                 return requiredAttribute;
             }
@@ -255,7 +255,12 @@ namespace FutureState.Specifications
                             // pull from resource file
                             if (!exAttribute.ErrorMessage.Exists())
                             {
-                                var msg = $@"'{property1.Name}' does not meet the required range pattern. The minimum allowed is {exAttribute.Minimum}  and the maximum {exAttribute.Maximum}. The current value is {value}.";
+                                var msg =
+                                    $@"'{
+                                            property1.Name
+                                        }' does not meet the required range pattern. The minimum allowed is {
+                                            exAttribute.Minimum
+                                        }  and the maximum {exAttribute.Maximum}. The current value is {value}.";
 
                                 detailedErrorMessage.AppendLine(msg);
                             }

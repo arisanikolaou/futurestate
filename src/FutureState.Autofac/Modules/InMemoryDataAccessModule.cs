@@ -70,17 +70,17 @@ namespace FutureState.Autofac.Modules
             {
             }
 
-            static Func<TKey> GetKeyGeneratorFunction()
+            private static Func<TKey> GetKeyGeneratorFunction()
             {
                 if (typeof(TKey) == typeof(int))
                 {
-                    int i = 0;
+                    var i = 0;
 
                     return () =>
                     {
                         i++;
                         object key = i;
-                        return (TKey)key;
+                        return (TKey) key;
                     };
                 }
 
@@ -92,7 +92,7 @@ namespace FutureState.Autofac.Modules
                     {
                         i++;
                         object key = i;
-                        return (TKey)key;
+                        return (TKey) key;
                     };
                 }
 
@@ -104,27 +104,23 @@ namespace FutureState.Autofac.Modules
                     {
                         i++;
                         object key = i;
-                        return (TKey)key;
+                        return (TKey) key;
                     };
                 }
 
                 if (typeof(TKey) == typeof(Guid))
-                {
                     return () =>
                     {
                         object key = Guid.NewGuid();
-                        return (TKey)key;
+                        return (TKey) key;
                     };
-                }
 
                 if (typeof(TKey) == typeof(string))
-                {
                     return () =>
                     {
                         object key = Guid.NewGuid().ToString();
-                        return (TKey)key;
+                        return (TKey) key;
                     };
-                }
 
                 throw new NotSupportedException("Key type not supported.");
             }

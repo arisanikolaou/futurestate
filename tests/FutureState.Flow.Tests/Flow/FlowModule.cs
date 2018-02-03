@@ -4,7 +4,6 @@ using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
 
-
 namespace FutureState.Flow.Tests.Flow
 {
     public class FlowModule : Module
@@ -35,7 +34,7 @@ namespace FutureState.Flow.Tests.Flow
                 .SingleInstance() // make singleton
                 .AsSelf()
                 .AsImplementedInterfaces();
-            
+
             cb.RegisterGeneric(typeof(FlowFileController<,>))
                 .AsSelf();
 
@@ -77,7 +76,7 @@ namespace FutureState.Flow.Tests.Flow
 
             public FlowFileBatchControllerFactory(IComponentContext context)
             {
-                this._context = context;
+                _context = context;
             }
 
             public IFlowFileController Create(Type type)
@@ -85,7 +84,8 @@ namespace FutureState.Flow.Tests.Flow
                 // ReSharper disable once UsePatternMatching
                 var batchProcessor = _context.Resolve(type) as IFlowFileController;
                 if (batchProcessor == null)
-                    throw new InvalidOperationException($"Controller type does not implement {typeof(IFlowFileController).Name}");
+                    throw new InvalidOperationException(
+                        $"Controller type does not implement {typeof(IFlowFileController).Name}");
 
                 return batchProcessor;
             }
@@ -97,7 +97,7 @@ namespace FutureState.Flow.Tests.Flow
 
             public FlowFileLogRepositoryFactory(IComponentContext context)
             {
-                this._context = context;
+                _context = context;
             }
 
             public FlowFileLogRepository Get()
@@ -106,13 +106,13 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public class FlowFileControllerServiceFactory:  IFlowFileControllerServiceFactory
+        public class FlowFileControllerServiceFactory : IFlowFileControllerServiceFactory
         {
             private readonly IComponentContext _context;
 
             public FlowFileControllerServiceFactory(IComponentContext context)
             {
-                this._context = context;
+                _context = context;
             }
 
             public FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller)

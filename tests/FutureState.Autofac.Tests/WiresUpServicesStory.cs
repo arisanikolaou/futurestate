@@ -14,12 +14,12 @@ namespace FutureState.Autofac.Tests
 {
     public class WiresUpServicesStory : IDisposable
     {
-        int contactId = 0;
         private string _conString;
         private IContainer _container;
         private string _dbName;
         private IEnumerable<Contact> _items;
         private IEnumerable<Address> _itemsFromGuidKeyedEntity;
+        private int contactId;
 
         public void Dispose()
         {
@@ -29,9 +29,9 @@ namespace FutureState.Autofac.Tests
 
         private string GetLocalDbConString(string dbName)
         {
-            string baseDirectory = Environment.CurrentDirectory;
+            var baseDirectory = Environment.CurrentDirectory;
 
-            string serverName = LocalDbSetup.LocalDbServerName;
+            var serverName = LocalDbSetup.LocalDbServerName;
             var conString =
                 $@"data source={serverName};AttachDBFilename={baseDirectory}\{dbName}.mdf;initial catalog={
                         dbName
@@ -74,7 +74,7 @@ namespace FutureState.Autofac.Tests
             });
 
             cb.RegisterAll(new AppTypeScanner(Environment.CurrentDirectory, "FutureState.Autofac"));
-            
+
             cb.Register(m => new KeyGenerator<Contact, int>(() => contactId++))
                 .AsSelf().AsImplementedInterfaces().SingleInstance();
 

@@ -9,11 +9,15 @@
 #addin "Cake.FileHelpers"
 #addin "System.Net.Http"
 
-#tool nuget:?package=vswhere
+#tool "nuget:?package=vswhere"
 #tool "xunit.runner.console"
 #tool "nuget:?package=GitVersion.CommandLine"
 #tool "nuget:?package=gitlink"
 
+// BUILD VERSION
+//////////////////////////////////////////////////////////////////////
+var defaultVersion = "0.3.0";
+//////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -28,20 +32,20 @@ var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var testDir = Directory("./testOutput");
-var defaultVersion = "0.3.0";
-var solutionVersion = Argument<string>("BUILD_VERSION",defaultVersion);
+var testDir = Directory("./testResults");
+var solutionVersion = Argument<string>("BUILD_VERSION", defaultVersion);
 
+//////////////////////////////////////////////////////////////////////
 // nuget get
-var nugetServer = "https://www.nuget.org";
-var apiKey = EnvironmentVariable("NUGET_APIKEY");
+//////////////////////////////////////////////////////////////////////
+var nugetServer = Argument<string>("NUGET_SERVER", "https://www.nuget.org");
+var apiKey = Argument<string>("NUGET_APIKEY", ""); // pass api key file
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
 Information("Starting build: " + solutionVersion);
-Information("Nuget Api Key: " + apiKey);
 
 Task("Clean")
 	.Does(() => 

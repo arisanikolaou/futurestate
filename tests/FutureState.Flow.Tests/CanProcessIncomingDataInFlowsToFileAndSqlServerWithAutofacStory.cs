@@ -24,10 +24,10 @@ namespace FutureState.Flow.Tests
         private ContainerBuilder _cb;
         private IContainer _container;
         private Processor<DenormalizedEntity, Dto1> _processorA;
+        private ProcessResultRepository<ProcessResult> _repository;
         private ProcessResult<DenormalizedEntity, Dto1> _resultA;
         private ProcessResult<Dto1, Dto2> _resultB;
         private ProcessResult<Dto2, Address> _resultC;
-        private ProcessResultRepository<ProcessResult> _repository;
 
         protected void GivenANewLocalSqlDb()
         {
@@ -40,6 +40,7 @@ namespace FutureState.Flow.Tests
                 db.Database.CreateIfNotExists();
             }
         }
+
         protected void AndGivenAProcessorResultsRepository()
         {
             _repository = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);

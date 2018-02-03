@@ -4,7 +4,6 @@ using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data;
-using FutureState.Data.Providers;
 using FutureState.Data.Sql;
 
 namespace FutureState.Autofac.Modules
@@ -45,7 +44,7 @@ namespace FutureState.Autofac.Modules
                 })
                 .AsSelf()
                 .AsImplementedInterfaces();
-            
+
             // guid key'ed entities
             builder.RegisterGeneric(typeof(RepositoryLinq<>))
                 .AsSelf()

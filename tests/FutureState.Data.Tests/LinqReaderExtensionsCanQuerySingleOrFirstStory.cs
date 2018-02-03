@@ -1,17 +1,16 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
 
 namespace FutureState.Data.Tests
 {
-    using System.ComponentModel.DataAnnotations;
-
     [Story]
     public class LinqReaderExtensionsCanQuerySingleOrFirstStory
     {
-        private ILinqReader<TestEntity, Guid> _reader;
         private TestEntity _first;
+        private ILinqReader<TestEntity, Guid> _reader;
         private TestEntity _single;
 
         protected void GivenALinqReaderWithData()
@@ -20,13 +19,13 @@ namespace FutureState.Data.Tests
             _reader = repo;
 
             // insert
-            repo.Insert(new TestEntity()
+            repo.Insert(new TestEntity
             {
                 Id = Guid.NewGuid(),
                 Name = "Name"
             });
 
-            repo.Insert(new TestEntity()
+            repo.Insert(new TestEntity
             {
                 Id = Guid.NewGuid(),
                 Name = "Name 2"
@@ -64,10 +63,9 @@ namespace FutureState.Data.Tests
 
         public class TestEntity : IEntity<Guid>
         {
-            [Key]
-            public Guid Id { get; set; }
-
             public string Name { get; set; }
+
+            [Key] public Guid Id { get; set; }
         }
     }
 }

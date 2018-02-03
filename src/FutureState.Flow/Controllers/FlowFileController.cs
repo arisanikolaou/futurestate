@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FutureState.Flow.Data;
@@ -23,16 +22,6 @@ namespace FutureState.Flow.Controllers
         private string _outDirectory;
 
         /// <summary>
-        ///     Gets the type of entity being processed.
-        /// </summary>
-        public Type InputType => typeof(TIn);
-
-        /// <summary>
-        ///     Gets the type of entity that will processed.
-        /// </summary>
-        public Type OutputType => typeof(TOut);
-
-        /// <summary>
         ///     Creates a new instance.
         /// </summary>
         /// <param name="config">Processor configuration settings.</param>
@@ -51,26 +40,42 @@ namespace FutureState.Flow.Controllers
             if (_getProcessor == null)
                 _getProcessor = controller => throw new NotImplementedException();
 
-            Config = config;// ?? new ProcessorConfiguration<TIn, TOut>();
+            Config = config; // ?? new ProcessorConfiguration<TIn, TOut>();
 
             OutDirectory = Environment.CurrentDirectory;
             InDirectory = Environment.CurrentDirectory;
 
             // assign name from type name by default
             ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
-            
+
             //create default flow id
             FlowId = SeqGuid.Create();
 
             _reader = reader;
         }
 
+
+        /// <summary>
+        ///     Gets the configuration to use to setup of a processor.
+        /// </summary>
+        public ProcessorConfiguration<TIn, TOut> Config { get; }
+
+        /// <summary>
+        ///     Gets the type of entity being processed.
+        /// </summary>
+        public Type InputType => typeof(TIn);
+
+        /// <summary>
+        ///     Gets the type of entity that will processed.
+        /// </summary>
+        public Type OutputType => typeof(TOut);
+
         public virtual void Initialize()
         {
             try
             {
                 // initialize directories
-                if (!Directory.Exists(this._inDirectory))
+                if (!Directory.Exists(_inDirectory))
                     Directory.CreateDirectory(_inDirectory);
 
                 if (!Directory.Exists(_outDirectory))
@@ -83,12 +88,6 @@ namespace FutureState.Flow.Controllers
                     ex);
             }
         }
-
-
-        /// <summary>
-        ///     Gets the configuration to use to setup of a processor.
-        /// </summary>
-        public ProcessorConfiguration<TIn, TOut> Config { get; }
 
         /// <summary>
         ///     Gets the controller name.
@@ -132,7 +131,7 @@ namespace FutureState.Flow.Controllers
             }
             else
             {
-                if(_logger.IsWarnEnabled)
+                if (_logger.IsWarnEnabled)
                     _logger.Warn($"No files were discovered under {InDirectory}.");
             }
 
@@ -150,10 +149,10 @@ namespace FutureState.Flow.Controllers
             try
             {
                 // read the incoming batch of data
-                IEnumerable<TIn> incomingData = _reader.Read(flowFile.FullName);
+                var incomingData = _reader.Read(flowFile.FullName);
 
                 // create the processor to batch process it
-                Processor<TIn, TOut> processor = GetProcessor();
+                var processor = GetProcessor();
 
                 // save results to output directory
                 if (!Directory.Exists(OutDirectory))
@@ -204,19 +203,18 @@ namespace FutureState.Flow.Controllers
             }
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
         public virtual Processor<TIn, TOut> GetProcessor()
         {
             return _getProcessor(this);
         }
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
-
         }
     }
 }

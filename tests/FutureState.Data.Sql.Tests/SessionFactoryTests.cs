@@ -17,9 +17,9 @@ namespace FutureState.Data.Sql.Tests
             var subject = new SessionFactory(ConnectionString, DapperConfiguration.Use());
 
             using (
-                ISession session = subject.Create())
+                var session = subject.Create())
             {
-                ITransaction tran = session.BeginTran();
+                var tran = session.BeginTran();
 
                 tran.Commit();
             }

@@ -24,7 +24,7 @@ namespace FutureState.Autofac.Tests
             cb.RegisterModule(new GenericDataAccessModule());
             cb.RegisterAll(
                 new AppTypeScanner(Environment.CurrentDirectory,
-                "FutureState.Autofac"));
+                    "FutureState.Autofac"));
             // register after
             cb.RegisterModule(new InMemoryDataAccessModule());
 
@@ -33,7 +33,7 @@ namespace FutureState.Autofac.Tests
 
         protected void AndGivenARepository()
         {
-            this._provider = _container.Resolve<InMemoryRepository<Contact, int>>();
+            _provider = _container.Resolve<InMemoryRepository<Contact, int>>();
         }
 
         protected void WhenAddingAnEntitiesToInMemoryRepos()

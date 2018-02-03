@@ -28,14 +28,13 @@ namespace FutureState
             lock (evt)
             {
                 var methods = evt.GetInvocationList().ToArray();
-                
+
                 for (var i = 0; i < methods.Length; i++)
                 {
                     // ReSharper disable once UsePatternMatching
                     var innerMethod = methods[i] as EventHandler<T>;
 
                     if (innerMethod != null)
-                    {
                         tasks.Add(Task.Run(
                             () =>
                             {
@@ -51,7 +50,6 @@ namespace FutureState
                                         throw;
                                 }
                             }));
-                    }
                 }
             }
 
@@ -76,7 +74,6 @@ namespace FutureState
                 var innerMethod = methods[i] as EventHandler;
 
                 if (innerMethod != null)
-                {
                     tasks.Add(Task.Run(
                         () =>
                         {
@@ -92,7 +89,6 @@ namespace FutureState
                                     throw;
                             }
                         }));
-                }
             }
 
             await Task.WhenAll(tasks);

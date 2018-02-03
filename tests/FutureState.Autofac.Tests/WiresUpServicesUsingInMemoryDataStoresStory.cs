@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Autofac;
 using FutureState.Autofac.Modules;
-using FutureState.Data;
 using FutureState.Data.Providers;
 using FutureState.Reflection;
 using TestStack.BDDfy;
@@ -18,6 +16,11 @@ namespace FutureState.Autofac.Tests
         private IContainer _container;
         private IEnumerable<Contact> _items;
         private IEnumerable<Address> _itemsFromGuidKeyedEntity;
+
+        public void Dispose()
+        {
+            _container?.Dispose();
+        }
 
 
         protected void GivenAnInMemoryDrivenApp()
@@ -65,11 +68,6 @@ namespace FutureState.Autofac.Tests
         public void WiresUpServicesUsingInMemoryDataStores()
         {
             this.BDDfy();
-        }
-
-        public void Dispose()
-        {
-            _container?.Dispose();
         }
     }
 }

@@ -41,7 +41,7 @@
         /// </summary>
         public void Provide(TEntity entity)
         {
-            TKey key = GetKey(entity);
+            var key = GetKey(entity);
             if (key.Equals(default(TKey)))
             {
                 key = _getKey.GetNew();
