@@ -251,8 +251,6 @@ Task("Publish-Packages")
 	.IsDependentOn("Packages")
 	.DoesForEach(GetFiles(nugetDirname + "/*.nupkg"), (package)=> {
 
-		Information("Publishing Packages Api Key: " + apiKey);
-
 		// Push the package.
 		NuGetPush(package, new NuGetPushSettings {
 			Source = nugetServer,
