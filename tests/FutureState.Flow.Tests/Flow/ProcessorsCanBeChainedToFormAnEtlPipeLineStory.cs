@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using CsvHelper;
-using FutureState.Flow.BatchControllers;
+using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
+using FutureState.Specifications;
 using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
@@ -39,11 +41,11 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void GivenASetOfDirectories()
         {
-            this._baseDirectoryName = "Flow";
+            this._baseDirectoryName = "Flow1";
             this._processName = @"MyProcess";
 
             this._baseDirectory = $@"{Environment.CurrentDirectory}\{_baseDirectoryName}";
-            if(Directory.Exists(_baseDirectory))
+            if (Directory.Exists(_baseDirectory))
                 Directory.Delete(_baseDirectory, true);
 
             this._inDirectory = $@"{_baseDirectory}\{_processName}\In";
@@ -106,14 +108,14 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void WhenStartingAProcessorService()
         {
-            var batchProcessor = new TestCsvFlowFileFlowFileBatchController()
+            var batchProcessor = new TestCsvFlowFileFlowFileBatchController(GetConfig<Enitity1, Entity2>())
             {
                 InDirectory = _inDirectory,
                 OutDirectory = _outDirectory,
                 FlowId = _flowId,
             };
 
-            var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
+            var processor = new FlowFileControllerService(_logRepository, batchProcessor)
             {
                 Interval = TimeSpan.FromSeconds(2)
             };
@@ -126,21 +128,31 @@ namespace FutureState.Flow.Tests.Flow
             processor.Start();
         }
 
+        ProcessorConfiguration<TEntityIn, TEntityOut> GetConfig<TEntityIn, TEntityOut>
+            () where TEntityOut: class, new()
+        {
+            var spec = new SpecProvider<TEntityOut>();
+
+            var col  = new SpecProvider<IEnumerable<TEntityOut>>();
+
+            return new ProcessorConfiguration<TEntityIn, TEntityOut>(spec, col);
+        }
+
         protected void AndWhenStartingAnotherProcessorService()
         {
             this._processName2 = @"MyProcess2";
 
             this._outDirectory2 = $@"{_baseDirectory}\{_processName2}\Out";
 
-
-            var batchProcessor = new TestProcessResultFlowFileBatchController()
+            var batchProcessor = new TestProcessResultFlowFileBatchController(
+                GetConfig<Entity2, Entity3>())
             {
                 InDirectory = _outDirectory,
                 OutDirectory = _outDirectory2,
                 FlowId = _flowId,
             };
 
-            var processor = new FlowFileProcessorService(_logRepository, batchProcessor)
+            var processor = new FlowFileControllerService(_logRepository, batchProcessor)
             {
                 Interval = TimeSpan.FromSeconds(2)
             };
@@ -168,8 +180,15 @@ namespace FutureState.Flow.Tests.Flow
             Assert.True(_flowFile1Processed);
         }
 
-        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileFlowFileBatchController<Enitity1, Entity2>
+        public class TestCsvFlowFileFlowFileBatchController : CsvFlowFileController<Enitity1, Entity2>
         {
+            public TestCsvFlowFileFlowFileBatchController(
+                ProcessorConfiguration<Enitity1, Entity2> config) :
+                base(config)
+            {
+
+            }
+
             public override Processor<Enitity1, Entity2> GetProcessor()
             {
                 int i = 0;
@@ -190,6 +209,12 @@ namespace FutureState.Flow.Tests.Flow
 
         public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<Entity2, Entity3>
         {
+            public TestProcessResultFlowFileBatchController(ProcessorConfiguration<Entity2, Entity3> config) :
+       base(config)
+            {
+
+            }
+
             public override Processor<Entity2, Entity3> GetProcessor()
             {
                 int i = 0;

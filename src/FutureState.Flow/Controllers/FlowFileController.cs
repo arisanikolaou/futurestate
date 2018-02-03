@@ -6,50 +6,82 @@ using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
 
-namespace FutureState.Flow.BatchControllers
+namespace FutureState.Flow.Controllers
 {
     /// <summary>
     ///     Controls the flow of data from an incoming batch source to a downstream processor.
     /// </summary>
     /// <typeparam name="TIn">The incoming data type to </typeparam>
-    /// <typeparam name="TOut"></typeparam>
-    public class FlowFileFlowFileBatchController<TIn, TOut> : IFlowFileBatchController
+    /// <typeparam name="TOut">The outgoing entity type.</typeparam>
+    public class FlowFileController<TIn, TOut> : IFlowFileController
         where TOut : class, new()
     {
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly Func<IFlowFileBatchController, Processor<TIn, TOut>> _getProcessor;
+        private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getProcessor;
         private readonly IReader<TIn> _reader;
         private string _inDirectory;
-
         private string _outDirectory;
 
         /// <summary>
+        ///     Gets the type of entity being processed.
         /// </summary>
+        public Type InputType => typeof(TIn);
+
+        /// <summary>
+        ///     Gets the type of entity that will processed.
+        /// </summary>
+        public Type OutputType => typeof(TOut);
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="config">Processor configuration settings.</param>
         /// <param name="reader">The reader to read incoming results from.</param>
         /// <param name="getProcessor">Function to create a new procesor.</param>
-        /// <param name="config">Processor configuration settings.</param>
-        public FlowFileFlowFileBatchController(
+        public FlowFileController(
+            ProcessorConfiguration<TIn, TOut> config,
             IReader<TIn> reader,
-            Func<IFlowFileBatchController, Processor<TIn, TOut>> getProcessor = null,
-            ProcessorConfiguration<TIn, TOut> config = null)
+            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null)
         {
             Guard.ArgumentNotNull(reader, nameof(reader));
+            Guard.ArgumentNotNull(config, nameof(config));
 
             _getProcessor = getProcessor;
+
             if (_getProcessor == null)
                 _getProcessor = controller => throw new NotImplementedException();
 
-            Config = config ?? new ProcessorConfiguration<TIn, TOut>();
+            Config = config;// ?? new ProcessorConfiguration<TIn, TOut>();
 
             OutDirectory = Environment.CurrentDirectory;
             InDirectory = Environment.CurrentDirectory;
 
             // assign name from type name by default
             ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
-            //create default flow it
+            
+            //create default flow id
             FlowId = SeqGuid.Create();
 
             _reader = reader;
+        }
+
+        public virtual void Initialize()
+        {
+            try
+            {
+                // initialize directories
+                if (!Directory.Exists(this._inDirectory))
+                    Directory.CreateDirectory(_inDirectory);
+
+                if (!Directory.Exists(_outDirectory))
+                    Directory.CreateDirectory(_outDirectory);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    $"Failed to initialize controller configuration {ControllerName}.",
+                    ex);
+            }
         }
 
 
@@ -107,17 +139,21 @@ namespace FutureState.Flow.BatchControllers
             return null;
         }
 
+        /// <summary>
+        ///     Process a file file within a given batch.
+        /// </summary>
+        /// <param name="flowFile"></param>
+        /// <param name="process">The batch to process the file in.</param>
+        /// <returns></returns>
         public virtual ProcessResult Process(FileInfo flowFile, BatchProcess process)
         {
             try
             {
                 // read the incoming batch of data
-                IEnumerable<TIn> incomingData = Read(flowFile);
+                IEnumerable<TIn> incomingData = _reader.Read(flowFile.FullName);
 
                 // create the processor to batch process it
                 Processor<TIn, TOut> processor = GetProcessor();
-
-                var result = processor.Process(incomingData, process);
 
                 // save results to output directory
                 if (!Directory.Exists(OutDirectory))
@@ -125,6 +161,9 @@ namespace FutureState.Flow.BatchControllers
 
                 var outputRepository = new ProcessResultRepository<ProcessResult>(OutDirectory);
 
+                var result = processor.Process(incomingData, process);
+
+                // save results
                 outputRepository.Save(result);
 
                 return result;
@@ -137,6 +176,9 @@ namespace FutureState.Flow.BatchControllers
             }
         }
 
+        /// <summary>
+        ///     The data source directory.
+        /// </summary>
         public string InDirectory
         {
             get => _inDirectory;
@@ -148,6 +190,9 @@ namespace FutureState.Flow.BatchControllers
             }
         }
 
+        /// <summary>
+        ///     The directory to process.
+        /// </summary>
         public string OutDirectory
         {
             get => _outDirectory;
@@ -164,9 +209,14 @@ namespace FutureState.Flow.BatchControllers
             return _getProcessor(this);
         }
 
-        protected virtual IEnumerable<TIn> Read(FileInfo flowFile)
+        public void Dispose()
         {
-            return _reader.Read(flowFile.FullName);
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+
         }
     }
 }

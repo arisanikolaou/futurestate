@@ -91,6 +91,7 @@
     </Compile>
     <Compile Include="ApplicationContainerBuilder.cs" />
     <Compile Include="Extensions\ApplicationContainerBuilderEx.cs" />
+    <Compile Include="Modules\CommonModule.cs" />
     <Compile Include="Modules\InMemoryDataAccessModule.cs" />
     <Compile Include="Modules\SqlDataModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

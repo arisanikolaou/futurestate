@@ -11,6 +11,6 @@
         /// </summary>
         public ErrorEvent Error { get; set; }
 
-        public TEntityDto Item { get; set; }
+        public TEntityDto SourceItem { get; set; }
     }
 }

@@ -10,6 +10,14 @@ using System.Linq.Expressions;
 namespace FutureState.Specifications
 {
     /// <summary>
+    ///     Creates spec providers.
+    /// </summary>
+    public interface ISpecProviderFactory
+    {
+        SpecProvider<TEntityOrService> Get<TEntityOrService>();
+    }
+
+    /// <summary>
     ///     Generic abstract base class to accumulate rules/specs for a given entity or service.
     /// </summary>
     /// <remarks>

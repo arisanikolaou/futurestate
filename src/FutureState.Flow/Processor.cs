@@ -25,6 +25,12 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
+        /// <param name="config">
+        ///     The configuration to use to map and validate items.
+        /// </param>
+        /// <param name="engine">
+        ///     If not supplied a default handler will be used.
+        /// </param>
         public Processor(
             ProcessorConfiguration<TEntityIn, TEntityOut> config,
             ProcessorEngine<TEntityIn> engine = null)
@@ -164,13 +170,21 @@ namespace FutureState.Flow
                         var errors = _config.Rules.ToErrors(dtoOut);
                         var e = errors as Error[] ?? errors.ToArray();
                         if (e.Any())
+                        {
                             foreach (var error in e)
                             {
-                                errorEvent = new ErrorEvent {Message = error.Message, Type = error.Type};
+                                errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
                                 errorEvents.Add(errorEvent);
                             }
+                        }
                         else
+                        {
                             processedValidItems.Add(dtoOut);
+                        }
+                    }
+                    else
+                    {
+                        errorEvents.Add(errorEvent);
                     }
                 }
 

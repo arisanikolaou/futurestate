@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using NLog;
 
 namespace FutureState.Reflection
 {
     //winding up application takes less than a millisecond
-
+    /// <summary>
+    ///     Fast/safe app domain type scanning.
+    /// </summary>
     public class AppTypeScanner
     {
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        static readonly Lazy<AppTypeScanner> _default = new Lazy<AppTypeScanner>(() => new AppTypeScanner());
         private readonly string _basePath;
         private readonly Lazy<IList<Type>> _reflectionOnlyTypesGet;
 
@@ -20,18 +26,36 @@ namespace FutureState.Reflection
                 .ReflectionOnlyAssemblyResolve += (sender, args) => Assembly.ReflectionOnlyLoad(args.Name);
         }
 
-        // construct internally
-        public AppTypeScanner(string assemblyProbePath = null, string assemblyScanPrefix = null)
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="assemblyProbePath">Defaults to current directory.</param>
+        /// <param name="assemblyScanPrefix">The prefix of the assemblies to filter out.</param>
+        public AppTypeScanner(
+            
+            string assemblyProbePath = null, string assemblyScanPrefix = "FutureState")
         {
-            _basePath = assemblyProbePath;
+            _basePath = assemblyProbePath ?? Environment.CurrentDirectory;
             _reflectionOnlyTypesGet = new Lazy<IList<Type>>(BuildReflectedTypes);
 
-            AssemblyFilterPrefix = assemblyScanPrefix ?? "FutureState";
+            AssemblyFilterPrefix = assemblyScanPrefix;
         }
 
         // only types associated with this base namespace are processed
+        /// <summary>
+        ///     Gets the assembly prefixes to filter type scanning results to.
+        /// </summary>
         public string AssemblyFilterPrefix { get; }
+        
+        /// <summary>
+        ///     Gets the default app type scanner.
+        /// </summary>
+        public static AppTypeScanner Default => _default.Value;
 
+        /// <summary>
+        ///     Gets all the reflected types.
+        /// </summary>
+        /// <returns></returns>
         internal IList<Type> GetReflectedTypes()
         {
             return _reflectionOnlyTypesGet.Value;
@@ -60,6 +84,7 @@ namespace FutureState.Reflection
                 appBinDirectory = new DirectoryInfo(_basePath);
             }
 
+            // gets all the assemblies
             var appAssemblies = appBinDirectory.GetFiles(AssemblyFilterPrefix + "*.dll");
 
             var reflectionOnlyTypes = new List<Type>();
@@ -67,10 +92,19 @@ namespace FutureState.Reflection
             // use reflection only type discovery to enhance performance
             appAssemblies.Each(m =>
             {
-                var reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(m.FullName);
+                // scan assemblies on a best effort basis
+                try
+                {
+                    var reflectionOnlyAssembly = Assembly.ReflectionOnlyLoadFrom(m.FullName);
 
-                // only deal with public types
-                reflectionOnlyTypes.AddRange(reflectionOnlyAssembly.GetExportedTypes());
+                    // only deal with public types
+                    reflectionOnlyTypes.AddRange(reflectionOnlyAssembly.GetExportedTypes());
+                }
+                catch (Exception ex)
+                {
+                    if (_logger.IsErrorEnabled)
+                        _logger.Error(ex,$"Can't scan assembly {m.Name} due to an unexpected error.");
+                }
             });
 
             return reflectionOnlyTypes;

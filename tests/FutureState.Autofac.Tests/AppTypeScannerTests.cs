@@ -10,7 +10,7 @@ namespace FutureState.Autofac.Tests
         [Fact]
         public void ApplicationCanScanDomainTypes()
         {
-            var subject = new AppTypeScanner(Environment.CurrentDirectory);
+            var subject = AppTypeScanner.Default;
             var domainTypes = subject.GetAppDomainTypes().Select(m => m.Name).ToList();
 
             Assert.False(domainTypes.Count == 0);
