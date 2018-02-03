@@ -2,12 +2,8 @@
 #addin "nuget:?package=Cake.SemVer"
 #addin "nuget:?package=semver&version=2.0.4"
 #addin "nuget:?package=Cake.Git"
-#addin "nuget:?package=Cake.AppVeyor"
-#addin "nuget:?package=Refit&version=3.0.0"
-#addin "nuget:?package=Newtonsoft.Json&version=9.0.1"
 #addin "Cake.XdtTransform"
 #addin "Cake.FileHelpers"
-#addin "System.Net.Http"
 
 #tool "nuget:?package=vswhere"
 #tool "xunit.runner.console"
@@ -39,7 +35,7 @@ var solutionVersion = Argument<string>("BUILD_VERSION", defaultVersion);
 // nuget get
 //////////////////////////////////////////////////////////////////////
 var nugetServer = Argument<string>("NUGET_SERVER", "https://www.nuget.org");
-var apiKey = Argument<string>("NUGET_APIKEY", ""); // pass api key file
+var apiKey = Argument<string>("NUGET_APIKEY", null) ?? EnvironmentVariable("NUGET_APIKEY"); // pass api key file
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -262,24 +258,6 @@ Task("Publish-Packages")
 			Source = nugetServer,
 			ApiKey = apiKey
 		});
-
-	});
-
-  // publish artefacts on appveyor	
-  Task("Artefacts")
-	.IsDependentOn("Packages")
-	.Does(() =>
-	{
-		if (AppVeyor.IsRunningOnAppVeyor)
-		{
-			Information("Deploying artefacts on AppVeyor.");
-
-			foreach (var file in GetFiles(distDir))
-				AppVeyor.UploadArtifact(file.FullPath);
-
-			foreach (var file in GetFiles(nugetDirname + "/*.nupkg"))
-				AppVeyor.UploadArtifact(file.FullPath);
-		}
 
 	});
 
