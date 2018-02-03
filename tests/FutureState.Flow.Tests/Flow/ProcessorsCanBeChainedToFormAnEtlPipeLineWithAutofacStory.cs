@@ -184,7 +184,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndThenShouldBeAbleToRepeatProcessingFromConfiguration()
         {
-            var config = FlowConfiguration.Load(@"Flow\flow-config.yaml");
+            var config = FlowConfiguration.Load($"{_flowConfig.BasePath}\flow-config.yaml");
             var controller = _container.Resolve<FlowController>();
 
             // clear prior results
