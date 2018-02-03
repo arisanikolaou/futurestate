@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assemblies timestamp="02/03/2018 12:16:52">
+  <assembly name="D:\Src\futurestate-flow\tests\FutureState.Flow.Tests\bin\Release\FutureState.Flow.Tests.DLL" environment="64-bit .NET 4.0.30319.42000 [collection-per-class, parallel (8 threads)]" test-framework="xUnit.net 2.3.1.3858" run-date="2018-02-03" run-time="12:16:12" config-file="D:\Src\futurestate-flow\tests\FutureState.Flow.Tests\bin\Release\FutureState.Flow.Tests.dll.config" total="4" passed="4" failed="0" skipped="0" time="38.135" errors="0">
+    <errors />
+    <collection total="1" passed="1" failed="0" skipped="0" name="Test collection for FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineStory" time="10.626">
+      <test name="FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineStory.ProcessorsCanBeChainedToFormAnEtlPipeLine" type="FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineStory" method="ProcessorsCanBeChainedToFormAnEtlPipeLine" time="10.6256699" result="Pass">
+        <output><![CDATA[Story: Processors can be chained to form an etl pipe line story
+
+Scenario: Processors can be chained to form an etl pipe line story
+	Given a set of directories
+	  And a generated data source csv file
+	  And a log repository
+	  And a consistent process id
+	When starting a processor service
+	  And starting another processor service
+	Then process results should be saved
+
+
+]]></output>
+      </test>
+    </collection>
+    <collection total="1" passed="1" failed="0" skipped="0" name="Test collection for FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory" time="32.619">
+      <test name="FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac" type="FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory" method="ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac" time="32.6189076" result="Pass">
+        <output><![CDATA[Story: Processors can be chained to form an etl pipe line with autofac story
+
+Scenario: Processors can be chained to form an etl pipe line with autofac story
+	Given an initialized flow config
+	  And a generated data source csv file
+	  And an initialized di container
+	  And a flow controller using this configuration
+	When running the flow controller
+	  And saving the flow config and using controller friendly names
+	Then processed results should be saved
+	Then configuration system should build validators
+	  And flow custom configuration should be set
+	  And should be able to repeat processing from configuration
+
+
+]]></output>
+      </test>
+    </collection>
+    <collection total="2" passed="2" failed="0" skipped="0" name="Flow Tests" time="37.989">
+      <test name="FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerStory.CanProcessIncomingDataInFlowsToFileAndSqlServer" type="FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerStory" method="CanProcessIncomingDataInFlowsToFileAndSqlServer" time="33.747187" result="Pass">
+        <output><![CDATA[Story: Can process incoming data in flows to file and sql server story
+
+Scenario: Can process incoming data in flows to file and sql server story
+	Given a new local sql db
+	Given a generated data source csv file
+	  And a processor results repository
+	  And abatch process
+	  And a set of specifications for source
+	  And a set of specifications for addresses
+	When processing a denormalized file using processing rules
+	  And chaining the processed results to another processor
+	  And chaining the processed results to last processor
+	Then results should be valid
+	  And all results should be processed and only valid contacts should be saved
+	  And only address with valid contacts should be inserted
+	  And should be able to restore process state
+
+
+]]></output>
+      </test>
+      <test name="FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofac" type="FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory" method="CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofac" time="4.2418106" result="Pass">
+        <output><![CDATA[Story: Can process incoming data in flows to file and sql server with autofac story
+
+Scenario: Can process incoming data in flows to file and sql server with autofac story
+	Given a new local sql db
+	Given a generated data source csv file
+	  And a processor results repository
+	  And a wired up container
+	  And abatch process
+	When processing a denormalized file using processing rules
+	  And chaining the processed results to another processor
+	  And chaining the processed results to last processor
+	Then results should be valid
+	  And all results should be processed and only valid contacts should be saved
+	  And only address with valid contacts should be inserted
+	  And should be able to restore process state
+
+
+]]></output>
+      </test>
+    </collection>
+  </assembly>
+</assemblies>

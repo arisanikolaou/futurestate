@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+  <head>
+    <title>xUnit.net Test Results</title>
+    <style type="text/css">
+          body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
+          h2,h3,h4,h5 { margin: 0; padding: 0; }
+          h3 { font-weight: normal; }
+          h4 { margin: 0.5em 0; }
+          h5 { font-weight: normal; font-style: italic; margin-bottom: 0.75em; }
+          h6 { font-size: 0.9em; font-weight: bold; margin: 0.5em 0 0 0.75em; padding: 0; }
+          pre,table { font-family: Consolas; font-size: 0.8em; margin: 0 0 0 1em; padding: 0; }
+          table { padding-bottom: 0.25em; }
+          th { padding: 0 0.5em; border-right: 1px solid #bbb; text-align: left; }
+          td { padding-left: 0.5em; }
+          .divided { border-top: solid 1px #f0f5fa; padding-top: 0.5em; }
+          .row, .altrow { padding: 0.1em 0.3em; }
+          .row { background-color: #f0f5fa; }
+          .altrow { background-color: #e1ebf4; }
+          .success, .failure, .skipped { font-family: Arial Unicode MS; font-weight: normal; float: left; width: 1em; display: block; }
+          .success { color: #0c0; }
+          .failure { color: #c00; }
+          .skipped { color: #cc0; }
+          .timing { float: right; }
+          .indent { margin: 0.25em 0 0.5em 2em; }
+          .clickable { cursor: pointer; }
+          .testcount { font-size: 85%; }
+        </style>
+    <script language="javascript">
+          function ToggleClass(id) {
+            var elem = document.getElementById(id);
+            if (elem.style.display == "none") {
+              elem.style.display = "block";
+            }
+            else {
+              elem.style.display = "none";
+            }
+          }
+        </script>
+  </head>
+  <body>
+    <h3 class="divided">
+      <b>Assemblies Run</b>
+    </h3>
+    <div>D:\Src\futurestate-flow\tests\FutureState.Flow.Tests\bin\Release\FutureState.Flow.Tests.DLL</div>
+    <h3 class="divided">
+      <b>Summary</b>
+    </h3>
+    <div>
+          Tests run: <a href="#all"><b>4</b></a> —
+          
+          Run time: <b>38.135s</b>,
+          Finished: <b>02/03/2018 12:16:52</b></div>
+    <br />
+    <h2>
+      <a id="all" />All tests
+        </h2>
+    <h5>Click test class name to expand/collapse test details</h5>
+    <h3>
+      <span class="timing">33.747s
+            </span>
+      <span class="clickable" onclick="ToggleClass('classID0EVB')" ondblclick="ToggleClass('classID0EVB')">
+        <span class="success">✔</span>
+               FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerStory
+               <span class="testcount">
+                (1 test)
+              </span></span>
+      <br clear="all" />
+    </h3>
+    <div class="indent" style="display: none;" id="classID0EVB">
+      <div class="row">
+        <span class="timing">33.747187s
+        </span>
+        <span class="success">✔</span>
+       FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerStory.CanProcessIncomingDataInFlowsToFileAndSqlServer<br clear="all" /><h6>Output:</h6><pre>Story: Can process incoming data in flows to file and sql server story
+
+Scenario: Can process incoming data in flows to file and sql server story
+	Given a new local sql db
+	Given a generated data source csv file
+	  And a processor results repository
+	  And abatch process
+	  And a set of specifications for source
+	  And a set of specifications for addresses
+	When processing a denormalized file using processing rules
+	  And chaining the processed results to another processor
+	  And chaining the processed results to last processor
+	Then results should be valid
+	  And all results should be processed and only valid contacts should be saved
+	  And only address with valid contacts should be inserted
+	  And should be able to restore process state
+
+
+</pre></div>
+    </div>
+    <h3>
+      <span class="timing">4.242s
+            </span>
+      <span class="clickable" onclick="ToggleClass('classID0E3B')" ondblclick="ToggleClass('classID0E3B')">
+        <span class="success">✔</span>
+               FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory
+               <span class="testcount">
+                (1 test)
+              </span></span>
+      <br clear="all" />
+    </h3>
+    <div class="indent" style="display: none;" id="classID0E3B">
+      <div class="row">
+        <span class="timing">4.2418106s
+        </span>
+        <span class="success">✔</span>
+       FutureState.Flow.Tests.CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofac<br clear="all" /><h6>Output:</h6><pre>Story: Can process incoming data in flows to file and sql server with autofac story
+
+Scenario: Can process incoming data in flows to file and sql server with autofac story
+	Given a new local sql db
+	Given a generated data source csv file
+	  And a processor results repository
+	  And a wired up container
+	  And abatch process
+	When processing a denormalized file using processing rules
+	  And chaining the processed results to another processor
+	  And chaining the processed results to last processor
+	Then results should be valid
+	  And all results should be processed and only valid contacts should be saved
+	  And only address with valid contacts should be inserted
+	  And should be able to restore process state
+
+
+</pre></div>
+    </div>
+    <h3>
+      <span class="timing">10.626s
+            </span>
+      <span class="clickable" onclick="ToggleClass('classID0EZ')" ondblclick="ToggleClass('classID0EZ')">
+        <span class="success">✔</span>
+               FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineStory
+               <span class="testcount">
+                (1 test)
+              </span></span>
+      <br clear="all" />
+    </h3>
+    <div class="indent" style="display: none;" id="classID0EZ">
+      <div class="row">
+        <span class="timing">10.6256699s
+        </span>
+        <span class="success">✔</span>
+       FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineStory.ProcessorsCanBeChainedToFormAnEtlPipeLine<br clear="all" /><h6>Output:</h6><pre>Story: Processors can be chained to form an etl pipe line story
+
+Scenario: Processors can be chained to form an etl pipe line story
+	Given a set of directories
+	  And a generated data source csv file
+	  And a log repository
+	  And a consistent process id
+	When starting a processor service
+	  And starting another processor service
+	Then process results should be saved
+
+
+</pre></div>
+    </div>
+    <h3>
+      <span class="timing">32.619s
+            </span>
+      <span class="clickable" onclick="ToggleClass('classID0EHB')" ondblclick="ToggleClass('classID0EHB')">
+        <span class="success">✔</span>
+               FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory
+               <span class="testcount">
+                (1 test)
+              </span></span>
+      <br clear="all" />
+    </h3>
+    <div class="indent" style="display: none;" id="classID0EHB">
+      <div class="row">
+        <span class="timing">32.6189076s
+        </span>
+        <span class="success">✔</span>
+       FutureState.Flow.Tests.Flow.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory.ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac<br clear="all" /><h6>Output:</h6><pre>Story: Processors can be chained to form an etl pipe line with autofac story
+
+Scenario: Processors can be chained to form an etl pipe line with autofac story
+	Given an initialized flow config
+	  And a generated data source csv file
+	  And an initialized di container
+	  And a flow controller using this configuration
+	When running the flow controller
+	  And saving the flow config and using controller friendly names
+	Then processed results should be saved
+	Then configuration system should build validators
+	  And flow custom configuration should be set
+	  And should be able to repeat processing from configuration
+
+
+</pre></div>
+    </div>
+  </body>
+</html>
