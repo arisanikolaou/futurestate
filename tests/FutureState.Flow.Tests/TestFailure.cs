@@ -7,6 +7,7 @@ namespace FutureState.Flow.Tests
         [Fact]
         public void AlwaysFail()
         {
+            // test pre-push hook
             Assert.False(true);
         }
     }
