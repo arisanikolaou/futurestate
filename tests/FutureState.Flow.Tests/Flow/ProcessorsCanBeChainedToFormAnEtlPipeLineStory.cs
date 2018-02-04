@@ -141,7 +141,7 @@ namespace FutureState.Flow.Tests.Flow
 
             _outDirectory2 = $@"{_baseDirectory}\{_processName2}\Out";
 
-            var batchProcessor = new TestProcessResultFlowFileBatchController(
+            var batchProcessor = new TestProcessResultFlowFileController(
                 GetConfig<Entity2, Entity3>())
             {
                 InDirectory = _outDirectory,
@@ -200,9 +200,9 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<Entity2, Entity3>
+        public class TestProcessResultFlowFileController : ProcessResultFlowFileController<Entity2, Entity3>
         {
-            public TestProcessResultFlowFileBatchController(ProcessorConfiguration<Entity2, Entity3> config) :
+            public TestProcessResultFlowFileController(ProcessorConfiguration<Entity2, Entity3> config) :
                 base(config)
             {
             }

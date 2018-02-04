@@ -18,4 +18,4 @@ namespace System {
     }
 }
 
-[assembly: AssemblyInformationalVersion("0.1.0-unstable.162+Branch.develop.Sha.856799374f55833073df6c8506879ff5222ea034")]
+[assembly: AssemblyInformationalVersion("0.1.0-unstable.166+Branch.develop.Sha.8b7ae92ca81610e4ca20de252b5713b558c5f312")]

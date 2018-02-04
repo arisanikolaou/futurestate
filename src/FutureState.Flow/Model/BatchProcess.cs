@@ -5,7 +5,7 @@ namespace FutureState.Flow
     /// <summary>
     ///     Represents a batch process or BatchProcess used in a process flow.
     /// </summary>
-    public class BatchProcess
+    public class BatchProcess : IEquatable<BatchProcess>
     {
         /// <summary>
         ///     Creates a new instance.
@@ -33,5 +33,32 @@ namespace FutureState.Flow
         ///     Gets the job/batch number.
         /// </summary>
         public long BatchId { get; set; }
+
+        /// <summary>
+        ///     Compares one batch to another for value equality.
+        /// </summary>
+        public bool Equals(BatchProcess other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return FlowId.Equals(other.FlowId) && BatchId == other.BatchId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((BatchProcess) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (FlowId.GetHashCode() * 397) ^ BatchId.GetHashCode();
+            }
+        }
     }
 }

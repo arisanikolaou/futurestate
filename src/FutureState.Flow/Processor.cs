@@ -132,6 +132,7 @@ namespace FutureState.Flow
             ProcessorEngine<TEntityIn> engine, ProcessResult<TEntityIn, TEntityOut> result)
         {
             var processedValidItems = new List<TEntityOut>();
+            var notValidItems = new List<TEntityOut>();
 
             engine.EntitiesReader = reader;
             engine.OnError = OnError;
@@ -147,52 +148,49 @@ namespace FutureState.Flow
                 pItem?.Invoke(dtoIn);
 
                 // create output entity
-                IEnumerable<TEntityOut> itemsToProcess = new[] { new TEntityOut() };
+                IEnumerable<TEntityOut> itemsToProcess;
+
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (CreateOutput != null)
                     itemsToProcess = CreateOutput(dtoIn);
+                else
+                    itemsToProcess = new[] {new TEntityOut()};
 
                 var errorEvents = new List<ErrorEvent>();
-                foreach (var dtoOutDefault in itemsToProcess)
+                foreach (TEntityOut dtoOutDefault in itemsToProcess)
                 {
-                    // apply default mapping
-                    var dtoOut = _config.Mapper.Map(dtoIn, dtoOutDefault);
-
-                    // prepare entity
-                    BeginProcessingItem?.Invoke(dtoIn, dtoOut);
-
-                    // validate
-                    var errorEvent = OnItemProcessing(dtoIn, dtoOut);
-
-                    // validate against business rules
-                    if (errorEvent == null)
+                    try
                     {
-                        var errors = _config.Rules.ToErrors(dtoOut);
-                        var e = errors as Error[] ?? errors.ToArray();
-                        if (e.Any())
-                            foreach (var error in e)
-                            {
-                                errorEvent = new ErrorEvent {Message = error.Message, Type = error.Type};
-                                errorEvents.Add(errorEvent);
-                            }
-                        else
-                            processedValidItems.Add(dtoOut);
+                        ProcessOutputItem(
+                            dtoIn,
+                            dtoOutDefault,
+                            errorEvents,
+                            processedValidItems,
+                            notValidItems);
                     }
-                    else
+                    catch (Exception ex)
                     {
+                        var errorEvent = new ErrorEvent { Message = ex.Message, Type = "Exception" };
+
                         errorEvents.Add(errorEvent);
+                        notValidItems.Add(dtoOutDefault);
+
+                        throw;
                     }
                 }
 
                 return errorEvents;
             };
+
             // commit operation for valid processed items
+            // ReSharper disable once ImplicitlyCapturedClosure
             engine.Commit = () =>
             {
                 // curry commit
                 pCommit?.Invoke();
 
                 // validate collection commit
-                var errors = _config.CollectionRules.ToErrors(processedValidItems);
+                IEnumerable<Error> errors = _config.CollectionRules.ToErrors(processedValidItems);
 
                 var enumerable = errors as Error[] ?? errors.ToArray();
                 if (enumerable.Any())
@@ -206,6 +204,44 @@ namespace FutureState.Flow
             };
 
             return engine;
+        }
+
+        private void ProcessOutputItem(TEntityIn dtoIn, TEntityOut dtoOutDefault, List<ErrorEvent> errorEvents, List<TEntityOut> processedValidItems, List<TEntityOut> notValidItems)
+        {
+            // apply default mapping
+            TEntityOut dtoOut = _config.Mapper.Map(dtoIn, dtoOutDefault);
+
+            // prepare entity
+            BeginProcessingItem?.Invoke(dtoIn, dtoOut);
+
+            // validate
+            var errorEvent = OnItemProcessing(dtoIn, dtoOut);
+
+            // validate against business rules
+            if (errorEvent == null)
+            {
+                var errors = _config.Rules.ToErrors(dtoOut);
+                var errorsArray = errors as Error[] ?? errors.ToArray();
+                if (errorsArray.Any())
+                {
+                    foreach (var error in errorsArray)
+                    {
+                        errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
+                        errorEvents.Add(errorEvent);
+                    }
+
+                    notValidItems.Add(dtoOut);
+                }
+                else
+                {
+                    processedValidItems.Add(dtoOut);
+                }
+            }
+            else
+            {
+                errorEvents.Add(errorEvent);
+                notValidItems.Add(dtoOut);
+            }
         }
 
         /// <summary>

@@ -47,7 +47,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the items that were used as the source for procesing such as the items in a csv file.
         /// </summary>
-        public List<TEntityIn> Input { get; internal set; }
+        public List<TEntityIn> Input { get; set; }
 
         /// <summary>
         ///     Gets the errors that were encountered processing the incoming entities.
@@ -66,5 +66,10 @@ namespace FutureState.Flow
         ///     Gets the valid items created after processing. This is the primary ouput.
         /// </summary>
         public List<TEntityOut> Output { get; set; } = new List<TEntityOut>();
+
+        /// <summary>
+        ///     Gets the invalid items that were not processed.
+        /// </summary>
+        public List<TEntityOut> Invalid { get; set; } = new List<TEntityOut>();
     }
 }

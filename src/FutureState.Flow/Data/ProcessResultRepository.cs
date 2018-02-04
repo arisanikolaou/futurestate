@@ -5,8 +5,13 @@ using NLog;
 
 namespace FutureState.Flow.Data
 {
-    public class ProcessResultRepository<T> : IProcessResultRepository<T> where T : ProcessResult
+    /// <summary>
+    ///     Repository for a given process result.
+    /// </summary>
+    /// <typeparam name="TProcessResult"></typeparam>
+    public class ProcessResultRepository<TProcessResult> : IProcessResultRepository<TProcessResult> where TProcessResult : ProcessResult
     {
+        // ReSharper disable once StaticMemberInGenericType
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _workingFolder;
@@ -34,11 +39,10 @@ namespace FutureState.Flow.Data
         }
 
         // keep a log of the entities which errored out or were processed
-        public void Save(T data)
+        public void Save(TProcessResult data)
         {
             CreateDirIfNotExists();
-
-
+            
             var i = 1;
             var fileName =
                 $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{data.BatchProcess.BatchId}.json";
@@ -59,19 +63,19 @@ namespace FutureState.Flow.Data
                 _logger.Info($"Saved process output to {fileName}.");
         }
 
-        public T Get(string processName, Guid correlationId, long batchId)
+        public TProcessResult Get(string processName, Guid correlationId, long batchId)
         {
             var fileName = $@"{WorkingFolder}\{processName}-{correlationId}-{batchId}.json";
 
             if (!File.Exists(fileName))
-                return default(T);
+                return default(TProcessResult);
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Reading process output from {fileName}.");
 
             var body = File.ReadAllText(fileName);
 
-            var result = JsonConvert.DeserializeObject<T>(body);
+            var result = JsonConvert.DeserializeObject<TProcessResult>(body);
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Read process output from {fileName}.");
@@ -79,14 +83,14 @@ namespace FutureState.Flow.Data
             return result;
         }
 
-        public T Get(string dataSource)
+        public TProcessResult Get(string dataSource)
         {
             if (!File.Exists(dataSource))
-                return default(T);
+                return default(TProcessResult);
 
             var body = File.ReadAllText(dataSource);
 
-            return JsonConvert.DeserializeObject<T>(body);
+            return JsonConvert.DeserializeObject<TProcessResult>(body);
         }
 
         private void CreateDirIfNotExists()

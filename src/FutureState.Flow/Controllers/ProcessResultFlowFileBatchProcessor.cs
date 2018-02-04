@@ -8,7 +8,7 @@ namespace FutureState.Flow.Controllers
     /// </summary>
     /// <typeparam name="TIn">The entity type to read in.</typeparam>
     /// <typeparam name="TOut">The entity type to process out.</typeparam>
-    public class ProcessResultFlowFileBatchController<TIn, TOut> : FlowFileController<TIn, TOut>
+    public class ProcessResultFlowFileController<TIn, TOut> : FlowFileController<TIn, TOut>
         where TOut : class, new()
     {
         /// <summary>
@@ -16,7 +16,7 @@ namespace FutureState.Flow.Controllers
         /// </summary>
         /// <param name="config">The configuration to use to map, configure incoming to outgoing entities.</param>
         /// <param name="getProcessor">How to get processors.</param>
-        public ProcessResultFlowFileBatchController(
+        public ProcessResultFlowFileController(
             ProcessorConfiguration<TIn, TOut> config,
             Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null)
             : base(config, GetReader(), getProcessor)

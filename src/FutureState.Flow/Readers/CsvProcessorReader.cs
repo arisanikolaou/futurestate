@@ -18,6 +18,7 @@ namespace FutureState.Flow
             if (!File.Exists(fileName))
                 throw new InvalidOperationException($"File {fileName} does not exist.");
 
+            // configuration
             var config = new Configuration { HasHeaderRecord = true };
 
             using (var reader = new StreamReader(File.OpenRead(fileName)))
@@ -25,6 +26,7 @@ namespace FutureState.Flow
                 using (var helper = new CsvReader(reader, config))
                 {
                     if (helper.Read())
+                    {
                         try
                         {
                             if (!helper.ReadHeader())
@@ -38,6 +40,7 @@ namespace FutureState.Flow
                         {
                             throw new ApplicationException($"Can't read data from file {fileName}.", ex);
                         }
+                    }
 
                     while (helper.Read())
                     {

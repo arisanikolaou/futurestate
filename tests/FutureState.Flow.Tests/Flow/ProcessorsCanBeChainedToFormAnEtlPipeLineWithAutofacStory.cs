@@ -56,7 +56,7 @@ namespace FutureState.Flow.Tests.Flow
             // configuration path
             def1.ConfigurationDetails.Add("ValueToConfigure", "http://helplnk.etc");
 
-            flowConfig.AddController<TestProcessResultFlowFileBatchController>("ProcessorB");
+            flowConfig.AddController<TestProcessResultFlowFileController>("ProcessorB");
 
             _flowConfig = flowConfig;
         }
@@ -110,7 +110,7 @@ namespace FutureState.Flow.Tests.Flow
 
             // register controllers
             cb.RegisterType<TestCsvFlowController>().AsSelf().AsImplementedInterfaces();
-            cb.RegisterType<TestProcessResultFlowFileBatchController>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<TestProcessResultFlowFileController>().AsSelf().AsImplementedInterfaces();
 
             _container = cb.Build();
         }
@@ -242,9 +242,9 @@ namespace FutureState.Flow.Tests.Flow
 
         // used in file configuration
         [DisplayName("ProcessorB")]
-        public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<EntityB, EntityC>
+        public class TestProcessResultFlowFileController : ProcessResultFlowFileController<EntityB, EntityC>
         {
-            public TestProcessResultFlowFileBatchController(ProcessorConfiguration<EntityB, EntityC> config)
+            public TestProcessResultFlowFileController(ProcessorConfiguration<EntityB, EntityC> config)
                 : base(config)
             {
             }

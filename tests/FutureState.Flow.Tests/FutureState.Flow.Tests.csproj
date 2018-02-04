@@ -121,6 +121,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aggregators\AggregatorTests.cs" />
+    <Compile Include="Aggregators\EnricherControllerService.cs" />
+    <Compile Include="Aggregators\EnricherController2.cs" />
+    <Compile Include="Aggregators\EnrichmentLogEntry.cs" />
+    <Compile Include="Aggregators\EnrichmentLogRepository.cs" />
+    <Compile Include="Aggregators\IEnricher.cs" />
+    <Compile Include="Aggregators\IEnrichmentLogRepository.cs" />
+    <Compile Include="Aggregators\MockClasses.cs" />
+    <Compile Include="Aggregators\EnrichmentLog.cs" />
+    <Compile Include="Aggregators\Enricher.cs" />
+    <Compile Include="Aggregators\EnrichmentController.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.cs" />
     <Compile Include="Flow\FlowModule.cs" />

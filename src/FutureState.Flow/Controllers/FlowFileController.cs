@@ -15,7 +15,9 @@ namespace FutureState.Flow.Controllers
     public class FlowFileController<TIn, TOut> : IFlowFileController
         where TOut : class, new()
     {
+        // ReSharper disable once StaticMemberInGenericType
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getProcessor;
         private readonly IReader<TIn> _reader;
         private string _inDirectory;
@@ -37,10 +39,11 @@ namespace FutureState.Flow.Controllers
 
             _getProcessor = getProcessor;
 
+            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (_getProcessor == null)
                 _getProcessor = controller => throw new NotImplementedException();
 
-            Config = config; // ?? new ProcessorConfiguration<TIn, TOut>();
+            Config = config; 
 
             OutDirectory = Environment.CurrentDirectory;
             InDirectory = Environment.CurrentDirectory;
@@ -70,6 +73,9 @@ namespace FutureState.Flow.Controllers
         /// </summary>
         public Type OutputType => typeof(TOut);
 
+        /// <summary>
+        ///     Initializes the controller.
+        /// </summary>
         public virtual void Initialize()
         {
             try

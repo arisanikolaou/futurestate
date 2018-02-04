@@ -87,8 +87,17 @@ namespace FutureState.Flow.Data
                 _logger.Info($"Saved flow file transaction log to {fileName}.");
         }
 
+        /// <summary>
+        ///     Gets the flow file log for the flow with the given id.
+        /// </summary>
+        /// <param name="flowId">The flow id.</param>
+        /// <returns>
+        /// </returns>
         public FlowFileLog Get(Guid flowId)
         {
+            if (!Directory.Exists(WorkingFolder))
+                Directory.CreateDirectory(WorkingFolder);
+
             var fileName =
                 $@"{WorkingFolder}\FlowLog-{flowId}.json";
 
