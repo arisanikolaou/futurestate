@@ -18,7 +18,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new batch instance against a given process id and a batch id.
         /// </summary>
-        public BatchProcess(Guid flowId, int batchId)
+        public BatchProcess(Guid flowId, long batchId)
         {
             FlowId = flowId;
             BatchId = batchId;
@@ -59,6 +59,11 @@ namespace FutureState.Flow
             {
                 return (FlowId.GetHashCode() * 397) ^ BatchId.GetHashCode();
             }
+        }
+
+        public BatchProcess Increment()
+        {
+            return new BatchProcess(FlowId, BatchId++);
         }
     }
 }

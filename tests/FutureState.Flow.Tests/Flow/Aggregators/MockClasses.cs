@@ -2,7 +2,19 @@
 
 namespace FutureState.Flow.Tests.Aggregators
 {
+    public class WholeSource 
+    {
+        public string Key { get; set; }
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public bool Equals(Whole other)
+        {
+            return string.Equals(Key, other?.Key, StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     public class Whole : IEquatable<Whole>
     {

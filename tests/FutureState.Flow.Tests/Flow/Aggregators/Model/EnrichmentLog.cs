@@ -12,6 +12,17 @@ namespace FutureState.Flow.Tests.Aggregators
     // a log of all the files that have been content enriched
     public class EnrichmentLog
     {
+        public EnrichmentLog(Guid flowId)
+        {
+            FlowId = flowId;
+            Logs = new List<EnrichmentLogEntry>();
+            Exceptions = new List<Exception>();
+        }
+
+        public EnrichmentLog()
+        {
+        }
+
         // the processor results or source of the data
 
         public string SourceId { get; set; }
@@ -40,18 +51,15 @@ namespace FutureState.Flow.Tests.Aggregators
         /// <summary>
         ///     Gets the batch process id.
         /// </summary>
-        public BatchProcess Batch { get; set; }
+        public Guid FlowId { get; set; }
 
         /// <summary>
         ///     Gets whether or not the enricher has already been procesed.
         /// </summary>
         /// <returns></returns>
-        public bool GetHasBeenProcessed(BatchProcess process, IEnricher enricher)
+        public bool GetHasBeenProcessed(Guid flowId, IEnricher enricher)
         {
-            if (Batch == null)
-                throw new InvalidOperationException();
-
-            if (!Batch.Equals(process))
+            if (!FlowId.Equals(flowId))
                 return false;
 
             // ReSharper disable once ConvertIfStatementToReturnStatement

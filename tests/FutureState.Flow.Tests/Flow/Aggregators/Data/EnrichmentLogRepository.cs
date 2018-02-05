@@ -20,12 +20,12 @@ namespace FutureState.Flow.Tests.Aggregators
         }
 
 
-        public EnrichmentLog Get(string sourceId, BatchProcess process)
+        public EnrichmentLog Get(string sourceId, Guid flowId)
         {
             // source id would be the name of a processor
 
             var fileName =
-                $@"{WorkingFolder}\{sourceId}-{process.FlowId}-{process.BatchId}.json";
+                $@"{WorkingFolder}\{sourceId}-{flowId}.json";
 
             if (!File.Exists(fileName))
                 return null;
@@ -39,12 +39,12 @@ namespace FutureState.Flow.Tests.Aggregators
             return log;
         }
 
-        public void Save(EnrichmentLog data, BatchProcess process)
+        public void Save(EnrichmentLog data, Guid flowId)
         {
             CreateDirIfNotExists();
 
             var fileName =
-                $@"{WorkingFolder}\{data.SourceId}-{process.FlowId}-{process.BatchId}.json";
+                $@"{WorkingFolder}\{data.SourceId}-{flowId}.json";
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving data enrichment log output to {fileName}.");

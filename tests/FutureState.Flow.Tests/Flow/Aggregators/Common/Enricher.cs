@@ -18,6 +18,7 @@ namespace FutureState.Flow.Tests.Aggregators
             return new Enricher<TPart, TComposite>(Read);
         }
 
+        // read from a csv file
         public IEnumerable<TPart> Read()
         {
             var config = new Configuration { HasHeaderRecord = true };
@@ -52,6 +53,11 @@ namespace FutureState.Flow.Tests.Aggregators
         }
     }
 
+    /// <summary>
+    ///     Enriches data from a given part entity type to a whole (target) entity tpe.
+    /// </summary>
+    /// <typeparam name="TPart"></typeparam>
+    /// <typeparam name="TComposite"></typeparam>
     public class Enricher<TPart, TComposite> : IEnricher<TComposite>
         where TPart : IEquatable<TComposite>
     {
@@ -70,6 +76,9 @@ namespace FutureState.Flow.Tests.Aggregators
         /// </summary>
         public string UniqueId { get; set; }
 
+        /// <summary>
+        ///     Geta a handle to the default mapper.
+        /// </summary>
         static Enricher()
         {
             _mapper = ObjectMapperManager
@@ -89,6 +98,7 @@ namespace FutureState.Flow.Tests.Aggregators
 
         public virtual TComposite Enrich(TPart part, TComposite whole)
         {
+            // copy objects from source to targe
             var map = _mapper.Map(part, whole);
 
             EnrichAction?.Invoke(part, map);

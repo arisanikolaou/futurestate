@@ -57,7 +57,7 @@ namespace FutureState.Flow.Tests.Aggregators
             };
 
             // source repository
-            var repo = new ProcessResultRepository<ProcessResult<EntityIn, EntityOut>>()
+            var repo = new ProcessResultRepository<ProcessResult<Part, Whole>>()
             {
                 WorkingFolder = SourceDirectory.FullName
             };
@@ -67,27 +67,27 @@ namespace FutureState.Flow.Tests.Aggregators
                 var enRepo = new EnrichmentLogRepository();
 
                 // load by source id
-                var log = enRepo.Get(sourceFileInfo.Name, batchProcess);
+                var log = enRepo.Get(sourceFileInfo.Name, batchProcess.FlowId);
 
-                var unProcessedEnrichers = new List<IEnricher<EntityOut>>();
+                var unProcessedEnrichers = new List<IEnricher<Whole>>();
 
                 // aggregate list of enrichers
                 foreach (var partDirectory in PartDirectory.GetFiles())
                 {                
                     // this is the source items
                     // load from sources
-                    var list = new List<EntityPart>
+                    var list = new List<Part>
                     {
-                        new EntityPart() {Key = "Key", Name = "Name"}
+                        new Part() {Key = "Key", FirstName = "Name"}
                     };
                     // read from source
 
-                    var enricher = new Enricher<EntityPart, EntityOut>(() => list)
+                    var enricher = new Enricher<Part, Whole>(() => list)
                     {
                         UniqueId = partDirectory.Name
                     };
 
-                    if (!log.GetHasBeenProcessed(batchProcess, enricher))
+                    if (!log.GetHasBeenProcessed(batchProcess.FlowId, enricher))
                     {
                         // start processing
                         unProcessedEnrichers.Add(enricher);
@@ -95,47 +95,47 @@ namespace FutureState.Flow.Tests.Aggregators
                 }
 
                 // load results to get the invalid items
-                ProcessResult<EntityIn, EntityOut> result = repo.Get(sourceFileInfo.FullName);
+                ProcessResult<Part, Whole> result = repo.Get(sourceFileInfo.FullName);
 
                 //enricher.Enrich()
                 var enrichmentController = new EnrichmentController();
 
                 // enrich valid and invalid items
                 enrichmentController
-                    .Enrich(batchProcess, result.Invalid, unProcessedEnrichers);
+                    .Enrich(batchProcess.FlowId, result.Invalid, unProcessedEnrichers);
 
                 // enrich valid and invalid items
                 enrichmentController
-                    .Enrich(batchProcess, result.Output, unProcessedEnrichers);
+                    .Enrich(batchProcess.FlowId, result.Output, unProcessedEnrichers);
 
                 // save new output
                 ProcessResults(result, batchProcess);
             }
         }
 
-        void ProcessResults(ProcessResult<EntityIn, EntityOut> result, BatchProcess batchProcess)
+        void ProcessResults(ProcessResult<Part, Whole> result, BatchProcess batchProcess)
         {
             var processorConfiguration = new ProcessorConfiguration
-                <EntityIn, EntityOut>(
-                    new SpecProvider<EntityOut>(),
-                    new SpecProvider<IEnumerable<EntityOut>>());
+                <Part, Whole>(
+                    new SpecProvider<Whole>(),
+                    new SpecProvider<IEnumerable<Whole>>());
 
             {
-                var outResult = new ProcessResult<EntityIn, EntityOut>()
+                var outResult = new ProcessResult<Part, Whole>()
                 {
                     Exceptions = new List<Exception>(),
-                    Errors = new List<ProcessError<EntityIn>>(),
+                    Errors = new List<ProcessError<Part>>(),
                     BatchProcess = batchProcess,
-                    Output = new List<EntityOut>(),
+                    Output = new List<Whole>(),
                     Input = result.Input,
-                    Invalid = new List<EntityOut>()
+                    Invalid = new List<Whole>()
                 };
 
                 var specs = processorConfiguration.Rules.ToArray();
                 var specsCollection = processorConfiguration.CollectionRules.ToArray();
 
-                var valid = new List<EntityOut>();
-                var inValid = new List<EntityOut>();
+                var valid = new List<Whole>();
+                var inValid = new List<Whole>();
 
                 foreach (var source in new[] { result.Output, result.Invalid })
                 {
@@ -151,7 +151,7 @@ namespace FutureState.Flow.Tests.Aggregators
                             // get all errors and add to error collection
                             foreach (var error in errors)
                             {
-                                outResult.Errors.Add(new ProcessError<EntityIn>()
+                                outResult.Errors.Add(new ProcessError<Part>()
                                 {
                                     Error = new ErrorEvent() { Message = error.Message, Type = error.Type },
                                     SourceItem = null,
@@ -180,7 +180,7 @@ namespace FutureState.Flow.Tests.Aggregators
                 }
 
                 // source repository
-                var repo = new ProcessResultRepository<ProcessResult<EntityIn, EntityOut>>()
+                var repo = new ProcessResultRepository<ProcessResult<Part, Whole>>()
                 {
                     WorkingFolder = SourceDirectory.FullName
                 };

@@ -26,12 +26,12 @@ namespace FutureState.Flow.Tests.Aggregators
         ///     Enriches the source data with data from parts.
         /// </summary>
         /// <typeparam name="TWhole">The whole data type to create</typeparam>
-        /// <param name="batchProcess">The batch process running.</param>
+        /// <param name="flowId">The associated flow id.</param>
         /// <param name="source">The data source for 'whole' objects.</param>
         /// <param name="enrichers">The sources to enrich.</param>
         /// <returns></returns>
         public EnrichmentLog Enrich<TWhole>(
-            BatchProcess batchProcess,
+            Guid flowId,
             IEnumerable<TWhole> source,
             IEnumerable<IEnricher<TWhole>> enrichers)
         {
@@ -39,7 +39,7 @@ namespace FutureState.Flow.Tests.Aggregators
             var log = new EnrichmentLog
             {
                 SourceId = SourceId,
-                Batch = batchProcess,
+                FlowId = flowId,
                 StartTime = DateTime.UtcNow,
                 Exceptions = new List<Exception>(),
                 Logs = new List<EnrichmentLogEntry>()

@@ -8,7 +8,7 @@ using Xunit;
 namespace FutureState.Flow.Tests.Aggregators
 {
     [Story]
-    public class AggregatorTests
+    public class CanEnrichFromDataSourcesStory
     {
         private string _sourceId = "Source";
         private List<Whole> _source;
@@ -61,13 +61,13 @@ namespace FutureState.Flow.Tests.Aggregators
 
         protected void WhenProcessingEnrichmentsAgainstTheSource()
         {
-            _processResults = _controller.Enrich(_process, _source, _enrichers);
+            _processResults = _controller.Enrich(_process.FlowId, _source, _enrichers);
         }
 
         protected void AndWhenSavingResults()
         {
             var repo = new EnrichmentLogRepository();
-            repo.Save(this._processResults,this._process);
+            repo.Save(this._processResults,this._process.FlowId);
         }
 
         protected void ThenAllEligibleWholeItemsShouldBeMerged()
@@ -100,7 +100,7 @@ namespace FutureState.Flow.Tests.Aggregators
             var repo = new EnrichmentLogRepository();
 
             // should be able to reload
-            this._loadedResults = repo.Get(_processResults.SourceId, _process);
+            this._loadedResults = repo.Get(_processResults.SourceId, _process.FlowId);
 
             Assert.NotNull(_loadedResults);
             Assert.Equal(2, _loadedResults.Logs.Count);
@@ -108,7 +108,7 @@ namespace FutureState.Flow.Tests.Aggregators
             foreach (var enricher in _enrichers)
             {
                 Assert.True(
-                    _loadedResults.GetHasBeenProcessed(_process, enricher));
+                    _loadedResults.GetHasBeenProcessed(_process.FlowId, enricher));
             }
         }
 
