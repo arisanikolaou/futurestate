@@ -15,9 +15,9 @@ namespace FutureState.Flow.Tests.Aggregators
     {
         private BatchProcess _batchProcess;
         private string _workingDirectory;
-        private ProcessResult<WholeSource, Whole> _procssResult;
+        private ProcessResult<WholeSource, Whole> _processResult;
         private ProcessResultRepository<ProcessResult<WholeSource, Whole>> _repo;
-        private string _sourceDir;
+        private string _wholeDir;
         private string _dataFileToCreate;
         private int CsvItemsToCreate = 10;
         private EnricherController2 _subject;
@@ -36,34 +36,41 @@ namespace FutureState.Flow.Tests.Aggregators
         {
             this._workingDirectory = $@"{Environment.CurrentDirectory}\Enrichers";
 
-            if (!Directory.Exists(_workingDirectory))
-                Directory.CreateDirectory(_workingDirectory);
+            if (Directory.Exists(_workingDirectory))
+                Directory.Delete(_workingDirectory, true);
+
+            Directory.CreateDirectory(_workingDirectory);
         }
 
         protected void AndGivenAProcessResult()
         {
-            this._procssResult = new ProcessResult<WholeSource, Whole>()
+            this._processResult = new ProcessResult<WholeSource, Whole>()
             {
+                ProcessName = "TestProcess",
                 BatchProcess = _batchProcess,
                 Input = new List<WholeSource>(),
                 Invalid = new List<Whole>(),
                 Output = new List<Whole>()
+                {
+                    new Whole(){Key = "Key1", FirstName = "A", LastName = "LastName"},
+                    new Whole(){Key = "Key2", FirstName = "", LastName = ""},
+                }
             };
 
-            _sourceDir = $@"{_workingDirectory}\Whole";
+            _wholeDir = $@"{_workingDirectory}\Whole";
 
-            _repo = new ProcessResultRepository<ProcessResult<WholeSource, Whole>>(_sourceDir);
-            _repo.Save(_procssResult);
+            _repo = new ProcessResultRepository<ProcessResult<WholeSource, Whole>>(_wholeDir);
+            _repo.Save(_processResult);
         }
 
         protected void AndGivenACsvFileToEnrich()
         {
-            this._partDir  = $@"{_workingDirectory}\Part";
-            if (!Directory.Exists(_partDir))
-                Directory.CreateDirectory(_partDir);
+            this._partDir = $@"{_workingDirectory}\Part";
+            Directory.CreateDirectory(_partDir);
+
 
             _dataFileToCreate = $@"{_partDir}\DataFile.csv";
-            if(File.Exists(_dataFileToCreate))
+            if (File.Exists(_dataFileToCreate))
                 File.Delete(_dataFileToCreate);
 
             using (var fs = File.OpenWrite(_dataFileToCreate))
@@ -100,16 +107,21 @@ namespace FutureState.Flow.Tests.Aggregators
         {
             _subject = new EnricherController2(
                 new ProcessorConfiguration<Whole, Whole>(new SpecProvider<Whole>(),
-                    new SpecProvider<IEnumerable<Whole>>()), _sourceDir)
-            {
-                TargetDirectory = new DirectoryInfo(_sourceDir),
-                PartDirectory = new DirectoryInfo(_partDir)
-            };
+                    new SpecProvider<IEnumerable<Whole>>()), _workingDirectory);
         }
 
         protected void WhenProcessingTheEnrichment()
         {
-            _subject.Process(_batchProcess.FlowId);
+            var enrichers = new List<Enricher<Part, Whole>>();
+            
+            foreach (var file in Directory.GetFiles(_partDir))
+            {
+                var enricherBuilder = new CsvEnricherBuilder<Part, Whole>() {FileName = file};
+                enrichers.Add(enricherBuilder.Get());
+            }
+            
+
+            _subject.Process(_batchProcess.FlowId, enrichers.ToArray(), new DirectoryInfo(_wholeDir));
         }
 
         protected void ThenANewProcessOutputFileShouldBeUsed()

@@ -67,6 +67,7 @@ namespace FutureState.Flow.Tests.Aggregators
         protected void AndWhenSavingResults()
         {
             var repo = new EnrichmentLogRepository();
+
             repo.Save(this._processResults,this._process.FlowId);
         }
 

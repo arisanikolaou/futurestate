@@ -9,9 +9,7 @@ namespace FutureState.Flow.Tests.Aggregators
 {
     public class EnricherController2
     {
-        private readonly EnrichmentLogRepository _enrichmentLogRepository;
-        private readonly ProcessorConfiguration<Whole, Whole> _processorConfiguration;
-        private readonly ProcessResultRepository<ProcessResult<Whole, Whole>> _repository;
+        private readonly EnrichmentLogRepository _logRepo;
         private readonly ISpecification<IEnumerable<Whole>>[] _entityCollection;
         private readonly ISpecification<Whole>[] _entityRules;
 
@@ -22,44 +20,40 @@ namespace FutureState.Flow.Tests.Aggregators
         {
         }
 
-        public EnricherController2(ProcessorConfiguration<Whole, Whole> config, string targetDirectory = null)
+        public EnricherController2(ProcessorConfiguration<Whole, Whole> config, string workingFolder = null)
         {
-            _processorConfiguration = config;
+            var processorConfiguration = config;
 
-            // source targetDirectory default to current targetDirectory
-            TargetDirectory = new DirectoryInfo(targetDirectory ?? Environment.CurrentDirectory);
+            // targetDirectory workingFolder default to current workingFolder
+            WorkingFolder = new DirectoryInfo(workingFolder ?? Environment.CurrentDirectory);
 
-            _enrichmentLogRepository = new EnrichmentLogRepository
+            _logRepo = new EnrichmentLogRepository()
             {
-                WorkingFolder = Environment.CurrentDirectory
-            };
-
-            // source repository
-            _repository = new ProcessResultRepository<ProcessResult<Whole, Whole>>
-            {
-                WorkingFolder = TargetDirectory.FullName
+                WorkingFolder = WorkingFolder.FullName
             };
 
 
-            this._entityRules = _processorConfiguration.Rules.ToArray();
-            this._entityCollection = _processorConfiguration.CollectionRules.ToArray();
+            this._entityRules = processorConfiguration.Rules.ToArray();
+            this._entityCollection = processorConfiguration.CollectionRules.ToArray();
         }
 
-        public DirectoryInfo TargetDirectory { get; set; }
+        public DirectoryInfo WorkingFolder { get; set; }
 
-        public DirectoryInfo PartDirectory { get; set; }
 
         public void Initialize()
         {
             // initialize directories
-            if (TargetDirectory == null)
-                TargetDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+            if (WorkingFolder == null)
+                WorkingFolder = new DirectoryInfo(Environment.CurrentDirectory);
         }
 
         public BatchProcess GetBatchProcess()
         {
             // load flow file
-            var flowFileRepo = new FlowFileLogRepository();
+            var flowFileRepo = new FlowFileLogRepository()
+            {
+                WorkingFolder = WorkingFolder.FullName
+            };
             var flowFile = flowFileRepo.Get(Guid.Parse("a4840d97-6924-4f35-a7bf-c09ef5a0bb2c"));
 
             // save
@@ -75,46 +69,34 @@ namespace FutureState.Flow.Tests.Aggregators
             return batchProcess;
         }
 
-        public void Process(Guid flowId)
+        public void Process(Guid flowId, IEnumerable<IEnricher<Whole>> enrichers, DirectoryInfo targetDirectory)
         {
-            foreach (var sourceFileInfo in TargetDirectory.GetFiles())
-                Process(flowId, sourceFileInfo);
+            foreach (var sourceFileInfo in targetDirectory.GetFiles())
+                Process(flowId, enrichers, sourceFileInfo);
         }
 
         /// <summary>
-        ///     Process unriched data from a given source file.
+        ///     Process unriched data from a given targetDirectory file.
         /// </summary>
-        protected void Process(Guid flowId, FileInfo sourceFileInfo)
+        protected void Process(Guid flowId, IEnumerable<IEnricher<Whole>> enrichers, FileInfo sourceFileInfo)
         {
-            // load by source id
-            var log = _enrichmentLogRepository.Get(sourceFileInfo.Name, flowId);
+            // load by targetDirectory id
+            var log = _logRepo.Get(sourceFileInfo.Name, flowId);
             if (log == null)
-                log = new EnrichmentLog(flowId);
+                log = new EnrichmentLog(flowId) {SourceId = sourceFileInfo.Name};
 
             var unProcessedEnrichers = new List<IEnricher<Whole>>();
 
             // aggregate list of enrichers
-            foreach (var partDirectory in PartDirectory?.GetFiles() ?? Enumerable.Empty<FileInfo>())
-            {
-                // this is the source items
-                // load from sources
-                var list = new List<Part>
-                {
-                    new Part {Key = "Key", FirstName = "Name"}
-                };
-                // read from source
-
-                var enricher = new Enricher<Part, Whole>(() => list)
-                {
-                    UniqueId = partDirectory.Name
-                };
-
+            foreach(var enricher in enrichers)
                 if (!log.GetHasBeenProcessed(flowId, enricher))
                     unProcessedEnrichers.Add(enricher);
-            }
+
+            // targetDirectory repository
+            var resultRepo = new ProcessResultRepository<ProcessResult<Whole, Whole>>();
 
             // load results to get the invalid items
-            var result = _repository.Get(sourceFileInfo.FullName);
+            ProcessResult<Whole, Whole> result = resultRepo.Get(sourceFileInfo.FullName);
 
             //enricher.Enrich()
             var enrichmentController = new EnrichmentController();
@@ -128,10 +110,13 @@ namespace FutureState.Flow.Tests.Aggregators
                 .Enrich(flowId, result.Output, unProcessedEnrichers);
 
             // save new output
-            ProcessResults(result);
+            ProcessResults(sourceFileInfo.Directory, result);
+
+            // save log
+            _logRepo.Save(log, flowId);
         }
 
-        private void ProcessResults(ProcessResult<Whole, Whole> result)
+        private void ProcessResults(DirectoryInfo targetFolder, ProcessResult<Whole, Whole> result)
         {
             // output result
             var outResult = result.CreateNew();
@@ -186,8 +171,15 @@ namespace FutureState.Flow.Tests.Aggregators
             // reset process errors
             result.Errors = processErrors;
 
+
+            // targetDirectory repository
+            var resultRepo = new ProcessResultRepository<ProcessResult<Whole, Whole>>()
+            {
+                WorkingFolder = targetFolder.FullName
+            };
+
             // save resports
-            _repository.Save(outResult);
+            resultRepo.Save(outResult);
         }
 
         protected virtual void Commit()
