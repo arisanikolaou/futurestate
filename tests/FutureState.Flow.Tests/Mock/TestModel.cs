@@ -9,13 +9,13 @@ namespace FutureState.Flow.Tests.Mock
         public TestModel()
             : base("name=TestModel")
         {
-            Database.Initialize(true);
+            
         }
 
         public TestModel(string conString)
             : base(conString)
         {
-            Database.Initialize(true);
+            
         }
 
 

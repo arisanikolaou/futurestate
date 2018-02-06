@@ -140,7 +140,6 @@
     <Compile Include="Flow\ProcessorsCanBeChainedToFormAnEtlPipeLineStory.cs" />
     <Compile Include="Mock\TestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestFailure.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FutureState.Common.Core\FutureState.Common.csproj">
