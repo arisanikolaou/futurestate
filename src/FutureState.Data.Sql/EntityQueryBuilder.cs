@@ -20,6 +20,7 @@ namespace FutureState.Data.Sql
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
+            // ReSharper disable once UsePatternMatching
             var sqlException = session as Session;
             if (sqlException != null)
             {
