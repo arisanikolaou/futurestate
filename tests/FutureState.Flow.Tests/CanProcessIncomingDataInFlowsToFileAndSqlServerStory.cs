@@ -31,6 +31,7 @@ namespace FutureState.Flow.Tests
         private SpecProvider<Dto1> _specProvider;
         private SpecProvider<Address> _specProviderFroAddress;
 
+
         protected void GivenANewLocalSqlDb()
         {
             using (var db = new TestModel())
@@ -191,6 +192,7 @@ namespace FutureState.Flow.Tests
                         db.SaveChanges();
 
                         // update mappings and fk references
+                        // ReSharper disable once PossibleMultipleEnumeration
                         processedItems.Each(m => { m.Addresses.Each(n => { n.ContactId = m.Contact.Id; }); });
                     }
                 }
