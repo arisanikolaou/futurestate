@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NLog;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     // manages the enrichment process 
     public class EnrichmentController

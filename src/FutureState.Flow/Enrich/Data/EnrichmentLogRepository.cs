@@ -3,7 +3,7 @@ using System.IO;
 using Newtonsoft.Json;
 using NLog;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     public class EnrichmentLogRepository : IEnrichmentLogRepository
     {
@@ -20,12 +20,12 @@ namespace FutureState.Flow.Tests.Aggregators
         }
 
 
-        public EnrichmentLog Get(string sourceId, Guid flowId)
+        public EnrichmentLog Get(string sourceId)
         {
             // source id would be the name of a processor
 
             var fileName =
-                $@"{WorkingFolder}\{sourceId}-{flowId}.json";
+                $@"{WorkingFolder}\EnrichmentLog-{sourceId}.json";
 
             if (!File.Exists(fileName))
                 return null;
@@ -39,12 +39,13 @@ namespace FutureState.Flow.Tests.Aggregators
             return log;
         }
 
-        public void Save(EnrichmentLog data, Guid flowId)
+        public void Save(EnrichmentLog data)
         {
             CreateDirIfNotExists();
 
+            // source log
             var fileName =
-                $@"{WorkingFolder}\{data.SourceId}-{flowId}.json";
+                $@"{WorkingFolder}\EnrichmentLog-{data.SourceId}.json";
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving data enrichment log output to {fileName}.");

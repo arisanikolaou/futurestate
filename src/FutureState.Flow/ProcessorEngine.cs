@@ -181,7 +181,6 @@ namespace FutureState.Flow
             result.Exceptions = exceptions;
 #endif
             result.Warnings = Warnings;
-            result.Input = processed;
             result.ProcessTime = DateTime.UtcNow - StartTime;
 
             return result;

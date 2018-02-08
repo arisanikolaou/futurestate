@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     public class WholeSource 
     {

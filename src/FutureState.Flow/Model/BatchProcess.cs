@@ -63,7 +63,7 @@ namespace FutureState.Flow
 
         public BatchProcess Increment()
         {
-            return new BatchProcess(FlowId, BatchId++);
+            return new BatchProcess(FlowId, BatchId + 1);
         }
     }
 }

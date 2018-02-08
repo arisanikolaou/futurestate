@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     // enrichers can/should work against 'invalid' entities as well as 'incomplete' entities
     // processed by a normal processor
@@ -25,10 +25,11 @@ namespace FutureState.Flow.Tests.Aggregators
 
         // the processor results or source of the data
 
+        /// <summary>
+        ///     Gets the data source being enriched.
+        /// </summary>
         public string SourceId { get; set; }
 
-        // a record of the file that was produced as the output
-        public string OutputFlowFile { get; set; }
 
         // a record of the items that have been enriched
         public List<EnrichmentLogEntry> Logs { get; set; }

@@ -5,7 +5,7 @@ using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     [Story]
     public class CanEnrichFromDataSourcesStory
@@ -68,7 +68,7 @@ namespace FutureState.Flow.Tests.Aggregators
         {
             var repo = new EnrichmentLogRepository();
 
-            repo.Save(this._processResults,this._process.FlowId);
+            repo.Save(this._processResults);
         }
 
         protected void ThenAllEligibleWholeItemsShouldBeMerged()
@@ -101,7 +101,7 @@ namespace FutureState.Flow.Tests.Aggregators
             var repo = new EnrichmentLogRepository();
 
             // should be able to reload
-            this._loadedResults = repo.Get(_processResults.SourceId, _process.FlowId);
+            this._loadedResults = repo.Get(_sourceId);
 
             Assert.NotNull(_loadedResults);
             Assert.Equal(2, _loadedResults.Logs.Count);

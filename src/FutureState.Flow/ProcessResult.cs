@@ -45,11 +45,6 @@ namespace FutureState.Flow
     public class ProcessResult<TEntityIn> : ProcessResult
     {
         /// <summary>
-        ///     Gets the items that were used as the source for procesing such as the items in a csv file.
-        /// </summary>
-        public List<TEntityIn> Input { get; set; }
-
-        /// <summary>
         ///     Gets the errors that were encountered processing the incoming entities.
         /// </summary>
         public List<ProcessError<TEntityIn>> Errors { get; set; }
@@ -84,7 +79,6 @@ namespace FutureState.Flow
                 BatchProcess = BatchProcess.Increment(),
                 Errors = new List<ProcessError<TEntityIn>>(),
                 Exceptions = new List<Exception>(),
-                Input = new List<TEntityIn>(Input),
                 Invalid = new List<TEntityOut>(Invalid),
                 Output = new List<TEntityOut>(Output),
                 ProcessTime = ProcessTime,

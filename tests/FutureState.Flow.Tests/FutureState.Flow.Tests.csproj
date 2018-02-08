@@ -122,16 +122,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Flow\Aggregators\CanEnrichFromDataSourcesStory.cs" />
-    <Compile Include="Flow\Aggregators\Common\EnricherControllerService.cs" />
-    <Compile Include="Flow\Aggregators\Common\EnricherController2.cs" />
-    <Compile Include="Flow\Aggregators\Model\EnrichmentLogEntry.cs" />
-    <Compile Include="Flow\Aggregators\Data\EnrichmentLogRepository.cs" />
-    <Compile Include="Flow\Aggregators\Common\IEnricher.cs" />
-    <Compile Include="Flow\Aggregators\Data\IEnrichmentLogRepository.cs" />
+    <Compile Include="Flow\Aggregators\EnricherControllerService.cs" />
     <Compile Include="Flow\Aggregators\MockClasses.cs" />
-    <Compile Include="Flow\Aggregators\Model\EnrichmentLog.cs" />
-    <Compile Include="Flow\Aggregators\Common\Enricher.cs" />
-    <Compile Include="Flow\Aggregators\Common\EnrichmentController.cs" />
     <Compile Include="Flow\Aggregators\EnricherControllerCanEnrichFromCsvStories.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.cs" />

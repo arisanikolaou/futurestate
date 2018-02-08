@@ -6,7 +6,7 @@ using CsvHelper.Configuration;
 using EmitMapper;
 using NLog;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     public class CsvEnricherBuilder<TPart, TComposite>
         where TPart : IEquatable<TComposite>

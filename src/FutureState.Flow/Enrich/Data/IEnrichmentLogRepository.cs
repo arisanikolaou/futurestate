@@ -1,22 +1,18 @@
 ﻿using System;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     public interface IEnrichmentLogRepository
     {
         /// <summary>
         ///     Gets the log of data sources used to enrich a given target entity set.
         /// </summary>
-        /// <param name="targetEntitySetId"></param>
-        /// <param name="flowId">The flow id.</param>
         /// <returns></returns>
-        EnrichmentLog Get(string targetEntitySetId, Guid flowId);
+        EnrichmentLog Get(string sourceId);
 
         /// <summary>
         ///     Saves the log of data sources used to enrich a given target entity set.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="flowId"></param>
-        void Save(EnrichmentLog data, Guid flowId);
+        void Save(EnrichmentLog data);
     }
 }

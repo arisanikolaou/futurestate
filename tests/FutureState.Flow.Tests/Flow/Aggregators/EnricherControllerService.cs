@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
-using Castle.Components.DictionaryAdapter;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     public class EnricherControllerService
     {
@@ -62,12 +59,16 @@ namespace FutureState.Flow.Tests.Aggregators
                 WorkingFolder = SourceDirectory.FullName
             };
 
+            var enRepo = new EnrichmentLogRepository();
+
+            // load by source id
+            
+
             foreach (var sourceFileInfo in SourceDirectory.GetFiles())
             {
-                var enRepo = new EnrichmentLogRepository();
+                string sourceId = Path.GetFileNameWithoutExtension(sourceFileInfo.Name);
 
-                // load by source id
-                var log = enRepo.Get(sourceFileInfo.Name, batchProcess.FlowId);
+                var log = enRepo.Get( sourceId);
 
                 var unProcessedEnrichers = new List<IEnricher<Whole>>();
 
@@ -127,7 +128,6 @@ namespace FutureState.Flow.Tests.Aggregators
                     Errors = new List<ProcessError<Part>>(),
                     BatchProcess = batchProcess,
                     Output = new List<Whole>(),
-                    Input = result.Input,
                     Invalid = new List<Whole>()
                 };
 

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using CsvHelper;
 using FutureState.Flow.Data;
-using FutureState.Flow.Tests.Flow;
 using FutureState.Specifications;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 
-namespace FutureState.Flow.Tests.Aggregators
+namespace FutureState.Flow.Enrich
 {
     [Story()]
     public class EnricherControllerCanEnrichFromCsvStories
@@ -20,7 +19,7 @@ namespace FutureState.Flow.Tests.Aggregators
         private string _wholeDir;
         private string _dataFileToCreate;
         private int CsvItemsToCreate = 10;
-        private EnricherController2 _subject;
+        private EnricherController<Whole> _subject;
         private string _partDir;
 
         protected void GivenAFlowAndABatchProcess()
@@ -48,9 +47,8 @@ namespace FutureState.Flow.Tests.Aggregators
             {
                 ProcessName = "TestProcess",
                 BatchProcess = _batchProcess,
-                Input = new List<WholeSource>(),
                 Invalid = new List<Whole>(),
-                Output = new List<Whole>()
+                Output = new List<Whole>() // valid entities
                 {
                     new Whole(){Key = "Key1", FirstName = "A", LastName = "LastName"},
                     new Whole(){Key = "Key2", FirstName = "", LastName = ""},
@@ -73,6 +71,7 @@ namespace FutureState.Flow.Tests.Aggregators
             if (File.Exists(_dataFileToCreate))
                 File.Delete(_dataFileToCreate);
 
+            // create mock csv
             using (var fs = File.OpenWrite(_dataFileToCreate))
             {
                 using (var sw = new StreamWriter(fs))
@@ -105,24 +104,35 @@ namespace FutureState.Flow.Tests.Aggregators
 
         protected void AndGivenAnEnrichingController()
         {
-            _subject = new EnricherController2(
+            _subject = new EnricherController<Whole>(
                 new ProcessorConfiguration<Whole, Whole>(new SpecProvider<Whole>(),
                     new SpecProvider<IEnumerable<Whole>>()), _workingDirectory);
         }
 
         protected void WhenProcessingTheEnrichment()
         {
+            // get list of enrichers
             var enrichers = new List<Enricher<Part, Whole>>();
-            
             foreach (var file in Directory.GetFiles(_partDir))
             {
-                var enricherBuilder = new CsvEnricherBuilder<Part, Whole>() {FileName = file};
+                var enricherBuilder = new CsvEnricherBuilder<Part, Whole>() { FileName = file };
                 enrichers.Add(enricherBuilder.Get());
             }
-            
 
-            _subject.Process(_batchProcess.FlowId, enrichers.ToArray(), new DirectoryInfo(_wholeDir));
+            // get list of files to process
+            var targetEnrichers = new List<EnrichmentTarget<WholeSource, Whole>>();
+            foreach (var file in new DirectoryInfo(_wholeDir).GetFiles())
+            {
+                targetEnrichers.Add(new EnrichmentTarget<WholeSource, Whole>()
+                {
+                    File = file
+                });
+            }
+
+            // process results
+            _subject.Process(_batchProcess.FlowId, enrichers, targetEnrichers);
         }
+
 
         protected void ThenANewProcessOutputFileShouldBeUsed()
         {
