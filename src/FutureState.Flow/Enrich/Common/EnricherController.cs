@@ -118,7 +118,7 @@ namespace FutureState.Flow.Enrich
                 // targetDirectory repository
                 var resultRepo = new ProcessResultRepository<ProcessResult<TPart, TTarget>>()
                 {
-                    WorkingFolder = target.File.Directory.FullName
+                    WorkingFolder = target.SourceFileName.Directory.FullName
                 };
 
                 // save resports
@@ -128,7 +128,7 @@ namespace FutureState.Flow.Enrich
             // update enricher log
             {
                 foreach (var enricher in unProcessedEnrichers)
-                    logRepository.Logs.Add(new EnrichmentLogEntry() { OutputTypeId = enricher.UniqueId, DateCreated = DateTime.UtcNow });
+                    logRepository.Logs.Add(new EnrichmentLogEntry() { OutputTypeId = enricher.OutputTypeId, DateCreated = DateTime.UtcNow });
 
                 // save log
                 _logRepo.Save(logRepository);

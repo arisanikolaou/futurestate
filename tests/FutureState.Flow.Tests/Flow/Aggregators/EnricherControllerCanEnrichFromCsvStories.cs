@@ -123,9 +123,9 @@ namespace FutureState.Flow.Enrich
             var targetEnrichers = new List<EnrichmentTarget<WholeSource, Whole>>();
             foreach (var file in new DirectoryInfo(_wholeDir).GetFiles())
             {
-                targetEnrichers.Add(new EnrichmentTarget<WholeSource, Whole>()
+                targetEnrichers.Add(new EnrichmentTarget<WholeSource, Whole>(new ProcessResultRepository<ProcessResult<WholeSource, Whole>>())
                 {
-                    File = file
+                    SourceFileName = file
                 });
             }
 

@@ -37,8 +37,8 @@ namespace FutureState.Flow.Enrich
                 new OtherPart() {Key = "Key1", LastName = "LastName"}
             };
 
-            var enricher = new Enricher<Part, Whole>(() => parts) {UniqueId = "EnricherA"};
-            var enricher1 = new Enricher<OtherPart, Whole>(() => parts2) { UniqueId = "EnricherB" };
+            var enricher = new Enricher<Part, Whole>(() => parts) {OutputTypeId = "EnricherA"};
+            var enricher1 = new Enricher<OtherPart, Whole>(() => parts2) { OutputTypeId = "EnricherB" };
 
             // collect all enrichment sources
             _enrichers = new List<IEnricher<Whole>> { enricher, enricher1 };
@@ -53,10 +53,7 @@ namespace FutureState.Flow.Enrich
 
         protected void AndGivenAnEnrichingController()
         {
-            this._controller = new EnricherProcessor()
-            {
-                SourceId = _sourceId
-            };
+            this._controller = new EnricherProcessor();
         }
 
         protected void WhenProcessingEnrichmentsAgainstTheSource()

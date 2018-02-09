@@ -81,7 +81,7 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Gets the unique id for the enricher.
         /// </summary>
-        public string UniqueId { get; set; }
+        public string OutputTypeId { get; set; }
 
         /// <summary>
         ///     Geta a handle to the default mapper.
@@ -105,7 +105,7 @@ namespace FutureState.Flow.Enrich
             this._source = sourceGet;
 
             // the unique id of the enricher
-            this.UniqueId = GetType().Name;
+            this.OutputTypeId = typeof(TComposite).Name;
         }
         
         /// <summary>

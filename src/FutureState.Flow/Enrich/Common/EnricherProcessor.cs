@@ -12,32 +12,31 @@ namespace FutureState.Flow.Enrich
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        ///     Creates a new instance.
         /// </summary>
         public EnricherProcessor()
         {
-            SourceId = "UniqueId";
+           
         }
-
-        /// <summary>
-        ///     Gets the unique id of the souce enriching a given target.
-        /// </summary>
-        public string SourceId { get; set; }
 
         /// <summary>
         ///     Enriches the source data with data from parts.
         /// </summary>
         /// <typeparam name="TWhole">The whole data type to enrich.</typeparam>
-        /// <param name="source">The data source for 'whole' objects.</param>
+        /// <param name="targets">The data source for 'whole' objects that will be enriched..</param>
         /// <param name="enrichers">The sources to enrich 'whole' target objects.</param>
         /// <returns></returns>
         public EnrichmentLog Enrich<TWhole>(
-            IEnumerable<TWhole> source,
+            IEnumerable<TWhole> targets,
             IEnumerable<IEnricher<TWhole>> enrichers)
         {
+            if (_logger.IsDebugEnabled)
+                _logger.Debug("Enriching targets.");
+
             // enrichment log to record transactions
-            var log = new EnrichmentLog
+            var db = new EnrichmentLog
             {
-                TargetTypeId = SourceId,
+                TargetTypeId = typeof(TWhole).Name,
                 StartTime = DateTime.UtcNow,
                 Exceptions = new List<Exception>(),
                 Logs = new List<EnrichmentLogEntry>()
@@ -46,21 +45,26 @@ namespace FutureState.Flow.Enrich
             // parallelize enrichment 
             foreach (var enricher in enrichers.AsParallel())
             {
-                // record event
+                // record event so that it is not duplicated
                 var logEntry = new EnrichmentLogEntry
                 {
                     DateCreated = DateTime.UtcNow,
-                    OutputTypeId = enricher.UniqueId
+                    OutputTypeId = enricher.OutputTypeId
                 };
+
 
                 // list of items to create
                 // ReSharper disable once PossibleMultipleEnumeration
-                foreach (var whole in source)
+                foreach (var target in targets)
                 {
+                    if (_logger.IsDebugEnabled)
+                        _logger.Debug($"Enriching target with enricher {enricher.OutputTypeId}.");
+
+
                     try
                     {
-                        // find the parts
-                        var foundParts = enricher.Find(whole);
+                        // find the parts that can enrich the whole
+                        var foundParts = enricher.Find(target);
 
                         // ReSharper disable once SuspiciousTypeConversion.Global
                         foreach (var part in foundParts)
@@ -68,7 +72,7 @@ namespace FutureState.Flow.Enrich
                             try
                             {
                                 // enrich the whole from the part
-                                enricher.Enrich(part, whole);
+                                enricher.Enrich(part, target);
 
                                 // increment entities enriched
                                 logEntry.EntitiesEnriched++;
@@ -76,37 +80,37 @@ namespace FutureState.Flow.Enrich
                             catch (Exception ex)
                             {
                                 throw new ApplicationException(
-                                    $"Failed to enrich {whole} from {part} due to an unexpected error.",
+                                    $"Failed to enrich {target} from {part} due to an unexpected error.",
                                     ex);
                             }
                         }
                     }
                     catch (ApplicationException aex)
                     {
-                        log.Exceptions.Add(aex);
+                        db.Exceptions.Add(aex);
 
                         throw;
                     }
                     catch (Exception ex)
                     {
-                        log.Exceptions.Add(ex);
+                        db.Exceptions.Add(ex);
 
                         throw new Exception(
-                            $"Failed to enrich whole {whole} from source {source} due to an unexpected error.", ex);
+                            $"Failed to enrich whole {target} from source {targets} due to an unexpected error.", ex);
                     }
                 }
 
                 lock (this)
                 {
                     // add log entry after completes
-                    log.Logs.Add(logEntry);
+                    db.Logs.Add(logEntry);
                 }
             }
 
             // the date/time completed
-            log.Completed = DateTime.UtcNow;
+            db.Completed = DateTime.UtcNow;
 
-            return log;
+            return db;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace FutureState.Flow.Enrich
 {
     public interface IEnricher
     {
-        string UniqueId { get; set; }
+        string OutputTypeId { get; set; }
     }
 
     /// <summary>

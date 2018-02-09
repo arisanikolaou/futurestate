@@ -8,7 +8,7 @@ namespace FutureState.Flow.Data
     /// <summary>
     ///     Repository for a given process result.
     /// </summary>
-    /// <typeparam name="TProcessResult"></typeparam>
+    /// <typeparam name="TProcessResult">The process result type.</typeparam>
     public class ProcessResultRepository<TProcessResult> : IProcessResultRepository<TProcessResult> where TProcessResult : ProcessResult
     {
         // ReSharper disable once StaticMemberInGenericType
@@ -39,6 +39,10 @@ namespace FutureState.Flow.Data
         }
 
         // keep a log of the entities which errored out or were processed
+        /// <summary>
+        ///     Saves the result to the data dir.
+        /// </summary>
+        /// <param name="data"></param>
         public void Save(TProcessResult data)
         {
             CreateDirIfNotExists();

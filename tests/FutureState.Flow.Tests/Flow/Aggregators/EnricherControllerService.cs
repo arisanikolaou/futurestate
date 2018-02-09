@@ -92,7 +92,7 @@ namespace FutureState.Flow.Enrich
                     // read from source
                     var enricher = new Enricher<Part, Whole>(() => list)
                     {
-                        UniqueId = partDirectory.Name
+                        OutputTypeId = partDirectory.Name
                     };
 
                     if (!log.GetHasBeenProcessed( enricher))

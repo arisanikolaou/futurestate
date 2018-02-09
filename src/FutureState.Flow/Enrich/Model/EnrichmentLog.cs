@@ -53,7 +53,7 @@ namespace FutureState.Flow.Enrich
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (Logs != null)
                 return Logs.Any(m =>
-                    string.Equals(m.OutputTypeId, enricher.UniqueId, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(m.OutputTypeId, enricher.OutputTypeId, StringComparison.OrdinalIgnoreCase));
 
             return false;
         }
