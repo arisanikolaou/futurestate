@@ -8,6 +8,11 @@ using NLog;
 
 namespace FutureState.Flow.Enrich
 {
+    /// <summary>
+    ///     Enrich a given target type from a Csv source file.
+    /// </summary>
+    /// <typeparam name="TPart"></typeparam>
+    /// <typeparam name="TComposite"></typeparam>
     public class CsvEnricherBuilder<TPart, TComposite>
         where TPart : IEquatable<TComposite>
     {
@@ -56,10 +61,10 @@ namespace FutureState.Flow.Enrich
 
 
     /// <summary>
-    ///     Enriches data from a given part entity type to a whole (target) entity tpe.
+    ///     Enriches data from a given 'part' entity type to a whole (target) entity tpe.
     /// </summary>
-    /// <typeparam name="TPart"></typeparam>
-    /// <typeparam name="TComposite"></typeparam>
+    /// <typeparam name="TPart">The entity type used to enrich the target composite type.</typeparam>
+    /// <typeparam name="TComposite">The composite type being enriched.</typeparam>
     public class Enricher<TPart, TComposite> : IEnricher<TComposite>
         where TPart : IEquatable<TComposite>
     {
@@ -88,6 +93,10 @@ namespace FutureState.Flow.Enrich
                 .GetMapper<TPart, TComposite>();
         }
 
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="sourceGet"></param>
         public Enricher(Func<IEnumerable<TPart>> sourceGet)
         {
             Guard.ArgumentNotNull(sourceGet, nameof(sourceGet));
@@ -95,30 +104,32 @@ namespace FutureState.Flow.Enrich
             // source data to enrich from
             this._source = sourceGet;
 
+            // the unique id of the enricher
             this.UniqueId = GetType().Name;
         }
-
-        public virtual TComposite Enrich(TPart part, TComposite whole)
-        {
-            // copy objects from source to targe
-            var map = _mapper.Map(part, whole);
-
-            EnrichAction?.Invoke(part, map);
-
-            return map;
-        }
-
+        
+        /// <summary>
+        ///     Enriches the whole from a given part.
+        /// </summary>
+        /// <param name="part">The data source used to enrich the whole composite data type.</param>
+        /// <param name="whole">The whole object to enrich.</param>
+        /// <returns></returns>
         public virtual TComposite Enrich(IEquatable<TComposite> part, TComposite whole)
         {
             return _mapper.Map((TPart)part, whole);
         }
 
-        public IEnumerable<IEquatable<TComposite>> Get()
+        /// <summary>
+        ///     Gets a set of composite objects.
+        /// </summary>
+        /// <returns></returns>
+        public virtual IEnumerable<IEquatable<TComposite>> Get()
         {
             // gets all the items in the source
             foreach (var item in _source())
                 yield return item;
         }
+
 
         public virtual IEnumerable<IEquatable<TComposite>> Find(TComposite composite)
         {

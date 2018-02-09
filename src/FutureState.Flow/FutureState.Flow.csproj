@@ -64,10 +64,10 @@
     <Compile Include="Controllers\IFlowFileController.cs" />
     <Compile Include="Enrich\Common\Enricher.cs" />
     <Compile Include="Enrich\Common\EnricherController.cs" />
-    <Compile Include="Enrich\Common\EnrichmentController.cs" />
+    <Compile Include="Enrich\Common\EnricherProcessor.cs" />
     <Compile Include="Enrich\Common\EnrichmentTarget.cs" />
     <Compile Include="Enrich\Common\IEnricher.cs" />
-    <Compile Include="Enrich\Data\EnrichmentLogRepository.cs" />
+    <Compile Include="Enrich\Data\EnricherLogRepository.cs" />
     <Compile Include="Enrich\Data\IEnrichmentLogRepository.cs" />
     <Compile Include="Enrich\Model\EnrichmentLog.cs" />
     <Compile Include="Enrich\Model\EnrichmentLogEntry.cs" />

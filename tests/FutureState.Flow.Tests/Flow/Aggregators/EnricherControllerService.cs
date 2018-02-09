@@ -8,23 +8,33 @@ using FutureState.Specifications;
 
 namespace FutureState.Flow.Enrich
 {
+
+    // polling consumer to enriche a target data source periodically
+
     public class EnricherControllerService
     {
         readonly Timer _timer;
+        private readonly FlowFileLogRepository _flowFileRepo;
 
-        public EnricherControllerService()
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public EnricherControllerService(FlowFileLogRepository flowFileRepo)
         {
             _timer = new Timer
             {
                 Interval = 1000
             };
 
+            _flowFileRepo = flowFileRepo;
             _timer.Elapsed += _timer_Elapsed;
         }
 
         public DirectoryInfo SourceDirectory { get; set; }
 
         public DirectoryInfo PartDirectory { get; set; }
+
+        public Guid FlowId { get; set; } = Guid.Parse("a4840d97-6924-4f35-a7bf-c09ef5a0bb2c");
 
         public void Start()
         {
@@ -40,11 +50,10 @@ namespace FutureState.Flow.Enrich
                 SourceDirectory = new DirectoryInfo(Environment.CurrentDirectory);
 
             // load flow file
-            var flowFileRepo = new FlowFileLogRepository();
-            var flowFile = flowFileRepo.Get(Guid.Parse("a4840d97-6924-4f35-a7bf-c09ef5a0bb2c"));
+            var flowFile = _flowFileRepo.Get(FlowId);
 
             // save
-            flowFileRepo.Save(flowFile);
+            _flowFileRepo.Save(flowFile);
 
             // load batch process
             var batchProcess = new BatchProcess()
@@ -59,11 +68,9 @@ namespace FutureState.Flow.Enrich
                 WorkingFolder = SourceDirectory.FullName
             };
 
-            var enRepo = new EnrichmentLogRepository();
+            var enRepo = new EnricherLogRepository();
 
             // load by source id
-            
-
             foreach (var sourceFileInfo in SourceDirectory.GetFiles())
             {
                 string sourceId = Path.GetFileNameWithoutExtension(sourceFileInfo.Name);
@@ -81,14 +88,14 @@ namespace FutureState.Flow.Enrich
                     {
                         new Part() {Key = "Key", FirstName = "Name"}
                     };
-                    // read from source
 
+                    // read from source
                     var enricher = new Enricher<Part, Whole>(() => list)
                     {
                         UniqueId = partDirectory.Name
                     };
 
-                    if (!log.GetHasBeenProcessed(batchProcess.FlowId, enricher))
+                    if (!log.GetHasBeenProcessed( enricher))
                     {
                         // start processing
                         unProcessedEnrichers.Add(enricher);
@@ -99,15 +106,15 @@ namespace FutureState.Flow.Enrich
                 ProcessResult<Part, Whole> result = repo.Get(sourceFileInfo.FullName);
 
                 //enricher.Enrich()
-                var enrichmentController = new EnrichmentController();
+                var enrichmentController = new EnricherProcessor();
 
                 // enrich valid and invalid items
                 enrichmentController
-                    .Enrich(batchProcess.FlowId, result.Invalid, unProcessedEnrichers);
+                    .Enrich(result.Invalid, unProcessedEnrichers);
 
                 // enrich valid and invalid items
                 enrichmentController
-                    .Enrich(batchProcess.FlowId, result.Output, unProcessedEnrichers);
+                    .Enrich(result.Output, unProcessedEnrichers);
 
                 // save new output
                 ProcessResults(result, batchProcess);

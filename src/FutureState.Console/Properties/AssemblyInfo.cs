@@ -18,4 +18,4 @@ namespace System {
     }
 }
 
-[assembly: AssemblyInformationalVersion("0.1.0-flow-enrichment.1+169.Branch.feature/flow-enrichment.Sha.654e631b25960eb8acfe0a5b2f06887c3aca60d9")]
+[assembly: AssemblyInformationalVersion("0.1.0-flow-enrichment.1+172.Branch.feature/flow-enrichment.Sha.70966fd3bdbc46ad59b936050fb27d2654345681")]

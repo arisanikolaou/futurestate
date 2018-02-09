@@ -5,41 +5,39 @@ using NLog;
 
 namespace FutureState.Flow.Enrich
 {
-    // manages the enrichment process 
-    public class EnrichmentController
+    // process enrichers on a given taarget
+
+    public class EnricherProcessor
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// </summary>
-        public EnrichmentController()
+        public EnricherProcessor()
         {
             SourceId = "UniqueId";
         }
 
         /// <summary>
-        /// 
+        ///     Gets the unique id of the souce enriching a given target.
         /// </summary>
         public string SourceId { get; set; }
 
         /// <summary>
         ///     Enriches the source data with data from parts.
         /// </summary>
-        /// <typeparam name="TWhole">The whole data type to create</typeparam>
-        /// <param name="flowId">The associated flow id.</param>
+        /// <typeparam name="TWhole">The whole data type to enrich.</typeparam>
         /// <param name="source">The data source for 'whole' objects.</param>
-        /// <param name="enrichers">The sources to enrich.</param>
+        /// <param name="enrichers">The sources to enrich 'whole' target objects.</param>
         /// <returns></returns>
         public EnrichmentLog Enrich<TWhole>(
-            Guid flowId,
             IEnumerable<TWhole> source,
             IEnumerable<IEnricher<TWhole>> enrichers)
         {
-            // enrichment log
+            // enrichment log to record transactions
             var log = new EnrichmentLog
             {
-                SourceId = SourceId,
-                FlowId = flowId,
+                TargetTypeId = SourceId,
                 StartTime = DateTime.UtcNow,
                 Exceptions = new List<Exception>(),
                 Logs = new List<EnrichmentLogEntry>()
@@ -52,7 +50,7 @@ namespace FutureState.Flow.Enrich
                 var logEntry = new EnrichmentLogEntry
                 {
                     DateCreated = DateTime.UtcNow,
-                    EnricherUniqueId = enricher.UniqueId
+                    OutputTypeId = enricher.UniqueId
                 };
 
                 // list of items to create

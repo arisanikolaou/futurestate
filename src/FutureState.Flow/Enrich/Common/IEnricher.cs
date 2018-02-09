@@ -8,12 +8,16 @@ namespace FutureState.Flow.Enrich
         string UniqueId { get; set; }
     }
 
-    public interface IEnricher<TComposite> : IEnricher
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TTarget">The data type to enrich.</typeparam>
+    public interface IEnricher<TTarget> : IEnricher
     {
-        IEnumerable<IEquatable<TComposite>> Get();
+        IEnumerable<IEquatable<TTarget>> Get();
 
-        TComposite Enrich(IEquatable<TComposite> part, TComposite whole);
+        TTarget Enrich(IEquatable<TTarget> part, TTarget whole);
 
-        IEnumerable<IEquatable<TComposite>> Find(TComposite composite);
+        IEnumerable<IEquatable<TTarget>> Find(TTarget composite);
     }
 }

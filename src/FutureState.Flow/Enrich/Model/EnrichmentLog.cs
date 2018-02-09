@@ -12,15 +12,10 @@ namespace FutureState.Flow.Enrich
     // a log of all the files that have been content enriched
     public class EnrichmentLog
     {
-        public EnrichmentLog(Guid flowId)
-        {
-            FlowId = flowId;
-            Logs = new List<EnrichmentLogEntry>();
-            Exceptions = new List<Exception>();
-        }
-
         public EnrichmentLog()
         {
+            Logs = new List<EnrichmentLogEntry>();
+            Exceptions = new List<Exception>();
         }
 
         // the processor results or source of the data
@@ -28,7 +23,7 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Gets the data source being enriched.
         /// </summary>
-        public string SourceId { get; set; }
+        public string TargetTypeId { get; set; }
 
 
         // a record of the items that have been enriched
@@ -50,23 +45,15 @@ namespace FutureState.Flow.Enrich
         public DateTime? Completed { get; set; }
 
         /// <summary>
-        ///     Gets the batch process id.
-        /// </summary>
-        public Guid FlowId { get; set; }
-
-        /// <summary>
         ///     Gets whether or not the enricher has already been procesed.
         /// </summary>
         /// <returns></returns>
-        public bool GetHasBeenProcessed(Guid flowId, IEnricher enricher)
+        public bool GetHasBeenProcessed(IEnricher enricher)
         {
-            if (!FlowId.Equals(flowId))
-                return false;
-
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (Logs != null)
                 return Logs.Any(m =>
-                    string.Equals(m.EnricherUniqueId, enricher.UniqueId, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(m.OutputTypeId, enricher.UniqueId, StringComparison.OrdinalIgnoreCase));
 
             return false;
         }

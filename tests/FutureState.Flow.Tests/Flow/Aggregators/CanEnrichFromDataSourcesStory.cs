@@ -15,7 +15,7 @@ namespace FutureState.Flow.Enrich
         private List<IEnricher<Whole>> _enrichers;
         private EnrichmentLog _processResults;
         private BatchProcess _process;
-        private EnrichmentController _controller;
+        private EnricherProcessor _controller;
         private EnrichmentLog _loadedResults;
 
         protected void GivenAnInMemorySetOfWholeAndPartSources()
@@ -53,7 +53,7 @@ namespace FutureState.Flow.Enrich
 
         protected void AndGivenAnEnrichingController()
         {
-            this._controller = new EnrichmentController()
+            this._controller = new EnricherProcessor()
             {
                 SourceId = _sourceId
             };
@@ -61,12 +61,12 @@ namespace FutureState.Flow.Enrich
 
         protected void WhenProcessingEnrichmentsAgainstTheSource()
         {
-            _processResults = _controller.Enrich(_process.FlowId, _source, _enrichers);
+            _processResults = _controller.Enrich( _source, _enrichers);
         }
 
         protected void AndWhenSavingResults()
         {
-            var repo = new EnrichmentLogRepository();
+            var repo = new EnricherLogRepository();
 
             repo.Save(this._processResults);
         }
@@ -92,13 +92,13 @@ namespace FutureState.Flow.Enrich
             Assert.Equal(
                 _enrichers.Count, 
                 _processResults.Logs
-                    .FirstOrDefault( m => m.EnricherUniqueId == "EnricherA")
+                    .FirstOrDefault( m => m.OutputTypeId == "EnricherA")
                     ?.EntitiesEnriched);
         }
 
         protected void AndThenShouldBeAbleToSaveEnricherResultsResults()
         {
-            var repo = new EnrichmentLogRepository();
+            var repo = new EnricherLogRepository();
 
             // should be able to reload
             this._loadedResults = repo.Get(_sourceId);
@@ -109,7 +109,7 @@ namespace FutureState.Flow.Enrich
             foreach (var enricher in _enrichers)
             {
                 Assert.True(
-                    _loadedResults.GetHasBeenProcessed(_process.FlowId, enricher));
+                    _loadedResults.GetHasBeenProcessed( enricher));
             }
         }
 

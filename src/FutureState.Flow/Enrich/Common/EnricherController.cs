@@ -9,16 +9,19 @@ namespace FutureState.Flow.Enrich
 {
 
     /// <summary>
-    ///     Controlls how a set of enrichers are used to enrich content in a given flow file (process result).
+    ///     Controlls how a set of enrichers are used to append/update content in a
+    ///     given flow file (process result).
     /// </summary>
-    /// <typeparam name="TTarget"></typeparam>
+    /// <typeparam name="TTarget">The target data type to enrich.</typeparam>
     public class EnricherController<TTarget> where TTarget :  class, new()
     {
-        private readonly EnrichmentLogRepository _logRepo;
+        private readonly EnricherLogRepository _logRepo;
         private readonly ISpecification<IEnumerable<TTarget>>[] _entityCollection;
         private readonly ISpecification<TTarget>[] _entityRules;
 
-        //
+        /// <summary>
+        ///     Gets a new instance.
+        /// </summary>
         public EnricherController() : this(
             new ProcessorConfiguration<TTarget, TTarget>(new SpecProvider<TTarget>(),
                 new SpecProvider<IEnumerable<TTarget>>()))
@@ -26,6 +29,9 @@ namespace FutureState.Flow.Enrich
 
         }
 
+        /// <summary>
+        ///     Gets a new instance using a given process configuration operating against a given working folder.
+        /// </summary>
         public EnricherController(ProcessorConfiguration<TTarget, TTarget> config, string workingFolder = null)
         {
             var processorConfiguration = config;
@@ -33,9 +39,9 @@ namespace FutureState.Flow.Enrich
             // targetDirectory workingFolder default to current workingFolder
             WorkingFolder = new DirectoryInfo(workingFolder ?? Environment.CurrentDirectory);
 
-            _logRepo = new EnrichmentLogRepository()
+            _logRepo = new EnricherLogRepository()
             {
-                WorkingFolder = WorkingFolder.FullName
+                DataDirectory = WorkingFolder.FullName
             };
 
 
@@ -43,9 +49,16 @@ namespace FutureState.Flow.Enrich
             this._entityCollection = processorConfiguration.CollectionRules.ToArray();
         }
 
+        /// <summary>
+        ///     Gets the directory to store the log of files used to enrich target
+        ///     flow files.
+        /// </summary>
         public DirectoryInfo WorkingFolder { get; set; }
 
 
+        /// <summary>
+        ///     Initializes the controller.
+        /// </summary>
         public void Initialize()
         {
             // initialize directories
@@ -70,29 +83,32 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Process unriched data from a given targetDirectory file.
         /// </summary>
-        protected void Process<TIn>(Guid flowId, IEnumerable<IEnricher<TTarget>> enrichers, EnrichmentTarget<TIn, TTarget> target)
+        protected void Process<TPart>(
+            Guid flowId, 
+            IEnumerable<IEnricher<TTarget>> enrichers, 
+            EnrichmentTarget<TPart, TTarget> target)
         {
             // load by targetDirectory id
             var logRepository = _logRepo.Get(target.UniqueId);
 
             if (logRepository == null)
-                logRepository = new EnrichmentLog(flowId) { SourceId = target.UniqueId };
+                logRepository = new EnrichmentLog() { TargetTypeId = target.UniqueId };
 
             var unProcessedEnrichers = new List<IEnricher<TTarget>>();
 
             // aggregate list of enrichers that haven't been processed for the target
             foreach (var enricher in enrichers)
-                if (!logRepository.GetHasBeenProcessed(flowId, enricher))
+                if (!logRepository.GetHasBeenProcessed(enricher))
                     unProcessedEnrichers.Add(enricher);
 
             // get results
             var processResult = target.GetProcessResult();
 
             // enrich valid and invalid items
-            var enrichmentController = new EnrichmentController();
+            var enrichmentController = new EnricherProcessor();
             foreach (var source in new[] { processResult.Invalid , processResult.Output })
                 enrichmentController
-                    .Enrich(flowId, source, unProcessedEnrichers);
+                    .Enrich(source, unProcessedEnrichers);
 
             // process and save new enriched file
             {
@@ -100,7 +116,7 @@ namespace FutureState.Flow.Enrich
 
                 // save new file
                 // targetDirectory repository
-                var resultRepo = new ProcessResultRepository<ProcessResult<TIn, TTarget>>()
+                var resultRepo = new ProcessResultRepository<ProcessResult<TPart, TTarget>>()
                 {
                     WorkingFolder = target.File.Directory.FullName
                 };
@@ -112,7 +128,7 @@ namespace FutureState.Flow.Enrich
             // update enricher log
             {
                 foreach (var enricher in unProcessedEnrichers)
-                    logRepository.Logs.Add(new EnrichmentLogEntry() { EnricherUniqueId = enricher.UniqueId, DateCreated = DateTime.UtcNow });
+                    logRepository.Logs.Add(new EnrichmentLogEntry() { OutputTypeId = enricher.UniqueId, DateCreated = DateTime.UtcNow });
 
                 // save log
                 _logRepo.Save(logRepository);
