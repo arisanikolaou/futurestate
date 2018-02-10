@@ -194,7 +194,7 @@ namespace FutureState.Flow
 
             // resolve repository to store flow file process details
             var logRepository = _flowFileLogFactory.Get();
-            logRepository.WorkingFolder = _config.BasePath;
+            logRepository.DataDir = _config.BasePath;
 
             var processor = _flowControllerServiceFactory.Get(logRepository, flowController);
 

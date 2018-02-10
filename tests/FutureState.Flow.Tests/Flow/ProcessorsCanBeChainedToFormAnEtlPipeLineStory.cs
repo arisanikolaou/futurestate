@@ -96,7 +96,7 @@ namespace FutureState.Flow.Tests.Flow
         {
             _logRepository = new FlowFileLogRepository
             {
-                WorkingFolder = _baseDirectory
+                DataDir = _baseDirectory
             };
         }
 

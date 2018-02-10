@@ -21,18 +21,18 @@ namespace FutureState.Flow.Data
         /// </summary>
         public ProcessResultRepository(string workingFolder = null)
         {
-            WorkingFolder = workingFolder ?? Environment.CurrentDirectory;
+            DataDir = workingFolder ?? Environment.CurrentDirectory;
         }
 
         /// <summary>
         ///     Gets or sets the working folder to persist temporary files to.
         /// </summary>
-        public string WorkingFolder
+        public string DataDir
         {
             get => _workingFolder;
             set
             {
-                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(WorkingFolder));
+                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(DataDir));
 
                 _workingFolder = value;
             }
@@ -49,10 +49,10 @@ namespace FutureState.Flow.Data
             
             var i = 1;
             var fileName =
-                $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{data.BatchProcess.BatchId}.json";
+                $@"{DataDir}\{data.ProcessName}-{data.BatchProcess.FlowId}-{data.BatchProcess.BatchId}.json";
             while (File.Exists(fileName))
                 fileName =
-                    $@"{WorkingFolder}\{data.ProcessName}-{data.BatchProcess.FlowId}-{
+                    $@"{DataDir}\{data.ProcessName}-{data.BatchProcess.FlowId}-{
                             data.BatchProcess.BatchId
                         }-{i++}.json";
 
@@ -69,7 +69,7 @@ namespace FutureState.Flow.Data
 
         public TProcessResult Get(string processName, Guid correlationId, long batchId)
         {
-            var fileName = $@"{WorkingFolder}\{processName}-{correlationId}-{batchId}.json";
+            var fileName = $@"{DataDir}\{processName}-{correlationId}-{batchId}.json";
 
             if (!File.Exists(fileName))
                 return default(TProcessResult);
@@ -99,14 +99,14 @@ namespace FutureState.Flow.Data
 
         private void CreateDirIfNotExists()
         {
-            if (!Directory.Exists(WorkingFolder))
+            if (!Directory.Exists(DataDir))
                 try
                 {
-                    Directory.CreateDirectory(WorkingFolder);
+                    Directory.CreateDirectory(DataDir);
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException($"Can't create working folder {WorkingFolder}.", ex);
+                    throw new ApplicationException($"Can't create working folder {DataDir}.", ex);
                 }
         }
     }

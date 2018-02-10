@@ -123,6 +123,7 @@
   <ItemGroup>
     <Compile Include="Flow\Aggregators\CanEnrichFromDataSourcesStory.cs" />
     <Compile Include="Flow\Aggregators\EnricherControllerService.cs" />
+    <Compile Include="Flow\Aggregators\IEnricherControllerService.cs" />
     <Compile Include="Flow\Aggregators\MockClasses.cs" />
     <Compile Include="Flow\Aggregators\EnricherControllerCanEnrichFromCsvStories.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />

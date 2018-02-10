@@ -25,11 +25,14 @@ namespace FutureState.Flow.Data
         FlowFileLog Get(Guid flowId);
     }
 
+    /// <summary>
+    ///     A repository for a given flow.
+    /// </summary>
     public class FlowFileLogRepository : IFlowFileLogRepository
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private string _workingFolder;
+        private string _dataDir;
 
         /// <summary>
         ///     Creates a new instance.
@@ -39,48 +42,50 @@ namespace FutureState.Flow.Data
         /// </param>
         public FlowFileLogRepository(string workingFolder = null)
         {
-            _workingFolder = workingFolder ?? Environment.CurrentDirectory;
+            _dataDir = workingFolder ?? Environment.CurrentDirectory;
         }
 
         /// <summary>
         ///     Gets or sets the working folder to persist temporary files to.
         /// </summary>
-        public string WorkingFolder
+        public string DataDir
         {
-            get => _workingFolder;
+            get => _dataDir;
             set
             {
-                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(WorkingFolder));
+                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(DataDir));
 
-                _workingFolder = value;
+                _dataDir = value;
             }
         }
 
-        public void Save(FlowFileLog data)
+        public void Save(FlowFileLog log)
         {
-            Guard.ArgumentNotNull(data, nameof(data));
+            Guard.ArgumentNotNull(log, nameof(log));
 
-            if (!Directory.Exists(WorkingFolder))
+            if (!Directory.Exists(DataDir))
                 try
                 {
-                    Directory.CreateDirectory(WorkingFolder);
+                    Directory.CreateDirectory(DataDir);
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException($"Can't create working folder {WorkingFolder}.", ex);
+                    throw new ApplicationException($"Can't create working folder {DataDir}.", ex);
                 }
 
+            // test to ensure we can convert the log
+            var body = JsonConvert.SerializeObject(log, new JsonSerializerSettings());
+
+            // update existing file
             var fileName =
-                $@"{WorkingFolder}\FlowLog-{data.FlowId}.json";
+                $@"{DataDir}\FlowLog-{log.FlowId}.json";
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving flow file transaction log to {fileName}.");
-
-            var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
-
+            
             File.WriteAllText(fileName, body);
 
             if (_logger.IsInfoEnabled)
@@ -95,11 +100,11 @@ namespace FutureState.Flow.Data
         /// </returns>
         public FlowFileLog Get(Guid flowId)
         {
-            if (!Directory.Exists(WorkingFolder))
-                Directory.CreateDirectory(WorkingFolder);
+            if (!Directory.Exists(DataDir))
+                Directory.CreateDirectory(DataDir);
 
             var fileName =
-                $@"{WorkingFolder}\FlowLog-{flowId}.json";
+                $@"{DataDir}\FlowLog-{flowId}.json";
 
             if (!File.Exists(fileName))
                 return new FlowFileLog(flowId);

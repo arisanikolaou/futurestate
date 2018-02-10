@@ -9,9 +9,14 @@ namespace FutureState.Flow.Enrich
     // enrichment should succeed or valid as a whole
     // should be able to work against a given process result
 
-    // a log of all the files that have been content enriched
+    /// <summary>
+    ///     A log of all enrichments processed from a given source to multiple targets.
+    /// </summary>
     public class EnrichmentLog
     {
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
         public EnrichmentLog()
         {
             Logs = new List<EnrichmentLogEntry>();
@@ -26,7 +31,9 @@ namespace FutureState.Flow.Enrich
         public string TargetTypeId { get; set; }
 
 
-        // a record of the items that have been enriched
+        /// <summary>
+        ///     Gets the log of all targets updated by data from the source.
+        /// </summary>
         public List<EnrichmentLogEntry> Logs { get; set; }
 
         /// <summary>
@@ -40,7 +47,7 @@ namespace FutureState.Flow.Enrich
         public DateTime StartTime { get; set; }
 
         /// <summary>
-        ///     Gets the date the enchrichment process finished if any.
+        ///     Gets the date the enchrichment process finished if any. If null the flow batch was not completed.
         /// </summary>
         public DateTime? Completed { get; set; }
 

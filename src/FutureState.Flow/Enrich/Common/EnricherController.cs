@@ -32,16 +32,16 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Gets a new instance using a given process configuration operating against a given working folder.
         /// </summary>
-        public EnricherController(ProcessorConfiguration<TTarget, TTarget> config, string workingFolder = null)
+        public EnricherController(ProcessorConfiguration<TTarget, TTarget> config, string dataDirectory = null)
         {
             var processorConfiguration = config;
 
             // targetDirectory workingFolder default to current workingFolder
-            WorkingFolder = new DirectoryInfo(workingFolder ?? Environment.CurrentDirectory);
+            DataDirectory = new DirectoryInfo(dataDirectory ?? Environment.CurrentDirectory);
 
             _logRepo = new EnricherLogRepository()
             {
-                DataDirectory = WorkingFolder.FullName
+                DataDirectory = DataDirectory.FullName
             };
 
 
@@ -53,7 +53,7 @@ namespace FutureState.Flow.Enrich
         ///     Gets the directory to store the log of files used to enrich target
         ///     flow files.
         /// </summary>
-        public DirectoryInfo WorkingFolder { get; set; }
+        public DirectoryInfo DataDirectory { get; set; }
 
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace FutureState.Flow.Enrich
         public void Initialize()
         {
             // initialize directories
-            if (WorkingFolder == null)
-                WorkingFolder = new DirectoryInfo(Environment.CurrentDirectory);
+            if (DataDirectory == null)
+                DataDirectory = new DirectoryInfo(Environment.CurrentDirectory);
         }
 
         /// <summary>
@@ -114,11 +114,11 @@ namespace FutureState.Flow.Enrich
             {
                 var outResult = ProcessResults(processResult);
 
-                // save new file
+                // save new flow file
                 // targetDirectory repository
                 var resultRepo = new ProcessResultRepository<ProcessResult<TPart, TTarget>>()
                 {
-                    WorkingFolder = target.SourceFileName.Directory.FullName
+                    DataDir = target.SourceFileName.Directory.FullName
                 };
 
                 // save resports

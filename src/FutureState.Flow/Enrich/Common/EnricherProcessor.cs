@@ -42,7 +42,7 @@ namespace FutureState.Flow.Enrich
                 Logs = new List<EnrichmentLogEntry>()
             };
 
-            // parallelize enrichment 
+            // parallelize enrichment of the targets
             foreach (var enricher in enrichers.AsParallel())
             {
                 // record event so that it is not duplicated
