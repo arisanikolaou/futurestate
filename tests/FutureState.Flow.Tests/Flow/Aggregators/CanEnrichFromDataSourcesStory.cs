@@ -98,7 +98,7 @@ namespace FutureState.Flow.Enrich
             var repo = new EnricherLogRepository();
 
             // should be able to reload
-            this._loadedResults = repo.Get(_sourceId);
+            this._loadedResults = repo.Get("Whole");
 
             Assert.NotNull(_loadedResults);
             Assert.Equal(2, _loadedResults.Logs.Count);
