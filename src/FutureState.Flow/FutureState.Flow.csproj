@@ -67,12 +67,12 @@
     <Compile Include="Enrich\Common\EnricherProcessor.cs" />
     <Compile Include="Enrich\Common\EnrichmentTarget.cs" />
     <Compile Include="Enrich\Common\IEnricher.cs" />
-    <Compile Include="Enrich\Data\EnricherLogRepository.cs" />
-    <Compile Include="Enrich\Data\IEnrichmentLogRepository.cs" />
-    <Compile Include="Enrich\Model\EnrichmentLog.cs" />
-    <Compile Include="Enrich\Model\EnrichmentLogEntry.cs" />
+    <Compile Include="Model\EnricherLogRepository.cs" />
+    <Compile Include="Model\EnrichmentLog.cs" />
+    <Compile Include="Model\EnrichmentLogEntry.cs" />
     <Compile Include="FlowConfiguration.cs" />
     <Compile Include="FlowController.cs" />
+    <Compile Include="Model\Flow.cs" />
     <Compile Include="Model\FlowFileLog.cs" />
     <Compile Include="FlowControllerService.cs" />
     <Compile Include="Model\FlowFileLogEntry.cs" />
@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Docs\DataStructures.xlsx" />
     <None Include="FutureState.Flow.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -111,6 +112,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\" />
+    <Folder Include="Enrich\Data\" />
+    <Folder Include="Enrich\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

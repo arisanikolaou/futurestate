@@ -12,6 +12,7 @@ namespace FutureState.Flow.Enrich
     [Story()]
     public class EnricherControllerCanEnrichFromCsvStories
     {
+        private Flow _flow;
         private BatchProcess _batchProcess;
         private string _workingDirectory;
         private ProcessResult<WholeSource, Whole> _processResult;
@@ -24,6 +25,8 @@ namespace FutureState.Flow.Enrich
 
         protected void GivenAFlowAndABatchProcess()
         {
+            this._flow = new Flow("Test");
+
             this._batchProcess = new BatchProcess()
             {
                 FlowId = Guid.Parse("f41cfe3a-4ddb-43ae-8302-0c322c84bdd2"),
@@ -115,7 +118,7 @@ namespace FutureState.Flow.Enrich
             var enrichers = new List<Enricher<Part, Whole>>();
             foreach (var file in Directory.GetFiles(_partDir))
             {
-                var enricherBuilder = new CsvEnricherBuilder<Part, Whole>() { FileName = file };
+                var enricherBuilder = new CsvEnricherBuilder<Part, Whole>() { FilePath = file };
                 enrichers.Add(enricherBuilder.Get());
             }
 
@@ -125,12 +128,12 @@ namespace FutureState.Flow.Enrich
             {
                 targetEnrichers.Add(new EnrichmentTarget<WholeSource, Whole>(new ProcessResultRepository<ProcessResult<WholeSource, Whole>>())
                 {
-                    SourceFileName = file
+                    DataSource = file
                 });
             }
 
             // process results
-            _subject.Process(_batchProcess.FlowId, enrichers, targetEnrichers);
+            _subject.Process(_flow, enrichers, targetEnrichers);
         }
 
 

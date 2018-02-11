@@ -3,8 +3,25 @@ using System.IO;
 using Newtonsoft.Json;
 using NLog;
 
-namespace FutureState.Flow.Enrich
+namespace FutureState.Flow
 {
+    /// <summary>
+    ///     Loads/start a given enrichment transaction log.
+    /// </summary>
+    public interface IEnrichmentLogRepository
+    {
+        /// <summary>
+        ///     Gets the log of data sources used to enrich a given target entity set.
+        /// </summary>
+        /// <returns></returns>
+        EnrichmentLog Get(Flow flow, FlowEntity sourceEntityType);
+
+        /// <summary>
+        ///     Saves the log of data sources used to enrich a given target entity set.
+        /// </summary>
+        void Save(EnrichmentLog data);
+    }
+
     /// <summary>
     ///     Loads/saves <see cref="EnrichmentLog"/> instances from the file system.
     /// </summary>
@@ -15,28 +32,29 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Gets/sets the directory to store/load data files from.
         /// </summary>
-        public string DataDirectory { get; set; }
+        public string DataDir { get; set; }
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
         public EnricherLogRepository()
         {
-            this.DataDirectory = Environment.CurrentDirectory;
+            this.DataDir = Environment.CurrentDirectory;
         }
 
 
         /// <summary>
         ///     Gets the enrichment log for a given target process type.
         /// </summary>
-        /// <param name="outputTypeId">The type of output to enrich.</param>
-        /// <returns>Null if not match exists.</returns>
-        public EnrichmentLog Get(string outputTypeId)
+        public EnrichmentLog Get(Flow flow, FlowEntity sourceEntityType)
         {
+            Guard.ArgumentNotNull(flow, nameof(flow));
+            Guard.ArgumentNotNull(sourceEntityType, nameof(sourceEntityType));
+
             // source id would be the name of a processor
 
             var fileName =
-                $@"{DataDirectory}\EnrichmentLog-{outputTypeId}.json";
+                $@"{DataDir}\{flow}-Enrichment-{sourceEntityType.EntityTypeId}.json";
 
             if (!File.Exists(fileName))
                 return null;
@@ -53,7 +71,6 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Saves the log to the active data dir.
         /// </summary>
-        /// <param name="log">The log to save.</param>
         public void Save(EnrichmentLog log)
         {
             Guard.ArgumentNotNull(log, nameof(log));
@@ -62,10 +79,10 @@ namespace FutureState.Flow.Enrich
 
             // source log
             var fileName =
-                $@"{DataDirectory}\EnrichmentLog-{log.TargetTypeId}.json";
+                $@"{DataDir}\{log.Flow}-Enrichment-{log.SourceEntityType.EntityTypeId}.json";
 
             if (_logger.IsInfoEnabled)
-                _logger.Info($"Saving data enrichment log output to {fileName}.");
+                _logger.Info($"Saving enrichment log output to {fileName}.");
 
             // save the data in the data directory
             var body = JsonConvert.SerializeObject(log, new JsonSerializerSettings());
@@ -89,8 +106,8 @@ namespace FutureState.Flow.Enrich
 
         private void CreateDirIfNotExists()
         {
-            if (!Directory.Exists(DataDirectory))
-                Directory.CreateDirectory(DataDirectory);
+            if (!Directory.Exists(DataDir))
+                Directory.CreateDirectory(DataDir);
         }
     }
 }

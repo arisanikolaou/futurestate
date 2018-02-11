@@ -1,14 +1,10 @@
-﻿using System;
+﻿using FutureState.Flow.Enrich;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FutureState.Flow.Enrich
+namespace FutureState.Flow
 {
-    // enrichers can/should work against 'invalid' entities as well as 'incomplete' entities
-    // processed by a normal processor
-    // enrichment should succeed or valid as a whole
-    // should be able to work against a given process result
-
     /// <summary>
     ///     A log of all enrichments processed from a given source to multiple targets.
     /// </summary>
@@ -19,16 +15,29 @@ namespace FutureState.Flow.Enrich
         /// </summary>
         public EnrichmentLog()
         {
+
+        }
+
+        public EnrichmentLog(Flow flow, FlowEntity sourceEntityType)
+        {
+            Guard.ArgumentNotNull(flow, nameof(flow));
+            Guard.ArgumentNotNull(sourceEntityType, nameof(sourceEntityType));
+
+            Flow = flow;
+            SourceEntityType = sourceEntityType;
             Logs = new List<EnrichmentLogEntry>();
             Exceptions = new List<Exception>();
         }
 
-        // the processor results or source of the data
+        /// <summary>
+        ///     Gets the flow associated with the current instance.
+        /// </summary>
+        public Flow Flow { get; set; }
 
         /// <summary>
-        ///     Gets the data source being enriched.
+        ///     Gets/sets the entity type being used to enrich a target type.
         /// </summary>
-        public string TargetTypeId { get; set; }
+        public FlowEntity SourceEntityType { get; set; }
 
 
         /// <summary>
@@ -42,25 +51,16 @@ namespace FutureState.Flow.Enrich
         public List<Exception> Exceptions { get; set; }
 
         /// <summary>
-        ///     Gets the process start time.
-        /// </summary>
-        public DateTime StartTime { get; set; }
-
-        /// <summary>
-        ///     Gets the date the enchrichment process finished if any. If null the flow batch was not completed.
-        /// </summary>
-        public DateTime? Completed { get; set; }
-
-        /// <summary>
         ///     Gets whether or not the enricher has already been procesed.
         /// </summary>
         /// <returns></returns>
-        public bool GetHasBeenProcessed(IEnricher enricher)
+        public bool GetHasBeenProcessed(IEnricher enricher, string addressId)
         {
             // ReSharper disable once ConvertIfStatementToReturnStatement
             if (Logs != null)
                 return Logs.Any(m =>
-                    string.Equals(m.OutputTypeId, enricher.OutputTypeId, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(m.TargetAddressId, addressId, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(m.SourceAddressId, addressId, StringComparison.OrdinalIgnoreCase));
 
             return false;
         }

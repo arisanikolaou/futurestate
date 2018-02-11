@@ -122,10 +122,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Flow\Aggregators\CanEnrichFromDataSourcesStory.cs" />
-    <Compile Include="Flow\Aggregators\EnricherControllerService.cs" />
-    <Compile Include="Flow\Aggregators\IEnricherControllerService.cs" />
+    <Content Include="Flow\Aggregators\Archive\EnricherControllerService.cs" />
+    <Content Include="Flow\Aggregators\Archive\IEnricherControllerService.cs" />
     <Compile Include="Flow\Aggregators\MockClasses.cs" />
-    <Compile Include="Flow\Aggregators\EnricherControllerCanEnrichFromCsvStories.cs" />
+    <Content Include="Flow\Aggregators\Archive\EnricherControllerCanEnrichFromCsvStories.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.cs" />
     <Compile Include="Flow\FlowModule.cs" />

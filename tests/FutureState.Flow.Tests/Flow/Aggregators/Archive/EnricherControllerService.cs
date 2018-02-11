@@ -108,7 +108,7 @@ namespace FutureState.Flow.Enrich
 
                 var builder = new CsvEnricherBuilder<TPart, TWhole>()
                 {
-                    FileName = partDataFile.FullName
+                    FilePath = partDataFile.FullName
                 };
 
                 var enricher = builder.Get();

@@ -57,6 +57,21 @@ namespace FutureState.Flow
     /// <typeparam name="TEntityOut">The output type.</typeparam>
     public class ProcessResult<TEntityIn, TEntityOut> : ProcessResult<TEntityIn>
     {
+        public FlowBatch Batch { get; set; }
+
+
+        public ProcessResult()
+        {
+            
+        }
+
+        public ProcessResult(FlowBatch batch)
+        {
+            Guard.ArgumentNotNull(batch, nameof(batch));
+
+            this.Batch = batch;
+        }
+
         /// <summary>
         ///     Gets the valid items created after processing. This is the primary ouput.
         /// </summary>
@@ -66,26 +81,5 @@ namespace FutureState.Flow
         ///     Gets the invalid items that were not processed.
         /// </summary>
         public List<TEntityOut> Invalid { get; set; } = new List<TEntityOut>();
-
-
-        /// <summary>
-        ///     Create a deep clone of the current instance incrementing the batch number and clearing out the errors and exceptions list.
-        /// </summary>
-        public ProcessResult<TEntityIn, TEntityOut> CreateNew()
-        {
-            // create a deep clone
-            return new ProcessResult<TEntityIn, TEntityOut>()
-            {
-                BatchProcess = BatchProcess.Increment(),
-                Errors = new List<ProcessError<TEntityIn>>(),
-                Exceptions = new List<Exception>(),
-                Invalid = new List<TEntityOut>(Invalid),
-                Output = new List<TEntityOut>(Output),
-                ProcessTime = ProcessTime,
-                ProcessedCount = ProcessedCount,
-                ProcessName = ProcessName,
-                Warnings = new List<string>()
-            };
-        }
     }
 }

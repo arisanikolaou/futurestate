@@ -9,9 +9,15 @@ namespace FutureState.Flow.Enrich
     public interface IEnricher
     {
         /// <summary>
-        ///     Gets the entity type being enriched.
+        ///     Gets the entity type used to enrich a given target.
         /// </summary>
-        string OutputTypeId { get; set; }
+        FlowEntity SourceEntityType { get; }
+
+
+        /// <summary>
+        ///     Gets the unique network address of the data source.
+        /// </summary>
+        string AddressId { get; }
     }
 
     /// <summary>

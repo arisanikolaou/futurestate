@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
+using NLog;
 
 namespace FutureState.Flow.Enrich
 {
@@ -15,8 +16,11 @@ namespace FutureState.Flow.Enrich
     /// <typeparam name="TTarget">The target data type to enrich.</typeparam>
     public class EnricherController<TTarget> where TTarget :  class, new()
     {
+        static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly EnricherLogRepository _logRepo;
         private readonly ISpecification<IEnumerable<TTarget>>[] _entityCollection;
+        private readonly Flow _flow;
         private readonly ISpecification<TTarget>[] _entityRules;
 
         /// <summary>
@@ -37,23 +41,24 @@ namespace FutureState.Flow.Enrich
             var processorConfiguration = config;
 
             // targetDirectory workingFolder default to current workingFolder
-            DataDirectory = new DirectoryInfo(dataDirectory ?? Environment.CurrentDirectory);
+            DataDir = new DirectoryInfo(dataDirectory ?? Environment.CurrentDirectory);
 
             _logRepo = new EnricherLogRepository()
             {
-                DataDirectory = DataDirectory.FullName
+                DataDir = DataDir.FullName
             };
 
 
             this._entityRules = processorConfiguration.Rules.ToArray();
             this._entityCollection = processorConfiguration.CollectionRules.ToArray();
+            this._flow = new Flow("FlowABD");
         }
 
         /// <summary>
         ///     Gets the directory to store the log of files used to enrich target
         ///     flow files.
         /// </summary>
-        public DirectoryInfo DataDirectory { get; set; }
+        public DirectoryInfo DataDir { get; set; }
 
 
         /// <summary>
@@ -62,118 +67,94 @@ namespace FutureState.Flow.Enrich
         public void Initialize()
         {
             // initialize directories
-            if (DataDirectory == null)
-                DataDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-        }
-
-        /// <summary>
-        ///     Process the targets with a given set of enrichers.
-        /// </summary>
-        public void Process<TIn>(
-            Guid flowId, 
-            IEnumerable<IEnricher<TTarget>> enrichers, 
-            IEnumerable<EnrichmentTarget<TIn, TTarget>> targets)
-        {
-            Initialize();
-
-            foreach (var target in targets)
-                Process(flowId, enrichers, target);
+            if (DataDir == null)
+                DataDir = new DirectoryInfo(Environment.CurrentDirectory);
         }
 
         /// <summary>
         ///     Process unriched data from a given targetDirectory file.
         /// </summary>
-        protected void Process<TPart>(
-            Guid flowId, 
-            IEnumerable<IEnricher<TTarget>> enrichers, 
-            EnrichmentTarget<TPart, TTarget> target)
+        public void Process<TPart>(
+            FlowBatch flowBatch,
+            IEnumerable<IEnricher<TTarget>> enrichers,
+            IEnrichmentTarget<TTarget> target)
         {
-            // load by targetDirectory id
-            var logRepository = _logRepo.Get(target.UniqueId);
-
-            if (logRepository == null)
-                logRepository = new EnrichmentLog() { TargetTypeId = target.UniqueId };
-
-            var unProcessedEnrichers = new List<IEnricher<TTarget>>();
-
-            // aggregate list of enrichers that haven't been processed for the target
             foreach (var enricher in enrichers)
-                if (!logRepository.GetHasBeenProcessed(enricher))
-                    unProcessedEnrichers.Add(enricher);
-
-            // get results
-            var processResult = target.GetProcessResult();
-
-            // enrich valid and invalid items
-            var enrichmentController = new EnricherProcessor();
-            foreach (var source in new[] { processResult.Invalid , processResult.Output })
-                enrichmentController
-                    .Enrich(source, unProcessedEnrichers);
-
-            // process and save new enriched file
             {
-                var outResult = ProcessResults(processResult);
+                // load by targetDirectory id
+                var logRepository = _logRepo.Get(_flow, enricher.SourceEntityType);
+
+                if (logRepository == null) // todo replace with flow
+                    logRepository = new EnrichmentLog(flowBatch.Flow, enricher.SourceEntityType);
+
+                // enrichers
+                var unProcessedEnrichers = new List<IEnricher<TTarget>>();
+
+                // aggregate list of enrichers that haven't been processed for the target
+                if (logRepository.GetHasBeenProcessed(enricher, target.AddressId))
+                {
+                    if (_logger.IsTraceEnabled)
+                        _logger.Trace("Target has already been updated.");
+
+                    continue;
+                }
+
+                // enrich valid and invalid items
+                var enrichmentController = new EnricherProcessor(_logRepo);
+                enrichmentController
+                        .Enrich(flowBatch, new[] { target }, unProcessedEnrichers);
+
+                // get results to save
+                var results = target.Get();
+
+                // process and save new enriched file
+                var outResult = ProcessResults<TPart>(flowBatch, results);
 
                 // save new flow file
                 // targetDirectory repository
                 var resultRepo = new ProcessResultRepository<ProcessResult<TPart, TTarget>>()
                 {
-                    DataDir = target.SourceFileName.Directory.FullName
+                    DataDir = this.DataDir.FullName
                 };
 
                 // save resports
                 resultRepo.Save(outResult);
             }
-
-            // update enricher log
-            {
-                foreach (var enricher in unProcessedEnrichers)
-                    logRepository.Logs.Add(new EnrichmentLogEntry() { OutputTypeId = enricher.OutputTypeId, DateCreated = DateTime.UtcNow });
-
-                // save log
-                _logRepo.Save(logRepository);
-            }
         }
 
-        private ProcessResult<TIn,TTarget> ProcessResults<TIn>(ProcessResult<TIn, TTarget> result)
+        private ProcessResult<TPart,TTarget> ProcessResults<TPart>(FlowBatch batch, IEnumerable<TTarget> results)
         {
             // output result
-            var outResult = result.CreateNew();
-            if (outResult.BatchProcess.BatchId == result.BatchProcess.BatchId)
-                throw new InvalidOperationException();
+            var outResult = new ProcessResult<TPart, TTarget>(batch);
 
             var valid = new List<TTarget>();
             var inValid = new List<TTarget>();
 
             // output errors
-            var processErrors = new List<ProcessError<TIn>>();
+            var processErrors = new List<ProcessError<TPart>>();
 
-            // enrich all valid and invalid entities from the source
-            foreach (var source in new[] { result.Output, result.Invalid })
+            foreach (var entityOut in results)
             {
-                foreach (var entityOut in source)
+                // validate enity
+                var errors = _entityRules.ToErrors(entityOut).ToList();
+
+                if (!errors.Any())
                 {
-                    // validate enity
-                    var errors = _entityRules.ToErrors(entityOut).ToList();
-
-                    if (!errors.Any())
+                    // no error - valid
+                    valid.Add(entityOut);
+                }
+                else
+                {
+                    // get all errors and add to error collection
+                    foreach (var error in errors)
                     {
-                        // no error - valid
-                        valid.Add(entityOut);
-                    }
-                    else
-                    {
-                        // get all errors and add to error collection
-                        foreach (var error in errors)
+                        processErrors.Add(new ProcessError<TPart>
                         {
-                            processErrors.Add(new ProcessError<TIn>
-                            {
-                                Error = new ErrorEvent { Message = error.Message, Type = error.Type }
-                            });
-                        }
-
-                        inValid.Add(entityOut);
+                            Error = new ErrorEvent { Message = error.Message, Type = error.Type }
+                        });
                     }
+
+                    inValid.Add(entityOut);
                 }
             }
 

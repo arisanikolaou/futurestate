@@ -37,12 +37,12 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="workingFolder">
+        /// <param name="DataDirectory">
         ///     The folder to read/write data to.
         /// </param>
-        public FlowFileLogRepository(string workingFolder = null)
+        public FlowFileLogRepository(string DataDirectory = null)
         {
-            _dataDir = workingFolder ?? Environment.CurrentDirectory;
+            _dataDir = DataDirectory ?? Environment.CurrentDirectory;
         }
 
         /// <summary>

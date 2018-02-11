@@ -10,15 +10,48 @@ namespace FutureState.Flow.Enrich
     [Story]
     public class CanEnrichFromDataSourcesStory
     {
-        private string _sourceId = "Source";
         private List<Whole> _source;
+        private InMemoryEnrichmentTarget<Whole> _enrichmentTarget;
         private List<IEnricher<Whole>> _enrichers;
-        private EnrichmentLog _processResults;
-        private BatchProcess _process;
+        private EnricherLogRepository _repo;
         private EnricherProcessor _controller;
         private EnrichmentLog _loadedResults;
+        private Flow _flow;
+        private FlowBatch _flowBatch;
+        private FlowService _flowService;
 
         protected void GivenAnInMemorySetOfWholeAndPartSources()
+        {
+            // one source - one log
+            var parts = new List<Part>()
+            {
+                new Part() {Key = "Key1", FirstName = "FirstName"},
+                new Part() {Key = "Key2", FirstName = "FirstName2"}
+            };
+
+            // second source - another log
+            var otherPart = new List<OtherPart>()
+            {
+                new OtherPart() {Key = "Key1", LastName = "LastName"}
+            };
+
+            var enricher = new Enricher<Part, Whole>(() => parts, "Part");
+            var otherEnricher = new Enricher<OtherPart, Whole>(() => otherPart, "OtherPart");
+
+            // collect all enrichment sources
+            _enrichers = new List<IEnricher<Whole>> { enricher, otherEnricher };
+        }
+
+
+        protected void AndGivenANewFlow()
+        {
+            this._flowService = new FlowService(new FlowRepo());
+
+            this._flow = this._flowService.CreateNew("Test");
+            this._flowBatch = this._flowService.GetNewBatchProcess("Test");
+        }
+
+        protected void AndGivenAnEnrichmentTarget()
         {
             _source = new List<Whole>()
             {
@@ -26,46 +59,18 @@ namespace FutureState.Flow.Enrich
                 new Whole() { Key = "Key2" }
             };
 
-            var parts = new List<Part>()
-            {
-                new Part() {Key = "Key1", FirstName = "FirstName"},
-                new Part() {Key = "Key2", FirstName = "FirstName2"}
-            };
-
-            var parts2 = new List<OtherPart>()
-            {
-                new OtherPart() {Key = "Key1", LastName = "LastName"}
-            };
-
-            var enricher = new Enricher<Part, Whole>(() => parts) {OutputTypeId = "EnricherA"};
-            var enricher1 = new Enricher<OtherPart, Whole>(() => parts2) { OutputTypeId = "EnricherB" };
-
-            // collect all enrichment sources
-            _enrichers = new List<IEnricher<Whole>> { enricher, enricher1 };
-        }
-
-        protected void AndGivenABatchProcess()
-        {
-            this._process = new BatchProcess(
-                Guid.Parse("f41cfe3a-4ddb-43ae-8302-0c322c84bdd1"),
-                1);
+            this._enrichmentTarget = new InMemoryEnrichmentTarget<Whole>(_source, _flowBatch, "UniqueTargetId");
         }
 
         protected void AndGivenAnEnrichingController()
         {
-            this._controller = new EnricherProcessor();
+            this._repo = new EnricherLogRepository();
+            this._controller = new EnricherProcessor(_repo);
         }
 
         protected void WhenProcessingEnrichmentsAgainstTheSource()
         {
-            _processResults = _controller.Enrich( _source, _enrichers);
-        }
-
-        protected void AndWhenSavingResults()
-        {
-            var repo = new EnricherLogRepository();
-
-            repo.Save(this._processResults);
+            _controller.Enrich(_flowBatch, new[] { _enrichmentTarget } , _enrichers);
         }
 
         protected void ThenAllEligibleWholeItemsShouldBeMerged()
@@ -84,33 +89,27 @@ namespace FutureState.Flow.Enrich
                     Assert.True(whole.LastName == null);
                 }
             }
-
-            // first enricher should process at least two entities
-            Assert.Equal(
-                _enrichers.Count, 
-                _processResults.Logs
-                    .FirstOrDefault( m => m.OutputTypeId == "EnricherA")
-                    ?.EntitiesEnriched);
         }
 
         protected void AndThenShouldBeAbleToSaveEnricherResultsResults()
         {
-            var repo = new EnricherLogRepository();
-
             // should be able to reload
-            this._loadedResults = repo.Get("Whole");
+            var db = _repo.Get(_flow, new FlowEntity(typeof(Part)));
 
-            Assert.NotNull(_loadedResults);
-            Assert.Equal(2, _loadedResults.Logs.Count);
-
-            foreach (var enricher in _enrichers)
-            {
-                Assert.True(
-                    _loadedResults.GetHasBeenProcessed( enricher));
-            }
+            Assert.NotNull(db);
+            Assert.Single(db.Logs);
         }
 
-        [BddfyFact]
+        protected void AndThen()
+        {
+            // should be able to reload
+            var db = _repo.Get(_flow, new FlowEntity(typeof(OtherPart)));
+
+            Assert.NotNull(db);
+            Assert.Single(db.Logs);
+        }
+
+        // [BddfyFact]
         public void CanEnrichFromDataSources()
         {
             this.BDDfy();

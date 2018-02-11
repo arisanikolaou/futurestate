@@ -16,11 +16,11 @@ namespace FutureState.Flow.Enrich
     public class CsvEnricherBuilder<TPart, TComposite>
         where TPart : IEquatable<TComposite>
     {
-        public string FileName { get; set; }
+        public string FilePath { get; set; }
 
         public Enricher<TPart, TComposite> Get()
         {
-            return new Enricher<TPart, TComposite>(Read);
+            return new Enricher<TPart, TComposite>(Read, FilePath);
         }
 
         // read from a csv file
@@ -28,7 +28,7 @@ namespace FutureState.Flow.Enrich
         {
             var config = new Configuration { HasHeaderRecord = true };
 
-            using (var sr = new StreamReader(FileName))
+            using (var sr = new StreamReader(FilePath))
             {
                 using (var csvHelper = new CsvReader(sr, config))
                 {
@@ -37,7 +37,7 @@ namespace FutureState.Flow.Enrich
                         try
                         {
                             if (!csvHelper.ReadHeader())
-                                throw new ApplicationException($"Can't read header of file {FileName}.");
+                                throw new ApplicationException($"Can't read header of file {FilePath}.");
                         }
                         catch (ApplicationException)
                         {
@@ -45,7 +45,7 @@ namespace FutureState.Flow.Enrich
                         }
                         catch (Exception ex)
                         {
-                            throw new ApplicationException($"Can't read data from file {FileName}.", ex);
+                            throw new ApplicationException($"Can't read data from file {FilePath}.", ex);
                         }
                     }
 
@@ -73,15 +73,20 @@ namespace FutureState.Flow.Enrich
         private static readonly ObjectsMapper<TPart, TComposite> _mapper;
         private readonly Func<IEnumerable<TPart>> _source;
 
-        /// <summary>
-        ///     Action to use to enrich data from a part to a whole.
-        /// </summary>
-        public Action<TPart, TComposite> EnrichAction { get; set; }
+        public string _addressId;
 
         /// <summary>
-        ///     Gets the unique id for the enricher.
+        ///     Gets the entity type used to enrich the target type.
         /// </summary>
-        public string OutputTypeId { get; set; }
+        public FlowEntity SourceEntityType
+        {
+            get
+            {
+                return new FlowEntity(typeof(TPart));
+            }
+        }
+
+        public string AddressId { get { return _addressId; } }
 
         /// <summary>
         ///     Geta a handle to the default mapper.
@@ -97,15 +102,14 @@ namespace FutureState.Flow.Enrich
         ///     Creates a new instance.
         /// </summary>
         /// <param name="sourceGet"></param>
-        public Enricher(Func<IEnumerable<TPart>> sourceGet)
+        public Enricher(Func<IEnumerable<TPart>> sourceGet, string addressId)
         {
             Guard.ArgumentNotNull(sourceGet, nameof(sourceGet));
+            Guard.ArgumentNotNullOrEmptyOrWhiteSpace(addressId, nameof(addressId));
 
             // source data to enrich from
             this._source = sourceGet;
-
-            // the unique id of the enricher
-            this.OutputTypeId = typeof(TComposite).Name;
+            this._addressId = addressId;
         }
         
         /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace FutureState.Flow
 {
+    /// <summary>
+    ///     A generic error raised while processing data.
+    /// </summary>
     public class ErrorEvent
     {
         /// <summary>
