@@ -16,13 +16,13 @@ namespace FutureState.Flow.Model
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowFileLog(Guid flowId)
+        public FlowFileLog(string flowCode)
         {
             Entries = new List<FlowFileLogEntry>();
-            FlowId = flowId;
+            FlowCode = flowCode;
         }
 
-        public Guid FlowId { get; set; }
+        public string FlowCode { get; set; }
 
         public int BatchId { get; set; }
 

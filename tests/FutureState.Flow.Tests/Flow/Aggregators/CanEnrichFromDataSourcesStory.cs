@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -15,7 +14,6 @@ namespace FutureState.Flow.Enrich
         private List<IEnricher<Whole>> _enrichers;
         private EnricherLogRepository _repo;
         private EnricherProcessor _controller;
-        private EnrichmentLog _loadedResults;
         private Flow _flow;
         private FlowBatch _flowBatch;
         private FlowService _flowService;
@@ -73,7 +71,7 @@ namespace FutureState.Flow.Enrich
             _controller.Enrich(_flowBatch, new[] { _enrichmentTarget } , _enrichers);
         }
 
-        protected void ThenAllEligibleWholeItemsShouldBeMerged()
+        protected void ThenAllEligibleWholeItemsShouldBeEnrichedFromSource()
         {
             foreach (var whole in _source)
             {
@@ -91,25 +89,26 @@ namespace FutureState.Flow.Enrich
             }
         }
 
-        protected void AndThenShouldBeAbleToSaveEnricherResultsResults()
+        protected void AndThenAnEnrichmentLogShouldBeSavedForAllSources()
         {
-            // should be able to reload
-            var db = _repo.Get(_flow, new FlowEntity(typeof(Part)));
+            {
+                // should be able to reload
+                var db = _repo.Get(_flow, new FlowEntity(typeof(Part)));
 
-            Assert.NotNull(db);
-            Assert.Single(db.Logs);
+                Assert.NotNull(db);
+                Assert.Single(db.Logs);
+            }
+
+            {
+                // should be able to reload
+                var db = _repo.Get(_flow, new FlowEntity(typeof(OtherPart)));
+
+                Assert.NotNull(db);
+                Assert.Single(db.Logs);
+            }
         }
 
-        protected void AndThen()
-        {
-            // should be able to reload
-            var db = _repo.Get(_flow, new FlowEntity(typeof(OtherPart)));
-
-            Assert.NotNull(db);
-            Assert.Single(db.Logs);
-        }
-
-        // [BddfyFact]
+        [BddfyFact]
         public void CanEnrichFromDataSources()
         {
             this.BDDfy();

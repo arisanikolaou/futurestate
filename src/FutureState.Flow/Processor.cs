@@ -96,6 +96,7 @@ namespace FutureState.Flow
         /// </summary>
         public string ProcessName { get; }
 
+
         /// <summary>
         ///     Gets the default processor name.
         /// </summary>
@@ -109,11 +110,13 @@ namespace FutureState.Flow
         /// <summary>
         ///     Processes an incoming data stream to an output.
         /// </summary>
-        public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process)
+        public FlowSnapShot<TEntityOut> Process(IEnumerable<TEntityIn> reader, FlowBatch process)
         {
-            var result = new ProcessResult<TEntityIn, TEntityOut>
+            var result = new FlowSnapShot<TEntityOut>
             {
-                ProcessName = ProcessName
+                ProcessName = ProcessName,
+                TargetType = new FlowEntity(typeof(TEntityOut)),
+                SourceType = new FlowEntity(typeof(TEntityIn))
             };
 
             return Process(reader, process, result);
@@ -128,8 +131,10 @@ namespace FutureState.Flow
         ///     Creates a new process engine instance using a given entity reader and core engine.
         /// </summary>
         /// <returns></returns>
-        public ProcessorEngine<TEntityIn> BuildProcessEngine(IEnumerable<TEntityIn> reader,
-            ProcessorEngine<TEntityIn> engine, ProcessResult<TEntityIn, TEntityOut> result)
+        public ProcessorEngine<TEntityIn> BuildProcessEngine(
+            IEnumerable<TEntityIn> reader,
+            ProcessorEngine<TEntityIn> engine, 
+            FlowSnapShot<TEntityOut> result)
         {
             var processedValidItems = new List<TEntityOut>();
             var notValidItems = new List<TEntityOut>();
@@ -245,14 +250,16 @@ namespace FutureState.Flow
         }
 
         /// <summary>
-        ///     Processes a BatchProcess of data using a process handle from an incoming source.
+        ///     Processes a FlowBatch of data using a process handle from an incoming source.
         /// </summary>
         /// <param name="reader">The source for the incoming dtos.</param>
         /// <param name="process">The batch process to run.</param>
         /// <param name="resultState">The resultState state from processing.</param>
         /// <returns></returns>
-        public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process,
-            ProcessResult<TEntityIn, TEntityOut> resultState)
+        public FlowSnapShot<TEntityOut> Process(
+            IEnumerable<TEntityIn> reader, 
+            FlowBatch process,
+            FlowSnapShot<TEntityOut> resultState)
         {
             if (Logger.IsTraceEnabled)
                 Logger.Trace($"Starting to process  {ProcessName} batch {process.BatchId}.");
@@ -295,7 +302,7 @@ namespace FutureState.Flow
         /// </summary>
         /// <param name="batch">The results to commit to the system.</param>
         /// <param name="result">The state to store the operation results to.</param>
-        public virtual void Commit(IEnumerable<TEntityOut> batch, ProcessResult<TEntityIn, TEntityOut> result)
+        public virtual void Commit(IEnumerable<TEntityOut> batch, FlowSnapShot<TEntityOut> result)
         {
             // save results to output file - unique
             var batchAsList = batch.ToList();

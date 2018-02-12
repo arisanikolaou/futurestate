@@ -125,7 +125,7 @@
     <Content Include="Flow\Aggregators\Archive\EnricherControllerService.cs" />
     <Content Include="Flow\Aggregators\Archive\IEnricherControllerService.cs" />
     <Compile Include="Flow\Aggregators\MockClasses.cs" />
-    <Content Include="Flow\Aggregators\Archive\EnricherControllerCanEnrichFromCsvStories.cs" />
+    <Compile Include="Flow\Aggregators\EnricherControllerCanEnrichFromCsvStory.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerStory.cs" />
     <Compile Include="CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory.cs" />
     <Compile Include="Flow\FlowModule.cs" />

@@ -67,28 +67,26 @@
     <Compile Include="Enrich\Common\EnricherProcessor.cs" />
     <Compile Include="Enrich\Common\EnrichmentTarget.cs" />
     <Compile Include="Enrich\Common\IEnricher.cs" />
-    <Compile Include="Model\EnricherLogRepository.cs" />
-    <Compile Include="Model\EnrichmentLog.cs" />
-    <Compile Include="Model\EnrichmentLogEntry.cs" />
+    <Compile Include="Model\Enricher\EnricherLogRepository.cs" />
+    <Compile Include="Model\Enricher\EnrichmentLog.cs" />
+    <Compile Include="Model\Enricher\EnrichmentLogEntry.cs" />
     <Compile Include="FlowConfiguration.cs" />
     <Compile Include="FlowController.cs" />
-    <Compile Include="Model\Flow.cs" />
+    <Compile Include="Model\Flow\Flow.cs" />
     <Compile Include="Model\FlowFileLog.cs" />
     <Compile Include="FlowControllerService.cs" />
     <Compile Include="Model\FlowFileLogEntry.cs" />
-    <Compile Include="Data\FlowFileLogRepository.cs" />
-    <Compile Include="Data\IProcessResultRepository.cs" />
-    <Compile Include="ProcessError.cs" />
+    <Compile Include="Model\Flow\FlowFileLogRepository.cs" />
+    <Compile Include="Model\FlowFile\IFlowSnapshotRepo.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
     <Compile Include="Readers\GenericResultReader.cs" />
-    <Compile Include="Data\ProcessResultRepository.cs" />
-    <Compile Include="Model\BatchProcess.cs" />
+    <Compile Include="Model\FlowFile\FlowSnapshotRepo.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="IProcessorEngine.cs" />
     <Compile Include="IProcessor.cs" />
     <Compile Include="Readers\IReader.cs" />
     <Compile Include="ProcessorEngine.cs" />
-    <Compile Include="ProcessResult.cs" />
+    <Compile Include="Model\FlowFile\FlowSnapshot.cs" />
     <Compile Include="Model\ErrorEvent.cs" />
     <Compile Include="Readers\CsvProcessorReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -112,8 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\" />
-    <Folder Include="Enrich\Data\" />
-    <Folder Include="Enrich\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -71,7 +71,7 @@ namespace FutureState.Flow.Enrich
             _timer.Start();
         }
 
-        BatchProcess GetNewBatchProcess()
+        FlowBatch GetNewBatchProcess()
         {
             // load flow file
             var flowFile = _flowFileRepo.Get(FlowId);
@@ -80,7 +80,7 @@ namespace FutureState.Flow.Enrich
             _flowFileRepo.Save(flowFile);
 
             // load batch process
-            var batchProcess = new BatchProcess()
+            var batchProcess = new FlowBatch()
             {
                 FlowId = flowFile.FlowId,
                 BatchId = flowFile.BatchId
@@ -198,7 +198,7 @@ namespace FutureState.Flow.Enrich
             {
                 Exceptions = new List<Exception>(),
                 Errors = new List<ProcessError<TPart>>(),
-                BatchProcess = batchProcess,
+                FlowBatch = batchProcess,
                 Output = new List<TWhole>(),
                 Invalid = new List<TWhole>()
             };

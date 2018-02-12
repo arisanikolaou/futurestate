@@ -275,7 +275,7 @@ namespace FutureState.Flow
     /// <summary>
     ///     A batch process identifier associated with a given flow.
     /// </summary>
-    public class FlowBatch
+    public class FlowBatch : IEquatable<FlowBatch>
     {
         public FlowBatch()
         {
@@ -297,6 +297,34 @@ namespace FutureState.Flow
         ///     Gets the batch id.
         /// </summary>
         public long BatchId { get; set; }
+
+        /// <summary>
+        ///     Compares one batch to another for value equality.
+        /// </summary>
+        public bool Equals(FlowBatch other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Flow.Equals(other.Flow) && BatchId == other.BatchId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+
+            return Equals((FlowBatch)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Flow.Code.GetHashCode() * 397) ^ BatchId.GetHashCode();
+            }
+        }
     }
 
     /// <summary>
@@ -311,106 +339,4 @@ namespace FutureState.Flow
         public long Errors { get; set; }
     }
 
-    /// <summary>
-    ///     Gets the identifier for a given snapshot flow file.
-    /// </summary>
-    public class FlowSnapshot
-    {
-        /// <summary>
-        ///     Gets the network address of the snapshot.
-        /// </summary>
-        public string Address { get; set; }
-
-        /// <summary>
-        ///     Gets the flow's source type if any.
-        /// </summary>
-        public FlowEntity SourceType { get; set; }
-
-        /// <summary>
-        ///     Gets the target output entity type.
-        /// </summary>
-        public FlowEntity TargetType { get; set; }
-
-        /// <summary>
-        ///     Gets the batch from which this snapshot originated from.
-        /// </summary>
-        public FlowBatch Batch { get; set; }
-    }
-
-    /// <summary>
-    ///     Saves/loads a given snap shot.
-    /// </summary>
-    public class FlowSnapshotRepo
-    {
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-
-        public string DataDir { get; set; }
-
-        /// <summary>
-        ///     Creates a new instance.
-        /// </summary>
-        public FlowSnapshotRepo()
-        {
-            this.DataDir = Environment.CurrentDirectory;
-        }
-
-
-        public FlowSnapshot Get(string snapShotAddress)
-        {
-            // source id would be the name of a processor
-
-            if (!File.Exists(snapShotAddress))
-                return null;
-
-            var content = File.ReadAllText(snapShotAddress);
-
-            var flowSnapShot = JsonConvert.DeserializeObject<FlowSnapshot>(
-                content,
-                new JsonSerializerSettings());
-
-            return flowSnapShot;
-        }
-
-        public void Save(FlowSnapshot flowSnapShot)
-        {
-            Guard.ArgumentNotNull(flowSnapShot, nameof(flowSnapShot));
-
-            CreateDirIfNotExists();
-
-            // source log
-            var fileName = flowSnapShot.Address; // this should be the unique address
-
-            if (_logger.IsInfoEnabled)
-                _logger.Info($"Saving flow output to {fileName}.");
-
-            // save the data in the data directory
-            var body = JsonConvert.SerializeObject(flowSnapShot, new JsonSerializerSettings());
-
-            if (File.Exists(fileName))
-            {
-                if (_logger.IsDebugEnabled)
-                    _logger.Debug("Backing up old archive file.");
-
-                // back up older file, don't delete
-                string backFile = fileName + ".bak";
-                if (File.Exists(backFile))
-                    File.Delete(backFile);
-
-                File.Move(fileName, backFile);
-            }
-
-            // wrap in transaction
-            File.WriteAllText(fileName, body);
-
-            if (_logger.IsInfoEnabled)
-                _logger.Info($"Saved flow file to {fileName}.");
-        }
-
-        private void CreateDirIfNotExists()
-        {
-            if (!Directory.Exists(DataDir))
-                Directory.CreateDirectory(DataDir);
-        }
-    }
 }

@@ -170,7 +170,7 @@ namespace FutureState.Flow
             // configure
             flowController.InDirectory = definition.Input;
             flowController.OutDirectory = definition.Output;
-            flowController.FlowId = _config.FlowId;
+            flowController.Flow = _config.Flow;
             flowController.ControllerName = definition.ControllerName;
 
             // apply controller configuration details
@@ -223,14 +223,14 @@ namespace FutureState.Flow
                 return; // already stopped
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Stopping flow {_config.FlowId}.");
+                _logger.Debug($"Stopping flow {_config.Flow}.");
 
             _processor?.Dispose();
 
             _flowControllers.Each(m => m.Dispose());
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Stopped flow {_config.FlowId}.");
+                _logger.Debug($"Stopped flow {_config.Flow}.");
 
             _started = false;
         }

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace FutureState.Flow.Enrich
 {
+    /// <summary>
+    ///     Gets a target snapshot file or other data source to enrich.
+    /// </summary>
+    /// <typeparam name="TTarget"></typeparam>
     public interface IEnrichmentTarget<TTarget>
     {
         /// <summary>
@@ -12,16 +16,15 @@ namespace FutureState.Flow.Enrich
         string AddressId { get;}
 
         /// <summary>
+        ///     Gets the entity type being enriched.
+        /// </summary>
+        FlowEntity FlowEntity { get; }
+
+        /// <summary>
         ///     Gets the underlying entity types to encrich.
         /// </summary>
         /// <returns></returns>
         IEnumerable<TTarget> Get();
-
-        /// <summary>
-        ///     Gets the batch process that was used to generate the target if any.
-        /// </summary>
-        /// <returns></returns>
-        FlowBatch GetBatch();
     }
 
     /// <summary>
@@ -31,45 +34,44 @@ namespace FutureState.Flow.Enrich
     /// <typeparam name="TTarget">The target data type to enrich.</typeparam>
     public class EnrichmentTarget<TSource, TTarget> : IEnrichmentTarget<TTarget>
     {
-        private readonly ProcessResultRepository<ProcessResult<TSource, TTarget>> _resultRepo;
+        private readonly FlowSnapshotRepo<FlowSnapShot<TTarget>> _resultRepo;
 
         /// <summary>
         ///     Gets the unique id of the enrichment target
         /// </summary>
-        public string AddressId
-        {
-            get { return DataSource.FullName; }
-        }
-
-        public FlowEntity SourceEntityType
-        {
-            get
-            {
-                return new FlowEntity(typeof(TSource));
-            }
-        }
+        public string AddressId => DataSource.FullName;
 
         /// <summary>
-        ///     Gets the file name/
+        ///     Gets the source entity type.
+        /// </summary>
+        public FlowEntity SourceEntityType => new FlowEntity(typeof(TSource));
+
+        /// <summary>
+        ///     Gets the file name.
         /// </summary>
         public FileInfo DataSource { get; set; }
 
         /// <summary>
+        ///     Gets the target flow entity type.
+        /// </summary>
+        public FlowEntity FlowEntity => new FlowEntity(typeof(TTarget));
+
+        /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public EnrichmentTarget(ProcessResultRepository<ProcessResult<TSource, TTarget>> repository)
+        public EnrichmentTarget(FlowSnapshotRepo<FlowSnapShot<TTarget>> repository)
         {
             // targetDirectory repository
-            this._resultRepo = repository ?? new ProcessResultRepository<ProcessResult<TSource, TTarget>>();
+            this._resultRepo = repository ?? new FlowSnapshotRepo<FlowSnapShot<TTarget>>();
         }
 
         /// <summary>
         ///     Gets the process result.
         /// </summary>
-        public ProcessResult<TSource, TTarget> GetProcessResult()
+        public FlowSnapShot<TTarget> GetProcessResult()
         {
             // load results to get the invalid items
-            ProcessResult<TSource, TTarget> result = _resultRepo.Get(DataSource.FullName);
+            FlowSnapShot<TTarget> result = _resultRepo.Get(DataSource.FullName);
 
             return result;
         }
@@ -85,11 +87,6 @@ namespace FutureState.Flow.Enrich
             foreach (var result in results.Invalid)
                 yield return result;
         }
-
-        public FlowBatch GetBatch()
-        {
-            return new FlowBatch() { Flow = new Flow("Test"), BatchId = 1 };
-        }
     }
 
     public class InMemoryEnrichmentTarget<TTarget> : IEnrichmentTarget<TTarget>
@@ -104,9 +101,14 @@ namespace FutureState.Flow.Enrich
         public string AddressId { get { return _uniqueAddressId; } }
 
         /// <summary>
-        ///     Gets the file name/
+        ///     Gets the file name.
         /// </summary>
         public FileInfo DataSource { get; set; }
+
+        /// <summary>
+        ///     Gets the target flow entity type.
+        /// </summary>
+        public FlowEntity FlowEntity => new FlowEntity(typeof(TTarget));
 
         /// <summary>
         ///     Creates a new instance.
@@ -125,11 +127,6 @@ namespace FutureState.Flow.Enrich
         {
             // load results to get the invalid items
             return _source;
-        }
-
-        public FlowBatch GetBatch()
-        {
-            return _batch;
         }
     }
 }

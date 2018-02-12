@@ -62,6 +62,10 @@ namespace FutureState.Flow
         /// </summary>
         public DateTime StartTime { get; private set; }
 
+        /// <summary>
+        ///     Gets the default processor name.
+        /// </summary>
+        /// <returns></returns>
         private string GetDefaultProcessName()
         {
             return $"{GetType().Name.Replace("`1", "")}-{typeof(TEntityDto).Name}";
@@ -73,7 +77,7 @@ namespace FutureState.Flow
         ///     a summary of the processes' execution status.
         /// </summary>
         /// <returns></returns>
-        public ProcessResult Process(BatchProcess process, ProcessResult<TEntityDto> result = null)
+        public FlowSnapshot Process<TOut>(FlowBatch process, FlowSnapShot<TOut> result = null)
         {
             Guard.ArgumentNotNull(process, nameof(process));
 
@@ -86,19 +90,19 @@ namespace FutureState.Flow
                 throw new InvalidOperationException("EntitiesReader has not been assigned.");
 
             if (result == null)
-                result = new ProcessResult<TEntityDto>
+                result = new FlowSnapShot<TOut>
                 {
                     ProcessName = GetDefaultProcessName()
                 };
 
-            result.BatchProcess = process;
+            result.Batch = process;
 
             Initialize?.Invoke();
 
             var onError = OnError ?? ((_, ___) => { });
 
             var processed = new List<TEntityDto>();
-            var errors = new List<ProcessError<TEntityDto>>();
+            var errors = new List<ErrorEvent>();
             var exceptions = new List<Exception>();
 
             foreach (var dto in EntitiesReader)
@@ -114,7 +118,7 @@ namespace FutureState.Flow
                         processed.Add(dto);
                     else
                         foreach (var error in errorEvents)
-                            errors.Add(new ProcessError<TEntityDto> {Error = error, SourceItem = dto});
+                            errors.Add(error);
                 }
                 catch (ApplicationException apex)
                 {
@@ -125,11 +129,7 @@ namespace FutureState.Flow
 
                     exceptions.Add(apex);
 
-                    errors.Add(new ProcessError<TEntityDto>
-                    {
-                        Error = new ErrorEvent { Type = "Exception", Message = apex.Message },
-                        SourceItem = dto
-                    });
+                    errors.Add(new ErrorEvent { Type = "Exception", Message = apex.Message });
                 }
                 catch (Exception ex)
                 {
@@ -140,11 +140,7 @@ namespace FutureState.Flow
 
                     exceptions.Add(ex);
 
-                    errors.Add(new ProcessError<TEntityDto>
-                    {
-                        Error = new ErrorEvent { Type = "Exception", Message = ex.Message },
-                        SourceItem = dto
-                    });
+                    errors.Add(new ErrorEvent { Type = "Exception", Message = ex.Message });
                 }
             }
 
@@ -160,12 +156,7 @@ namespace FutureState.Flow
 
                 // roll back items into an error state
                 foreach (var entityDto in processed)
-                    errors.Add(new ProcessError<TEntityDto>
-                    {
-                        Error =
-                            new ErrorEvent {Type = "Exception", Message = $"Failed to commit changes: {ex.Message}"},
-                        SourceItem = entityDto
-                    });
+                    errors.Add(new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" });
 
                 //reset items
                 processed.Clear();

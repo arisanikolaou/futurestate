@@ -8,7 +8,7 @@ namespace FutureState.Flow.Controllers
     /// </summary>
     /// <typeparam name="TIn">The entity type to read in.</typeparam>
     /// <typeparam name="TOut">The entity type to process out.</typeparam>
-    public class ProcessResultFlowFileController<TIn, TOut> : FlowFileController<TIn, TOut>
+    public class FlowSnapshotFileController<TIn, TOut> : FlowFileController<TIn, TOut>
         where TOut : class, new()
     {
         /// <summary>
@@ -16,7 +16,7 @@ namespace FutureState.Flow.Controllers
         /// </summary>
         /// <param name="config">The configuration to use to map, configure incoming to outgoing entities.</param>
         /// <param name="getProcessor">How to get processors.</param>
-        public ProcessResultFlowFileController(
+        public FlowSnapshotFileController(
             ProcessorConfiguration<TIn, TOut> config,
             Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null)
             : base(config, GetReader(), getProcessor)
@@ -31,7 +31,7 @@ namespace FutureState.Flow.Controllers
         {
             return new GenericResultReader<TIn>(flowFileSource =>
             {
-                var repoository = new ProcessResultRepository<ProcessResult<TOut, TIn>>(flowFileSource);
+                var repoository = new FlowSnapshotRepo<FlowSnapShot<TIn>>(flowFileSource);
 
                 var processResult = repoository.Get(flowFileSource);
 

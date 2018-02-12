@@ -20,17 +20,17 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance using a given flow id.
         /// </summary>
-        public FlowConfiguration(Guid flowId)
+        public FlowConfiguration(Flow flow)
         {
-            FlowId = flowId;
+            Flow = flow;
             BasePath = Environment.CurrentDirectory;
             Controllers = new List<FlowControllerDefinition>();
         }
 
         /// <summary>
-        ///     Gets the flow's unique identifier.
+        ///     Gets the flow to configure.
         /// </summary>
-        public Guid FlowId { get; set; }
+        public Flow Flow { get; set; }
 
         /// <summary>
         ///     Gets the working directory for the flow.

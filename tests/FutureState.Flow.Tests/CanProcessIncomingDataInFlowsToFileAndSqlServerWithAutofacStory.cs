@@ -9,9 +9,11 @@ using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
+using F = FutureState.Flow;
 
 namespace FutureState.Flow.Tests
 {
+
     [Story]
     [Collection("Flow Tests")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory
@@ -19,15 +21,15 @@ namespace FutureState.Flow.Tests
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
         private const int CsvItemsToCreate = 10;
         private const int BatchId = 1;
-        private readonly Guid _processId = Guid.Parse("523a8558-e5a5-4309-ad20-f3813997e652");
-        private BatchProcess _batchProcess;
+        private readonly F.Flow _flow = new F.Flow("TestFlow2");
+        private FlowBatch _batchProcess;
         private ContainerBuilder _cb;
         private IContainer _container;
         private Processor<DenormalizedEntity, Dto1> _processorA;
-        private ProcessResultRepository<ProcessResult> _repository;
-        private ProcessResult<DenormalizedEntity, Dto1> _resultA;
-        private ProcessResult<Dto1, Dto2> _resultB;
-        private ProcessResult<Dto2, Address> _resultC;
+        private FlowSnapshotRepo<FlowSnapshot> _repository;
+        private FlowSnapShot<Dto1> _resultA;
+        private FlowSnapShot<Dto2> _resultB;
+        private FlowSnapShot<Address> _resultC;
 
         protected void GivenANewLocalSqlDb()
         {
@@ -43,7 +45,7 @@ namespace FutureState.Flow.Tests
 
         protected void AndGivenAProcessorResultsRepository()
         {
-            _repository = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
+            _repository = new FlowSnapshotRepo<FlowSnapshot>(Environment.CurrentDirectory);
         }
 
         protected void AndGivenAWiredUpContainer()
@@ -97,7 +99,7 @@ namespace FutureState.Flow.Tests
 
             _cb.Register(m =>
             {
-                var s = new ProcessResultRepository<ProcessResult>(Environment.CurrentDirectory);
+                var s = new FlowSnapshotRepo<FlowSnapshot>(Environment.CurrentDirectory);
                 return s;
             }).AsSelf().AsImplementedInterfaces();
 
@@ -106,7 +108,7 @@ namespace FutureState.Flow.Tests
 
         protected void AndGivenAbatchProcess()
         {
-            _batchProcess = new BatchProcess(_processId, BatchId);
+            _batchProcess = new FlowBatch(_flow, BatchId);
         }
 
         protected void GivenAGeneratedDataSourceCsvFile()
@@ -275,11 +277,11 @@ namespace FutureState.Flow.Tests
         protected void AndThenShouldBeAbleToRestoreProcessState()
         {
             var repo =
-                new ProcessResultRepository<ProcessResult<DenormalizedEntity, Dto1>>(Environment.CurrentDirectory);
+                new FlowSnapshotRepo<FlowSnapShot<Dto1>>(Environment.CurrentDirectory);
 
             var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
-            var result = repo.Get(processorName, _processId, BatchId);
+            var result = repo.Get(processorName, _flow.Code, BatchId);
 
             Assert.NotNull(result);
             Assert.Equal(CsvItemsToCreate - 1, result.ProcessedCount);

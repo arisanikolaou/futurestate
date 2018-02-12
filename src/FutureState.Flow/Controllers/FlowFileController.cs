@@ -51,8 +51,7 @@ namespace FutureState.Flow.Controllers
             // assign name from type name by default
             ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
 
-            //create default flow id
-            FlowId = SeqGuid.Create();
+            Flow = new Flow(typeof(TOut).Name);
 
             _reader = reader;
         }
@@ -101,9 +100,9 @@ namespace FutureState.Flow.Controllers
         public string ControllerName { get; set; }
 
         /// <summary>
-        ///     Gets/sets the unique flow id.
+        ///     Gets/sets the unique flow.
         /// </summary>
-        public Guid FlowId { get; set; }
+        public Flow Flow { get; set; }
 
         /// <summary>
         ///     Gets the flow files associated with the current directory.
@@ -150,7 +149,7 @@ namespace FutureState.Flow.Controllers
         /// <param name="flowFile"></param>
         /// <param name="process">The batch to process the file in.</param>
         /// <returns></returns>
-        public virtual ProcessResult Process(FileInfo flowFile, BatchProcess process)
+        public virtual FlowSnapshot Process(FileInfo flowFile, FlowBatch process)
         {
             try
             {
@@ -164,7 +163,7 @@ namespace FutureState.Flow.Controllers
                 if (!Directory.Exists(OutDirectory))
                     Directory.CreateDirectory(OutDirectory);
 
-                var outputRepository = new ProcessResultRepository<ProcessResult>(OutDirectory);
+                var outputRepository = new FlowSnapshotRepo<FlowSnapshot>(OutDirectory);
 
                 var result = processor.Process(incomingData, process);
 

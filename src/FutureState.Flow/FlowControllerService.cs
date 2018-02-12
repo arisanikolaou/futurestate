@@ -105,7 +105,7 @@ namespace FutureState.Flow
                 throw new InvalidOperationException("Batch processor has not been configured or assigned.");
 
             // load transaction log db
-            var flowFileLog = _logRepository.Get(FlowFileController.FlowId);
+            var flowFileLog = _logRepository.Get(FlowFileController.Flow.Code);
 
             // get next available flow file
             var flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
@@ -125,15 +125,15 @@ namespace FutureState.Flow
                 flowFileLog.BatchId++; // increment batch id
 
                 // reate a new batch process
-                var batchProcess = new BatchProcess
+                var batchProcess = new FlowBatch
                 {
-                    FlowId = FlowFileController.FlowId,
+                    Flow = FlowFileController.Flow,
                     BatchId = flowFileLog.BatchId
                 };
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileController.FlowId} by batch controller {FlowFileController.ControllerName}.");
+                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileController.Flow} by batch controller {FlowFileController.ControllerName}.");
 
                 // run processor
                 var result = FlowFileController.Process(flowFile, batchProcess);
@@ -153,13 +153,13 @@ namespace FutureState.Flow
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileController.FlowId}.");
+                        $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileController.Flow}.");
 
                 // update database
                 _logRepository.Save(flowFileLog);
 
                 if (_logger.IsInfoEnabled)
-                    _logger.Info($"Flow {FlowFileController.FlowId} transaction log updated.");
+                    _logger.Info($"Flow {FlowFileController.Flow} transaction log updated.");
             }
             catch (Exception ex)
             {

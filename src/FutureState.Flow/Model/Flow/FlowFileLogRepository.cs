@@ -20,9 +20,9 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Loads the load data given a flow id.
         /// </summary>
-        /// <param name="flowId">The id of the flow.</param>
+        /// <param name="flowCode">The unique flow code.</param>
         /// <returns></returns>
-        FlowFileLog Get(Guid flowId);
+        FlowFileLog Get(string flowCode);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ namespace FutureState.Flow.Data
 
             // update existing file
             var fileName =
-                $@"{DataDir}\FlowLog-{log.FlowId}.json";
+                $@"{DataDir}\FlowLog-{log.FlowCode}.json";
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
@@ -95,19 +95,19 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Gets the flow file log for the flow with the given id.
         /// </summary>
-        /// <param name="flowId">The flow id.</param>
+        /// <param name="flowCode">The flow id.</param>
         /// <returns>
         /// </returns>
-        public FlowFileLog Get(Guid flowId)
+        public FlowFileLog Get(string flowCode)
         {
             if (!Directory.Exists(DataDir))
                 Directory.CreateDirectory(DataDir);
 
             var fileName =
-                $@"{DataDir}\FlowLog-{flowId}.json";
+                $@"{DataDir}\FlowLog-{flowCode}.json";
 
             if (!File.Exists(fileName))
-                return new FlowFileLog(flowId);
+                return new FlowFileLog(flowCode);
 
             // else
             var body = File.ReadAllText(fileName);

@@ -10,13 +10,13 @@ using TestStack.BDDfy.Xunit;
 namespace FutureState.Flow.Enrich
 {
     [Story()]
-    public class EnricherControllerCanEnrichFromCsvStories
+    public class EnricherControllerCanEnrichFromCsvStory
     {
         private Flow _flow;
-        private BatchProcess _batchProcess;
+        private FlowBatch _flowBatch;
         private string _workingDirectory;
-        private ProcessResult<WholeSource, Whole> _processResult;
-        private ProcessResultRepository<ProcessResult<WholeSource, Whole>> _repo;
+        private FlowSnapShot<Whole> _processResult;
+        private FlowSnapshotRepo<FlowSnapShot<Whole>> _repo;
         private string _wholeDir;
         private string _dataFileToCreate;
         private int CsvItemsToCreate = 10;
@@ -26,12 +26,7 @@ namespace FutureState.Flow.Enrich
         protected void GivenAFlowAndABatchProcess()
         {
             this._flow = new Flow("Test");
-
-            this._batchProcess = new BatchProcess()
-            {
-                FlowId = Guid.Parse("f41cfe3a-4ddb-43ae-8302-0c322c84bdd2"),
-                BatchId = 1
-            };
+            this._flowBatch = new FlowBatch(_flow, 1);
         }
 
         protected void AndGivenACleanWorkingDirectory()
@@ -46,10 +41,10 @@ namespace FutureState.Flow.Enrich
 
         protected void AndGivenAProcessResult()
         {
-            this._processResult = new ProcessResult<WholeSource, Whole>()
+            this._processResult = new FlowSnapShot<Whole>()
             {
                 ProcessName = "TestProcess",
-                BatchProcess = _batchProcess,
+                Batch = _flowBatch,
                 Invalid = new List<Whole>(),
                 Output = new List<Whole>() // valid entities
                 {
@@ -60,7 +55,7 @@ namespace FutureState.Flow.Enrich
 
             _wholeDir = $@"{_workingDirectory}\Whole";
 
-            _repo = new ProcessResultRepository<ProcessResult<WholeSource, Whole>>(_wholeDir);
+            _repo = new FlowSnapshotRepo<FlowSnapShot<Whole>>(_wholeDir);
             _repo.Save(_processResult);
         }
 
@@ -126,20 +121,23 @@ namespace FutureState.Flow.Enrich
             var targetEnrichers = new List<EnrichmentTarget<WholeSource, Whole>>();
             foreach (var file in new DirectoryInfo(_wholeDir).GetFiles())
             {
-                targetEnrichers.Add(new EnrichmentTarget<WholeSource, Whole>(new ProcessResultRepository<ProcessResult<WholeSource, Whole>>())
+                var repository = new FlowSnapshotRepo<FlowSnapShot<Whole>>();
+
+                targetEnrichers.Add(new EnrichmentTarget<WholeSource, Whole>(repository)
                 {
                     DataSource = file
                 });
             }
 
             // process results
-            _subject.Process(_flow, enrichers, targetEnrichers);
+            foreach (var target in targetEnrichers)
+                _subject.Process(_flowBatch, enrichers, target);
         }
 
 
         protected void ThenANewProcessOutputFileShouldBeUsed()
         {
-
+            //todo
         }
 
 

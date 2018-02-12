@@ -25,9 +25,9 @@ namespace FutureState.Flow.Controllers
         string ControllerName { get; set; }
 
         /// <summary>
-        ///     Gets the process id.
+        ///     Gets the flow.
         /// </summary>
-        Guid FlowId { get; set; }
+        Flow Flow { get; set; }
 
         /// <summary>
         ///     Gets the input directory or port.
@@ -45,7 +45,7 @@ namespace FutureState.Flow.Controllers
         /// <param name="flowFile">The flow file to process.</param>
         /// <param name="process">The batch processor.</param>
         /// <returns></returns>
-        ProcessResult Process(FileInfo flowFile, BatchProcess process);
+        FlowSnapshot Process(FileInfo flowFile, FlowBatch process);
 
         /// <summary>
         ///     Gets the next batch to process.

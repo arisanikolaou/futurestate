@@ -24,7 +24,7 @@ namespace FutureState.Flow.Tests.Flow
         private string _dataFileToCreate = @"Test.csv";
         private bool _flowFile1Processed;
         private bool _flowFileProcessed;
-        public Guid _flowId;
+        public FutureState.Flow.Flow _flow;
         private string _inDirectory;
         private FlowFileLogRepository _logRepository;
         private string _outDirectory;
@@ -102,7 +102,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenAConsistentProcessId()
         {
-            _flowId = Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c859");
+            _flow = new FutureState.Flow.Flow("TestFlow1");
         }
 
 
@@ -112,7 +112,7 @@ namespace FutureState.Flow.Tests.Flow
             {
                 InDirectory = _inDirectory,
                 OutDirectory = _outDirectory,
-                FlowId = _flowId
+                Flow = _flow
             };
 
             var processor = new FlowFileControllerService(_logRepository, batchProcessor)
@@ -146,7 +146,7 @@ namespace FutureState.Flow.Tests.Flow
             {
                 InDirectory = _outDirectory,
                 OutDirectory = _outDirectory2,
-                FlowId = _flowId
+                Flow = _flow
             };
 
             var processor = new FlowFileControllerService(_logRepository, batchProcessor)
@@ -200,7 +200,7 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        public class TestProcessResultFlowFileController : ProcessResultFlowFileController<Entity2, Entity3>
+        public class TestProcessResultFlowFileController : FlowSnapshotFileController<Entity2, Entity3>
         {
             public TestProcessResultFlowFileController(ProcessorConfiguration<Entity2, Entity3> config) :
                 base(config)

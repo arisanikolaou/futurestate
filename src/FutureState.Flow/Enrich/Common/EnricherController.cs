@@ -74,7 +74,7 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Process unriched data from a given targetDirectory file.
         /// </summary>
-        public void Process<TPart>(
+        public void Process(
             FlowBatch flowBatch,
             IEnumerable<IEnricher<TTarget>> enrichers,
             IEnrichmentTarget<TTarget> target)
@@ -107,12 +107,27 @@ namespace FutureState.Flow.Enrich
                 // get results to save
                 var results = target.Get();
 
+                // output result
+                var outResult = new FlowSnapShot<TTarget>(
+                    flowBatch,
+                    enricher.SourceEntityType,
+                    enricher.AddressId,
+                    new FlowEntity(typeof(TTarget)),
+                    target.AddressId)
+                {
+                    Batch = flowBatch,
+                    Address = target.AddressId,
+                    TargetType = new FlowEntity(typeof(TTarget)),
+                    SourceType = enricher.SourceEntityType,
+                    SourceAddressId = enricher.AddressId,
+                };
+
                 // process and save new enriched file
-                var outResult = ProcessResults<TPart>(flowBatch, results);
+                ProcessSnapShot(outResult, results);
 
                 // save new flow file
                 // targetDirectory repository
-                var resultRepo = new ProcessResultRepository<ProcessResult<TPart, TTarget>>()
+                var resultRepo = new FlowSnapshotRepo<FlowSnapShot<TTarget>>()
                 {
                     DataDir = this.DataDir.FullName
                 };
@@ -122,16 +137,13 @@ namespace FutureState.Flow.Enrich
             }
         }
 
-        private ProcessResult<TPart,TTarget> ProcessResults<TPart>(FlowBatch batch, IEnumerable<TTarget> results)
+        private void ProcessSnapShot(FlowSnapShot<TTarget> outResult, IEnumerable<TTarget> results)
         {
-            // output result
-            var outResult = new ProcessResult<TPart, TTarget>(batch);
-
             var valid = new List<TTarget>();
             var inValid = new List<TTarget>();
 
             // output errors
-            var processErrors = new List<ProcessError<TPart>>();
+            var processErrors = new List<ErrorEvent>();
 
             foreach (var entityOut in results)
             {
@@ -148,10 +160,7 @@ namespace FutureState.Flow.Enrich
                     // get all errors and add to error collection
                     foreach (var error in errors)
                     {
-                        processErrors.Add(new ProcessError<TPart>
-                        {
-                            Error = new ErrorEvent { Message = error.Message, Type = error.Type }
-                        });
+                        processErrors.Add(new ErrorEvent { Message = error.Message, Type = error.Type });
                     }
 
                     inValid.Add(entityOut);
@@ -178,8 +187,6 @@ namespace FutureState.Flow.Enrich
 
             // reset process errors
             outResult.Errors = processErrors;
-
-            return outResult;
         }
 
         protected virtual void Commit()

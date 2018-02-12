@@ -25,6 +25,7 @@ namespace FutureState.Flow.Tests.Flow
         private FlowConfiguration _flowConfig;
         private FlowController _flowController;
         private readonly int CsvItemsToCreate = 25;
+        private FutureState.Flow.Flow _flow;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac()
@@ -40,7 +41,8 @@ namespace FutureState.Flow.Tests.Flow
             if (Directory.Exists(baseDirectory))
                 Directory.Delete(baseDirectory, true);
 
-            var flowConfig = new FlowConfiguration(Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c860"))
+            this._flow = new FutureState.Flow.Flow("ConfigureFlow");
+            var flowConfig = new FlowConfiguration(_flow)
             {
                 BasePath = baseDirectory
             };
@@ -242,7 +244,7 @@ namespace FutureState.Flow.Tests.Flow
 
         // used in file configuration
         [DisplayName("ProcessorB")]
-        public class TestProcessResultFlowFileController : ProcessResultFlowFileController<EntityB, EntityC>
+        public class TestProcessResultFlowFileController : FlowSnapshotFileController<EntityB, EntityC>
         {
             public TestProcessResultFlowFileController(ProcessorConfiguration<EntityB, EntityC> config)
                 : base(config)
