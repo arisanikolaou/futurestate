@@ -13,7 +13,6 @@ namespace FutureState.Flow.Enrich
         /// </summary>
         FlowEntity SourceEntityType { get; }
 
-
         /// <summary>
         ///     Gets the unique network address of the data source.
         /// </summary>
@@ -31,6 +30,7 @@ namespace FutureState.Flow.Enrich
         /// </summary>
         /// <returns></returns>
         IEnumerable<IEquatable<TTarget>> Get();
+
         /// <summary>
         ///     Enriches the 'whole' data type from the 'part' data type.
         /// </summary>

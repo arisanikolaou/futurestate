@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FutureState.Flow
+﻿namespace FutureState.Flow
 {
     /// <summary>
     ///     Saves and gets a given process result to an underlying data store.

@@ -85,7 +85,7 @@ namespace FutureState.Flow.Data
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving flow file transaction log to {fileName}.");
-            
+
             File.WriteAllText(fileName, body);
 
             if (_logger.IsInfoEnabled)

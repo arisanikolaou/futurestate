@@ -15,7 +15,6 @@ namespace FutureState.Flow
         /// </summary>
         public EnrichmentLog()
         {
-
         }
 
         public EnrichmentLog(Flow flow, FlowEntity sourceEntityType)
@@ -38,7 +37,6 @@ namespace FutureState.Flow
         ///     Gets/sets the entity type being used to enrich a target type.
         /// </summary>
         public FlowEntity SourceEntityType { get; set; }
-
 
         /// <summary>
         ///     Gets the log of all targets updated by data from the source.

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 
 namespace FutureState.Flow.Enrich
 {
@@ -42,7 +42,7 @@ namespace FutureState.Flow.Enrich
             {
                 // enrichment log to record transactions
                 var db = new EnrichmentLog(flowBatch.Flow, enricher.SourceEntityType);
-                
+
                 // list of items to create
                 // ReSharper disable once PossibleMultipleEnumeration
                 foreach (var target in targets)

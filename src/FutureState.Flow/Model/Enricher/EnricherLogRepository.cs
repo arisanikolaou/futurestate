@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
+using System;
+using System.IO;
 
 namespace FutureState.Flow
 {
@@ -42,7 +42,6 @@ namespace FutureState.Flow
             this.DataDir = Environment.CurrentDirectory;
         }
 
-
         /// <summary>
         ///     Gets the enrichment log for a given target process type.
         /// </summary>
@@ -62,7 +61,7 @@ namespace FutureState.Flow
             var content = File.ReadAllText(fileName);
 
             var log = JsonConvert.DeserializeObject<EnrichmentLog>(
-                content, 
+                content,
                 new JsonSerializerSettings());
 
             return log;

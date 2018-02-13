@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
+using System;
+using System.IO;
 
 namespace FutureState.Flow.Data
 {
@@ -46,7 +46,7 @@ namespace FutureState.Flow.Data
         public void Save(TSnapShot data)
         {
             CreateDirIfNotExists();
-            
+
             var i = 1;
             var fileName =
                 $@"{DataDir}\{data.ProcessName}-{data.Batch.Flow.Code}-{data.Batch.BatchId}.json";
@@ -88,7 +88,6 @@ namespace FutureState.Flow.Data
             return result;
         }
 
- 
         public TSnapShot Get(string snapShotAddress)
         {
             // source id would be the name of a processor

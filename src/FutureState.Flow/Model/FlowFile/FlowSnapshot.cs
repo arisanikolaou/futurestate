@@ -46,7 +46,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the address id of the source. This would typically be a network address.
         /// </summary>
-        public string SourceAddressId { get;  set; }
+        public string SourceAddressId { get; set; }
 
         /// <summary>
         ///     Gets the target output entity type.
@@ -68,7 +68,6 @@ namespace FutureState.Flow
         /// </summary>
         public FlowSnapshot()
         {
-            
             this.Warnings = new List<string>();
             this.Exceptions = new List<Exception>();
             this.Errors = new List<ErrorEvent>();
@@ -78,8 +77,8 @@ namespace FutureState.Flow
         ///     Creates a new instance
         /// </summary>
         public FlowSnapshot(
-            FlowBatch flowBatch, 
-            FlowEntity sourceType, string sourceAddressId, 
+            FlowBatch flowBatch,
+            FlowEntity sourceType, string sourceAddressId,
             FlowEntity targetType, string targetAddressId) : this()
         {
             Guard.ArgumentNotNull(sourceType, nameof(sourceType));
@@ -113,13 +112,12 @@ namespace FutureState.Flow
         public FlowSnapShot(
             FlowBatch flowBatch,
             FlowEntity sourceType, string sourceAddressId,
-            FlowEntity targetType, string targetAddressId) 
-            : base(flowBatch, sourceType, sourceAddressId, targetType, targetAddressId) 
+            FlowEntity targetType, string targetAddressId)
+            : base(flowBatch, sourceType, sourceAddressId, targetType, targetAddressId)
         {
             this.Output = new List<TEntityOut>();
             this.Invalid = new List<TEntityOut>();
         }
-
 
         /// <summary>
         ///     Gets the valid items created after processing. This is the primary ouput.

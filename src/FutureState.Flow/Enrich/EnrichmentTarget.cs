@@ -1,6 +1,6 @@
-﻿using System.IO;
-using FutureState.Flow.Data;
+﻿using FutureState.Flow.Data;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FutureState.Flow.Enrich
 {
@@ -13,7 +13,7 @@ namespace FutureState.Flow.Enrich
         /// <summary>
         ///     Gets the global unique id of the target to enrich. This could be a network address or file system path.
         /// </summary>
-        string AddressId { get;}
+        string AddressId { get; }
 
         /// <summary>
         ///     Gets the entity type being enriched.
@@ -91,7 +91,7 @@ namespace FutureState.Flow.Enrich
 
     public class InMemoryEnrichmentTarget<TTarget> : IEnrichmentTarget<TTarget>
     {
-        readonly string _uniqueAddressId;
+        private readonly string _uniqueAddressId;
         private readonly FlowBatch _batch;
         private readonly IEnumerable<TTarget> _source;
 

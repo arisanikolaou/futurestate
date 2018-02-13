@@ -1,22 +1,21 @@
-﻿using System;
+﻿using FutureState.Flow.Data;
+using FutureState.Specifications;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.Data;
-using FutureState.Specifications;
-using NLog;
 
 namespace FutureState.Flow.Enrich
 {
-
     /// <summary>
     ///     Controlls how a set of enrichers are used to append/update content in a
     ///     given flow file (process result).
     /// </summary>
     /// <typeparam name="TTarget">The target data type to enrich.</typeparam>
-    public class EnricherController<TTarget> where TTarget :  class, new()
+    public class EnricherController<TTarget> where TTarget : class, new()
     {
-        static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly EnricherLogRepository _logRepo;
         private readonly ISpecification<IEnumerable<TTarget>>[] _entityCollection;
@@ -30,7 +29,6 @@ namespace FutureState.Flow.Enrich
             new ProcessorConfiguration<TTarget, TTarget>(new SpecProvider<TTarget>(),
                 new SpecProvider<IEnumerable<TTarget>>()))
         {
-
         }
 
         /// <summary>
@@ -48,7 +46,6 @@ namespace FutureState.Flow.Enrich
                 DataDir = DataDir.FullName
             };
 
-
             this._entityRules = processorConfiguration.Rules.ToArray();
             this._entityCollection = processorConfiguration.CollectionRules.ToArray();
             this._flow = new Flow("FlowABD");
@@ -59,7 +56,6 @@ namespace FutureState.Flow.Enrich
         ///     flow files.
         /// </summary>
         public DirectoryInfo DataDir { get; set; }
-
 
         /// <summary>
         ///     Initializes the controller.
@@ -191,7 +187,6 @@ namespace FutureState.Flow.Enrich
 
         protected virtual void Commit()
         {
-
         }
     }
 }

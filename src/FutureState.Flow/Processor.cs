@@ -96,7 +96,6 @@ namespace FutureState.Flow
         /// </summary>
         public string ProcessName { get; }
 
-
         /// <summary>
         ///     Gets the default processor name.
         /// </summary>
@@ -133,7 +132,7 @@ namespace FutureState.Flow
         /// <returns></returns>
         public ProcessorEngine<TEntityIn> BuildProcessEngine(
             IEnumerable<TEntityIn> reader,
-            ProcessorEngine<TEntityIn> engine, 
+            ProcessorEngine<TEntityIn> engine,
             FlowSnapShot<TEntityOut> result)
         {
             var processedValidItems = new List<TEntityOut>();
@@ -159,7 +158,7 @@ namespace FutureState.Flow
                 if (CreateOutput != null)
                     itemsToProcess = CreateOutput(dtoIn);
                 else
-                    itemsToProcess = new[] {new TEntityOut()};
+                    itemsToProcess = new[] { new TEntityOut() };
 
                 var errorEvents = new List<ErrorEvent>();
                 foreach (TEntityOut dtoOutDefault in itemsToProcess)
@@ -257,7 +256,7 @@ namespace FutureState.Flow
         /// <param name="resultState">The resultState state from processing.</param>
         /// <returns></returns>
         public FlowSnapShot<TEntityOut> Process(
-            IEnumerable<TEntityIn> reader, 
+            IEnumerable<TEntityIn> reader,
             FlowBatch process,
             FlowSnapShot<TEntityOut> resultState)
         {

@@ -13,10 +13,8 @@ namespace FutureState.Flow
     /// </summary>
     public class Flow
     {
-
         public Flow()
         {
-            
         }
 
         public Flow(string code)
@@ -35,6 +33,7 @@ namespace FutureState.Flow
         ///     Gets the flow code.
         /// </summary>
         public string Code { get; set; }
+
         /// <summary>
         ///     Gets the flow's display name.
         /// </summary>
@@ -63,10 +62,9 @@ namespace FutureState.Flow
     /// <summary>
     ///     Gets the repository to load/save flow files.
     /// </summary>
-    public class FlowRepo 
+    public class FlowRepo
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
 
         public string DataDir { get; set; }
 
@@ -77,7 +75,6 @@ namespace FutureState.Flow
         {
             this.DataDir = Environment.CurrentDirectory;
         }
-
 
         public Flow Get(string flowCode)
         {
@@ -138,6 +135,9 @@ namespace FutureState.Flow
         }
     }
 
+    /// <summary>
+    ///     Service to create/remove flows and flow batches.
+    /// </summary>
     public class FlowService
     {
         private readonly FlowRepo _repo;
@@ -237,13 +237,11 @@ namespace FutureState.Flow
         }
     }
 
-
     /// <summary>
-    ///     A well known entity processed within a given flow. 
+    ///     A well known entity processed within a given flow.
     /// </summary>
     public class FlowEntity
     {
-
         public FlowEntity(Type type)
         {
             this.AssemblyQualifiedTypeName = type.AssemblyQualifiedName;
@@ -253,7 +251,6 @@ namespace FutureState.Flow
 
         public FlowEntity()
         {
-
         }
 
         /// <summary>
@@ -271,72 +268,4 @@ namespace FutureState.Flow
         /// </summary>
         public string EntityTypeId { get; set; }
     }
-
-    /// <summary>
-    ///     A batch process identifier associated with a given flow.
-    /// </summary>
-    public class FlowBatch : IEquatable<FlowBatch>
-    {
-        public FlowBatch()
-        {
-            // required by serializer
-        }
-
-        public FlowBatch(Flow flow, long batchId)
-        {
-            Flow = flow;
-            BatchId = batchId;
-        }
-
-        /// <summary>
-        ///     The originating flow.
-        /// </summary>
-        public Flow Flow { get; set; }
-
-        /// <summary>
-        ///     Gets the batch id.
-        /// </summary>
-        public long BatchId { get; set; }
-
-        /// <summary>
-        ///     Compares one batch to another for value equality.
-        /// </summary>
-        public bool Equals(FlowBatch other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return Flow.Equals(other.Flow) && BatchId == other.BatchId;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-
-            return Equals((FlowBatch)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Flow.Code.GetHashCode() * 397) ^ BatchId.GetHashCode();
-            }
-        }
-    }
-
-    /// <summary>
-    ///     A log of the batch process.
-    /// </summary>
-    public class FlowBatchLog
-    {
-        public FlowBatch Batch { get; set; }
-
-        public long Processed { get; set; }
-
-        public long Errors { get; set; }
-    }
-
 }

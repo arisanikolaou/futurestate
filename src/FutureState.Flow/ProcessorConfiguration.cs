@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using EmitMapper;
+﻿using EmitMapper;
 using FutureState.Specifications;
+using System.Collections.Generic;
 
 namespace FutureState.Flow
 {

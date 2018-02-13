@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FutureState.Flow.Controllers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.Controllers;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow

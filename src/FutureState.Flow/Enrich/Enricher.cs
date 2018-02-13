@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
 using EmitMapper;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace FutureState.Flow.Enrich
 {
@@ -58,8 +58,6 @@ namespace FutureState.Flow.Enrich
         }
     }
 
-
-
     /// <summary>
     ///     Enriches data from a given 'part' entity type to a whole (target) entity tpe.
     /// </summary>
@@ -111,7 +109,7 @@ namespace FutureState.Flow.Enrich
             this._source = sourceGet;
             this._addressId = addressId;
         }
-        
+
         /// <summary>
         ///     Enriches the whole from a given part.
         /// </summary>
@@ -133,7 +131,6 @@ namespace FutureState.Flow.Enrich
             foreach (var item in _source())
                 yield return item;
         }
-
 
         public virtual IEnumerable<IEquatable<TComposite>> Find(TComposite composite)
         {

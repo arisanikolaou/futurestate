@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FutureState.Specifications;
+using Magnum.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using FutureState.Specifications;
-using Magnum.Reflection;
 
 namespace FutureState.Flow
 {
@@ -19,7 +19,7 @@ namespace FutureState.Flow
 
         public void Build(Type type, IList<ValidationRule> rules)
         {
-            this.FastInvoke(new[] {type}, "Build", rules);
+            this.FastInvoke(new[] { type }, "Build", rules);
         }
 
         public void Build<TEntity>(IList<ValidationRule> rules)

@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using FutureState.Flow.Data;
+﻿using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace FutureState.Flow.Controllers
 {
@@ -43,7 +43,7 @@ namespace FutureState.Flow.Controllers
             if (_getProcessor == null)
                 _getProcessor = controller => throw new NotImplementedException();
 
-            Config = config; 
+            Config = config;
 
             OutDirectory = Environment.CurrentDirectory;
             InDirectory = Environment.CurrentDirectory;
@@ -55,7 +55,6 @@ namespace FutureState.Flow.Controllers
 
             _reader = reader;
         }
-
 
         /// <summary>
         ///     Gets the configuration to use to setup of a processor.
