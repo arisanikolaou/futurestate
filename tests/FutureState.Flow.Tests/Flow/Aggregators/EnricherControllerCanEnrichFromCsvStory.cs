@@ -12,7 +12,7 @@ namespace FutureState.Flow.Enrich
     [Story()]
     public class EnricherControllerCanEnrichFromCsvStory
     {
-        private Flow _flow;
+        private FlowId _flow;
         private FlowBatch _flowBatch;
         private string _workingDirectory;
         private FlowSnapShot<Whole> _processResult;
@@ -25,7 +25,7 @@ namespace FutureState.Flow.Enrich
 
         protected void GivenAFlowAndABatchProcess()
         {
-            this._flow = new Flow("Test");
+            this._flow = new FlowId("Test");
             this._flowBatch = new FlowBatch(_flow, 1);
         }
 
@@ -43,10 +43,11 @@ namespace FutureState.Flow.Enrich
         {
             this._processResult = new FlowSnapShot<Whole>()
             {
-                ProcessName = "TestProcess",
+                SourceType = new FlowEntity(typeof(Part)),
+                TargetType = new FlowEntity(typeof(Whole)),
                 Batch = _flowBatch,
                 Invalid = new List<Whole>(),
-                Output = new List<Whole>() // valid entities
+                Valid = new List<Whole>() // valid entities
                 {
                     new Whole(){Key = "Key1", FirstName = "A", LastName = "LastName"},
                     new Whole(){Key = "Key2", FirstName = "", LastName = ""},

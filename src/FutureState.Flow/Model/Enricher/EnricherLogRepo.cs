@@ -8,24 +8,24 @@ namespace FutureState.Flow
     /// <summary>
     ///     Loads/start a given enrichment transaction log.
     /// </summary>
-    public interface IEnrichmentLogRepository
+    public interface IEnricherLogRepo
     {
         /// <summary>
         ///     Gets the log of data sources used to enrich a given target entity set.
         /// </summary>
         /// <returns></returns>
-        EnrichmentLog Get(Flow flow, FlowEntity sourceEntityType);
+        EnricherLog Get(FlowId flow, FlowEntity sourceEntityType);
 
         /// <summary>
         ///     Saves the log of data sources used to enrich a given target entity set.
         /// </summary>
-        void Save(EnrichmentLog data);
+        void Save(EnricherLog data);
     }
 
     /// <summary>
-    ///     Loads/saves <see cref="EnrichmentLog"/> instances from the file system.
+    ///     Loads/saves <see cref="EnricherLog"/> instances from the file system.
     /// </summary>
-    public class EnricherLogRepository : IEnrichmentLogRepository
+    public class EnricherLogRepository : IEnricherLogRepo
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -45,7 +45,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the enrichment log for a given target process type.
         /// </summary>
-        public EnrichmentLog Get(Flow flow, FlowEntity sourceEntityType)
+        public EnricherLog Get(FlowId flow, FlowEntity sourceEntityType)
         {
             Guard.ArgumentNotNull(flow, nameof(flow));
             Guard.ArgumentNotNull(sourceEntityType, nameof(sourceEntityType));
@@ -56,11 +56,16 @@ namespace FutureState.Flow
                 $@"{DataDir}\{flow}-Enrichment-{sourceEntityType.EntityTypeId}.json";
 
             if (!File.Exists(fileName))
+            {
+                if (_logger.IsInfoEnabled)
+                    _logger.Info($"File {fileName} could not be found.");
+
                 return null;
+            }
 
             var content = File.ReadAllText(fileName);
 
-            var log = JsonConvert.DeserializeObject<EnrichmentLog>(
+            var log = JsonConvert.DeserializeObject<EnricherLog>(
                 content,
                 new JsonSerializerSettings());
 
@@ -70,7 +75,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Saves the log to the active data dir.
         /// </summary>
-        public void Save(EnrichmentLog log)
+        public void Save(EnricherLog log)
         {
             Guard.ArgumentNotNull(log, nameof(log));
 
@@ -99,6 +104,7 @@ namespace FutureState.Flow
             // wrap in transaction
             File.WriteAllText(fileName, body);
 
+            // 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saved enrichment log output to {fileName}.");
         }

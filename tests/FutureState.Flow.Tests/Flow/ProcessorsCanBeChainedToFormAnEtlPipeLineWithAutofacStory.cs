@@ -25,7 +25,7 @@ namespace FutureState.Flow.Tests.Flow
         private FlowConfiguration _flowConfig;
         private FlowController _flowController;
         private readonly int CsvItemsToCreate = 25;
-        private FutureState.Flow.Flow _flow;
+        private FutureState.Flow.FlowId _flow;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac()
@@ -41,7 +41,7 @@ namespace FutureState.Flow.Tests.Flow
             if (Directory.Exists(baseDirectory))
                 Directory.Delete(baseDirectory, true);
 
-            this._flow = new FutureState.Flow.Flow("ConfigureFlow");
+            this._flow = new FutureState.Flow.FlowId("ConfigureFlow");
             var flowConfig = new FlowConfiguration(_flow)
             {
                 BasePath = baseDirectory

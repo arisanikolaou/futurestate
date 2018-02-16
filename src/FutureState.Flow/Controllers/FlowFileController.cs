@@ -10,7 +10,7 @@ namespace FutureState.Flow.Controllers
     /// <summary>
     ///     Controls the flow of data from an incoming batch source to a downstream processor.
     /// </summary>
-    /// <typeparam name="TIn">The incoming data type to </typeparam>
+    /// <typeparam name="TIn">The incoming data type to process.</typeparam>
     /// <typeparam name="TOut">The outgoing entity type.</typeparam>
     public class FlowFileController<TIn, TOut> : IFlowFileController
         where TOut : class, new()
@@ -51,7 +51,7 @@ namespace FutureState.Flow.Controllers
             // assign name from type name by default
             ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
 
-            Flow = new Flow(typeof(TOut).Name);
+            Flow = new FlowId(typeof(TOut).Name);
 
             _reader = reader;
         }
@@ -101,7 +101,7 @@ namespace FutureState.Flow.Controllers
         /// <summary>
         ///     Gets/sets the unique flow.
         /// </summary>
-        public Flow Flow { get; set; }
+        public FlowId Flow { get; set; }
 
         /// <summary>
         ///     Gets the flow files associated with the current directory.

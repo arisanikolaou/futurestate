@@ -9,8 +9,8 @@ namespace FutureState.Flow
     ///     Extracts entities from a given data sources in a managed way to use in
     ///     data processing.
     /// </summary>
-    /// <typeparam name="TEntityDto">The type of entity to process.</typeparam>
-    public class ProcessorEngine<TEntityDto> : IProcessorEngine
+    /// <typeparam name="TEntityIn">The type of entity to process.</typeparam>
+    public class ProcessorEngine<TEntityIn> : IProcessorEngine
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -30,17 +30,17 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the action to read results from.
         /// </summary>
-        public IEnumerable<TEntityDto> EntitiesReader { get; set; }
+        public IEnumerable<TEntityIn> EntitiesReader { get; set; }
 
         /// <summary>
         ///     Gets the action to process one item.
         /// </summary>
-        public Func<TEntityDto, IEnumerable<ErrorEvent>> ProcessItem { get; set; }
+        public Func<TEntityIn, IEnumerable<ErrorEvent>> ProcessItem { get; set; }
 
         /// <summary>
         ///     Gets the error handler.
         /// </summary>
-        public Action<TEntityDto, Exception> OnError { get; set; }
+        public Action<TEntityIn, Exception> OnError { get; set; }
 
         /// <summary>
         ///     Gets the list of warnings accumulated.
@@ -61,23 +61,14 @@ namespace FutureState.Flow
         ///     Gets the date the process started.
         /// </summary>
         public DateTime StartTime { get; private set; }
-
-        /// <summary>
-        ///     Gets the default processor name.
-        /// </summary>
-        /// <returns></returns>
-        private string GetDefaultProcessName()
-        {
-            return $"{GetType().Name.Replace("`1", "")}-{typeof(TEntityDto).Name}";
-        }
-
+        
         /// <summary>
         ///     Processes all  data from the incoming source and records. Will record to file and memory the entities that were and
         ///     were not processed and returns
         ///     a summary of the processes' execution status.
         /// </summary>
         /// <returns></returns>
-        public FlowSnapshot Process<TOut>(FlowBatch process, FlowSnapShot<TOut> result = null)
+        public FlowSnapshot Process<TEntityOut>(FlowBatch process, FlowSnapShot<TEntityOut> result = null)
         {
             Guard.ArgumentNotNull(process, nameof(process));
 
@@ -90,18 +81,23 @@ namespace FutureState.Flow
                 throw new InvalidOperationException("EntitiesReader has not been assigned.");
 
             if (result == null)
-                result = new FlowSnapShot<TOut>
+            {
+                // create new
+                result = new FlowSnapShot<TEntityOut>
                 {
-                    ProcessName = GetDefaultProcessName()
+                    SourceType = new FlowEntity(typeof(TEntityIn)),
+                    TargetType = new FlowEntity(typeof(TEntityOut))
                 };
+            }
 
+            // creates new result batch
             result.Batch = process;
 
             Initialize?.Invoke();
 
             var onError = OnError ?? ((_, ___) => { });
 
-            var processed = new List<TEntityDto>();
+            var processed = new List<TEntityIn>();
             var errors = new List<ErrorEvent>();
             var exceptions = new List<Exception>();
 

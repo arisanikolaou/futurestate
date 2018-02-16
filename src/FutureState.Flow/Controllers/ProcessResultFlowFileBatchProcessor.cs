@@ -35,7 +35,7 @@ namespace FutureState.Flow.Controllers
 
                 var processResult = repoository.Get(flowFileSource);
 
-                return processResult.Output;
+                return processResult.Valid;
             });
         }
     }

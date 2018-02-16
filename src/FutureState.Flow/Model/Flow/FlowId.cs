@@ -11,14 +11,24 @@ namespace FutureState.Flow
     ///     A flow is a well known data flow from a given distinct primary source to a set of extensible target
     ///     data stores (flow files).
     /// </summary>
-    public class Flow
+    public class FlowId
     {
-        public Flow()
+        /// <summary>
+        ///     Creates a new flow id.
+        /// </summary>
+        public FlowId()
         {
+            // required by serializer
         }
 
-        public Flow(string code)
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="code">Thee code.</param>
+        public FlowId(string code)
         {
+            Guard.ArgumentNotNullOrEmptyOrWhiteSpace(code, nameof(code));
+
             this.Entities = new List<FlowEntity>();
             this.Code = code;
             this.CurrentBatchId = 1;
@@ -62,21 +72,33 @@ namespace FutureState.Flow
     /// <summary>
     ///     Gets the repository to load/save flow files.
     /// </summary>
-    public class FlowRepo
+    public class FlowIdRepo
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        ///     Gets the data directory to load from.
+        /// </summary>
         public string DataDir { get; set; }
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowRepo()
+        public FlowIdRepo()
         {
             this.DataDir = Environment.CurrentDirectory;
         }
 
-        public Flow Get(string flowCode)
+        /// <summary>
+        ///     Gets the flow code to load from the file system.
+        /// </summary>
+        /// <param name="flowCode">
+        ///     The flow code to load.
+        /// </param>
+        /// <returns>
+        ///     The flow.
+        /// </returns>
+        public FlowId Get(string flowCode)
         {
             // source id would be the name of a processor
 
@@ -88,14 +110,18 @@ namespace FutureState.Flow
 
             var content = File.ReadAllText(fileName);
 
-            var log = JsonConvert.DeserializeObject<Flow>(
+            var log = JsonConvert.DeserializeObject<FlowId>(
                 content,
                 new JsonSerializerSettings());
 
             return log;
         }
 
-        public void Save(Flow flow)
+        /// <summary>
+        ///     Saves/updates a given flow.
+        /// </summary>
+        /// <param name="flow">The flow to save.</param>
+        public void Save(FlowId flow)
         {
             Guard.ArgumentNotNull(flow, nameof(flow));
 
@@ -133,6 +159,20 @@ namespace FutureState.Flow
             if (!Directory.Exists(DataDir))
                 Directory.CreateDirectory(DataDir);
         }
+
+        /// <summary>
+        ///     Gets whether a flow with a given code already exists.
+        /// </summary>
+        /// <param name="code">The flow code.</param>
+        /// <returns></returns>
+        public bool Exists(string code)
+        {
+            // source log
+            var fileName =
+                $@"{DataDir}\Flow-{code}.json";
+
+            return File.Exists(fileName);
+        }
     }
 
     /// <summary>
@@ -140,16 +180,21 @@ namespace FutureState.Flow
     /// </summary>
     public class FlowService
     {
-        private readonly FlowRepo _repo;
+        private readonly FlowIdRepo _repo;
 
-        public FlowService(FlowRepo repo)
+        public FlowService(FlowIdRepo repo)
         {
             _repo = repo;
         }
 
-        public Flow CreateNew(string flowCode)
+        /// <summary>
+        ///     Creates a new flow flow.
+        /// </summary>
+        /// <param name="flowCode">The unique flow code.</param>
+        /// <returns></returns>
+        public FlowId CreateNew(string flowCode)
         {
-            var flow = new Flow()
+            var flow = new FlowId()
             {
                 Code = flowCode,
                 DataDir = Environment.CurrentDirectory,
@@ -163,13 +208,16 @@ namespace FutureState.Flow
             return flow;
         }
 
-        public Flow Get(string flowCode)
+        public FlowId Get(string flowCode)
         {
             return _repo.Get(flowCode);
         }
 
-        public void Save(Flow flow)
+        public void Save(FlowId flow)
         {
+            if (_repo.Exists(flow.Code))
+                throw new InvalidOperationException($"Another flow with the code {flow.Code} already exists.");
+
             _repo.Save(flow);
         }
 
@@ -193,7 +241,7 @@ namespace FutureState.Flow
             flow.Entities.Add(entity);
 
             // update
-            Save(flow);
+            _repo.Save(flow);
 
             //
             return entity;
@@ -212,14 +260,14 @@ namespace FutureState.Flow
             entity.DateAdded = DateTime.UtcNow;
 
             // update
-            Save(flow);
+            _repo.Save(flow);
         }
 
-        public FlowBatch GetNewBatchProcess(string flowCode)
+        public FlowBatch GetNewFlowBatch(string flowCode)
         {
             var flow = Get(flowCode);
             if (flow == null)
-                throw new InvalidOperationException($"Can't find flow with the code {flowCode}.");
+                flow = new FlowId(flowCode); // just create new flow code
 
             var newBatchId = flow.CurrentBatchId++;
 
@@ -229,43 +277,11 @@ namespace FutureState.Flow
                 BatchId = newBatchId,
             };
 
-            // save/update original file
-            Save(flow);
+            // save/update original file - don't call save as it will through error
+            _repo.Save(flow);
 
             // now return to caller
             return batch;
         }
-    }
-
-    /// <summary>
-    ///     A well known entity processed within a given flow.
-    /// </summary>
-    public class FlowEntity
-    {
-        public FlowEntity(Type type)
-        {
-            this.AssemblyQualifiedTypeName = type.AssemblyQualifiedName;
-            this.DateAdded = DateTime.UtcNow;
-            this.EntityTypeId = type.Name;
-        }
-
-        public FlowEntity()
-        {
-        }
-
-        /// <summary>
-        ///     Gets the assembly qualified flow entity. This is the type name of the material form of the entity.
-        /// </summary>
-        public string AssemblyQualifiedTypeName { get; set; }
-
-        /// <summary>
-        ///     Gets the date, in UTC, the flow entity was added.
-        /// </summary>
-        public DateTime DateAdded { get; set; }
-
-        /// <summary>
-        ///     Gets the entity type id. This id must be unique within a given flow.
-        /// </summary>
-        public string EntityTypeId { get; set; }
     }
 }

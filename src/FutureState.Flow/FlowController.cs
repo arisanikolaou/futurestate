@@ -11,21 +11,6 @@ using System.Reflection;
 
 namespace FutureState.Flow
 {
-    public interface IFlowFileControllerFactory
-    {
-        IFlowFileController Create(Type type);
-    }
-
-    public interface IFlowFileLogRepositoryFactory
-    {
-        FlowFileLogRepository Get();
-    }
-
-    public interface IFlowFileControllerServiceFactory
-    {
-        FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller);
-    }
-
     /// <summary>
     ///     Controls how flow files are processed.
     /// </summary>
@@ -43,6 +28,9 @@ namespace FutureState.Flow
         private FlowFileControllerService _processor;
         private bool _started;
 
+        /// <summary>
+        ///     
+        /// </summary>
         static FlowController()
         {
             // scan assemblies

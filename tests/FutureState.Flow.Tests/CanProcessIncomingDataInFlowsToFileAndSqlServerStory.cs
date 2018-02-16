@@ -51,7 +51,7 @@ namespace FutureState.Flow.Tests
 
         protected void AndGivenAbatchProcess()
         {
-            _batchProcess = new FlowBatch(new FutureState.Flow.Flow(_flowCode), BatchId);
+            _batchProcess = new FlowBatch(new FutureState.Flow.FlowId(_flowCode), BatchId);
         }
 
         protected void AndGivenASetOfSpecificationsForSource()
@@ -198,7 +198,7 @@ namespace FutureState.Flow.Tests
                 }
             };
 
-            _resultB = processorB.Process(_resultA.Output, _batchProcess);
+            _resultB = processorB.Process(_resultA.Valid, _batchProcess);
 
             _repository.Save(_resultB);
         }
@@ -227,7 +227,10 @@ namespace FutureState.Flow.Tests
                 }
             };
 
-            _resultC = processorC.Process(_resultB.Output, _batchProcess);
+            // 
+            _resultC = processorC.Process(_resultB.Valid, _batchProcess);
+
+            // save
             _repository.Save(_resultC);
         }
 
@@ -235,7 +238,7 @@ namespace FutureState.Flow.Tests
         {
             Assert.NotNull(_resultA);
             Assert.NotNull(_resultB);
-            Assert.NotNull(_resultB.Output.First().Addresses.First().StreetName);
+            Assert.NotNull(_resultB.Valid.First().Addresses.First().StreetName);
         }
 
         protected void AndThenAllResultsShouldBeProcessedAndOnlyValidContactsShouldBeSaved()
@@ -266,9 +269,10 @@ namespace FutureState.Flow.Tests
         {
             var repo =
                 new FlowSnapshotRepo<FlowSnapShot<Dto1>>(Environment.CurrentDirectory);
-            var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
 
-            var result = repo.Get(processorName, _flowCode, BatchId);
+            var flowEntity = new FlowEntity(typeof(Dto1));
+
+            var result = repo.Get(flowEntity.EntityTypeId, _flowCode, BatchId);
 
             Assert.NotNull(result);
             Assert.Equal(CsvItemsToCreate - 1, result.ProcessedCount);

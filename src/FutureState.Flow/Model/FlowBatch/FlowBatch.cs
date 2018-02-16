@@ -18,7 +18,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowBatch(Flow flow, long batchId)
+        public FlowBatch(FlowId flow, long batchId)
         {
             Guard.ArgumentNotNull(flow, nameof(flow));
 
@@ -29,7 +29,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     The originating flow.
         /// </summary>
-        public Flow Flow { get; set; }
+        public FlowId Flow { get; set; }
 
         /// <summary>
         ///     Gets the batch id.
@@ -47,6 +47,10 @@ namespace FutureState.Flow
             return Flow.Equals(other.Flow) && BatchId == other.BatchId;
         }
 
+        /// <summary>
+        ///     Gets wheter a given object is equal to the current flow.
+        /// </summary>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -56,6 +60,10 @@ namespace FutureState.Flow
             return Equals((FlowBatch)obj);
         }
 
+        /// <summary>
+        ///     Gets the hash code for the flow batch.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             unchecked
@@ -63,17 +71,5 @@ namespace FutureState.Flow
                 return (Flow.Code.GetHashCode() * 397) ^ BatchId.GetHashCode();
             }
         }
-    }
-
-    /// <summary>
-    ///     A log of the batch process.
-    /// </summary>
-    public class FlowBatchLog
-    {
-        public FlowBatch Batch { get; set; }
-
-        public long Processed { get; set; }
-
-        public long Errors { get; set; }
     }
 }

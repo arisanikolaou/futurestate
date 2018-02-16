@@ -21,7 +21,7 @@ namespace FutureState.Flow.Tests
         private const string DataFileToCreate = "CsvProcessorUnitTests-Source.csv";
         private const int CsvItemsToCreate = 10;
         private const int BatchId = 1;
-        private readonly F.Flow _flow = new F.Flow("TestFlow2");
+        private readonly F.FlowId _flow = new F.FlowId("TestFlow2");
         private FlowBatch _batchProcess;
         private ContainerBuilder _cb;
         private IContainer _container;
@@ -214,7 +214,7 @@ namespace FutureState.Flow.Tests
                 }
             };
 
-            _resultB = processorB.Process(_resultA.Output, _batchProcess);
+            _resultB = processorB.Process(_resultA.Valid, _batchProcess);
 
             _repository.Save(_resultB);
         }
@@ -238,7 +238,7 @@ namespace FutureState.Flow.Tests
                 }
             };
 
-            _resultC = processorC.Process(_resultB.Output, _batchProcess);
+            _resultC = processorC.Process(_resultB.Valid, _batchProcess);
 
             _repository.Save(_resultC);
         }
@@ -247,7 +247,7 @@ namespace FutureState.Flow.Tests
         {
             Assert.NotNull(_resultA);
             Assert.NotNull(_resultB);
-            Assert.NotNull(_resultB.Output.First().Addresses.First().StreetName);
+            Assert.NotNull(_resultB.Valid.First().Addresses.First().StreetName);
         }
 
         protected void AndThenAllResultsShouldBeProcessedAndOnlyValidContactsShouldBeSaved()
@@ -279,13 +279,13 @@ namespace FutureState.Flow.Tests
             var repo =
                 new FlowSnapshotRepo<FlowSnapShot<Dto1>>(Environment.CurrentDirectory);
 
-            var processorName = Processor<DenormalizedEntity, Dto1>.GetProcessName(_processorA);
+            var targetEntityType = new FlowEntity(typeof(Dto2));
 
-            var result = repo.Get(processorName, _flow.Code, BatchId);
+            var result = repo.Get(targetEntityType.EntityTypeId, _flow.Code, BatchId);
 
             Assert.NotNull(result);
             Assert.Equal(CsvItemsToCreate - 1, result.ProcessedCount);
-            Assert.Single(result.Errors);
+            Assert.Empty(result.Errors);
         }
 
         [BddfyFact]

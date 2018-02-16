@@ -121,6 +121,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanCreateUniqueFlowsStory.cs" />
+    <Compile Include="CanAddUpdateFlowSnapShotsStory.cs" />
     <Compile Include="Flow\Aggregators\CanEnrichFromDataSourcesStory.cs" />
     <Content Include="Flow\Aggregators\Archive\EnricherControllerService.cs" />
     <Content Include="Flow\Aggregators\Archive\IEnricherControllerService.cs" />

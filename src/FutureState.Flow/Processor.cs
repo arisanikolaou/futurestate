@@ -18,6 +18,7 @@ namespace FutureState.Flow
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _config;
+
         private Action<TEntityIn, TEntityOut> _beginProcessingItem;
         private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
         private Action<IEnumerable<TEntityOut>> _onCommitting;
@@ -40,7 +41,6 @@ namespace FutureState.Flow
             _config = config;
 
             CreateOutput = dtoIn => new[] { new TEntityOut() };
-            ProcessName = GetProcessName(this);
             Engine = engine ?? new ProcessorEngine<TEntityIn>();
         }
 
@@ -92,28 +92,12 @@ namespace FutureState.Flow
         }
 
         /// <summary>
-        ///     Get the well known name of the processor type.
-        /// </summary>
-        public string ProcessName { get; }
-
-        /// <summary>
-        ///     Gets the default processor name.
-        /// </summary>
-        /// <param name="processor">The processor instance to calculate a name for.</param>
-        /// <returns></returns>
-        public static string GetProcessName(IProcessor processor)
-        {
-            return $"{processor.GetType().Name.Replace("`2", "")}-{typeof(TEntityIn).Name}-{typeof(TEntityOut).Name}";
-        }
-
-        /// <summary>
         ///     Processes an incoming data stream to an output.
         /// </summary>
         public FlowSnapShot<TEntityOut> Process(IEnumerable<TEntityIn> reader, FlowBatch process)
         {
             var result = new FlowSnapShot<TEntityOut>
             {
-                ProcessName = ProcessName,
                 TargetType = new FlowEntity(typeof(TEntityOut)),
                 SourceType = new FlowEntity(typeof(TEntityIn))
             };
@@ -210,6 +194,7 @@ namespace FutureState.Flow
             return engine;
         }
 
+
         private void ProcessOutputItem(TEntityIn dtoIn, TEntityOut dtoOutDefault, List<ErrorEvent> errorEvents, List<TEntityOut> processedValidItems, List<TEntityOut> notValidItems)
         {
             // apply default mapping
@@ -226,6 +211,7 @@ namespace FutureState.Flow
             {
                 var errors = _config.Rules.ToErrors(dtoOut);
                 var errorsArray = errors as Error[] ?? errors.ToArray();
+
                 if (errorsArray.Any())
                 {
                     foreach (var error in errorsArray)
@@ -261,7 +247,7 @@ namespace FutureState.Flow
             FlowSnapShot<TEntityOut> resultState)
         {
             if (Logger.IsTraceEnabled)
-                Logger.Trace($"Starting to process  {ProcessName} batch {process.BatchId}.");
+                Logger.Trace($"Starting to process entity {typeof(TEntityOut).Name} batch {process.BatchId}.");
 
             try
             {
@@ -277,12 +263,12 @@ namespace FutureState.Flow
             catch (Exception ex)
             {
                 throw new ApplicationException(
-                    $"Failed to process {ProcessName} batch {process.BatchId} due to an unexpected error.", ex);
+                    $"Failed to process entity {typeof(TEntityOut).Name} batch {process.BatchId} due to an unexpected error.", ex);
             }
             finally
             {
                 if (Logger.IsTraceEnabled)
-                    Logger.Trace($"Finished processing {ProcessName} batch {process.BatchId}.");
+                    Logger.Trace($"Finished processing entity {typeof(TEntityOut).Name} batch {process.BatchId}.");
             }
 
             return resultState;
@@ -306,7 +292,7 @@ namespace FutureState.Flow
             // save results to output file - unique
             var batchAsList = batch.ToList();
 
-            result.Output = batchAsList;
+            result.Valid = batchAsList;
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace FutureState.Flow
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IFlowFileLogRepository _logRepository;
+        private readonly IFlowFileLogRepo _logRepository;
         private readonly object _syncLock = new object();
         private readonly Timer _timer;
         private volatile bool _isProcessing;
@@ -27,7 +27,7 @@ namespace FutureState.Flow
         /// <param name="logRepository">The repositoro to update transaction log details to.</param>
         /// <param name="flowFileController">The batch processor implementation.</param>
         public FlowFileControllerService(
-            IFlowFileLogRepository logRepository,
+            IFlowFileLogRepo logRepository,
             IFlowFileController flowFileController)
         {
             Guard.ArgumentNotNull(logRepository, nameof(logRepository));

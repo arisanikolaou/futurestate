@@ -14,7 +14,7 @@ namespace FutureState.Flow.Enrich
         private List<IEnricher<Whole>> _enrichers;
         private EnricherLogRepository _repo;
         private EnricherProcessor _controller;
-        private Flow _flow;
+        private FlowId _flow;
         private FlowBatch _flowBatch;
         private FlowService _flowService;
 
@@ -43,10 +43,10 @@ namespace FutureState.Flow.Enrich
 
         protected void AndGivenANewFlow()
         {
-            this._flowService = new FlowService(new FlowRepo());
+            this._flowService = new FlowService(new FlowIdRepo());
 
             this._flow = this._flowService.CreateNew("Test");
-            this._flowBatch = this._flowService.GetNewBatchProcess("Test");
+            this._flowBatch = this._flowService.GetNewFlowBatch("Test");
         }
 
         protected void AndGivenAnEnrichmentTarget()

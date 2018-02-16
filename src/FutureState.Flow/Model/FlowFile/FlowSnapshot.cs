@@ -29,16 +29,6 @@ namespace FutureState.Flow
         public long ProcessedCount { get; set; }
 
         /// <summary>
-        ///     Gets or sets the process name.
-        /// </summary>
-        public string ProcessName { get; set; }
-
-        /// <summary>
-        ///     Gets the network address of the snapshot.
-        /// </summary>
-        public string Address { get; set; }
-
-        /// <summary>
         ///     Gets the flow's source type if any.
         /// </summary>
         public FlowEntity SourceType { get; set; }
@@ -74,23 +64,31 @@ namespace FutureState.Flow
         }
 
         /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public FlowSnapshot(
+            FlowBatch flowBatch) : this()
+        {
+            this.Batch = flowBatch;
+        }
+
+        /// <summary>
         ///     Creates a new instance
         /// </summary>
         public FlowSnapshot(
             FlowBatch flowBatch,
             FlowEntity sourceType, string sourceAddressId,
-            FlowEntity targetType, string targetAddressId) : this()
+            FlowEntity targetType, string targetAddressId = null) : this()
         {
+            Guard.ArgumentNotNull(flowBatch, nameof(flowBatch));
             Guard.ArgumentNotNull(sourceType, nameof(sourceType));
             Guard.ArgumentNotNull(targetType, nameof(targetType));
 
             Batch = flowBatch;
             SourceType = sourceType;
             SourceAddressId = sourceAddressId;
-            Address = targetAddressId;
+            SourceAddressId = targetAddressId;
             TargetType = targetType;
-
-            this.ProcessName = $"{targetType.EntityTypeId}-Process";
         }
     }
 
@@ -100,10 +98,24 @@ namespace FutureState.Flow
     /// <typeparam name="TEntityOut">The output type.</typeparam>
     public class FlowSnapShot<TEntityOut> : FlowSnapshot
     {
+        /// <summary>
+        ///     Creates a new flow file snapshot.
+        /// </summary>
         public FlowSnapShot() : base()
         {
-            this.Output = new List<TEntityOut>();
+            this.Valid = new List<TEntityOut>();
             this.Invalid = new List<TEntityOut>();
+            this.TargetType = new FlowEntity(typeof(TEntityOut));
+        }
+
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        public FlowSnapShot(
+            FlowBatch flowBatch) : base(flowBatch)
+        {
+            this.Batch = flowBatch;
+            this.TargetType = new FlowEntity(typeof(TEntityOut));
         }
 
         /// <summary>
@@ -115,14 +127,14 @@ namespace FutureState.Flow
             FlowEntity targetType, string targetAddressId)
             : base(flowBatch, sourceType, sourceAddressId, targetType, targetAddressId)
         {
-            this.Output = new List<TEntityOut>();
+            this.Valid = new List<TEntityOut>();
             this.Invalid = new List<TEntityOut>();
         }
 
         /// <summary>
-        ///     Gets the valid items created after processing. This is the primary ouput.
+        ///     Gets the valid items created from a process. This is the primary ouput.
         /// </summary>
-        public List<TEntityOut> Output { get; set; }
+        public List<TEntityOut> Valid { get; set; }
 
         /// <summary>
         ///     Gets the invalid items that were not processed.

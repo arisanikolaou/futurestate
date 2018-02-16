@@ -27,7 +27,7 @@ namespace FutureState.Flow.Controllers
         /// <summary>
         ///     Gets the flow.
         /// </summary>
-        Flow Flow { get; set; }
+        FlowId Flow { get; set; }
 
         /// <summary>
         ///     Gets the input directory or port.

@@ -1,10 +1,6 @@
 ﻿using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FutureState.Flow
 {
@@ -16,11 +12,11 @@ namespace FutureState.Flow
 
     public interface IFlowFileLogRepositoryFactory
     {
-        FlowFileLogRepository Get();
+        FlowFileLogRepo Get();
     }
 
     public interface IFlowFileControllerServiceFactory
     {
-        FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller);
+        FlowFileControllerService Get(IFlowFileLogRepo repository, IFlowFileController controller);
     }
 }

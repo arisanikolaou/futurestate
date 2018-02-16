@@ -8,16 +8,22 @@ namespace FutureState.Flow
     /// <summary>
     ///     A log of all enrichments processed from a given source to multiple targets.
     /// </summary>
-    public class EnrichmentLog
+    public class EnricherLog
     {
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public EnrichmentLog()
+        public EnricherLog()
         {
+            // required by serializer
         }
 
-        public EnrichmentLog(Flow flow, FlowEntity sourceEntityType)
+        /// <summary>
+        ///     Creates a new instance.
+        /// </summary>
+        /// <param name="flow">The related flow.</param>
+        /// <param name="sourceEntityType">The source entity type id.</param>
+        public EnricherLog(FlowId flow, FlowEntity sourceEntityType)
         {
             Guard.ArgumentNotNull(flow, nameof(flow));
             Guard.ArgumentNotNull(sourceEntityType, nameof(sourceEntityType));
@@ -31,7 +37,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the flow associated with the current instance.
         /// </summary>
-        public Flow Flow { get; set; }
+        public FlowId Flow { get; set; }
 
         /// <summary>
         ///     Gets/sets the entity type being used to enrich a target type.

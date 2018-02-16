@@ -24,9 +24,9 @@ namespace FutureState.Flow.Tests.Flow
         private string _dataFileToCreate = @"Test.csv";
         private bool _flowFile1Processed;
         private bool _flowFileProcessed;
-        public FutureState.Flow.Flow _flow;
+        public FutureState.Flow.FlowId _flow;
         private string _inDirectory;
-        private FlowFileLogRepository _logRepository;
+        private FlowFileLogRepo _logRepository;
         private string _outDirectory;
         private string _outDirectory2;
         private string _processName;
@@ -94,7 +94,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenALogRepository()
         {
-            _logRepository = new FlowFileLogRepository
+            _logRepository = new FlowFileLogRepo
             {
                 DataDir = _baseDirectory
             };
@@ -102,7 +102,7 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndGivenAConsistentProcessId()
         {
-            _flow = new FutureState.Flow.Flow("TestFlow1");
+            _flow = new FutureState.Flow.FlowId("TestFlow1");
         }
 
 

@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Interfaces.cs" />
     <Compile Include="Controllers\CsvFlowFileController.cs" />
     <Compile Include="Controllers\FlowFileController.cs" />
     <Compile Include="Controllers\ProcessResultFlowFileBatchProcessor.cs" />
@@ -67,17 +68,18 @@
     <Compile Include="Enrich\EnricherProcessor.cs" />
     <Compile Include="Enrich\EnrichmentTarget.cs" />
     <Compile Include="Enrich\IEnricher.cs" />
-    <Compile Include="Model\Enricher\EnricherLogRepository.cs" />
+    <Compile Include="Model\Enricher\EnricherLogRepo.cs" />
     <Compile Include="Model\Enricher\EnrichmentLog.cs" />
     <Compile Include="Model\Enricher\EnrichmentLogEntry.cs" />
     <Compile Include="FlowConfiguration.cs" />
     <Compile Include="FlowController.cs" />
     <Compile Include="Model\FlowBatch\FlowBatch.cs" />
-    <Compile Include="Model\Flow\Flow.cs" />
+    <Compile Include="Model\Flow\FlowId.cs" />
     <Compile Include="Model\FlowFileLog.cs" />
     <Compile Include="FlowControllerService.cs" />
     <Compile Include="Model\FlowFileLogEntry.cs" />
-    <Compile Include="Model\Flow\FlowFileLogRepository.cs" />
+    <Compile Include="Model\FlowEntity.cs" />
+    <Compile Include="Model\Flow\FlowFileLogRepo.cs" />
     <Compile Include="Model\FlowFile\IFlowSnapshotRepo.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
     <Compile Include="Readers\GenericResultReader.cs" />
@@ -91,7 +93,7 @@
     <Compile Include="Model\ErrorEvent.cs" />
     <Compile Include="Readers\CsvProcessorReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpecProviderBuilder.cs" />
+    <Compile Include="Specs\SpecProviderBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -109,8 +111,6 @@
       <Name>FutureState.Specifications</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

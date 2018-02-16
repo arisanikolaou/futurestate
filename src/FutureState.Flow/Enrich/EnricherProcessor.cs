@@ -41,7 +41,7 @@ namespace FutureState.Flow.Enrich
             foreach (var enricher in enrichers.AsParallel())
             {
                 // enrichment log to record transactions
-                var db = new EnrichmentLog(flowBatch.Flow, enricher.SourceEntityType);
+                var db = new EnricherLog(flowBatch.Flow, enricher.SourceEntityType);
 
                 // list of items to create
                 // ReSharper disable once PossibleMultipleEnumeration

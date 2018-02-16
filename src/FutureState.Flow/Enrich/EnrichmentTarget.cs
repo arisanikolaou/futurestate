@@ -81,7 +81,7 @@ namespace FutureState.Flow.Enrich
             var results = GetProcessResult();
 
             // load results to get the invalid items
-            foreach (var result in results.Output)
+            foreach (var result in results.Valid)
                 yield return result;
 
             foreach (var result in results.Invalid)

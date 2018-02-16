@@ -19,7 +19,7 @@ namespace FutureState.Flow.Enrich
 
         private readonly EnricherLogRepository _logRepo;
         private readonly ISpecification<IEnumerable<TTarget>>[] _entityCollection;
-        private readonly Flow _flow;
+        private readonly FlowId _flow;
         private readonly ISpecification<TTarget>[] _entityRules;
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace FutureState.Flow.Enrich
 
             this._entityRules = processorConfiguration.Rules.ToArray();
             this._entityCollection = processorConfiguration.CollectionRules.ToArray();
-            this._flow = new Flow("FlowABD");
+            this._flow = new FlowId("FlowABD");
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace FutureState.Flow.Enrich
                 var logRepository = _logRepo.Get(_flow, enricher.SourceEntityType);
 
                 if (logRepository == null) // todo replace with flow
-                    logRepository = new EnrichmentLog(flowBatch.Flow, enricher.SourceEntityType);
+                    logRepository = new EnricherLog(flowBatch.Flow, enricher.SourceEntityType);
 
                 // enrichers
                 var unProcessedEnrichers = new List<IEnricher<TTarget>>();
@@ -112,7 +112,6 @@ namespace FutureState.Flow.Enrich
                     target.AddressId)
                 {
                     Batch = flowBatch,
-                    Address = target.AddressId,
                     TargetType = new FlowEntity(typeof(TTarget)),
                     SourceType = enricher.SourceEntityType,
                     SourceAddressId = enricher.AddressId,
@@ -169,7 +168,7 @@ namespace FutureState.Flow.Enrich
             if (!collectionErrors.Any())
             {
                 outResult.Invalid = inValid;
-                outResult.Output = valid;
+                outResult.Valid = valid;
             }
             else
             {
@@ -178,7 +177,7 @@ namespace FutureState.Flow.Enrich
 
                 // result.Output = 0
                 outResult.Invalid = inValid;
-                outResult.Output.Clear();
+                outResult.Valid.Clear();
             }
 
             // reset process errors

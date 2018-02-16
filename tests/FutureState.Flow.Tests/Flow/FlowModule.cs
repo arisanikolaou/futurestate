@@ -24,7 +24,7 @@ namespace FutureState.Flow.Tests.Flow
             cb.RegisterType<FlowController>()
                 .AsSelf().AsImplementedInterfaces();
 
-            cb.RegisterType<FlowFileLogRepository>()
+            cb.RegisterType<FlowFileLogRepo>()
                 .AsSelf().AsImplementedInterfaces();
 
             cb.RegisterType<FlowFileControllerService>()
@@ -100,9 +100,9 @@ namespace FutureState.Flow.Tests.Flow
                 _context = context;
             }
 
-            public FlowFileLogRepository Get()
+            public FlowFileLogRepo Get()
             {
-                return _context.Resolve<FlowFileLogRepository>();
+                return _context.Resolve<FlowFileLogRepo>();
             }
         }
 
@@ -115,10 +115,10 @@ namespace FutureState.Flow.Tests.Flow
                 _context = context;
             }
 
-            public FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller)
+            public FlowFileControllerService Get(IFlowFileLogRepo repository, IFlowFileController controller)
             {
                 return _context.Resolve<FlowFileControllerService>(
-                    new TypedParameter(typeof(IFlowFileLogRepository), repository),
+                    new TypedParameter(typeof(IFlowFileLogRepo), repository),
                     new TypedParameter(typeof(IFlowFileController), controller));
             }
         }

@@ -11,7 +11,7 @@
         ///     batch id.
         /// </summary>
         /// <returns></returns>
-        TProcessResult Get(string processName, string flowCode, long batchId);
+        TProcessResult Get(string targetEntityTypeId, string flowCode, long batchId);
 
         /// <summary>
         ///     Gets the process results found on a given network file path or internet address.

@@ -9,7 +9,7 @@ namespace FutureState.Flow.Data
     /// <summary>
     ///     Saves/loads the flow transasction log from an underlying data store.
     /// </summary>
-    public interface IFlowFileLogRepository
+    public interface IFlowFileLogRepo
     {
         /// <summary>
         ///     Upserts the data to the underlying data store.
@@ -28,7 +28,7 @@ namespace FutureState.Flow.Data
     /// <summary>
     ///     A repository for a given flow.
     /// </summary>
-    public class FlowFileLogRepository : IFlowFileLogRepository
+    public class FlowFileLogRepo : IFlowFileLogRepo
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -40,7 +40,7 @@ namespace FutureState.Flow.Data
         /// <param name="DataDirectory">
         ///     The folder to read/write data to.
         /// </param>
-        public FlowFileLogRepository(string DataDirectory = null)
+        public FlowFileLogRepo(string DataDirectory = null)
         {
             _dataDir = DataDirectory ?? Environment.CurrentDirectory;
         }
