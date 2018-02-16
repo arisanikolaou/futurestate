@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -43,6 +44,10 @@ namespace FutureState.Flow.Enrich
 
         protected void AndGivenANewFlow()
         {
+            // cleanup any existing file
+            foreach (var file in Directory.GetFiles(Environment.CurrentDirectory, "*Test*.json"))
+                File.Delete(file);
+
             this._flowService = new FlowService(new FlowIdRepo());
 
             this._flow = this._flowService.CreateNew("Test");
