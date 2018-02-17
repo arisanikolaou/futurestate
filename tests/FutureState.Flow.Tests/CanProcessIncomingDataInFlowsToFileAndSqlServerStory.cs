@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CsvHelper;
+﻿using CsvHelper;
 using FutureState.Flow.Data;
 using FutureState.Flow.Tests.Mock;
 using FutureState.Specifications;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -30,7 +30,6 @@ namespace FutureState.Flow.Tests
         private FlowSnapShot<Address> _resultC;
         private SpecProvider<Dto1> _specProvider;
         private SpecProvider<Address> _specProviderFroAddress;
-
 
         protected void GivenANewLocalSqlDb()
         {
@@ -66,7 +65,6 @@ namespace FutureState.Flow.Tests
                 return SpecResult.Success;
             }, "Key", "Description");
 
-
             _specProvider.MergeFrom(m => m.Contact, new SpecProvider<Contact>());
         }
 
@@ -100,7 +98,6 @@ namespace FutureState.Flow.Tests
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -227,7 +224,7 @@ namespace FutureState.Flow.Tests
                 }
             };
 
-            // 
+            //
             _resultC = processorC.Process(_resultB.Valid, _batchProcess);
 
             // save

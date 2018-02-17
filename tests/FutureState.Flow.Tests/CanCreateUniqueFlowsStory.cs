@@ -12,7 +12,7 @@ namespace FutureState.Flow.Tests
         private FlowIdRepo _repo;
         private FlowService _flowService;
         private FlowId _flow1;
-        string _flowCode = "FlowCode";
+        private string _flowCode = "FlowCode";
 
         protected void GivenANewFlowService()
         {

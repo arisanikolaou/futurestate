@@ -6,7 +6,7 @@ using System.Linq;
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     A log of all enrichments processed from a given source to multiple targets.
+    ///     A log of all data enrichments processed from a given source to multiple targets.
     /// </summary>
     public class EnricherLog
     {
@@ -29,7 +29,7 @@ namespace FutureState.Flow
             Guard.ArgumentNotNull(sourceEntityType, nameof(sourceEntityType));
 
             Flow = flow;
-            SourceEntityType = sourceEntityType;
+            EntityType = sourceEntityType;
             Logs = new List<EnrichmentLogEntry>();
             Exceptions = new List<Exception>();
         }
@@ -42,7 +42,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets/sets the entity type being used to enrich a target type.
         /// </summary>
-        public FlowEntity SourceEntityType { get; set; }
+        public FlowEntity EntityType { get; set; }
 
         /// <summary>
         ///     Gets the log of all targets updated by data from the source.

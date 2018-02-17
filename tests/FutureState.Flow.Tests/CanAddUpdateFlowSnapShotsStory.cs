@@ -1,5 +1,4 @@
-﻿
-using FutureState.Flow.Data;
+﻿using FutureState.Flow.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,12 +50,12 @@ namespace FutureState.Flow.Tests
             var resultRepo = new FlowSnapshotRepo<FlowSnapShot<TargetType>>();
 
             var loadedSnapShot = resultRepo.Get(
-                new FlowEntity(typeof(TargetType)).EntityTypeId, 
-                "SampleFlow", 
+                new FlowEntity(typeof(TargetType)).EntityTypeId,
+                "SampleFlow",
                 1);
 
             Assert.NotNull(loadedSnapShot);
-            
+
             Assert.NotNull(loadedSnapShot.Valid.FirstOrDefault(m => m.Name == "Name"));
             Assert.NotNull(loadedSnapShot.Valid.FirstOrDefault(m => m.MaybeInt == 2));
             Assert.True(loadedSnapShot.Valid.Last()?.MaybeInt == 3);
@@ -88,7 +87,6 @@ namespace FutureState.Flow.Tests
             public string Name { get; set; }
 
             public DateTime MaybeDate { get; set; }
-
 
             public int MaybeInt { get; set; }
         }

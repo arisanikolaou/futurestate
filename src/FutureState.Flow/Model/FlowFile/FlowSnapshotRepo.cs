@@ -46,7 +46,7 @@ namespace FutureState.Flow.Data
         /// </summary>
         /// <param name="data">
         /// </param>
-        public void Save(TSnapShot data)
+        public string Save(TSnapShot data)
         {
             CreateDirIfNotExists();
 
@@ -72,6 +72,9 @@ namespace FutureState.Flow.Data
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving flow snapshot output to {fileName}.");
 
+            // record file name
+            data.TargetAddressId = fileName;
+
             var body = JsonConvert.SerializeObject(data, new JsonSerializerSettings());
 
             if (File.Exists(fileName))
@@ -91,6 +94,8 @@ namespace FutureState.Flow.Data
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saved flow snapshot to {fileName}.");
+
+            return fileName;
         }
 
         /// <summary>

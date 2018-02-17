@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CsvHelper;
+﻿using CsvHelper;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 
@@ -65,7 +65,6 @@ namespace FutureState.Flow.Enrich
             this._partDir = $@"{_workingDirectory}\Part";
             Directory.CreateDirectory(_partDir);
 
-
             _dataFileToCreate = $@"{_partDir}\DataFile.csv";
             if (File.Exists(_dataFileToCreate))
                 File.Delete(_dataFileToCreate);
@@ -82,7 +81,6 @@ namespace FutureState.Flow.Enrich
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -135,12 +133,10 @@ namespace FutureState.Flow.Enrich
                 _subject.Process(_flowBatch, enrichers, target);
         }
 
-
         protected void ThenANewProcessOutputFileShouldBeUsed()
         {
             //todo
         }
-
 
         [BddfyFact]
         public void EnricherControllerTests()

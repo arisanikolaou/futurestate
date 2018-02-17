@@ -9,18 +9,14 @@ namespace FutureState.Flow.Tests.Mock
         public TestModel()
             : base("name=TestModel")
         {
-            
         }
 
         public TestModel(string conString)
             : base(conString)
         {
-            
         }
 
-
         public virtual DbSet<Contact> Contacts { get; set; }
-
 
         public virtual DbSet<Address> Addresses { get; set; }
     }

@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Autofac;
+using CsvHelper;
+using FutureState.Flow.Controllers;
+using FutureState.Specifications;
+using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Autofac;
-using CsvHelper;
-using FutureState.Flow.Controllers;
-using FutureState.Specifications;
-using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -25,7 +25,7 @@ namespace FutureState.Flow.Tests.Flow
         private FlowConfiguration _flowConfig;
         private FlowController _flowController;
         private readonly int CsvItemsToCreate = 25;
-        private FutureState.Flow.FlowId _flow;
+        private FlowId _flow;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac()
@@ -41,7 +41,7 @@ namespace FutureState.Flow.Tests.Flow
             if (Directory.Exists(baseDirectory))
                 Directory.Delete(baseDirectory, true);
 
-            this._flow = new FutureState.Flow.FlowId("ConfigureFlow");
+            this._flow = new FlowId("ConfigureFlow");
             var flowConfig = new FlowConfiguration(_flow)
             {
                 BasePath = baseDirectory
@@ -86,7 +86,6 @@ namespace FutureState.Flow.Tests.Flow
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -289,7 +288,6 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
-
 
             public DateTime DateProcessed { get; set; }
         }

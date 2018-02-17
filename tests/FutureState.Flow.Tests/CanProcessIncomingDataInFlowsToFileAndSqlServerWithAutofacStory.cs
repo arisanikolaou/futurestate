@@ -13,7 +13,6 @@ using F = FutureState.Flow;
 
 namespace FutureState.Flow.Tests
 {
-
     [Story]
     [Collection("Flow Tests")]
     public class CanProcessIncomingDataInFlowsToFileAndSqlServerWithAutofacStory

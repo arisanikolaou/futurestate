@@ -23,6 +23,7 @@
         ///     Saves the process result.
         /// </summary>
         /// <param name="data">The data to save.</param>
-        void Save(TProcessResult data);
+        /// <returns>The address the data was saved to.</returns>
+        string Save(TProcessResult data);
     }
 }

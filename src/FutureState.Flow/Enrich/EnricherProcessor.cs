@@ -53,7 +53,8 @@ namespace FutureState.Flow.Enrich
                         DateCreated = DateTime.UtcNow,
                         Batch = flowBatch,
                         SourceAddressId = enricher.AddressId,
-                        TargetAddressId = target.AddressId
+                        TargetAddressId = target.AddressId,
+                        TargetEntity = FlowEntity.Create<TTarget>()
                     };
 
                     if (_logger.IsDebugEnabled)

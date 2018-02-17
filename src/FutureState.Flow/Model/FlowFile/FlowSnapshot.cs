@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     Gets the result of processing data from an incoming data source.
+    ///     A snapshot of data produced in a given flow batch.
     /// </summary>
     public class FlowSnapshot
     {
@@ -37,6 +37,11 @@ namespace FutureState.Flow
         ///     Gets the address id of the source. This would typically be a network address.
         /// </summary>
         public string SourceAddressId { get; set; }
+
+        /// <summary>
+        ///     Gets/sets the target address id the results were last saved to.
+        /// </summary>
+        public string TargetAddressId { get; set; }
 
         /// <summary>
         ///     Gets the target output entity type.
@@ -87,7 +92,7 @@ namespace FutureState.Flow
             Batch = flowBatch;
             SourceType = sourceType;
             SourceAddressId = sourceAddressId;
-            SourceAddressId = targetAddressId;
+            TargetAddressId = targetAddressId;
             TargetType = targetType;
         }
     }
@@ -132,12 +137,12 @@ namespace FutureState.Flow
         }
 
         /// <summary>
-        ///     Gets the valid items created from a process. This is the primary ouput.
+        ///     Gets the valid items created from a snapshot. This is the primary ouput.
         /// </summary>
         public List<TEntityOut> Valid { get; set; }
 
         /// <summary>
-        ///     Gets the invalid items that were not processed.
+        ///     Gets the invalid items that were not processed in a flow snapshot.
         /// </summary>
         public List<TEntityOut> Invalid { get; set; }
     }

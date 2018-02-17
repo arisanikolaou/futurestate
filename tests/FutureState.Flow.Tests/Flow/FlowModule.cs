@@ -1,8 +1,8 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using FutureState.Specifications;
+using System;
 
 namespace FutureState.Flow.Tests.Flow
 {
@@ -11,6 +11,12 @@ namespace FutureState.Flow.Tests.Flow
         protected override void Load(ContainerBuilder cb)
         {
             base.Load(cb);
+
+            cb.RegisterType<FlowIdRepo>()
+                .AsSelf().AsImplementedInterfaces();
+
+            cb.RegisterType<FlowService>()
+                .AsSelf().AsImplementedInterfaces();
 
             cb.RegisterType<FlowFileBatchControllerFactory>()
                 .AsSelf().AsImplementedInterfaces();

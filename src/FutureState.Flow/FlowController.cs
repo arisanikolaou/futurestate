@@ -19,7 +19,7 @@ namespace FutureState.Flow
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private static readonly Dictionary<string, Type> _dictTypes;
         private readonly IFlowFileControllerFactory _flowControllerFactory;
-        private readonly List<IFlowFileController> _flowControllers;
+        private readonly IList<IFlowFileController> _flowControllers;
         private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
         private readonly IFlowFileLogRepositoryFactory _flowFileLogFactory;
         private readonly ISpecProviderFactory _specProviderFactory;
@@ -55,10 +55,6 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="flowControllerFactory"></param>
-        /// <param name="flowFileLogFactory"></param>
-        /// <param name="flowControllerServiceFactory"></param>
-        /// <param name="specProviderFactor"></param>
         public FlowController(
             IFlowFileControllerFactory flowControllerFactory,
             IFlowFileLogRepositoryFactory flowFileLogFactory,
@@ -74,7 +70,6 @@ namespace FutureState.Flow
             _flowFileLogFactory = flowFileLogFactory;
             _flowControllerServiceFactory = flowControllerServiceFactory;
             _specProviderFactory = specProviderFactor;
-
             _flowControllers = new List<IFlowFileController>();
         }
 
@@ -83,6 +78,9 @@ namespace FutureState.Flow
         /// </summary>
         public long Processed { get; private set; }
 
+        /// <summary>
+        ///     Disposes.
+        /// </summary>
         public void Dispose()
         {
             Stop();
@@ -101,7 +99,9 @@ namespace FutureState.Flow
             // start controllers in sequential order
             foreach (var flowControllerDefinitionse in _config.Controllers
                 .OrderBy(m => m.ExecutionOrder))
+            {
                 StartController(flowControllerDefinitionse);
+            }
 
             _started = true;
 
@@ -141,6 +141,7 @@ namespace FutureState.Flow
             // ReSharper disable once UsePatternMatching
             var flowController = _flowControllerFactory
                 .Create(flowControllerType);
+
             if (flowController == null)
                 throw new InvalidOperationException(
                     $"Controller type does not implement {typeof(IFlowFileController).Name}");
@@ -152,7 +153,7 @@ namespace FutureState.Flow
             // the application's scope
             if (definition.FieldValidationRules != null)
                 specProviderBuilder.Build(
-                    flowController.OutputType,
+                    Type.GetType(flowController.TargetEntityType.AssemblyQualifiedTypeName),
                     definition.FieldValidationRules.ToList());
 
             // configure

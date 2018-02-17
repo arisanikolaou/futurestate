@@ -23,11 +23,6 @@ namespace FutureState.Flow
         public FlowBatch Batch { get; set; }
 
         /// <summary>
-        ///     Gets the unique id of the snapshot enriching a given target.
-        /// </summary>
-        public string OutputTypeId { get; set; }
-
-        /// <summary>
         ///     Gets the date the log entry was created in utc.
         /// </summary>
         public DateTime DateCreated { get; set; }

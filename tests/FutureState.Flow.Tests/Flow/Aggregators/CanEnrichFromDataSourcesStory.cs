@@ -41,7 +41,6 @@ namespace FutureState.Flow.Enrich
             _enrichers = new List<IEnricher<Whole>> { enricher, otherEnricher };
         }
 
-
         protected void AndGivenANewFlow()
         {
             // cleanup any existing file
@@ -73,7 +72,7 @@ namespace FutureState.Flow.Enrich
 
         protected void WhenProcessingEnrichmentsAgainstTheSource()
         {
-            _controller.Enrich(_flowBatch, new[] { _enrichmentTarget } , _enrichers);
+            _controller.Enrich(_flowBatch, new[] { _enrichmentTarget }, _enrichers);
         }
 
         protected void ThenAllEligibleWholeItemsShouldBeEnrichedFromSource()

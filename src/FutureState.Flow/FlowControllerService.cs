@@ -3,6 +3,7 @@ using FutureState.Flow.Data;
 using FutureState.Flow.Model;
 using NLog;
 using System;
+using System.IO;
 using System.Timers;
 
 namespace FutureState.Flow
@@ -19,6 +20,7 @@ namespace FutureState.Flow
         private readonly IFlowFileLogRepo _logRepository;
         private readonly object _syncLock = new object();
         private readonly Timer _timer;
+        private readonly IFlowService _flowService;
         private volatile bool _isProcessing;
 
         /// <summary>
@@ -27,11 +29,14 @@ namespace FutureState.Flow
         /// <param name="logRepository">The repositoro to update transaction log details to.</param>
         /// <param name="flowFileController">The batch processor implementation.</param>
         public FlowFileControllerService(
+            IFlowService flowService,
             IFlowFileLogRepo logRepository,
             IFlowFileController flowFileController)
         {
             Guard.ArgumentNotNull(logRepository, nameof(logRepository));
             Guard.ArgumentNotNull(flowFileController, nameof(flowFileController));
+
+            _flowService = flowService;
 
             FlowFileController = flowFileController;
             Interval = TimeSpan.FromSeconds(30);
@@ -108,7 +113,7 @@ namespace FutureState.Flow
             var flowFileLog = _logRepository.Get(FlowFileController.Flow.Code);
 
             // get next available flow file
-            var flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
+            FileInfo flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
 
             // flow file
             if (flowFile == null)
@@ -122,38 +127,34 @@ namespace FutureState.Flow
 
             try
             {
-                flowFileLog.BatchId++; // increment batch id
-
-                // reate a new batch process
-                var batchProcess = new FlowBatch
-                {
-                    Flow = FlowFileController.Flow,
-                    BatchId = flowFileLog.BatchId
-                };
+                // create a new flow batch - will create the flow entry if it does not exit
+                var flowBatch = _flowService.GetNewFlowBatch(FlowFileController.Flow.Code);
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"New flow file {flowFile.Name} detected. Processing batch {batchProcess.BatchId} in flow {FlowFileController.Flow} by batch controller {FlowFileController.ControllerName}.");
+                        $"New flow file {flowFile.Name} detected. Processing batch {flowBatch.BatchId} in flow {FlowFileController.Flow} by batch controller {FlowFileController.ControllerName}.");
 
                 // run processor
-                var result = FlowFileController.Process(flowFile, batchProcess);
+                var result = FlowFileController.Process(flowFile, flowBatch);
 
                 if (result == null)
                     return; // no work to do
 
                 // update flow transaction log
-                var processLogEntry = new FlowFileLogEntry
+                var flowFileLogEntry = new FlowFileLogEntry
                 {
-                    FlowFileProcessed = flowFile.FullName,
-                    ControllerName = FlowFileController.ControllerName,
-                    BatchId = flowFileLog.BatchId
+                    SourceAddressId = flowFile.FullName,
+                    SourceEntityType = FlowFileController.SourceEntityType,
+                    TargetEntityType = FlowFileController.TargetEntityType,
+                    TargetAddressId = result.TargetAddressId,
+                    BatchId = flowBatch.BatchId
                 };
 
-                flowFileLog.Entries.Add(processLogEntry);
+                flowFileLog.Entries.Add(flowFileLogEntry);
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
-                        $"Flow file {flowFile.Name} processed in batch {batchProcess.BatchId} in flow {FlowFileController.Flow}.");
+                        $"Flow file {flowFile.Name} processed in batch {flowBatch.BatchId} in flow {FlowFileController.Flow}.");
 
                 // update database
                 _logRepository.Save(flowFileLog);

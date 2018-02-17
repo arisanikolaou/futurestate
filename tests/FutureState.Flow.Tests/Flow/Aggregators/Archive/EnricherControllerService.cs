@@ -9,12 +9,11 @@ using NLog;
 
 namespace FutureState.Flow.Enrich
 {
-
     // polling consumer to enriche a target data source periodically
     /// <summary>
     ///     A service to automatically process updates from a given source to a target from csv source files.
     /// </summary>
-    public class EnricherControllerService<TPart, TWhole> : IEnricherControllerService , IDisposable
+    public class EnricherControllerService<TPart, TWhole> : IEnricherControllerService, IDisposable
         where TPart : IEquatable<TWhole>, new()
         where TWhole : class, new()
     {
@@ -30,7 +29,7 @@ namespace FutureState.Flow.Enrich
         ///     Creates a new instance.
         /// </summary>
         public EnricherControllerService(
-            FlowFileLogRepository flowFileRepo, 
+            FlowFileLogRepository flowFileRepo,
             ProcessorConfiguration<TPart, TWhole> config = null,
             int pollTime = 0)
         {
@@ -54,7 +53,6 @@ namespace FutureState.Flow.Enrich
         }
 
         public DirectoryInfo TargetDirectoy { get; set; }
-
 
         public DirectoryInfo PartDataDir { get; set; }
 
@@ -222,9 +220,11 @@ namespace FutureState.Flow.Enrich
                         {
                             outResult.Errors.Add(new ProcessError<TPart>()
                             {
-                                Error = new ErrorEvent() {
+                                Error = new ErrorEvent()
+                                {
                                     Message = error.Message,
-                                    Type = error.Type },
+                                    Type = error.Type
+                                },
                             });
                         }
 

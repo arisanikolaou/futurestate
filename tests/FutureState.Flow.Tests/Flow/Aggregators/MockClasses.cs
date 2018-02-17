@@ -2,7 +2,7 @@
 
 namespace FutureState.Flow.Enrich
 {
-    public class WholeSource 
+    public class WholeSource
     {
         public string Key { get; set; }
 

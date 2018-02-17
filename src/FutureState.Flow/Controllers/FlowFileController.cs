@@ -2,6 +2,7 @@
 using FutureState.Flow.Model;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -64,12 +65,12 @@ namespace FutureState.Flow.Controllers
         /// <summary>
         ///     Gets the type of entity being processed.
         /// </summary>
-        public Type InputType => typeof(TIn);
+        public FlowEntity SourceEntityType => FlowEntity.Create<TIn>();
 
         /// <summary>
         ///     Gets the type of entity that will processed.
         /// </summary>
-        public Type OutputType => typeof(TOut);
+        public FlowEntity TargetEntityType => FlowEntity.Create<TOut>();
 
         /// <summary>
         ///     Initializes the controller.
@@ -124,9 +125,9 @@ namespace FutureState.Flow.Controllers
                 {
                     // determine if the file was processed by the given processor
                     var processLogEntry = log.Entries.FirstOrDefault(
-                        m => string.Equals(flowFile.FullName, m.FlowFileProcessed,
+                        m => string.Equals(flowFile.FullName, m.SourceAddressId,
                                  StringComparison.OrdinalIgnoreCase)
-                             && string.Equals(ControllerName, m.ControllerName,
+                             && string.Equals(TargetEntityType.EntityTypeId, m.TargetEntityType.EntityTypeId,
                                  StringComparison.OrdinalIgnoreCase));
 
                     if (processLogEntry == null)
@@ -145,7 +146,7 @@ namespace FutureState.Flow.Controllers
         /// <summary>
         ///     Process a file file within a given batch.
         /// </summary>
-        /// <param name="flowFile"></param>
+        /// <param name="flowFile">The address to read the primary source entities from.</param>
         /// <param name="process">The batch to process the file in.</param>
         /// <returns></returns>
         public virtual FlowSnapshot Process(FileInfo flowFile, FlowBatch process)
@@ -153,7 +154,7 @@ namespace FutureState.Flow.Controllers
             try
             {
                 // read the incoming batch of data
-                var incomingData = _reader.Read(flowFile.FullName);
+                IEnumerable<TIn> incomingData = _reader.Read(flowFile.FullName);
 
                 // create the processor to batch process it
                 var processor = GetProcessor();
@@ -162,12 +163,13 @@ namespace FutureState.Flow.Controllers
                 if (!Directory.Exists(OutDirectory))
                     Directory.CreateDirectory(OutDirectory);
 
-                var outputRepository = new FlowSnapshotRepo<FlowSnapshot>(OutDirectory);
-
-                var result = processor.Process(incomingData, process);
-
+                // process incoming data into a snapshot result
+                FlowSnapShot<TOut> result = processor.Process(incomingData, process);
+                
                 // save results
-                outputRepository.Save(result);
+                var outputRepository = new FlowSnapshotRepo<FlowSnapShot<TOut>>(OutDirectory);
+
+                var targetAddressId = outputRepository.Save(result);
 
                 return result;
             }

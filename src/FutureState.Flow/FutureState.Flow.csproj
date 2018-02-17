@@ -75,12 +75,14 @@
     <Compile Include="FlowController.cs" />
     <Compile Include="Model\FlowBatch\FlowBatch.cs" />
     <Compile Include="Model\Flow\FlowId.cs" />
-    <Compile Include="Model\FlowFileLog.cs" />
+    <Compile Include="Model\FlowFileLog\FlowFileLog.cs" />
     <Compile Include="FlowControllerService.cs" />
-    <Compile Include="Model\FlowFileLogEntry.cs" />
+    <Compile Include="Model\FlowFileLog\FlowFileLogEntry.cs" />
     <Compile Include="Model\FlowEntity.cs" />
-    <Compile Include="Model\Flow\FlowFileLogRepo.cs" />
+    <Compile Include="Model\FlowFileLog\FlowFileLogRepo.cs" />
     <Compile Include="Model\FlowFile\IFlowSnapshotRepo.cs" />
+    <Compile Include="Model\Flow\FlowService.cs" />
+    <Compile Include="Model\Flow\IFlowService.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
     <Compile Include="Readers\GenericResultReader.cs" />
     <Compile Include="Model\FlowFile\FlowSnapshotRepo.cs" />

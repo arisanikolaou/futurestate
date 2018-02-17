@@ -83,7 +83,7 @@ namespace FutureState.Flow
 
             // source log
             var fileName =
-                $@"{DataDir}\{log.Flow}-Enrichment-{log.SourceEntityType.EntityTypeId}.json";
+                $@"{DataDir}\{log.Flow}-Enrichment-{log.EntityType.EntityTypeId}.json";
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving enrichment log output to {fileName}.");

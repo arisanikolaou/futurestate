@@ -1,14 +1,14 @@
-﻿using System;
+﻿using CsvHelper;
+using FutureState.Flow.Controllers;
+using FutureState.Flow.Data;
+using FutureState.Specifications;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using CsvHelper;
-using FutureState.Flow.Controllers;
-using FutureState.Flow.Data;
-using FutureState.Specifications;
-using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -32,6 +32,7 @@ namespace FutureState.Flow.Tests.Flow
         private string _processName;
         private string _processName2;
         private readonly int CsvItemsToCreate = 25;
+        private FlowService _flowService;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLine()
@@ -50,6 +51,11 @@ namespace FutureState.Flow.Tests.Flow
 
             _inDirectory = $@"{_baseDirectory}\{_processName}\In";
             _outDirectory = $@"{_baseDirectory}\{_processName}\Out";
+        }
+
+        protected void AndGivenAFlowService()
+        {
+            _flowService = new FlowService(new FlowIdRepo());
         }
 
         protected void AndGivenAGeneratedDataSourceCsvFile()
@@ -74,7 +80,6 @@ namespace FutureState.Flow.Tests.Flow
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -105,7 +110,6 @@ namespace FutureState.Flow.Tests.Flow
             _flow = new FutureState.Flow.FlowId("TestFlow1");
         }
 
-
         protected void WhenStartingAProcessorService()
         {
             var batchProcessor = new TestCsvFlowFileFlowFileBatchController(GetConfig<Enitity1, Entity2>())
@@ -115,7 +119,7 @@ namespace FutureState.Flow.Tests.Flow
                 Flow = _flow
             };
 
-            var processor = new FlowFileControllerService(_logRepository, batchProcessor)
+            var processor = new FlowFileControllerService(_flowService, _logRepository, batchProcessor)
             {
                 Interval = TimeSpan.FromSeconds(2)
             };
@@ -149,7 +153,7 @@ namespace FutureState.Flow.Tests.Flow
                 Flow = _flow
             };
 
-            var processor = new FlowFileControllerService(_logRepository, batchProcessor)
+            var processor = new FlowFileControllerService(_flowService, _logRepository, batchProcessor)
             {
                 Interval = TimeSpan.FromSeconds(2)
             };
@@ -158,7 +162,6 @@ namespace FutureState.Flow.Tests.Flow
 
             processor.Start();
         }
-
 
         protected void ThenProcessResultsShouldBeSaved()
         {
@@ -226,7 +229,6 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-
         public class Enitity1
         {
             public string Name { get; set; }
@@ -244,7 +246,6 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
-
 
             public DateTime DateProcessed { get; set; }
         }

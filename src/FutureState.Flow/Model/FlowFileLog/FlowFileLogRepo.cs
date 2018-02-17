@@ -37,12 +37,12 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="DataDirectory">
+        /// <param name="dataDir">
         ///     The folder to read/write data to.
         /// </param>
-        public FlowFileLogRepo(string DataDirectory = null)
+        public FlowFileLogRepo(string dataDir = null)
         {
-            _dataDir = DataDirectory ?? Environment.CurrentDirectory;
+            _dataDir = dataDir ?? Environment.CurrentDirectory;
         }
 
         /// <summary>
@@ -59,6 +59,7 @@ namespace FutureState.Flow.Data
             }
         }
 
+        /// <inheritdoc />
         public void Save(FlowFileLog log)
         {
             Guard.ArgumentNotNull(log, nameof(log));
@@ -81,7 +82,17 @@ namespace FutureState.Flow.Data
                 $@"{DataDir}\FlowLog-{log.FlowCode}.json";
 
             if (File.Exists(fileName))
-                File.Delete(fileName);
+            {
+                if (_logger.IsDebugEnabled)
+                    _logger.Debug("Backing up old archive file.");
+
+                // back up older file, don't delete
+                string backFile = fileName + ".bak";
+                if (File.Exists(backFile))
+                    File.Delete(backFile);
+
+                File.Move(fileName, backFile);
+            }
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($"Saving flow file transaction log to {fileName}.");

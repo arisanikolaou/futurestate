@@ -32,11 +32,6 @@ namespace FutureState.Flow.Model
         public string FlowCode { get; set; }
 
         /// <summary>
-        ///     Gets the flow batch id.
-        /// </summary>
-        public int BatchId { get; set; }
-
-        /// <summary>
         ///     Gets the flow file log entries to record which flow files were process againts a flow.
         /// </summary>
         public List<FlowFileLogEntry> Entries { get; set; }

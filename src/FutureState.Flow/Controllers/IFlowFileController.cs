@@ -12,12 +12,12 @@ namespace FutureState.Flow.Controllers
         /// <summary>
         ///     Gets the type of entity being processed.
         /// </summary>
-        Type InputType { get; }
+        FlowEntity SourceEntityType { get; }
 
         /// <summary>
-        ///     Gets the output type.
+        ///     Gets the output entity type to produce.
         /// </summary>
-        Type OutputType { get; }
+        FlowEntity TargetEntityType { get; }
 
         /// <summary>
         ///     Gets the display name of the processor.
