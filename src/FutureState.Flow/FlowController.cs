@@ -17,7 +17,7 @@ namespace FutureState.Flow
     public class FlowController : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private static readonly Dictionary<string, Type> _dictTypes;
+        private static readonly Dictionary<string, Type> _dictOfControllerTypes;
         private readonly IFlowFileControllerFactory _flowControllerFactory;
         private readonly IList<IFlowFileController> _flowControllers;
         private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
@@ -29,7 +29,7 @@ namespace FutureState.Flow
         private bool _started;
 
         /// <summary>
-        ///     
+        ///     Setup static dictionary of types that implement IFlowFileController
         /// </summary>
         static FlowController()
         {
@@ -40,15 +40,17 @@ namespace FutureState.Flow
                 .GetTypes<IFlowFileController>()
                 .ToList();
 
-            _dictTypes = new Dictionary<string, Type>();
+            _dictOfControllerTypes = new Dictionary<string, Type>();
+
+            // controller types
             foreach (var controllerType in controllerTypes)
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
-                _dictTypes.Add(controllerType.Value.AssemblyQualifiedName, controllerType.Value);
+                _dictOfControllerTypes.Add(controllerType.Value.AssemblyQualifiedName, controllerType.Value);
 
                 var attribute = controllerType.Value.GetCustomAttribute<DisplayNameAttribute>();
                 if (attribute != null)
-                    _dictTypes[attribute.DisplayName] = controllerType.Value;
+                    _dictOfControllerTypes[attribute.DisplayName] = controllerType.Value;
             }
         }
 
@@ -133,15 +135,16 @@ namespace FutureState.Flow
 
             // resolve from precompiled list of well known processors
             // or assembly resolve
-            if (_dictTypes.ContainsKey(definition.ControllerName))
-                flowControllerType = _dictTypes[definition.ControllerName];
+            if (_dictOfControllerTypes.ContainsKey(definition.ControllerName))
+                flowControllerType = _dictOfControllerTypes[definition.ControllerName];
             else
                 flowControllerType = Type.GetType(definition.TypeName);
 
             // ReSharper disable once UsePatternMatching
-            var flowController = _flowControllerFactory
+            IFlowFileController flowController = _flowControllerFactory
                 .Create(flowControllerType);
 
+            // flow controller
             if (flowController == null)
                 throw new InvalidOperationException(
                     $"Controller type does not implement {typeof(IFlowFileController).Name}");
@@ -152,13 +155,26 @@ namespace FutureState.Flow
             // spec providers expected to be single instance in
             // the application's scope
             if (definition.FieldValidationRules != null)
+            {
+                Type type = null;
+                try
+                {
+                    type = Type.GetType(flowController.TargetEntityType.AssemblyQualifiedTypeName);
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException($"Can't load type {flowController.TargetEntityType.AssemblyQualifiedTypeName}.");
+                }
+
                 specProviderBuilder.Build(
-                    Type.GetType(flowController.TargetEntityType.AssemblyQualifiedTypeName),
+                    type,
                     definition.FieldValidationRules.ToList());
+            }
 
             // configure
             flowController.InDirectory = definition.Input;
             flowController.OutDirectory = definition.Output;
+
             flowController.Flow = _config.Flow;
             flowController.ControllerName = definition.ControllerName;
 
@@ -166,6 +182,9 @@ namespace FutureState.Flow
             if (definition.ConfigurationDetails != null)
             {
                 var type = flowController.GetType();
+
+                if (_logger.IsDebugEnabled)
+                    _logger.Debug($"Configuring properties of controller type {type.Name} has been initialized.");
 
                 foreach (var configDetail in definition.ConfigurationDetails)
                 {
@@ -176,16 +195,14 @@ namespace FutureState.Flow
                 }
             }
 
-            flowController.Initialize(); // complete initialization
+            // complete initialization
+            flowController.Initialize(); 
 
             if (_logger.IsDebugEnabled)
                 _logger.Debug($"Flow controller {definition.ControllerName} has been initialized.");
 
-            // resolve repository to store flow file process details
-            var logRepository = _flowFileLogFactory.Get();
-            logRepository.DataDir = _config.BasePath;
 
-            var processor = _flowControllerServiceFactory.Get(logRepository, flowController);
+            FlowFileControllerService processor = GetControllerService(flowController);
 
             // configure polling internval
             processor.Interval = TimeSpan.FromSeconds(definition.PollInterval);
@@ -206,6 +223,22 @@ namespace FutureState.Flow
             _flowControllers.Add(flowController);
         }
 
+        FlowFileControllerService GetControllerService(IFlowFileController flowController)
+        {
+            // resolve repository to store flow file process details
+            var logRepository = _flowFileLogFactory.Get();
+
+            // set base path for the flow
+            logRepository.DataDir = _config.BasePath;
+
+            FlowFileControllerService processor = _flowControllerServiceFactory.Get(logRepository, flowController);
+
+            return processor;
+        }
+
+        /// <summary>
+        ///     Stop processing data from the incoming data store.
+        /// </summary>
         public void Stop()
         {
             if (!_started)

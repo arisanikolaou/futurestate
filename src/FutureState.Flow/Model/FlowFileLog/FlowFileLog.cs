@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FutureState.Flow.Model
 {
@@ -29,6 +30,7 @@ namespace FutureState.Flow.Model
         /// <summary>
         ///     Gets/sets the flow code to use.
         /// </summary>
+        [Required]
         public string FlowCode { get; set; }
 
         /// <summary>

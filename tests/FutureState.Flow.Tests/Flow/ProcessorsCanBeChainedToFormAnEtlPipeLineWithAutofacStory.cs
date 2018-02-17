@@ -129,15 +129,15 @@ namespace FutureState.Flow.Tests.Flow
         protected void AndWhenSavingTheFlowConfigAndUsingControllerFriendlyNames()
         {
             // ReSharper disable once PossibleNullReferenceException
-            var lastController = _flowConfig.Controllers.LastOrDefault();
-            Assert.NotNull(lastController);
+            var lastControllerDef = _flowConfig.Controllers.LastOrDefault();
+            Assert.NotNull(lastControllerDef);
 
-            lastController
+            lastControllerDef
                 .ConfigurationDetails.Add("Item1", "Value1");
-            lastController.TypeName = "";
+            lastControllerDef.TypeName = "";
 
             // should match the display name of the controller type
-            lastController.ControllerName = "ProcessorB";
+            lastControllerDef.ControllerName = "ProcessorB";
 
             _flowConfig.Save();
         }
@@ -152,10 +152,14 @@ namespace FutureState.Flow.Tests.Flow
             while (_flowController.Processed <= 20 && sw.Elapsed.TotalSeconds < 15)
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
+            Assert.True(_flowController.Processed == 2);
+        }
+
+        protected void AndThenNoDuplicateFilesFromSourceShouldBeProduced()
+        {
+
             foreach (var flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
-
-            Assert.True(_flowController.Processed == 2);
         }
 
         protected void ThenConfigurationSystemShouldBuildValidators()
@@ -204,7 +208,11 @@ namespace FutureState.Flow.Tests.Flow
 
             // resave
             _flowConfig.Save();
+        }
 
+        protected void AndThenOutputFilesShouldNotBeDuplicated()
+        {
+            // only should produce out files once
             foreach (var flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }

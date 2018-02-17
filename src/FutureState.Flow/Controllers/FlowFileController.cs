@@ -147,9 +147,9 @@ namespace FutureState.Flow.Controllers
         ///     Process a file file within a given batch.
         /// </summary>
         /// <param name="flowFile">The address to read the primary source entities from.</param>
-        /// <param name="process">The batch to process the file in.</param>
+        /// <param name="flowBatch">The batch to process the file in.</param>
         /// <returns></returns>
-        public virtual FlowSnapshot Process(FileInfo flowFile, FlowBatch process)
+        public virtual FlowSnapshot Process(FileInfo flowFile, FlowBatch flowBatch)
         {
             try
             {
@@ -164,7 +164,7 @@ namespace FutureState.Flow.Controllers
                     Directory.CreateDirectory(OutDirectory);
 
                 // process incoming data into a snapshot result
-                FlowSnapShot<TOut> result = processor.Process(incomingData, process);
+                FlowSnapShot<TOut> result = processor.Process(incomingData, flowBatch);
                 
                 // save results
                 var outputRepository = new FlowSnapshotRepo<FlowSnapShot<TOut>>(OutDirectory);
@@ -176,7 +176,7 @@ namespace FutureState.Flow.Controllers
             catch (Exception ex)
             {
                 throw new Exception(
-                    $"Failed to process flow file {flowFile.Name} due to an unexpected error. Batch process is {process}.",
+                    $"Failed to process flow file {flowFile.Name} due to an unexpected error. Batch process is {flowBatch}.",
                     ex);
             }
         }

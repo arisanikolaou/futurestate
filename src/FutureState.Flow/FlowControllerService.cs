@@ -22,6 +22,7 @@ namespace FutureState.Flow
         private readonly Timer _timer;
         private readonly IFlowService _flowService;
         private volatile bool _isProcessing;
+        private bool _started;
 
         /// <summary>
         ///     Creates a new instance.
@@ -181,15 +182,30 @@ namespace FutureState.Flow
         /// </summary>
         public void Start()
         {
-            if (Interval != default(TimeSpan))
-                _timer.Interval = Interval.TotalMilliseconds;
-            else
-                _timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
+            if (_started)
+                throw new InvalidOperationException("Service has already started.");
+
+
+            if (Interval == default(TimeSpan))
+            {
+                int seconds = 15;
+
+                // keep running
+                if (_logger.IsErrorEnabled)
+                    _logger.Error($"Invalid interval was configured. Defaulting to a polling interval of {seconds} seconds.");
+
+                Interval = TimeSpan.FromSeconds(seconds);
+            }
+
+            _timer.Interval = Interval.TotalMilliseconds;
 
             _timer.Start();
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($@"Started polling for new flow files every {Interval.TotalSeconds} seconds.");
+
+
+            _started = true;
         }
 
         /// <summary>
@@ -201,6 +217,8 @@ namespace FutureState.Flow
 
             if (_logger.IsInfoEnabled)
                 _logger.Info($@"Stopped polling for new flow files.");
+
+            _started = false; 
         }
 
         private void Dispose(bool disposing)

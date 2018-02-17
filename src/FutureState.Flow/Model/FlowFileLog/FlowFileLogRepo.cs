@@ -21,7 +21,7 @@ namespace FutureState.Flow.Data
         ///     Loads the load data given a flow id.
         /// </summary>
         /// <param name="flowCode">The unique flow code.</param>
-        /// <returns></returns>
+        /// <returns>A new or existing log for the given flow.</returns>
         FlowFileLog Get(string flowCode);
     }
 
@@ -65,6 +65,7 @@ namespace FutureState.Flow.Data
             Guard.ArgumentNotNull(log, nameof(log));
 
             if (!Directory.Exists(DataDir))
+            {
                 try
                 {
                     Directory.CreateDirectory(DataDir);
@@ -73,13 +74,14 @@ namespace FutureState.Flow.Data
                 {
                     throw new ApplicationException($"Can't create working folder {DataDir}.", ex);
                 }
+            }
 
             // test to ensure we can convert the log
             var body = JsonConvert.SerializeObject(log, new JsonSerializerSettings());
 
             // update existing file
             var fileName =
-                $@"{DataDir}\FlowLog-{log.FlowCode}.json";
+                $@"{DataDir}\flow-{log.FlowCode}-log.json";
 
             if (File.Exists(fileName))
             {
@@ -108,19 +110,17 @@ namespace FutureState.Flow.Data
         /// </summary>
         /// <param name="flowCode">The flow id.</param>
         /// <returns>
+        ///     A new or existing flow file log instance.
         /// </returns>
         public FlowFileLog Get(string flowCode)
         {
-            if (!Directory.Exists(DataDir))
-                Directory.CreateDirectory(DataDir);
-
             var fileName =
-                $@"{DataDir}\FlowLog-{flowCode}.json";
+                $@"{DataDir}\flow-{flowCode}-log.json";
 
             if (!File.Exists(fileName))
                 return new FlowFileLog(flowCode);
 
-            // else
+            // else deserialize the flow log
             var body = File.ReadAllText(fileName);
 
             return JsonConvert.DeserializeObject<FlowFileLog>(body);
