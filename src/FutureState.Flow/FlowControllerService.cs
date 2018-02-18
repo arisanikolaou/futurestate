@@ -18,7 +18,6 @@ namespace FutureState.Flow
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly IFlowFileLogRepo _logRepository;
-        private readonly object _syncLock = new object();
         private readonly Timer _timer;
         private readonly IFlowService _flowService;
         private volatile bool _isProcessing;
@@ -34,6 +33,7 @@ namespace FutureState.Flow
             IFlowFileLogRepo logRepository,
             IFlowFileController flowFileController)
         {
+            Guard.ArgumentNotNull(flowService, nameof(flowService));
             Guard.ArgumentNotNull(logRepository, nameof(logRepository));
             Guard.ArgumentNotNull(flowFileController, nameof(flowFileController));
 
@@ -74,7 +74,7 @@ namespace FutureState.Flow
         public event EventHandler FlowFileProcessed;
 
         /// <summary>
-        ///     /   Destructor.
+        ///     Destructor.
         /// </summary>
         ~FlowFileControllerService()
         {
@@ -86,35 +86,50 @@ namespace FutureState.Flow
         /// </summary>
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            lock (_syncLock)
+            try
             {
-                try
+                if (!_isProcessing)
                 {
-                    if (!_isProcessing)
-                    {
-                        _isProcessing = true;
+                    _isProcessing = true;
 
-                        // load the logRepository
-                        BeginProcesFlowFiles();
-                    }
+                    // load the logRepository
+                    ProcessFlowFile();
                 }
-                finally
+                else
                 {
-                    _isProcessing = false;
+                    if (_logger.IsTraceEnabled)
+                        _logger.Trace("Still processing last flow file.");
                 }
+            }
+            catch(Exception ex)
+            {
+                if(_logger.IsErrorEnabled)
+                    _logger.Error(ex); // don't bubble up errors
+            }
+            finally
+            {
+                _isProcessing = false;
             }
         }
 
-        private void BeginProcesFlowFiles()
+        FileInfo TryGetNextFlowFile()
         {
-            if (FlowFileController == null)
-                throw new InvalidOperationException("Batch processor has not been configured or assigned.");
-
             // load transaction log db
             var flowFileLog = _logRepository.Get(FlowFileController.Flow.Code);
 
-            // get next available flow file
+            // get next available flow file from the source
             FileInfo flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
+
+            return flowFile;
+        }
+
+        private void ProcessFlowFile()
+        {
+            if (FlowFileController == null)
+                throw new InvalidOperationException("Flow file controller not been configured or assigned.");
+
+            // get next available flow file from the source
+            FileInfo flowFile = TryGetNextFlowFile();
 
             // flow file
             if (flowFile == null)
@@ -136,29 +151,23 @@ namespace FutureState.Flow
                         $"New flow file {flowFile.Name} detected. Processing batch {flowBatch.BatchId} in flow {FlowFileController.Flow} by batch controller {FlowFileController.ControllerName}.");
 
                 // run processor
-                var result = FlowFileController.Process(flowFile, flowBatch);
-
-                if (result == null)
-                    return; // no work to do
-
-                // update flow transaction log
-                var flowFileLogEntry = new FlowFileLogEntry
+                FlowSnapshot result = null;
+                try
                 {
-                    SourceAddressId = flowFile.FullName,
-                    SourceEntityType = FlowFileController.SourceEntityType,
-                    TargetEntityType = FlowFileController.TargetEntityType,
-                    TargetAddressId = result.TargetAddressId,
-                    BatchId = flowBatch.BatchId
-                };
+                    result = FlowFileController.Process(flowFile, flowBatch);
 
-                flowFileLog.Entries.Add(flowFileLogEntry);
+                    if (result == null)
+                        return; // no work to do
+                }
+                finally
+                {
+                    // update transaction log - always to ensure we are not re-processing the data
+                    UpdateTransactionLog(flowFile.FullName, result);
+                }
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info(
                         $"Flow file {flowFile.Name} processed in batch {flowBatch.BatchId} in flow {FlowFileController.Flow}.");
-
-                // update database
-                _logRepository.Save(flowFileLog);
 
                 if (_logger.IsInfoEnabled)
                     _logger.Info($"Flow {FlowFileController.Flow} transaction log updated.");
@@ -166,15 +175,35 @@ namespace FutureState.Flow
             catch (Exception ex)
             {
                 var msg =
-                    $"Failed to process flow file {flowFile.Name}. {ex.Message}. Batch controller is {FlowFileController.GetType().Name}.";
+                    $"Failed to process flow file {flowFile.Name}. {ex.Message}. Flow file controller is {FlowFileController.GetType().Name}.";
 
-                if (_logger.IsErrorEnabled)
-                    _logger.Error(ex, msg);
+                throw new Exception(msg, ex);
             }
             finally
             {
                 FlowFileProcessed?.Invoke(this, EventArgs.Empty);
             }
+        }
+
+        private void UpdateTransactionLog(string sourceFilePath, FlowSnapshot result)
+        {
+            // load transaction log db
+            var flowFileLog = _logRepository.Get(FlowFileController.Flow.Code);
+
+            // update flow transaction log
+            var flowFileLogEntry = new FlowFileLogEntry
+            {
+                SourceAddressId = sourceFilePath,
+                SourceEntityType = FlowFileController.SourceEntityType,
+                TargetEntityType = FlowFileController.TargetEntityType,
+                TargetAddressId = result.TargetAddressId, // the output file path
+                BatchId = result.Batch.BatchId
+            };
+
+            flowFileLog.Entries.Add(flowFileLogEntry);
+
+            // update database
+            _logRepository.Save(flowFileLog);
         }
 
         /// <summary>
@@ -197,8 +226,8 @@ namespace FutureState.Flow
                 Interval = TimeSpan.FromSeconds(seconds);
             }
 
+            // start polling
             _timer.Interval = Interval.TotalMilliseconds;
-
             _timer.Start();
 
             if (_logger.IsInfoEnabled)

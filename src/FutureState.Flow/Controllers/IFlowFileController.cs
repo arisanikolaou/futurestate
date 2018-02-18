@@ -5,8 +5,11 @@ using System.IO;
 namespace FutureState.Flow.Controllers
 {
     /// <summary>
-    ///     Controls how batches of data flow into batch processors for processing (loading and/or transformation).
+    ///     Controls how batches of data flow into flow file processors.
     /// </summary>
+    /// <remarks>
+    ///     Ensures that only unique files are pulled from an incoming data source.
+    /// </remarks>
     public interface IFlowFileController : IDisposable
     {
         /// <summary>
@@ -40,17 +43,17 @@ namespace FutureState.Flow.Controllers
         string OutDirectory { get; set; }
 
         /// <summary>
-        ///     Processes a batch of data from an incoming flow file within a batch process.
+        ///     Processes an incoming flow file.
         /// </summary>
         /// <param name="flowFile">The flow file to process.</param>
-        /// <param name="process">The batch processor.</param>
+        /// <param name="flowBatch">The current batch process running.</param>
         /// <returns></returns>
-        FlowSnapshot Process(FileInfo flowFile, FlowBatch process);
+        FlowSnapshot Process(FileInfo flowFile, FlowBatch flowBatch);
 
         /// <summary>
-        ///     Gets the next batch to process.
+        ///     Gets the next data source/flow file to process.
         /// </summary>
-        /// <param name="log">The log containing the list of files processed.</param>
+        /// <param name="log">The log containing the transaction log of flow files processed..</param>
         /// <returns></returns>
         FileInfo GetNextFlowFile(FlowFileLog log);
 
