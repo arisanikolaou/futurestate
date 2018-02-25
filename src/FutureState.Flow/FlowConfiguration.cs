@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     Configuration settings for a given flow.
+    ///     Configuration settings for a given flow file controller.
     /// </summary>
     public class FlowConfiguration
     {
@@ -38,12 +38,12 @@ namespace FutureState.Flow
         public FlowId Flow { get; set; }
 
         /// <summary>
-        ///     Gets the default working directory for the flow.
+        ///     Gets the default working directory for a flow controller.
         /// </summary>
         public string BasePath { get; set; }
 
         /// <summary>
-        ///     Gets the controller to start/stop.
+        ///     Gets the controllers to start/stop.
         /// </summary>
         public List<FlowControllerDefinition> Controllers { get; set; }
 
@@ -63,6 +63,7 @@ namespace FutureState.Flow
 
             var lastOutputDirectory = Controllers.LastOrDefault()?.Output;
 
+            // defaults
             Controllers.Add(def = new FlowControllerDefinition
             {
                 ControllerName = controllerName,

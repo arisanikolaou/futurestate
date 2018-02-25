@@ -13,6 +13,9 @@ namespace FutureState.Flow
     /// <summary>
     ///     Ensures that only unique batches of data sourced from a controller are processed every N minutes.
     /// </summary>
+    /// <remarks>   
+    ///     Uses a polling consumer pattern to query for source files.
+    /// </remarks>
     public class FlowFileControllerService : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -46,7 +49,7 @@ namespace FutureState.Flow
 
             // the time to poll for incoming data
             _timer = new Timer();
-            _timer.Elapsed += _timer_Elapsed;
+            _timer.Elapsed += TryProcessNewFlowFiles;
         }
 
         /// <summary>
@@ -84,7 +87,7 @@ namespace FutureState.Flow
         /// <summary>
         ///     Processing incoming data.
         /// </summary>
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void TryProcessNewFlowFiles(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -92,8 +95,21 @@ namespace FutureState.Flow
                 {
                     _isProcessing = true;
 
-                    // load the logRepository
-                    ProcessFlowFile();
+                    // get next available flow file from the source
+                    FileInfo flowFile = TryGetNextFlowFile();
+
+                    // flow file
+                    if (flowFile == null)
+                    {
+                        if (_logger.IsDebugEnabled)
+                            _logger.Debug(
+                                $"No new flow file is available for the flow file controller {FlowFileController.ControllerName}.");
+
+                        return;
+                    }
+
+                    // else
+                    ProcessFlowFile(flowFile);
                 }
                 else
                 {
@@ -123,23 +139,11 @@ namespace FutureState.Flow
             return flowFile;
         }
 
-        private void ProcessFlowFile()
+        private void ProcessFlowFile(FileInfo flowFile)
         {
             if (FlowFileController == null)
                 throw new InvalidOperationException("Flow file controller not been configured or assigned.");
 
-            // get next available flow file from the source
-            FileInfo flowFile = TryGetNextFlowFile();
-
-            // flow file
-            if (flowFile == null)
-            {
-                if (_logger.IsDebugEnabled)
-                    _logger.Debug(
-                        $"No new data is available from the given flow controller {FlowFileController.ControllerName}.");
-
-                return;
-            }
 
             try
             {
@@ -250,6 +254,10 @@ namespace FutureState.Flow
             _started = false; 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
         private void Dispose(bool disposing)
         {
             if (disposing)

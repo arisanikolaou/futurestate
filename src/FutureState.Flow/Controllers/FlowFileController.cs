@@ -19,7 +19,7 @@ namespace FutureState.Flow.Controllers
         // ReSharper disable once StaticMemberInGenericType
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getProcessor;
+        private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getFlowFileController;
         private readonly IReader<TIn> _reader;
         private string _inDirectory;
         private string _outDirectory;
@@ -29,20 +29,20 @@ namespace FutureState.Flow.Controllers
         /// </summary>
         /// <param name="config">Processor configuration settings.</param>
         /// <param name="reader">The reader to read incoming results from.</param>
-        /// <param name="getProcessor">Function to create a new procesor.</param>
+        /// <param name="getController">Function to create a new procesor.</param>
         public FlowFileController(
             ProcessorConfiguration<TIn, TOut> config,
             IReader<TIn> reader,
-            Func<IFlowFileController, Processor<TIn, TOut>> getProcessor = null)
+            Func<IFlowFileController, Processor<TIn, TOut>> getController = null)
         {
             Guard.ArgumentNotNull(reader, nameof(reader));
             Guard.ArgumentNotNull(config, nameof(config));
 
-            _getProcessor = getProcessor;
+            _getFlowFileController = getController;
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
-            if (_getProcessor == null)
-                _getProcessor = controller => throw new NotImplementedException();
+            if (_getFlowFileController == null)
+                _getFlowFileController = controller => throw new NotImplementedException();
 
             Config = config;
 
@@ -89,7 +89,7 @@ namespace FutureState.Flow.Controllers
             catch (Exception ex)
             {
                 throw new Exception(
-                    $"Failed to initialize controller configuration {ControllerName}.",
+                    $"Failed to initialize controller configuration for controller {ControllerName}.",
                     ex);
             }
         }
@@ -216,7 +216,7 @@ namespace FutureState.Flow.Controllers
 
         public virtual Processor<TIn, TOut> GetProcessor()
         {
-            return _getProcessor(this);
+            return _getFlowFileController(this);
         }
 
         protected virtual void Dispose(bool disposing)

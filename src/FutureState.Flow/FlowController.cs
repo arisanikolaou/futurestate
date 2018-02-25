@@ -97,6 +97,9 @@ namespace FutureState.Flow
 
             _config = config;
 
+            if (_logger.IsDebugEnabled)
+                _logger.Debug($"Starting all controllers.");
+
             // start controllers in sequential order
             foreach (var flowControllerDefinitionse in _config.Controllers
                 .OrderBy(m => m.ExecutionOrder))
@@ -156,6 +159,10 @@ namespace FutureState.Flow
             if (definition.FieldValidationRules != null)
             {
                 Type type = null;
+
+                if (_logger.IsTraceEnabled)
+                    _logger.Trace($"Activating controller type {flowController?.TargetEntityType?.AssemblyQualifiedTypeName}.");
+
                 try
                 {
                     type = Type.GetType(flowController.TargetEntityType.AssemblyQualifiedTypeName);

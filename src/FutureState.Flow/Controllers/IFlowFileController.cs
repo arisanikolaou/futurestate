@@ -23,7 +23,7 @@ namespace FutureState.Flow.Controllers
         FlowEntity TargetEntityType { get; }
 
         /// <summary>
-        ///     Gets the display name of the processor.
+        ///     Gets the display name of the flow file controller.
         /// </summary>
         string ControllerName { get; set; }
 

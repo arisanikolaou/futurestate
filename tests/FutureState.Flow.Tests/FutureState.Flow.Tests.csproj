@@ -134,6 +134,7 @@
     <Compile Include="Flow\ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory.cs" />
     <Compile Include="Flow\ProcessorsCanBeChainedToFormAnEtlPipeLineStory.cs" />
     <Compile Include="Mock\TestModel.cs" />
+    <Compile Include="ProducesDataSourceLogsFromDifferentDirsStory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
