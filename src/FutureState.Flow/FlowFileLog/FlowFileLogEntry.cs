@@ -1,9 +1,11 @@
-﻿namespace FutureState.Flow.Model
+﻿using System;
+
+namespace FutureState.Flow.Model
 {
     /// <summary>
     ///     Logs the flow file snapshots processed.
     /// </summary>
-    public class FlowFileLogEntry
+    public class FlowFileLogEntry : DataFileLogEntry
     {
         /// <summary>
         ///     Gets the batch id of the flow file that was processed.
@@ -11,23 +13,8 @@
         public long BatchId { get; set; }
 
         /// <summary>
-        ///     Gets the identifier of the primary source file used to create the output.
-        /// </summary>
-        public string SourceAddressId { get; set; }
-
-        /// <summary>
-        ///     Gets the identifier of the flow file processed.
+        ///     Gets the identifier of the flow file processed. This is typically a file path.
         /// </summary>
         public string TargetAddressId { get; set; }
-
-        /// <summary>
-        ///     Gets the target entity type created.
-        /// </summary>
-        public FlowEntity TargetEntityType { get; set; }
-
-        /// <summary>
-        ///     Gets the primary source entity type used to produce the target entity type.
-        /// </summary>
-        public FlowEntity SourceEntityType { get; set; }
     }
 }

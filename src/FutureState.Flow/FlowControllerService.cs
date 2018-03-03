@@ -20,7 +20,7 @@ namespace FutureState.Flow
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly IFlowFileLogRepo _logRepository;
+        private readonly IFlowFileLogRepo _repo;
         private readonly Timer _timer;
         private readonly IFlowService _flowService;
         private volatile bool _isProcessing;
@@ -45,7 +45,7 @@ namespace FutureState.Flow
             FlowFileController = flowFileController;
             Interval = TimeSpan.FromSeconds(30);
 
-            _logRepository = logRepository;
+            _repo = logRepository;
 
             // the time to poll for incoming data
             _timer = new Timer();
@@ -131,7 +131,11 @@ namespace FutureState.Flow
         FileInfo TryGetNextFlowFile()
         {
             // load transaction log db
-            var flowFileLog = _logRepository.Get(FlowFileController.Flow.Code);
+            
+            var flowFileLog = _repo.Get(
+                FlowFileController.SourceEntityType,
+                FlowFileController.TargetEntityType,
+                FlowFileController.Flow.Code);
 
             // get next available flow file from the source
             FileInfo flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
@@ -191,23 +195,17 @@ namespace FutureState.Flow
 
         private void UpdateTransactionLog(string sourceFilePath, FlowSnapshot result)
         {
-            // load transaction log db
-            var flowFileLog = _logRepository.Get(FlowFileController.Flow.Code);
-
             // update flow transaction log
             var flowFileLogEntry = new FlowFileLogEntry
             {
-                SourceAddressId = sourceFilePath,
-                SourceEntityType = FlowFileController.SourceEntityType,
-                TargetEntityType = FlowFileController.TargetEntityType,
+                AddressId = sourceFilePath,
                 TargetAddressId = result.TargetAddressId, // the output file path
-                BatchId = result.Batch.BatchId
+                BatchId = result.Batch.BatchId,
+                DateLastUpdated = DateTime.UtcNow
             };
 
-            flowFileLog.Entries.Add(flowFileLogEntry);
 
-            // update database
-            _logRepository.Save(flowFileLog);
+            _repo.Add(result.SourceType, result.TargetType, result.Batch.Flow, flowFileLogEntry);
         }
 
         /// <summary>

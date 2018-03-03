@@ -20,6 +20,7 @@ namespace FutureState.Flow.Controllers
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getFlowFileController;
+        private readonly FlowFileLogRepo _flowFileLogRepo;
         private readonly IReader<TIn> _reader;
         private string _inDirectory;
         private string _outDirectory;
@@ -39,6 +40,7 @@ namespace FutureState.Flow.Controllers
             Guard.ArgumentNotNull(config, nameof(config));
 
             _getFlowFileController = getController;
+            _flowFileLogRepo = new FlowFileLogRepo();
 
             // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (_getFlowFileController == null)
@@ -110,37 +112,7 @@ namespace FutureState.Flow.Controllers
         /// <returns></returns>
         public FileInfo GetNextFlowFile(FlowFileLog log)
         {
-            if (!Directory.Exists(InDirectory))
-                Directory.CreateDirectory(InDirectory);
-
-            // this enumerate working folder
-            var flowFiles = new DirectoryInfo(InDirectory)
-                .GetFiles()
-                .OrderBy(m => m.CreationTimeUtc)
-                .ToList();
-
-            if (flowFiles.Any())
-            {
-                foreach (var flowFile in flowFiles)
-                {
-                    // determine if the file was processed by the given processor
-                    var processLogEntry = log.Entries.FirstOrDefault(
-                        m => string.Equals(flowFile.FullName, m.SourceAddressId,
-                                 StringComparison.OrdinalIgnoreCase)
-                             && string.Equals(TargetEntityType.EntityTypeId, m.TargetEntityType.EntityTypeId,
-                                 StringComparison.OrdinalIgnoreCase));
-
-                    if (processLogEntry == null)
-                        return flowFile;
-                }
-            }
-            else
-            {
-                if (_logger.IsWarnEnabled)
-                    _logger.Warn($"No files were discovered under {InDirectory}.");
-            }
-
-            return null;
+            return _flowFileLogRepo.GetNextFlowFile(InDirectory, log);
         }
 
         /// <summary>

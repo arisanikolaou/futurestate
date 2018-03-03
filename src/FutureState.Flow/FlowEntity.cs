@@ -3,7 +3,8 @@
 namespace FutureState.Flow
 {
     /// <summary>
-    ///     A well known entity processed within a given flow.
+    ///     A well known entity processed within a given flow. Flow entities are encoded in data source files and snap shot files and 
+    ///     can be produced and consumed. They wil typically represent a POCO or DTO data type.
     /// </summary>
     public class FlowEntity
     {

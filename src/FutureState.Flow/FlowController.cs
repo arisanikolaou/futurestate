@@ -1,4 +1,5 @@
-﻿using FutureState.Flow.Controllers;
+﻿using FutureState.Diagnostics;
+using FutureState.Flow.Controllers;
 using FutureState.Reflection;
 using FutureState.Specifications;
 using NLog;
@@ -80,6 +81,11 @@ namespace FutureState.Flow
         public long Processed { get; private set; }
 
         /// <summary>
+        ///     Gets whether the processor has started.
+        /// </summary>
+        public bool HasStarted => _started;
+
+        /// <summary>
         ///     Disposes.
         /// </summary>
         public void Dispose()
@@ -90,7 +96,9 @@ namespace FutureState.Flow
         /// <summary>
         ///     Starts the flow.
         /// </summary>
-        /// <param name="config">The configuration to use.</param>
+        /// <param name="config">
+        ///     The configuration to use.
+        /// </param>
         public void Start(FlowConfiguration config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
@@ -130,7 +138,7 @@ namespace FutureState.Flow
             Guard.ArgumentNotNull(definition, nameof(definition));
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Starting controller {definition.ControllerName}");
+                _logger.Debug($"Starting controller {definition.ControllerName}.");
 
             //flow controller type
             Type flowControllerType;
@@ -149,7 +157,7 @@ namespace FutureState.Flow
             // flow controller
             if (flowController == null)
                 throw new InvalidOperationException(
-                    $"Controller type does not implement {typeof(IFlowFileController).Name}");
+                    $"Controller type does not implement {typeof(IFlowFileController).Name}.");
 
             // build rules that will be used to validate outgoing entitities
             var specProviderBuilder = new SpecProviderBuilder(_specProviderFactory);
@@ -169,7 +177,7 @@ namespace FutureState.Flow
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException($"Can't load type {flowController.TargetEntityType.AssemblyQualifiedTypeName}.");
+                    throw new ApplicationException($"Can't load type {flowController.TargetEntityType.AssemblyQualifiedTypeName}.", ex);
                 }
 
                 specProviderBuilder.Build(
@@ -177,7 +185,7 @@ namespace FutureState.Flow
                     definition.FieldValidationRules.ToList());
             }
 
-            // configure
+            // configure data source log
             flowController.InDirectory = definition.Input;
             flowController.OutDirectory = definition.Output;
 
