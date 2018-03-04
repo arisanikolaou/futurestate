@@ -57,5 +57,14 @@ namespace FutureState.Flow
         ///     Gets the entity type id. This id must be unique within a given flow.
         /// </summary>
         public string EntityTypeId { get; set; }
+
+        /// <summary>
+        ///     Implicitly convert from a given CLR type.
+        /// </summary>
+        /// <param name="type"></param>
+        public static implicit operator FlowEntity(Type type)
+        {
+            return new FlowEntity(type);
+        }
     }
 }

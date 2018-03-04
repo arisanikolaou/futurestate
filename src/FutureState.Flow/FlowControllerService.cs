@@ -134,7 +134,6 @@ namespace FutureState.Flow
             
             var flowFileLog = _repo.Get(
                 FlowFileController.SourceEntityType,
-                FlowFileController.TargetEntityType,
                 FlowFileController.Flow.Code);
 
             // get next available flow file from the source
@@ -183,7 +182,7 @@ namespace FutureState.Flow
             catch (Exception ex)
             {
                 var msg =
-                    $"Failed to process flow file {flowFile.Name}. {ex.Message}. Flow file controller is {FlowFileController.GetType().Name}.";
+                    $"Failed to process flow file {flowFile.Name}. Flow file controller is {FlowFileController.GetType().Name}. Error: is {ex.Message}";
 
                 throw new Exception(msg, ex);
             }
@@ -204,8 +203,7 @@ namespace FutureState.Flow
                 DateLastUpdated = DateTime.UtcNow
             };
 
-
-            _repo.Add(result.SourceType, result.TargetType, result.Batch.Flow, flowFileLogEntry);
+            _repo.Add(result.SourceType, result.Batch.Flow, flowFileLogEntry);
         }
 
         /// <summary>

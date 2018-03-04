@@ -66,6 +66,14 @@ namespace FutureState.Flow
         {
             return Code;
         }
+
+        /// <summary>
+        ///     Creates a new flow id from a given flow code.
+        /// </summary>
+        public static implicit operator FlowId(string code)
+        {
+            return new FlowId(code);
+        }
     }
 
     /// <summary>

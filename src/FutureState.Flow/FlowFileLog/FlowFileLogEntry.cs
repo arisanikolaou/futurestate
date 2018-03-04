@@ -3,7 +3,7 @@
 namespace FutureState.Flow.Model
 {
     /// <summary>
-    ///     Logs the flow file snapshots processed.
+    ///     A log of a new flow file that would be consumable by another data source.
     /// </summary>
     public class FlowFileLogEntry : DataFileLogEntry
     {

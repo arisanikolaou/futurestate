@@ -111,10 +111,10 @@ namespace FutureState.Flow.Tests
 
             Assert.Equal(5, log.Entries.Count);
 
-            Assert.True(_repo.Contains(_flowEntity,"File1.csv"));
-            Assert.True(_repo.Contains(_flowEntity, "File2.csv"));
+            Assert.True(_repo.Contains(_flowEntity, Path.GetFullPath($@"{_sourceDir1}\File1.csv")));
+            Assert.True(_repo.Contains(_flowEntity, Path.GetFullPath($@"{_sourceDir1}\File2.csv")));
 
-            Assert.False(_repo.Contains(_flowEntity, "File3.txt"));
+            Assert.False(_repo.Contains(_flowEntity, Path.GetFullPath($@"{_sourceDir1}\File3.txt")));
         }
 
         protected void AndThenUpdatingAnExistingDataSourceFile()
@@ -146,9 +146,9 @@ namespace FutureState.Flow.Tests
         protected void AndThenLogShouldBeAvailableAfterStopping()
         {
             // ensure log populated with three entities.
-            var log = _repo.Get(_flowEntity);
+            var entriesCount = _repo.Count(_flowEntity);
 
-            Assert.Equal(6, log.Entries.Count);
+            Assert.Equal(6, entriesCount);
         }
 
         [BddfyFact]

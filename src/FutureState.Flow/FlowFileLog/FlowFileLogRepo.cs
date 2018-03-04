@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -22,23 +23,19 @@ namespace FutureState.Flow.Data
         /// <summary>
         ///     Gets a flow file log for a given entity type.
         /// </summary>
-        /// <param name="entityType">The entity type to use as the data source.</param>
         /// <param name="entityType">The entity type to process.</param>
         /// <param name="code">The flow code</param>
         /// <returns></returns>
-        FlowFileLog Get(FlowEntity entityType, FlowEntity processedEntityType, string code);
-
+        FlowFileLog Get(FlowEntity entityType,  string code);
 
         /// <summary>
         ///     Adds a new flow file log entry.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <param name="flow"></param>
+        /// <param name="entityType">The entity type being processed.</param>
+        /// <param name="flow">The associated flow.</param>
         /// <param name="flowFileLogEntry"></param>
         void Add(
-            FlowEntity source,
-            FlowEntity target,
+            FlowEntity entityType,
             FlowId flow,
             FlowFileLogEntry flowFileLogEntry);
     }
@@ -49,6 +46,7 @@ namespace FutureState.Flow.Data
     public class FlowFileLogRepo : IFlowFileLogRepo
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        static readonly object _syncLock = new object();
 
         private string _dataDir;
 
@@ -82,35 +80,38 @@ namespace FutureState.Flow.Data
         /// </summary>
         public FileInfo GetNextFlowFile(string sourceDirectory, FlowFileLog log)
         {
-            if (!Directory.Exists(sourceDirectory))
-                Directory.CreateDirectory(sourceDirectory);
-
-            // this enumerate working folder
-            var flowFiles = new DirectoryInfo(sourceDirectory)
-                .GetFiles()
-                .OrderBy(m => m.CreationTimeUtc)
-                .ToList();
-
-            if (flowFiles.Any())
+            lock (_syncLock)
             {
-                foreach (var flowFile in flowFiles)
+                if (!Directory.Exists(sourceDirectory))
+                    Directory.CreateDirectory(sourceDirectory);
+
+                // this enumerate working folder
+                var flowFiles = new DirectoryInfo(sourceDirectory)
+                    .GetFiles(log.FileTypes ?? @"*.*")
+                    .OrderBy(m => m.CreationTimeUtc)
+                    .ToList();
+
+                if (flowFiles.Any())
                 {
-                    // determine if the file was processed by the given processor
-                    var processLogEntry = log.Entries.FirstOrDefault(
-                        m => string.Equals(flowFile.FullName, m.AddressId,
-                                 StringComparison.OrdinalIgnoreCase));
+                    foreach (var flowFile in flowFiles)
+                    {
+                        // determine if the file was processed by the given processor
+                        var processLogEntry = log.Entries.FirstOrDefault(
+                            m => string.Equals(flowFile.FullName, m.AddressId,
+                                     StringComparison.OrdinalIgnoreCase));
 
-                    if (processLogEntry == null)
-                        return flowFile;
+                        if (processLogEntry == null)
+                            return flowFile;
+                    }
                 }
-            }
-            else
-            {
-                if (_logger.IsWarnEnabled)
-                    _logger.Warn($"No files were discovered under {sourceDirectory}.");
-            }
+                else
+                {
+                    if (_logger.IsWarnEnabled)
+                        _logger.Warn($"No files were discovered under {sourceDirectory}.");
+                }
 
-            return null;
+                return null;
+            }
         }
 
         /// <inheritdoc />
@@ -118,92 +119,99 @@ namespace FutureState.Flow.Data
         {
             Guard.ArgumentNotNull(log, nameof(log));
 
-            if (!Directory.Exists(DataDir))
+            lock (_syncLock)
             {
-                try
+                if (!Directory.Exists(DataDir))
                 {
-                    Directory.CreateDirectory(DataDir);
+                    try
+                    {
+                        Directory.CreateDirectory(DataDir);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ApplicationException($"Can't create working folder {DataDir}.", ex);
+                    }
                 }
-                catch (Exception ex)
+
+                // test to ensure we can convert the log
+                var body = JsonConvert.SerializeObject(log, new JsonSerializerSettings());
+
+                // update existing file
+                var fileName =
+                    $@"{DataDir}\flow-{log.EntityType.EntityTypeId}-log.json";
+
+                if (File.Exists(fileName))
                 {
-                    throw new ApplicationException($"Can't create working folder {DataDir}.", ex);
+                    if (_logger.IsDebugEnabled)
+                        _logger.Debug("Backing up old archive file.");
+
+                    // back up older file, don't delete
+                    string backFile = fileName + ".bak";
+                    if (File.Exists(backFile))
+                        File.Delete(backFile);
+
+                    File.Move(fileName, backFile);
                 }
+
+                if (_logger.IsInfoEnabled)
+                    _logger.Info($"Saving flow file transaction log to {fileName}.");
+
+                File.WriteAllText(fileName, body);
+
+                if (_logger.IsInfoEnabled)
+                    _logger.Info($"Saved flow file transaction log to {fileName}.");
             }
-
-            // test to ensure we can convert the log
-            var body = JsonConvert.SerializeObject(log, new JsonSerializerSettings());
-
-            // update existing file
-            var fileName =
-                $@"{DataDir}\flow-{log.FlowCode}-log.json";
-
-            if (File.Exists(fileName))
-            {
-                if (_logger.IsDebugEnabled)
-                    _logger.Debug("Backing up old archive file.");
-
-                // back up older file, don't delete
-                string backFile = fileName + ".bak";
-                if (File.Exists(backFile))
-                    File.Delete(backFile);
-
-                File.Move(fileName, backFile);
-            }
-
-            if (_logger.IsInfoEnabled)
-                _logger.Info($"Saving flow file transaction log to {fileName}.");
-
-            File.WriteAllText(fileName, body);
-
-            if (_logger.IsInfoEnabled)
-                _logger.Info($"Saved flow file transaction log to {fileName}.");
         }
 
         /// <summary>
         ///     Gets the flow file log for the flow with the given id.
         /// </summary>
         /// <param name="entityType"> The flow entity type. </param>
-        /// <param name="processedEntityType"> The flow entity type to process. </param>
         /// <param name="flowCode"> The flow id. </param>
         /// <returns>
         ///     A new or existing flow file log instance.
         /// </returns>
-        public FlowFileLog Get(FlowEntity entityType, FlowEntity processedEntityType, string flowCode)
+        public FlowFileLog Get(FlowEntity entityType, string flowCode)
         {
-            var fileName =
-                $@"{DataDir}\flow-{flowCode}-{entityType.EntityTypeId}-{processedEntityType.EntityTypeId}-log.json";
+            lock (_syncLock)
+            {
+                var fileName =
+                    $@"{DataDir}\flow-{entityType.EntityTypeId}-log.json";
 
-            if (!File.Exists(fileName))
-                return new FlowFileLog(entityType, flowCode, processedEntityType);
+                if (!File.Exists(fileName))
+                    return new FlowFileLog(entityType, flowCode);
 
-            // else deserialize the flow log
-            var body = File.ReadAllText(fileName);
+                // else deserialize the flow log
+                var body = File.ReadAllText(fileName);
 
-            return JsonConvert.DeserializeObject<FlowFileLog>(body);
+                return JsonConvert.DeserializeObject<FlowFileLog>(body);
+            }
         }
 
         /// <summary>
         ///     Adds a new flow file log entry.
         /// </summary>
         /// <param name="source">The source entity type to use for processing.</param>
-        /// <param name="target">The target entity type to process.</param>
         /// <param name="flow">The flow id to process.</param>
         /// <param name="flowFileLogEntry">
         ///     The flow file log entry.
         /// </param>
         public void Add(
             FlowEntity source, 
-            FlowEntity target, 
             FlowId flow, 
             FlowFileLogEntry flowFileLogEntry)
         { 
             // load transaction log db
-            FlowFileLog flowFileLog = Get(source, target, flow.Code);
+            FlowFileLog flowFileLog = Get(source, flow.Code);
             if (flowFileLog == null)
                 throw new InvalidOperationException("Expected flow file log.");
 
-            // update database
+            // update databasei
+            if (flowFileLog.Entries == null)
+                flowFileLog.Entries = new List<FlowFileLogEntry>();
+
             flowFileLog.Entries.Add(flowFileLogEntry);
+
             Save(flowFileLog);
         }
     }

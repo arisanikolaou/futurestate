@@ -55,10 +55,10 @@ namespace FutureState.Flow
             _flowEntity = flowEntity;
             _repository = repository;
 
-            _timer = new Timer(PollInterval.TotalMilliseconds);
-            _timer.Elapsed += _timer_Elapsed;
-
             PollInterval = TimeSpan.FromSeconds(polltime);
+
+            _timer = new Timer(polltime);
+            _timer.Elapsed += _timer_Elapsed;
         }
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)

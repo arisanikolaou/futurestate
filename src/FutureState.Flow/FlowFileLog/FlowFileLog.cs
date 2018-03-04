@@ -7,14 +7,13 @@ namespace FutureState.Flow.Model
     ///     A log of all the flow files processed for a particular flow processed for 
     ///     a particular flow entity type.
     /// </summary>
+    /// <remarks>
+    ///     Flow files are interchangeable as data file logs. Flow files can be used to data drive
+    ///     other processors in a given flow. Flow file logs help decouple the system
+    ///     from directory structure configuration.
+    /// </remarks>
     public class FlowFileLog : DataFileLog
     {
-
-        /// <summary>
-        ///     Gets the type of entity that was produced.
-        /// </summary>
-        public FlowEntity TargetEntityType { get; set; }
-
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
@@ -26,15 +25,13 @@ namespace FutureState.Flow.Model
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        public FlowFileLog(FlowEntity flowEntity, string flowCode, FlowEntity processedEntityType)
+        public FlowFileLog(FlowEntity flowEntity, string flowCode)
         {
             Guard.ArgumentNotNullOrEmptyOrWhiteSpace(flowCode, nameof(flowCode));
             Guard.ArgumentNotNull(flowEntity, nameof(flowEntity));
-            Guard.ArgumentNotNull(processedEntityType, nameof(processedEntityType));
 
             Entries = new List<FlowFileLogEntry>();
             EntityType = flowEntity;
-            TargetEntityType = processedEntityType;
             FlowCode = flowCode;
         }
 
