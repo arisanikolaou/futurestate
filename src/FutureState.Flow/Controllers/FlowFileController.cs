@@ -1,18 +1,16 @@
 ﻿using FutureState.Flow.Data;
-using FutureState.Flow.Model;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace FutureState.Flow.Controllers
 {
     /// <summary>
-    ///     Controls the flow of data from an incoming batch source to a downstream processor.
+    ///     Controls how data is read from a set of data source files and processed into outgoing flow files.
     /// </summary>
-    /// <typeparam name="TIn">The incoming data type to process.</typeparam>
-    /// <typeparam name="TOut">The outgoing entity type.</typeparam>
+    /// <typeparam name="TIn">The incoming data type to read from.</typeparam>
+    /// <typeparam name="TOut">The outgoing entity type to produce.</typeparam>
     public class FlowFileController<TIn, TOut> : IFlowFileController
         where TOut : class, new()
     {
@@ -22,14 +20,12 @@ namespace FutureState.Flow.Controllers
         private readonly Func<IFlowFileController, Processor<TIn, TOut>> _getFlowFileController;
         private readonly FlowFileLogRepo _flowFileLogRepo;
         private readonly IReader<TIn> _reader;
-        private string _inDirectory;
-        private string _outDirectory;
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
         /// <param name="config">Processor configuration settings.</param>
-        /// <param name="reader">The reader to read incoming results from.</param>
+        /// <param name="reader">The reader to read incoming data from.</param>
         /// <param name="getController">Function to create a new procesor.</param>
         public FlowFileController(
             ProcessorConfiguration<TIn, TOut> config,
@@ -47,10 +43,7 @@ namespace FutureState.Flow.Controllers
                 _getFlowFileController = controller => throw new NotImplementedException();
 
             Config = config;
-
-            OutDirectory = Environment.CurrentDirectory;
-            InDirectory = Environment.CurrentDirectory;
-
+            
             // assign name from type name by default
             ControllerName = $"{GetType().Name.Replace("`2", "")}-{typeof(TIn).Name}-{typeof(TOut).Name}";
 
@@ -81,17 +74,13 @@ namespace FutureState.Flow.Controllers
         {
             try
             {
-                // initialize directories
-                if (!Directory.Exists(_inDirectory))
-                    Directory.CreateDirectory(_inDirectory);
-
-                if (!Directory.Exists(_outDirectory))
-                    Directory.CreateDirectory(_outDirectory);
+                if (!Directory.Exists(Config.OutDirectory))
+                    Directory.CreateDirectory(Config.OutDirectory);
             }
             catch (Exception ex)
             {
                 throw new Exception(
-                    $"Failed to initialize controller configuration for controller {ControllerName}.",
+                    $"Failed to initialize controller configuration for controller '{ControllerName}'.",
                     ex);
             }
         }
@@ -106,14 +95,8 @@ namespace FutureState.Flow.Controllers
         /// </summary>
         public FlowId Flow { get; set; }
 
-        /// <summary>
-        ///     Gets the flow files associated with the current directory.
-        /// </summary>
-        /// <returns></returns>
-        public FileInfo GetNextFlowFile(FlowFileLog log)
-        {
-            return _flowFileLogRepo.GetNextFlowFile(InDirectory, log);
-        }
+
+        IProcessorConfiguration IFlowFileController.Config => Config;
 
         /// <summary>
         ///     Process a file file within a given batch.
@@ -132,14 +115,14 @@ namespace FutureState.Flow.Controllers
                 var processor = GetProcessor();
 
                 // save results to output directory
-                if (!Directory.Exists(OutDirectory))
-                    Directory.CreateDirectory(OutDirectory);
+                if (!Directory.Exists(Config.OutDirectory))
+                    Directory.CreateDirectory(Config.OutDirectory);
 
                 // process incoming data into a snapshot result
                 FlowSnapShot<TOut> result = processor.Process(incomingData, flowBatch);
                 
                 // save results
-                var outputRepository = new FlowSnapshotRepo<FlowSnapShot<TOut>>(OutDirectory);
+                var outputRepository = new FlowSnapshotRepo<FlowSnapShot<TOut>>(Config.OutDirectory);
 
                 var targetAddressId = outputRepository.Save(result);
 
@@ -150,34 +133,6 @@ namespace FutureState.Flow.Controllers
                 throw new Exception(
                     $"Failed to process flow file {flowFile.Name} due to an unexpected error. Batch process is {flowBatch}.",
                     ex);
-            }
-        }
-
-        /// <summary>
-        ///     The data source directory.
-        /// </summary>
-        public string InDirectory
-        {
-            get => _inDirectory;
-            set
-            {
-                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(InDirectory));
-
-                _inDirectory = value;
-            }
-        }
-
-        /// <summary>
-        ///     The directory to process.
-        /// </summary>
-        public string OutDirectory
-        {
-            get => _outDirectory;
-            set
-            {
-                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(OutDirectory));
-
-                _outDirectory = value;
             }
         }
 

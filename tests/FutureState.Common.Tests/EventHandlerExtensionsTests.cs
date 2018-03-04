@@ -98,7 +98,7 @@ namespace FutureState.Common.Tests
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
 
-            Thread.Sleep(1000); //avoid race condition
+            Thread.Sleep(1500); //avoid race condition
 
             Assert.Equal(5, errors.Count);
             Assert.Equal(1, args.HitCount);

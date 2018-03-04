@@ -10,7 +10,7 @@ namespace FutureState.Flow
     ///     A flow is a well known data flow from a given distinct primary source to a set of extensible target
     ///     data stores (flow files).
     /// </summary>
-    public class FlowId
+    public class FlowId : IEquatable<FlowId>
     {
         /// <summary>
         ///     Creates a new flow id.
@@ -23,7 +23,6 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="code">Thee code.</param>
         public FlowId(string code)
         {
             Guard.ArgumentNotNullOrEmptyOrWhiteSpace(code, nameof(code));
@@ -59,9 +58,19 @@ namespace FutureState.Flow
         public List<FlowEntity> Entities { get; set; }
 
         /// <summary>
+        ///     Compares flows by code.
+        /// </summary>
+        public bool Equals(FlowId other)
+        {
+            if (other == null)
+                return false;
+
+            return string.Equals(other.Code, Code, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         ///     Gets the flow code.
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             return Code;

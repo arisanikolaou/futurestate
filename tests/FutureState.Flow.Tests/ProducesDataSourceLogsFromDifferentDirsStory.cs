@@ -16,7 +16,7 @@ namespace FutureState.Flow.Tests
         private string _logDir;
         private DataSourceLogRepo _repo;
         private FlowEntity _flowEntity;
-        private DirectoryBasedDataSourceProducer _producer;
+        private DataSourceProducerFromDirectory _producer;
         private string _sourceDir2;
 
         protected void GivenASetOfCsvFilesInAGivenSouceDir()
@@ -82,7 +82,7 @@ namespace FutureState.Flow.Tests
 
             var dirs = new[] { dir1, dir2 };
 
-            var producer = new DirectoryBasedDataSourceProducer(dirs, _flowEntity, _repo)
+            var producer = new DataSourceProducerFromDirectory(dirs, _flowEntity, _repo)
             {
                 PollInterval = TimeSpan.FromMilliseconds(500)
             };

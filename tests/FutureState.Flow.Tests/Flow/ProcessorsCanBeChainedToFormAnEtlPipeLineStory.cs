@@ -24,15 +24,15 @@ namespace FutureState.Flow.Tests.Flow
         private string _dataFileToCreate = @"Test.csv";
         private bool _flowFile1Processed;
         private bool _flowFileProcessed;
-        public FutureState.Flow.FlowId _flow;
+        public FlowId _flow;
         private string _inDirectory;
-        private FlowFileLogRepo _logRepository;
         private string _outDirectory;
         private string _outDirectory2;
         private string _processName;
         private string _processName2;
         private readonly int CsvItemsToCreate = 25;
         private FlowService _flowService;
+        private FlowFileLogRepo _logRepository;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLine()
@@ -51,6 +51,14 @@ namespace FutureState.Flow.Tests.Flow
 
             _inDirectory = $@"{_baseDirectory}\{_processName}\In";
             _outDirectory = $@"{_baseDirectory}\{_processName}\Out";
+        }
+
+        protected void AndGivenALogRepository()
+        {
+            _logRepository = new FlowFileLogRepo
+            {
+                DataDir = _baseDirectory
+            };
         }
 
         protected void AndGivenAFlowService()
@@ -97,25 +105,20 @@ namespace FutureState.Flow.Tests.Flow
             }
         }
 
-        protected void AndGivenALogRepository()
-        {
-            _logRepository = new FlowFileLogRepo
-            {
-                DataDir = _baseDirectory
-            };
-        }
-
         protected void AndGivenAConsistentProcessId()
         {
-            _flow = new FutureState.Flow.FlowId("TestFlow1");
+            _flow = new FlowId("TestFlow1");
         }
 
         protected void WhenStartingAProcessorService()
         {
-            var batchProcessor = new TestCsvFlowFileFlowFileBatchController(GetConfig<Enitity1, Entity2>())
+            var config = GetConfig<Enitity1, Entity2>();
+
+            config.InDirectory = _inDirectory;
+            config.OutDirectory = _outDirectory;
+
+            var batchProcessor = new TestCsvFlowFileFlowFileBatchController(config)
             {
-                InDirectory = _inDirectory,
-                OutDirectory = _outDirectory,
                 Flow = _flow
             };
 
@@ -145,11 +148,14 @@ namespace FutureState.Flow.Tests.Flow
 
             _outDirectory2 = $@"{_baseDirectory}\{_processName2}\Out";
 
-            var batchProcessor = new TestProcessResultFlowFileController(
-                GetConfig<Entity2, Entity3>())
+            var config =
+                GetConfig<Entity2, Entity3>();
+
+            config.InDirectory = _outDirectory;
+            config.OutDirectory = _outDirectory2;
+
+            var batchProcessor = new TestProcessResultFlowFileController(config)
             {
-                InDirectory = _outDirectory,
-                OutDirectory = _outDirectory2,
                 Flow = _flow
             };
 
@@ -168,6 +174,7 @@ namespace FutureState.Flow.Tests.Flow
             // wait for jobs to finish processing
             var sw = new Stopwatch();
             sw.Start();
+
             while (!(_flowFile1Processed && _flowFileProcessed) && sw.Elapsed.TotalSeconds < 15)
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 

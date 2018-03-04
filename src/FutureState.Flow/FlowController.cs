@@ -186,8 +186,8 @@ namespace FutureState.Flow
             }
 
             // configure data source log
-            flowController.InDirectory = definition.Input;
-            flowController.OutDirectory = definition.Output;
+            flowController.Config.InDirectory = definition.Input;
+            flowController.Config.OutDirectory = definition.Output;
 
             flowController.Flow = _config.Flow;
             flowController.ControllerName = definition.ControllerName;

@@ -1,5 +1,6 @@
 ﻿using FutureState.Diagnostics;
 using FutureState.Services;
+using NLog;
 using System;
 using System.IO;
 using System.Timers;
@@ -11,8 +12,10 @@ namespace FutureState.Flow
     ///     Populates a given data source log file based on the files in a given directory
     ///     over a regular and configurable time interval.
     /// </summary>
-    public class DirectoryBasedDataSourceProducer : IAgent, IDisposable
+    public class DataSourceProducerFromDirectory : IAgent, IDisposable
     {
+        static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private readonly DirectoryInfo[] _sourceDirectories;
         private readonly FlowEntity _flowEntity;
         private readonly DataSourceLogRepo _repository;
@@ -20,7 +23,7 @@ namespace FutureState.Flow
         private bool _hasStarted;
 
         /// <summary>
-        ///     Gets the flow entity.
+        ///     Gets the flow entity represented in the data files in the source directories.
         /// </summary>
         public FlowEntity FlowEntity { get { return _flowEntity; } }
 
@@ -35,7 +38,7 @@ namespace FutureState.Flow
         public TimeSpan PollInterval { get; set; }
 
         /// <summary>
-        ///     Gets whether or not that servuce has started.
+        ///     Gets whether or not that service has started.
         /// </summary>
         public bool HasStarted { get { return _hasStarted; } }
 
@@ -44,8 +47,9 @@ namespace FutureState.Flow
         /// </summary>
         /// <param name="flowEntity">The flow entity encoded in the directory.</param>
         /// <param name="sourceDirectories">The directories to poll for new files.</param>
+        /// <param name="repository">The repository to populate with new files.</param>
         /// <param name="polltime">The number of seconds to check for new data files and refresh the target directory.</param>
-        public DirectoryBasedDataSourceProducer(DirectoryInfo[] sourceDirectories, FlowEntity flowEntity, DataSourceLogRepo repository , int polltime = 1)
+        public DataSourceProducerFromDirectory(DirectoryInfo[] sourceDirectories, FlowEntity flowEntity, DataSourceLogRepo repository , int polltime = 1)
         {
             Guard.ArgumentNotNull(flowEntity, nameof(flowEntity));
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -120,10 +124,22 @@ namespace FutureState.Flow
 
                 foreach (FileInfo file in files)
                 {
-                    bool added = _repository.Add(log, file.FullName, file.LastWriteTimeUtc);
+                    try
+                    {
+                        using (file.OpenRead())
+                        {
+                            // try to read - succeeded
+                            bool added = _repository.Add(log, file.FullName, file.LastWriteTimeUtc);
 
-                    if (added)
-                        hasChanges = added;
+                            if (added)
+                                hasChanges = added;
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        if (_logger.IsErrorEnabled)
+                            _logger.Error(ex, $"File {file.FullName} was not added to the data source log due to an unexpected error."); // can't read
+                    }
                 }
             }
 

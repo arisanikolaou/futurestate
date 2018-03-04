@@ -75,45 +75,6 @@ namespace FutureState.Flow.Data
             }
         }
 
-        /// <summary>
-        ///     Gets the flow files associated with the current directory.
-        /// </summary>
-        public FileInfo GetNextFlowFile(string sourceDirectory, FlowFileLog log)
-        {
-            lock (_syncLock)
-            {
-                if (!Directory.Exists(sourceDirectory))
-                    Directory.CreateDirectory(sourceDirectory);
-
-                // this enumerate working folder
-                var flowFiles = new DirectoryInfo(sourceDirectory)
-                    .GetFiles(log.FileTypes ?? @"*.*")
-                    .OrderBy(m => m.CreationTimeUtc)
-                    .ToList();
-
-                if (flowFiles.Any())
-                {
-                    foreach (var flowFile in flowFiles)
-                    {
-                        // determine if the file was processed by the given processor
-                        var processLogEntry = log.Entries.FirstOrDefault(
-                            m => string.Equals(flowFile.FullName, m.AddressId,
-                                     StringComparison.OrdinalIgnoreCase));
-
-                        if (processLogEntry == null)
-                            return flowFile;
-                    }
-                }
-                else
-                {
-                    if (_logger.IsWarnEnabled)
-                        _logger.Warn($"No files were discovered under {sourceDirectory}.");
-                }
-
-                return null;
-            }
-        }
-
         /// <inheritdoc />
         public void Save(FlowFileLog log)
         {
@@ -138,7 +99,7 @@ namespace FutureState.Flow.Data
 
                 // update existing file
                 var fileName =
-                    $@"{DataDir}\flow-{log.EntityType.EntityTypeId}-log.json";
+                    $@"{DataDir}\flow-{log.FlowEntity.EntityTypeId}-log.json";
 
                 if (File.Exists(fileName))
                 {

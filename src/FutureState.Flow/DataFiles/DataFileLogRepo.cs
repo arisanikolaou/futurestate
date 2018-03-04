@@ -86,7 +86,6 @@ namespace FutureState.Flow
             }
         }
 
-
         /// <returns></returns>
         public DataFileLog Get(FlowEntity flowEntity)
         {
@@ -150,6 +149,7 @@ namespace FutureState.Flow
             
             return entries.Any(m => m.AddressId.Equals(addressId, StringComparison.OrdinalIgnoreCase));
         }
+
 
         /// <summary>
         ///     Records a new available and accessible data source file in the log.

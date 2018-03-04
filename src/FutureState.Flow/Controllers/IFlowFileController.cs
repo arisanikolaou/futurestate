@@ -1,5 +1,4 @@
-﻿using FutureState.Flow.Model;
-using System;
+﻿using System;
 using System.IO;
 
 namespace FutureState.Flow.Controllers
@@ -33,14 +32,9 @@ namespace FutureState.Flow.Controllers
         FlowId Flow { get; set; }
 
         /// <summary>
-        ///     Gets the input directory or port.
+        ///     Gets the configuration used by the instance.
         /// </summary>
-        string InDirectory { get; set; }
-
-        /// <summary>
-        ///     Gets the output directory or port.
-        /// </summary>
-        string OutDirectory { get; set; }
+        IProcessorConfiguration Config { get; }
 
         /// <summary>
         ///     Processes an incoming flow file.
@@ -49,13 +43,6 @@ namespace FutureState.Flow.Controllers
         /// <param name="flowBatch">The current batch process running.</param>
         /// <returns></returns>
         FlowSnapshot Process(FileInfo flowFile, FlowBatch flowBatch);
-
-        /// <summary>
-        ///     Gets the next data source/flow file to process.
-        /// </summary>
-        /// <param name="log">The log containing the transaction log of flow files processed..</param>
-        /// <returns></returns>
-        FileInfo GetNextFlowFile(FlowFileLog log);
 
         /// <summary>
         ///     Initializes the controller.

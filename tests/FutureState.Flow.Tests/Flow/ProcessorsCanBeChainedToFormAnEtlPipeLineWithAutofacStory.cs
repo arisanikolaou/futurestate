@@ -24,8 +24,9 @@ namespace FutureState.Flow.Tests.Flow
         private IContainer _container;
         private FlowConfiguration _flowConfig;
         private FlowController _flowController;
-        private readonly int CsvItemsToCreate = 25;
         private FlowId _flow;
+
+        private readonly int CsvItemsToCreate = 25;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac()
@@ -41,7 +42,7 @@ namespace FutureState.Flow.Tests.Flow
             if (Directory.Exists(baseDirectory))
                 Directory.Delete(baseDirectory, true);
 
-            this._flow = new FlowId("ConfigureFlow");
+            _flow = new FlowId("ConfigureFlow");
             var flowConfig = new FlowConfiguration(_flow)
             {
                 BasePath = baseDirectory
@@ -75,6 +76,7 @@ namespace FutureState.Flow.Tests.Flow
             if (File.Exists(csvFilePath))
                 File.Delete(csvFilePath);
 
+            // write data file
             using (var fs = File.OpenWrite(csvFilePath))
             {
                 using (var sw = new StreamWriter(fs))
@@ -137,7 +139,8 @@ namespace FutureState.Flow.Tests.Flow
             lastControllerDef.TypeName = "";
 
             // should match the display name of the controller type
-            lastControllerDef.ControllerName = "ProcessorB";
+            lastControllerDef
+                .ControllerName = "ProcessorB";
 
             _flowConfig.Save();
         }
@@ -157,7 +160,6 @@ namespace FutureState.Flow.Tests.Flow
 
         protected void AndThenNoDuplicateFilesFromSourceShouldBeProduced()
         {
-
             foreach (var flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }
@@ -177,11 +179,13 @@ namespace FutureState.Flow.Tests.Flow
             // flow conrtroller should configure all controllers
             var controllers = _flowController.GetControllers();
             foreach (var controller in controllers)
+            {
                 if (controller is TestCsvFlowController)
                 {
                     var testCsv = controller as TestCsvFlowController;
                     Assert.Equal("http://helplnk.etc", testCsv.ValueToConfigure);
                 }
+            }
         }
 
         protected void AndThenShouldBeAbleToRepeatProcessingFromConfiguration()
@@ -256,6 +260,7 @@ namespace FutureState.Flow.Tests.Flow
             public TestProcessResultFlowFileController(ProcessorConfiguration<EntityB, EntityC> config)
                 : base(config)
             {
+
             }
 
             public override Processor<EntityB, EntityC> GetProcessor()

@@ -4,6 +4,7 @@ using FutureState.Flow.Model;
 using NLog;
 using System;
 using System.IO;
+using System.Linq;
 using System.Timers;
 
 namespace FutureState.Flow
@@ -19,25 +20,24 @@ namespace FutureState.Flow
     public class FlowFileControllerService : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        private readonly IFlowFileLogRepo _repo;
         private readonly Timer _timer;
         private readonly IFlowService _flowService;
         private volatile bool _isProcessing;
+        private readonly IFlowFileLogRepo _dataFileTranRepo; // repository keeping track of what snapshot files have been processed
         private bool _started;
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
         /// <param name="logRepository">The repositoro to update transaction log details to.</param>
+        /// <param name="flowFileRepo">The flow file log repository.</param>
         /// <param name="flowFileController">The batch processor implementation.</param>
         public FlowFileControllerService(
             IFlowService flowService,
-            IFlowFileLogRepo logRepository,
+            IFlowFileLogRepo flowFileRepo,
             IFlowFileController flowFileController)
         {
             Guard.ArgumentNotNull(flowService, nameof(flowService));
-            Guard.ArgumentNotNull(logRepository, nameof(logRepository));
             Guard.ArgumentNotNull(flowFileController, nameof(flowFileController));
 
             _flowService = flowService;
@@ -45,7 +45,7 @@ namespace FutureState.Flow
             FlowFileController = flowFileController;
             Interval = TimeSpan.FromSeconds(30);
 
-            _repo = logRepository;
+            _dataFileTranRepo = flowFileRepo;
 
             // the time to poll for incoming data
             _timer = new Timer();
@@ -96,7 +96,7 @@ namespace FutureState.Flow
                     _isProcessing = true;
 
                     // get next available flow file from the source
-                    FileInfo flowFile = TryGetNextFlowFile();
+                    FileInfo flowFile = GetNextFlowFile();
 
                     // flow file
                     if (flowFile == null)
@@ -128,25 +128,10 @@ namespace FutureState.Flow
             }
         }
 
-        FileInfo TryGetNextFlowFile()
-        {
-            // load transaction log db
-            
-            var flowFileLog = _repo.Get(
-                FlowFileController.SourceEntityType,
-                FlowFileController.Flow.Code);
-
-            // get next available flow file from the source
-            FileInfo flowFile = FlowFileController.GetNextFlowFile(flowFileLog);
-
-            return flowFile;
-        }
-
         private void ProcessFlowFile(FileInfo flowFile)
         {
             if (FlowFileController == null)
                 throw new InvalidOperationException("Flow file controller not been configured or assigned.");
-
 
             try
             {
@@ -192,7 +177,7 @@ namespace FutureState.Flow
             }
         }
 
-        private void UpdateTransactionLog(string sourceFilePath, FlowSnapshot result)
+        void UpdateTransactionLog(string sourceFilePath, FlowSnapshot result)
         {
             // update flow transaction log
             var flowFileLogEntry = new FlowFileLogEntry
@@ -203,8 +188,58 @@ namespace FutureState.Flow
                 DateLastUpdated = DateTime.UtcNow
             };
 
-            _repo.Add(result.SourceType, result.Batch.Flow, flowFileLogEntry);
+            _dataFileTranRepo.Add(result.SourceType, result.Batch.Flow, flowFileLogEntry);
         }
+
+        /// <summary>
+        ///     Gets the next data source file that hasn't been processed by the current instance.
+        /// </summary>
+        FileInfo GetNextFlowFile()
+        {
+            return GetNextFlowFile(FlowFileController.SourceEntityType, FlowFileController.Flow);
+        }
+
+        /// <summary>
+        ///     Gets the next flow file that has not been processed.
+        /// </summary>
+        public FileInfo GetNextFlowFile(FlowEntity entity, FlowId flow)
+        {
+            // this enumerate working folder
+            var dataFilesDirectory = FlowFileController.Config.InDirectory;
+
+            var flowFiles = new DirectoryInfo(dataFilesDirectory)
+                .GetFiles("*.*")
+                .OrderBy(m => m.CreationTimeUtc)
+                .ToList();
+
+            if (flowFiles.Any())
+            {
+                if (_logger.IsTraceEnabled)
+                    _logger.Trace($"Found {flowFiles.Count} files under {dataFilesDirectory}.");
+
+                // determine if it the data source file has been processed
+                var flowTransactionLog = _dataFileTranRepo.Get(entity, flow.Code);
+
+                foreach (var flowFile in flowFiles)
+                {
+                    // determine if the file was processed by the given processor
+                    var processLogEntry = flowTransactionLog.Entries.FirstOrDefault(
+                        m => string.Equals(
+                            flowFile.FullName, m.AddressId, StringComparison.OrdinalIgnoreCase));
+
+                    if (processLogEntry == null)
+                        return flowFile;
+                }
+            }
+            else
+            {
+                if (_logger.IsWarnEnabled)
+                    _logger.Warn($"No files were discovered under {dataFilesDirectory}.");
+            }
+
+            return null;
+        }
+
 
         /// <summary>
         ///     Starts checking for batch data to process.

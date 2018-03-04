@@ -38,8 +38,7 @@ namespace FutureState.Flow.Tests.Flow
 
             cb.RegisterGeneric(typeof(ProcessorConfiguration<,>))
                 .SingleInstance() // make singleton
-                .AsSelf()
-                .AsImplementedInterfaces();
+                .AsSelf();
 
             cb.RegisterGeneric(typeof(FlowFileController<,>))
                 .AsSelf();
