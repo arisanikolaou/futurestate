@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Dapper.Extensions.Linq.Core.Enums;
+﻿using Dapper.Extensions.Linq.Core.Enums;
 using Dapper.Extensions.Linq.Core.Predicates;
 using Dapper.Extensions.Linq.Core.Sql;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Dapper.Extensions.Linq.Predicates
 {

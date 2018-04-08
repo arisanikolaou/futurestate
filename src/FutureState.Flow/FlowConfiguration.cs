@@ -1,12 +1,15 @@
-﻿using System;
+﻿using FutureState.Flow.Controllers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FutureState.Flow.Controllers;
 using YamlDotNet.Serialization;
 
 namespace FutureState.Flow
 {
+    /// <summary>
+    ///     Configuration settings for a given flow file controller.
+    /// </summary>
     public class FlowConfiguration
     {
         /// <summary>
@@ -20,30 +23,38 @@ namespace FutureState.Flow
         /// <summary>
         ///     Creates a new instance using a given flow id.
         /// </summary>
-        public FlowConfiguration(Guid flowId)
+        public FlowConfiguration(FlowId flow)
         {
-            FlowId = flowId;
+            Guard.ArgumentNotNull(flow, nameof(flow));
+
+            Flow = flow;
             BasePath = Environment.CurrentDirectory;
             Controllers = new List<FlowControllerDefinition>();
         }
 
         /// <summary>
-        ///     Gets the flow's unique identifier.
+        ///     Gets the flow to configure.
         /// </summary>
-        public Guid FlowId { get; set; }
+        public FlowId Flow { get; set; }
 
         /// <summary>
-        ///     Gets the working directory for the flow.
+        ///     Gets the default working directory for a flow controller.
         /// </summary>
         public string BasePath { get; set; }
 
         /// <summary>
-        ///     Gets the controller to start/stop.
+        ///     Gets the controllers to start/stop.
         /// </summary>
         public List<FlowControllerDefinition> Controllers { get; set; }
 
-        public FlowControllerDefinition AddController<T>(string controllerName)
-            where T : IFlowFileController
+        /// <summary>
+        ///     Adds a controller definition to the instance.
+        /// </summary>
+        /// <typeparam name="TFlowFileController">Gets the flow controller type.</typeparam>
+        /// <param name="controllerName">Gets the flow controller name.</param>
+        /// <returns></returns>
+        public FlowControllerDefinition AddController<TFlowFileController>(string controllerName)
+            where TFlowFileController : IFlowFileController
         {
             FlowControllerDefinition def;
 
@@ -52,10 +63,11 @@ namespace FutureState.Flow
 
             var lastOutputDirectory = Controllers.LastOrDefault()?.Output;
 
+            // defaults
             Controllers.Add(def = new FlowControllerDefinition
             {
                 ControllerName = controllerName,
-                TypeName = typeof(T).AssemblyQualifiedName,
+                TypeName = typeof(TFlowFileController).AssemblyQualifiedName,
                 // the last output directory will be the input to this one
                 Input = lastOutputDirectory ?? $@"{BasePath}\{controllerName}\In",
                 Output = $@"{BasePath}\{controllerName}\Out",
@@ -66,12 +78,19 @@ namespace FutureState.Flow
             return def;
         }
 
+        /// <summary>
+        ///     Saves the flow configuration to a particular file path.
+        /// </summary>
+        /// <param name="fileName">
+        ///     The full file name.
+        /// </param>
         public void Save(string fileName = null)
         {
             fileName = fileName ?? "flow-config.yaml";
 
             // save yaml config
             var serializer = new Serializer();
+
             var yamlFile = $@"{BasePath}\{fileName}";
             if (File.Exists(yamlFile))
                 File.Delete(yamlFile);
@@ -86,6 +105,11 @@ namespace FutureState.Flow
             }
         }
 
+        /// <summary>
+        ///     Loads a flow configuration from a given file path.
+        /// </summary>
+        /// <param name="filePath">The yaml file path to load.</param>
+        /// <returns></returns>
         public static FlowConfiguration Load(string filePath)
         {
             if (!File.Exists(filePath))
@@ -99,6 +123,9 @@ namespace FutureState.Flow
         }
     }
 
+    /// <summary>
+    ///     Defines the configuration settings to use to setup a controller.
+    /// </summary>
     public class FlowControllerDefinition
     {
         /// <summary>

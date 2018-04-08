@@ -29,7 +29,7 @@ namespace FutureState.Common.Tests
                 {
                     new TestEntity2 {Name = "Name3"}
                 },
-                TestEntity2 = new TestEntity2 {Name = "Name2"}
+                TestEntity2 = new TestEntity2 { Name = "Name2" }
             };
 
             var clone = source.CloneDeep();

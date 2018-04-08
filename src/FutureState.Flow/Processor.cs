@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FutureState.Specifications;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using FutureState.Specifications;
-using NLog;
 
 namespace FutureState.Flow
 {
@@ -18,6 +18,7 @@ namespace FutureState.Flow
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly ProcessorConfiguration<TEntityIn, TEntityOut> _config;
+
         private Action<TEntityIn, TEntityOut> _beginProcessingItem;
         private Func<TEntityIn, IEnumerable<TEntityOut>> _createOutput;
         private Action<IEnumerable<TEntityOut>> _onCommitting;
@@ -39,8 +40,7 @@ namespace FutureState.Flow
 
             _config = config;
 
-            CreateOutput = dtoIn => new[] {new TEntityOut()};
-            ProcessName = GetProcessName(this);
+            CreateOutput = dtoIn => new[] { new TEntityOut() };
             Engine = engine ?? new ProcessorEngine<TEntityIn>();
         }
 
@@ -92,28 +92,14 @@ namespace FutureState.Flow
         }
 
         /// <summary>
-        ///     Get the well known name of the processor type.
-        /// </summary>
-        public string ProcessName { get; }
-
-        /// <summary>
-        ///     Gets the default processor name.
-        /// </summary>
-        /// <param name="processor">The processor instance to calculate a name for.</param>
-        /// <returns></returns>
-        public static string GetProcessName(IProcessor processor)
-        {
-            return $"{processor.GetType().Name.Replace("`2", "")}-{typeof(TEntityIn).Name}-{typeof(TEntityOut).Name}";
-        }
-
-        /// <summary>
         ///     Processes an incoming data stream to an output.
         /// </summary>
-        public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process)
+        public FlowSnapShot<TEntityOut> Process(IEnumerable<TEntityIn> reader, FlowBatch process)
         {
-            var result = new ProcessResult<TEntityIn, TEntityOut>
+            var result = new FlowSnapShot<TEntityOut>
             {
-                ProcessName = ProcessName
+                TargetType = new FlowEntity(typeof(TEntityOut)),
+                SourceType = new FlowEntity(typeof(TEntityIn))
             };
 
             return Process(reader, process, result);
@@ -124,15 +110,17 @@ namespace FutureState.Flow
         /// </summary>
         public event EventHandler<EventArgs> OnFinishedProcessing;
 
-
         /// <summary>
         ///     Creates a new process engine instance using a given entity reader and core engine.
         /// </summary>
         /// <returns></returns>
-        public ProcessorEngine<TEntityIn> BuildProcessEngine(IEnumerable<TEntityIn> reader,
-            ProcessorEngine<TEntityIn> engine, ProcessResult<TEntityIn, TEntityOut> result)
+        public ProcessorEngine<TEntityIn> BuildProcessEngine(
+            IEnumerable<TEntityIn> reader,
+            ProcessorEngine<TEntityIn> engine,
+            FlowSnapShot<TEntityOut> result)
         {
             var processedValidItems = new List<TEntityOut>();
+            var notValidItems = new List<TEntityOut>();
 
             engine.EntitiesReader = reader;
             engine.OnError = OnError;
@@ -148,52 +136,49 @@ namespace FutureState.Flow
                 pItem?.Invoke(dtoIn);
 
                 // create output entity
-                IEnumerable<TEntityOut> itemsToProcess = new[] {new TEntityOut()};
+                IEnumerable<TEntityOut> itemsToProcess;
+
+                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                 if (CreateOutput != null)
                     itemsToProcess = CreateOutput(dtoIn);
+                else
+                    itemsToProcess = new[] { new TEntityOut() };
 
                 var errorEvents = new List<ErrorEvent>();
-                foreach (var dtoOutDefault in itemsToProcess)
+                foreach (TEntityOut dtoOutDefault in itemsToProcess)
                 {
-                    // apply default mapping
-                    var dtoOut = _config.Mapper.Map(dtoIn, dtoOutDefault);
-
-                    // prepare entity
-                    BeginProcessingItem?.Invoke(dtoIn, dtoOut);
-
-                    // validate
-                    var errorEvent = OnItemProcessing(dtoIn, dtoOut);
-
-                    // validate against business rules
-                    if (errorEvent == null)
+                    try
                     {
-                        var errors = _config.Rules.ToErrors(dtoOut);
-                        var e = errors as Error[] ?? errors.ToArray();
-                        if (e.Any())
-                            foreach (var error in e)
-                            {
-                                errorEvent = new ErrorEvent {Message = error.Message, Type = error.Type};
-                                errorEvents.Add(errorEvent);
-                            }
-                        else
-                            processedValidItems.Add(dtoOut);
+                        ProcessOutputItem(
+                            dtoIn,
+                            dtoOutDefault,
+                            errorEvents,
+                            processedValidItems,
+                            notValidItems);
                     }
-                    else
+                    catch (Exception ex)
                     {
+                        var errorEvent = new ErrorEvent { Message = ex.Message, Type = "Exception" };
+
                         errorEvents.Add(errorEvent);
+                        notValidItems.Add(dtoOutDefault);
+
+                        throw;
                     }
                 }
 
                 return errorEvents;
             };
+
             // commit operation for valid processed items
+            // ReSharper disable once ImplicitlyCapturedClosure
             engine.Commit = () =>
             {
                 // curry commit
                 pCommit?.Invoke();
 
                 // validate collection commit
-                var errors = _config.CollectionRules.ToErrors(processedValidItems);
+                IEnumerable<Error> errors = _config.CollectionRules.ToErrors(processedValidItems);
 
                 var enumerable = errors as Error[] ?? errors.ToArray();
                 if (enumerable.Any())
@@ -209,18 +194,60 @@ namespace FutureState.Flow
             return engine;
         }
 
+
+        private void ProcessOutputItem(TEntityIn dtoIn, TEntityOut dtoOutDefault, List<ErrorEvent> errorEvents, List<TEntityOut> processedValidItems, List<TEntityOut> notValidItems)
+        {
+            // apply default mapping
+            TEntityOut dtoOut = _config.Mapper.Map(dtoIn, dtoOutDefault);
+
+            // prepare entity
+            BeginProcessingItem?.Invoke(dtoIn, dtoOut);
+
+            // validate
+            var errorEvent = OnItemProcessing(dtoIn, dtoOut);
+
+            // validate against business rules
+            if (errorEvent == null)
+            {
+                var errors = _config.Rules.ToErrors(dtoOut);
+                var errorsArray = errors as Error[] ?? errors.ToArray();
+
+                if (errorsArray.Any())
+                {
+                    foreach (var error in errorsArray)
+                    {
+                        errorEvent = new ErrorEvent { Message = error.Message, Type = error.Type };
+                        errorEvents.Add(errorEvent);
+                    }
+
+                    notValidItems.Add(dtoOut);
+                }
+                else
+                {
+                    processedValidItems.Add(dtoOut);
+                }
+            }
+            else
+            {
+                errorEvents.Add(errorEvent);
+                notValidItems.Add(dtoOut);
+            }
+        }
+
         /// <summary>
-        ///     Processes a BatchProcess of data using a process handle from an incoming source.
+        ///     Processes a FlowBatch of data using a process handle from an incoming source.
         /// </summary>
         /// <param name="reader">The source for the incoming dtos.</param>
         /// <param name="process">The batch process to run.</param>
         /// <param name="resultState">The resultState state from processing.</param>
         /// <returns></returns>
-        public ProcessResult<TEntityIn, TEntityOut> Process(IEnumerable<TEntityIn> reader, BatchProcess process,
-            ProcessResult<TEntityIn, TEntityOut> resultState)
+        public FlowSnapShot<TEntityOut> Process(
+            IEnumerable<TEntityIn> reader,
+            FlowBatch process,
+            FlowSnapShot<TEntityOut> resultState)
         {
             if (Logger.IsTraceEnabled)
-                Logger.Trace($"Starting to process  {ProcessName} batch {process.BatchId}.");
+                Logger.Trace($"Starting to process entity {typeof(TEntityOut).Name} batch {process.BatchId}.");
 
             try
             {
@@ -236,12 +263,12 @@ namespace FutureState.Flow
             catch (Exception ex)
             {
                 throw new ApplicationException(
-                    $"Failed to process {ProcessName} batch {process.BatchId} due to an unexpected error.", ex);
+                    $"Failed to process entity {typeof(TEntityOut).Name} batch {process.BatchId} due to an unexpected error.", ex);
             }
             finally
             {
                 if (Logger.IsTraceEnabled)
-                    Logger.Trace($"Finished processing {ProcessName} batch {process.BatchId}.");
+                    Logger.Trace($"Finished processing entity {typeof(TEntityOut).Name} batch {process.BatchId}.");
             }
 
             return resultState;
@@ -260,12 +287,12 @@ namespace FutureState.Flow
         /// </summary>
         /// <param name="batch">The results to commit to the system.</param>
         /// <param name="result">The state to store the operation results to.</param>
-        public virtual void Commit(IEnumerable<TEntityOut> batch, ProcessResult<TEntityIn, TEntityOut> result)
+        public virtual void Commit(IEnumerable<TEntityOut> batch, FlowSnapShot<TEntityOut> result)
         {
             // save results to output file - unique
             var batchAsList = batch.ToList();
 
-            result.Output = batchAsList;
+            result.Valid = batchAsList;
         }
 
         /// <summary>

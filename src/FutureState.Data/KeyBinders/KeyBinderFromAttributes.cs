@@ -40,7 +40,7 @@ namespace FutureState.Data
 
         public TKey Get(TEntity entity)
         {
-            return (TKey) GetterFn(entity); //don't check for null entity to avoid perf penalty
+            return (TKey)GetterFn(entity); //don't check for null entity to avoid perf penalty
         }
 
         public void Set(TEntity entity, TKey key)

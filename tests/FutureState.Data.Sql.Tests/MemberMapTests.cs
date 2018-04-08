@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using FutureState.Data.Sql.Mappings;
+﻿using FutureState.Data.Sql.Mappings;
+using System.Reflection;
 using Xunit;
 
 namespace FutureState.Data.Sql.Tests

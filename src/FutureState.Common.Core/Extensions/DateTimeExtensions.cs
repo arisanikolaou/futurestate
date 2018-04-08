@@ -28,7 +28,7 @@ namespace FutureState
         {
             var unspecifiedDate = value.HasValue
                 ? DateTime.SpecifyKind(value.Value.Date, DateTimeKind.Unspecified)
-                : (DateTime?) null;
+                : (DateTime?)null;
 
             return unspecifiedDate;
         }

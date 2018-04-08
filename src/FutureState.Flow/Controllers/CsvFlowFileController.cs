@@ -3,7 +3,7 @@
 namespace FutureState.Flow.Controllers
 {
     /// <summary>
-    ///     Uses csv files to create batchs of data to process.
+    ///     Uses csv files to create batches of data to process.
     /// </summary>
     /// <typeparam name="TIn">The input entity type.</typeparam>
     /// <typeparam name="TOut">The entity type to produce.</typeparam>

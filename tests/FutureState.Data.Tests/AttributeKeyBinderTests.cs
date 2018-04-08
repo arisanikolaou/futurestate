@@ -17,7 +17,7 @@ namespace FutureState.Data.Tests
         {
             var subject = new KeyBinderFromAttributes<TestEntity, string>();
 
-            var testEntity = new TestEntity {Key = "Key"};
+            var testEntity = new TestEntity { Key = "Key" };
 
             var key = subject.Get(testEntity);
 

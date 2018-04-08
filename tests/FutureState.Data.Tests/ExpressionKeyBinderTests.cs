@@ -16,11 +16,10 @@ namespace FutureState.Data.Tests
         {
             var subject = new KeyBinder<TestEntity, string>(entity => entity.Key, (e, k) => e.Key = k);
 
-            var key = subject.Get(new TestEntity {Key = "Key1"});
+            var key = subject.Get(new TestEntity { Key = "Key1" });
 
             Assert.Equal("Key1", key);
         }
-
 
         [Fact]
         public void CanSetKeyOnEntity()

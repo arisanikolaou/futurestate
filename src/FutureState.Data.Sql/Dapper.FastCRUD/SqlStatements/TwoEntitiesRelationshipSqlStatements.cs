@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Dapper.FastCrud.SqlBuilders;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Dapper.FastCrud.SqlBuilders;
 
 namespace Dapper.FastCrud.SqlStatements
 {

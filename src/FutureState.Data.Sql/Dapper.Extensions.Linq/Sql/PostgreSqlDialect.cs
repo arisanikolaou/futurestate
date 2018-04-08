@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Sql;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using Dapper.Extensions.Linq.Core.Sql;
 
 namespace Dapper.Extensions.Linq.Sql
 {

@@ -39,9 +39,8 @@ namespace FutureState.Common.Tests
 
         private void ThenActionShouldExecuteFirstTimeButNotAfterMaxRetries()
         {
-            // 
+            //
         }
-
 
         [BddfyFact]
         public void ShouldBeAbleToExecuteActionsDurably()

@@ -46,6 +46,7 @@
       <HintPath>..\..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,35 +59,53 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Interfaces.cs" />
     <Compile Include="Controllers\CsvFlowFileController.cs" />
     <Compile Include="Controllers\FlowFileController.cs" />
-    <Compile Include="Controllers\ProcessResultFlowFileBatchProcessor.cs" />
+    <Compile Include="Controllers\FlowSnapshotFileController.cs" />
     <Compile Include="Controllers\IFlowFileController.cs" />
+    <Compile Include="DataFiles\DataFileLog.cs" />
+    <Compile Include="DataFiles\DataFileLogEntry.cs" />
+    <Compile Include="DataFiles\DataFileLogRepo.cs" />
+    <Compile Include="Enrich\Enricher.cs" />
+    <Compile Include="Enrich\EnricherController.cs" />
+    <Compile Include="Enrich\EnricherProcessor.cs" />
+    <Compile Include="Enrich\EnrichmentTarget.cs" />
+    <Compile Include="Enrich\IEnricher.cs" />
+    <Compile Include="Enricher\EnricherLogRepo.cs" />
+    <Compile Include="Enricher\EnrichmentLog.cs" />
+    <Compile Include="Enricher\EnrichmentLogEntry.cs" />
     <Compile Include="FlowConfiguration.cs" />
     <Compile Include="FlowController.cs" />
-    <Compile Include="Model\FlowFileLog.cs" />
-    <Compile Include="FlowControllerService.cs" />
-    <Compile Include="Model\FlowFileLogEntry.cs" />
-    <Compile Include="Data\FlowFileLogRepository.cs" />
-    <Compile Include="Data\IProcessResultRepository.cs" />
-    <Compile Include="ProcessError.cs" />
+    <Compile Include="FlowBatch\FlowBatch.cs" />
+    <Compile Include="DataFiles\DataSourceProducerFromDirectory.cs" />
+    <Compile Include="Flow\FlowId.cs" />
+    <Compile Include="FlowFileLog\FlowFileLog.cs" />
+    <Compile Include="Controllers\FlowControllerService.cs" />
+    <Compile Include="FlowFileLog\FlowFileLogEntry.cs" />
+    <Compile Include="FlowEntity.cs" />
+    <Compile Include="FlowFileLog\FlowFileLogRepo.cs" />
+    <Compile Include="FlowFiles\IFlowSnapshotRepo.cs" />
+    <Compile Include="Flow\FlowService.cs" />
+    <Compile Include="Flow\IFlowService.cs" />
+    <Compile Include="IProcessorConfiguration.cs" />
     <Compile Include="ProcessorConfiguration.cs" />
     <Compile Include="Readers\GenericResultReader.cs" />
-    <Compile Include="Data\ProcessResultRepository.cs" />
-    <Compile Include="Model\BatchProcess.cs" />
+    <Compile Include="FlowFiles\FlowSnapshotRepo.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="IProcessorEngine.cs" />
     <Compile Include="IProcessor.cs" />
     <Compile Include="Readers\IReader.cs" />
     <Compile Include="ProcessorEngine.cs" />
-    <Compile Include="ProcessResult.cs" />
-    <Compile Include="Model\ErrorEvent.cs" />
+    <Compile Include="FlowFiles\FlowSnapshot.cs" />
+    <Compile Include="ErrorEvent.cs" />
     <Compile Include="Readers\CsvProcessorReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpecProviderBuilder.cs" />
+    <Compile Include="Specs\SpecProviderBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Docs\DataStructures.xlsx" />
     <None Include="FutureState.Flow.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -100,8 +119,6 @@
       <Name>FutureState.Specifications</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

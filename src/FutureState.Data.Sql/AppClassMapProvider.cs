@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Dapper;
+﻿using Dapper;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.FluentMap;
 using Dapper.FluentMap.Configuration;
 using FutureState.Data.Sql.Mappings;
 using FutureState.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace FutureState.Data.Sql
 {

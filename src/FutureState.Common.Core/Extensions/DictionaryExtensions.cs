@@ -62,7 +62,6 @@ namespace FutureState
             return left.Concat(right).ToUniqueDictionary(p => p.Key, p => p.Value);
         }
 
-
         /// <summary>
         ///     Builds a dictionary populated with unique keys based an an enumerable set of entities.
         /// </summary>

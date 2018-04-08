@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Core.Predicates;
+using System.Collections.Generic;
 
 namespace Dapper.Extensions.Linq.Core.Sql
 {

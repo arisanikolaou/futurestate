@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Autofac;
+﻿using Autofac;
 using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data;
 using FutureState.Data.Sql;
+using System.Collections.Generic;
 
 namespace FutureState.Autofac.Modules
 {

@@ -1,14 +1,14 @@
-﻿using System;
+﻿using FutureState.ComponentModel;
+using FutureState.Services;
+using FutureState.Specifications;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using FutureState.ComponentModel;
-using FutureState.Services;
-using FutureState.Specifications;
-using NLog;
 
 namespace FutureState.Data.Providers
 {
@@ -149,7 +149,6 @@ namespace FutureState.Data.Providers
             _onBeforeInsert.Push(addHandler);
         }
 
-
         private class NoOpMessagePipe : IMessagePipe
         {
             public Task SendAsync<T>(T message) where T : IDomainEvent
@@ -268,7 +267,6 @@ namespace FutureState.Data.Providers
                 yield return Initialize(entity);
         }
 
-
         // TODO: consider internalizing
 
         /// <summary>
@@ -299,7 +297,7 @@ namespace FutureState.Data.Providers
         {
             Guard.ArgumentNotNull(entity, nameof(entity));
 
-            Add(new[] {entity});
+            Add(new[] { entity });
         }
 
         protected virtual void OnAfterItemAdded(TEntity entity)
@@ -477,7 +475,7 @@ namespace FutureState.Data.Providers
         /// </summary>
         public void DemandValid(TEntity entity)
         {
-            DemandValid(new[] {entity});
+            DemandValid(new[] { entity });
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Dapper.Extensions.Linq.Core.Predicates;
+﻿using Dapper.Extensions.Linq.Core.Predicates;
+using System.Collections.Generic;
 
 namespace Dapper.Extensions.Linq.Predicates
 {

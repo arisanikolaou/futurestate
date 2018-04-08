@@ -1,6 +1,6 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using FutureState.Data;
+using System;
 
 namespace FutureState.Autofac.Modules
 {

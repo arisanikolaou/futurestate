@@ -1,14 +1,10 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 
 namespace FutureState.Diagnostics
 {
-    #region usings
-
-    #endregion usings
-
     /// <summary>
     ///     An agent which is a collection of one or more other agents.
     /// </summary>

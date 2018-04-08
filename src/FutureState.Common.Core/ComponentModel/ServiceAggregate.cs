@@ -30,7 +30,7 @@ namespace FutureState.ComponentModel
         ///     Initializes a new instance of the <see cref="ServiceAggregate{TInterface}" /> class.
         /// </summary>
         public ServiceAggregate(T serviceProviders)
-            : this(new[] {serviceProviders})
+            : this(new[] { serviceProviders })
         {
         }
 

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 
 namespace FutureState.Flow
 {
@@ -9,8 +9,8 @@ namespace FutureState.Flow
     ///     Extracts entities from a given data sources in a managed way to use in
     ///     data processing.
     /// </summary>
-    /// <typeparam name="TEntityDto">The type of entity to process.</typeparam>
-    public class ProcessorEngine<TEntityDto> : IProcessorEngine
+    /// <typeparam name="TEntityIn">The type of entity to process.</typeparam>
+    public class ProcessorEngine<TEntityIn> : IProcessorEngine
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -30,17 +30,17 @@ namespace FutureState.Flow
         /// <summary>
         ///     Gets the action to read results from.
         /// </summary>
-        public IEnumerable<TEntityDto> EntitiesReader { get; set; }
+        public IEnumerable<TEntityIn> EntitiesReader { get; set; }
 
         /// <summary>
         ///     Gets the action to process one item.
         /// </summary>
-        public Func<TEntityDto, IEnumerable<ErrorEvent>> ProcessItem { get; set; }
+        public Func<TEntityIn, IEnumerable<ErrorEvent>> ProcessItem { get; set; }
 
         /// <summary>
         ///     Gets the error handler.
         /// </summary>
-        public Action<TEntityDto, Exception> OnError { get; set; }
+        public Action<TEntityIn, Exception> OnError { get; set; }
 
         /// <summary>
         ///     Gets the list of warnings accumulated.
@@ -61,19 +61,14 @@ namespace FutureState.Flow
         ///     Gets the date the process started.
         /// </summary>
         public DateTime StartTime { get; private set; }
-
-        private string GetDefaultProcessName()
-        {
-            return $"{GetType().Name.Replace("`1", "")}-{typeof(TEntityDto).Name}";
-        }
-
+        
         /// <summary>
         ///     Processes all  data from the incoming source and records. Will record to file and memory the entities that were and
         ///     were not processed and returns
         ///     a summary of the processes' execution status.
         /// </summary>
         /// <returns></returns>
-        public ProcessResult Process(BatchProcess process, ProcessResult<TEntityDto> result = null)
+        public FlowSnapshot Process<TEntityOut>(FlowBatch process, FlowSnapShot<TEntityOut> result = null)
         {
             Guard.ArgumentNotNull(process, nameof(process));
 
@@ -86,19 +81,24 @@ namespace FutureState.Flow
                 throw new InvalidOperationException("EntitiesReader has not been assigned.");
 
             if (result == null)
-                result = new ProcessResult<TEntityDto>
+            {
+                // create new
+                result = new FlowSnapShot<TEntityOut>
                 {
-                    ProcessName = GetDefaultProcessName()
+                    SourceType = new FlowEntity(typeof(TEntityIn)),
+                    TargetType = new FlowEntity(typeof(TEntityOut))
                 };
+            }
 
-            result.BatchProcess = process;
+            // creates new result batch
+            result.Batch = process;
 
             Initialize?.Invoke();
 
             var onError = OnError ?? ((_, ___) => { });
 
-            var processed = new List<TEntityDto>();
-            var errors = new List<ProcessError<TEntityDto>>();
+            var processed = new List<TEntityIn>();
+            var errors = new List<ErrorEvent>();
             var exceptions = new List<Exception>();
 
             foreach (var dto in EntitiesReader)
@@ -114,7 +114,7 @@ namespace FutureState.Flow
                         processed.Add(dto);
                     else
                         foreach (var error in errorEvents)
-                            errors.Add(new ProcessError<TEntityDto> {Error = error, SourceItem = dto});
+                            errors.Add(error);
                 }
                 catch (ApplicationException apex)
                 {
@@ -125,11 +125,7 @@ namespace FutureState.Flow
 
                     exceptions.Add(apex);
 
-                    errors.Add(new ProcessError<TEntityDto>
-                    {
-                        Error = new ErrorEvent {Type = "Exception", Message = apex.Message},
-                        SourceItem = dto
-                    });
+                    errors.Add(new ErrorEvent { Type = "Exception", Message = apex.Message });
                 }
                 catch (Exception ex)
                 {
@@ -140,11 +136,7 @@ namespace FutureState.Flow
 
                     exceptions.Add(ex);
 
-                    errors.Add(new ProcessError<TEntityDto>
-                    {
-                        Error = new ErrorEvent {Type = "Exception", Message = ex.Message},
-                        SourceItem = dto
-                    });
+                    errors.Add(new ErrorEvent { Type = "Exception", Message = ex.Message });
                 }
             }
 
@@ -160,12 +152,7 @@ namespace FutureState.Flow
 
                 // roll back items into an error state
                 foreach (var entityDto in processed)
-                    errors.Add(new ProcessError<TEntityDto>
-                    {
-                        Error =
-                            new ErrorEvent {Type = "Exception", Message = $"Failed to commit changes: {ex.Message}"},
-                        SourceItem = entityDto
-                    });
+                    errors.Add(new ErrorEvent { Type = "Exception", Message = $"Failed to commit changes: {ex.Message}" });
 
                 //reset items
                 processed.Clear();
@@ -181,7 +168,6 @@ namespace FutureState.Flow
             result.Exceptions = exceptions;
 #endif
             result.Warnings = Warnings;
-            result.Input = processed;
             result.ProcessTime = DateTime.UtcNow - StartTime;
 
             return result;

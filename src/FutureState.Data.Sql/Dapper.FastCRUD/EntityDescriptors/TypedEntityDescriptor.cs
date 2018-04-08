@@ -1,9 +1,9 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using Dapper.FastCrud.Mappings;
+﻿using Dapper.FastCrud.Mappings;
 using Dapper.FastCrud.SqlBuilders;
 using Dapper.FastCrud.SqlStatements;
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Dapper.FastCrud.EntityDescriptors
 {
@@ -57,15 +57,19 @@ namespace Dapper.FastCrud.EntityDescriptors
                 case SqlDialect.MsSql:
                     statementSqlBuilder = new MsSqlBuilder(this, entityMapping);
                     break;
+
                 case SqlDialect.MySql:
                     statementSqlBuilder = new MySqlBuilder(this, entityMapping);
                     break;
+
                 case SqlDialect.PostgreSql:
                     statementSqlBuilder = new PostgreSqlBuilder(this, entityMapping);
                     break;
+
                 case SqlDialect.SqLite:
                     statementSqlBuilder = new SqLiteBuilder(this, entityMapping);
                     break;
+
                 default:
                     throw new NotSupportedException($"Dialect {entityMapping.Dialect} is not supported");
             }

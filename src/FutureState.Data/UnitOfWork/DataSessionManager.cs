@@ -1,5 +1,5 @@
-﻿using System;
-using NLog;
+﻿using NLog;
+using System;
 
 namespace FutureState.Data
 {
@@ -36,7 +36,6 @@ namespace FutureState.Data
         ///     An optional identifier for the instance.
         /// </summary>
         public string Id { get; protected set; }
-
 
         internal bool IsClosed => ActiveDataSession == null || ActiveDataSession.IsDisposed;
 
@@ -157,7 +156,6 @@ namespace FutureState.Data
         {
             return _linqReaderHandler.HandleReader(getLinqReader);
         }
-
 
         protected ISessionFactory GetSessionFactory()
         {

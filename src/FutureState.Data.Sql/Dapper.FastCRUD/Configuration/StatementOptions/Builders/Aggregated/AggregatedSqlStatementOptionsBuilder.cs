@@ -1,8 +1,8 @@
-﻿using System;
-using System.Data;
-using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
+﻿using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
 using Dapper.FastCrud.Mappings;
 using Dapper.FastCrud.Validations;
+using System;
+using System.Data;
 
 namespace Dapper.FastCrud.Configuration.StatementOptions.Builders.Aggregated
 {

@@ -1,6 +1,6 @@
+using Dapper.Extensions.Linq.Core.Predicates;
 using System;
 using System.Collections.Generic;
-using Dapper.Extensions.Linq.Core.Predicates;
 
 namespace Dapper.Extensions.Linq.Predicates
 {

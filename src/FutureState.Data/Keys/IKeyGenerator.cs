@@ -11,6 +11,7 @@ namespace FutureState.Data
             out TKey> : IKeyGenerator // first type param required to distinguish instances in app domain
     {
         Type EntityType { get; }
+
         TKey GetNew();
     }
 

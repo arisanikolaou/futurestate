@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using Dapper.FastCrud.EntityDescriptors;
+﻿using Dapper.FastCrud.EntityDescriptors;
 using Dapper.FastCrud.Mappings;
+using System;
+using System.Linq;
 
 namespace Dapper.FastCrud.SqlBuilders
 {
@@ -31,8 +31,8 @@ namespace Dapper.FastCrud.SqlBuilders
                 if (keyPropertyType == typeof(int) || keyPropertyType == typeof(long))
                     return
                         ResolveWithCultureInvariantFormatter(
-                            $@"INSERT 
-                                    INTO {GetTableName()} ({ConstructColumnEnumerationForInsert()}) 
+                            $@"INSERT
+                                    INTO {GetTableName()} ({ConstructColumnEnumerationForInsert()})
                                     VALUES ({ConstructParamEnumerationForInsert()});
                            SELECT SCOPE_IDENTITY() AS {GetDelimitedIdentifier(keyProperty.PropertyName)}");
             }
@@ -44,12 +44,12 @@ namespace Dapper.FastCrud.SqlBuilders
             // the union will make the constraints be ignored
             return ResolveWithCultureInvariantFormatter($@"
                 SELECT *
-                    INTO #temp 
-                    FROM (SELECT {dbGeneratedColumns} FROM {GetTableName()} WHERE 1=0 
+                    INTO #temp
+                    FROM (SELECT {dbGeneratedColumns} FROM {GetTableName()} WHERE 1=0
                         UNION SELECT {dbGeneratedColumns} FROM {GetTableName()} WHERE 1=0) as u;
-            
-                INSERT INTO {GetTableName()} ({ConstructColumnEnumerationForInsert()}) 
-                    OUTPUT {dbInsertedOutputColumns} INTO #temp 
+
+                INSERT INTO {GetTableName()} ({ConstructColumnEnumerationForInsert()})
+                    OUTPUT {dbInsertedOutputColumns} INTO #temp
                     VALUES ({ConstructParamEnumerationForInsert()});
 
                 SELECT * FROM #temp");
@@ -71,11 +71,11 @@ namespace Dapper.FastCrud.SqlBuilders
             // the union will make the constraints be ignored
             return ResolveWithCultureInvariantFormatter($@"
                 SELECT *
-                    INTO #temp 
-                    FROM (SELECT {dbGeneratedColumns} FROM {GetTableName()} WHERE 1=0 
+                    INTO #temp
+                    FROM (SELECT {dbGeneratedColumns} FROM {GetTableName()} WHERE 1=0
                         UNION SELECT {dbGeneratedColumns} FROM {GetTableName()} WHERE 1=0) as u;
 
-                UPDATE {GetTableName()} 
+                UPDATE {GetTableName()}
                     SET {ConstructUpdateClause()}
                     OUTPUT {dbUpdatedOutputColumns} INTO #temp
                     WHERE {ConstructKeysWhereClause()}

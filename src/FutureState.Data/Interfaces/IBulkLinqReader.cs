@@ -9,7 +9,7 @@ namespace FutureState.Data
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public interface IBulkLinqReader<TEntity> : IBulkLinqReader<TEntity, Guid>
-        //do not delete 'redundant' key
+    //do not delete 'redundant' key
     {
     }
 
@@ -20,7 +20,7 @@ namespace FutureState.Data
     /// <typeparam name="TEntity">The entity type.</typeparam>
     /// <typeparam name="TK">The entity key.</typeparam>
     public interface IBulkLinqReader<TEntity, in TK> : ILinqReader<TEntity, TK>
-        //do not delete 'redundant' key
+    //do not delete 'redundant' key
     {
         /// <summary>
         ///     Queries a sub-set of a given table for entities that match a given set of criteria and will select

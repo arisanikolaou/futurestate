@@ -1,10 +1,10 @@
-﻿using System;
+﻿using EmitMapper;
+using NLog;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using EmitMapper;
-using NLog;
 
 namespace FutureState.Data
 {
@@ -387,7 +387,7 @@ namespace FutureState.Data
         public static Func<TEntity, TKey> GetGetIdFunc()
         {
             if (typeof(IEntity<TKey>).IsAssignableFrom(typeof(TEntity)))
-                return item => ((IEntity<TKey>) item).Id;
+                return item => ((IEntity<TKey>)item).Id;
 
             throw new NotSupportedException(
                 $"Entity {typeof(TEntity).Name} is not supported by the default constructor of 'InMemoryRepository' as it does not implement {typeof(IEntity<>).Name}.");
@@ -467,6 +467,6 @@ namespace FutureState.Data
             }
         }
 
-        #endregion
+        #endregion PageRequest
     }
 }

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Dapper.FastCrud.Mappings;
+using System;
 using System.Data;
-using Dapper.FastCrud.Mappings;
 
 namespace Dapper.FastCrud.Configuration.StatementOptions
 {

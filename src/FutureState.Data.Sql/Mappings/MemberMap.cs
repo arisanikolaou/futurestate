@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Reflection;
-using Dapper;
 
 namespace FutureState.Data.Sql.Mappings
 {
@@ -27,8 +27,8 @@ namespace FutureState.Data.Sql.Mappings
             {
                 switch (_member.MemberType)
                 {
-                    case MemberTypes.Field: return ((FieldInfo) _member).FieldType;
-                    case MemberTypes.Property: return ((PropertyInfo) _member).PropertyType;
+                    case MemberTypes.Field: return ((FieldInfo)_member).FieldType;
+                    case MemberTypes.Property: return ((PropertyInfo)_member).PropertyType;
                     default: throw new NotSupportedException($"Member type {_member.MemberType} is not supported.");
                 }
             }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Enums;
+using Dapper.Extensions.Linq.Core.Predicates;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Dapper.Extensions.Linq.Core.Enums;
-using Dapper.Extensions.Linq.Core.Predicates;
 
 namespace Dapper.Extensions.Linq.Predicates
 {

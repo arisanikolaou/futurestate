@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FutureState
+﻿namespace FutureState
 {
     /// <summary>
     ///     Dispatches a set of domain events in a given application domain.

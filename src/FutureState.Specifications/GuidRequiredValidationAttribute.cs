@@ -15,7 +15,7 @@ namespace FutureState.Specifications
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if ((Guid) value == Guid.Empty)
+            if ((Guid)value == Guid.Empty)
                 return new ValidationResult("A valid not empty guid is required.");
 
             return ValidationResult.Success;

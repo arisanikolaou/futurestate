@@ -57,7 +57,6 @@ namespace FutureState
             return true;
         }
 
-
         /// <summary>
         ///     Yields the union of a and b.
         /// </summary>
@@ -88,7 +87,7 @@ namespace FutureState
         /// <returns></returns>
         public static IEnumerable<IEnumerable<T>> BatchEx<T>(this IEnumerable<T> items, int maxItems)
         {
-            return items?.Select((item, inx) => new {item, inx})
+            return items?.Select((item, inx) => new { item, inx })
                 .GroupBy(x => x.inx / maxItems)
                 .Select(g => g.Select(x => x.item));
         }

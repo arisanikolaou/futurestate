@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using CsvHelper;
-using CsvHelper.Configuration;
 
 namespace FutureState.Flow
 {
@@ -18,13 +18,15 @@ namespace FutureState.Flow
             if (!File.Exists(fileName))
                 throw new InvalidOperationException($"File {fileName} does not exist.");
 
-            var config = new Configuration {HasHeaderRecord = true};
+            // configuration
+            var config = new Configuration { HasHeaderRecord = true };
 
             using (var reader = new StreamReader(File.OpenRead(fileName)))
             {
                 using (var helper = new CsvReader(reader, config))
                 {
                     if (helper.Read())
+                    {
                         try
                         {
                             if (!helper.ReadHeader())
@@ -38,6 +40,7 @@ namespace FutureState.Flow
                         {
                             throw new ApplicationException($"Can't read data from file {fileName}.", ex);
                         }
+                    }
 
                     while (helper.Read())
                     {
