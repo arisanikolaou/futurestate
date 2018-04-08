@@ -1,5 +1,5 @@
-﻿using System;
-using Dapper.FastCrud.Validations;
+﻿using Dapper.FastCrud.Validations;
+using System;
 
 namespace Dapper.FastCrud.Mappings
 {

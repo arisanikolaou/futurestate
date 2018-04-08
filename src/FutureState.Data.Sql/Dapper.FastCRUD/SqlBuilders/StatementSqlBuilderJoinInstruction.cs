@@ -1,5 +1,5 @@
-﻿using System;
-using Dapper.FastCrud.Configuration.StatementOptions;
+﻿using Dapper.FastCrud.Configuration.StatementOptions;
+using System;
 
 namespace Dapper.FastCrud.SqlBuilders
 {

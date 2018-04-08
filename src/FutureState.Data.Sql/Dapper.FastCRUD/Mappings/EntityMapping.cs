@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Dapper.FastCrud.Validations;
-using FutureState;
 
 namespace Dapper.FastCrud.Mappings
 {
@@ -156,7 +155,7 @@ namespace Dapper.FastCrud.Mappings
         /// </summary>
         public PropertyMapping SetProperty(PropertyDescriptor property)
         {
-            this.ValidateState();
+            ValidateState();
 
             return SetPropertyByMapping(new PropertyMapping(this, property));
         }

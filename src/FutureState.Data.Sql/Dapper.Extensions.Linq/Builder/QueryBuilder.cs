@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using Dapper.Extensions.Linq.Core.Builder;
+﻿using Dapper.Extensions.Linq.Core.Builder;
 using Dapper.Extensions.Linq.Core.Enums;
 using Dapper.Extensions.Linq.Core.Predicates;
 using Dapper.Extensions.Linq.Predicates;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Dapper.Extensions.Linq.Builder
 {
@@ -102,7 +102,7 @@ namespace Dapper.Extensions.Linq.Builder
             if (!callback(predicate))
                 return predicate;
 
-            var group = (IPredicateGroup) predicate;
+            var group = (IPredicateGroup)predicate;
             foreach (var p in group.Predicates)
                 VisitPredicateTree(p, callback);
 
@@ -114,7 +114,7 @@ namespace Dapper.Extensions.Linq.Builder
             switch (expression.NodeType)
             {
                 case ExpressionType.Convert:
-                    return ((UnaryExpression) expression).Operand;
+                    return ((UnaryExpression)expression).Operand;
 
                 default:
                     return expression;
@@ -152,21 +152,21 @@ namespace Dapper.Extensions.Linq.Builder
             public static PredicateGroup Convert(Expression expression)
             {
                 if (expression.NodeType == ExpressionType.Lambda)
-                    expression = ((LambdaExpression) expression).Body;
+                    expression = ((LambdaExpression)expression).Body;
 
                 var converter = new PredicateConverter();
                 var result = converter.Parse(expression);
 
                 var group = result as PredicateGroup;
                 if (group == null)
-                    group = new PredicateGroup {Predicates = new List<IPredicate> {result}};
+                    group = new PredicateGroup { Predicates = new List<IPredicate> { result } };
 
                 return group;
             }
 
             private IPredicate ParseGroup(BinaryExpression expression)
             {
-                var group = new PredicateGroup {Predicates = new List<IPredicate>(2)};
+                var group = new PredicateGroup { Predicates = new List<IPredicate>(2) };
                 switch (expression.NodeType)
                 {
                     case ExpressionType.AndAlso:
@@ -216,7 +216,7 @@ namespace Dapper.Extensions.Linq.Builder
 
                 object value;
                 if (valueExpression.NodeType == ExpressionType.Constant)
-                    value = ((ConstantExpression) valueExpression).Value;
+                    value = ((ConstantExpression)valueExpression).Value;
                 else
                     value = InvokeExpression(valueExpression);
 
@@ -312,7 +312,7 @@ namespace Dapper.Extensions.Linq.Builder
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Not:
-                        return ParseUnaryNot((UnaryExpression) expression);
+                        return ParseUnaryNot((UnaryExpression)expression);
 
                     case ExpressionType.GreaterThan:
                     case ExpressionType.GreaterThanOrEqual:
@@ -320,17 +320,17 @@ namespace Dapper.Extensions.Linq.Builder
                     case ExpressionType.LessThanOrEqual:
                     case ExpressionType.NotEqual:
                     case ExpressionType.Equal:
-                        return ParseField((BinaryExpression) expression);
+                        return ParseField((BinaryExpression)expression);
 
                     case ExpressionType.OrElse:
                     case ExpressionType.AndAlso:
-                        return ParseGroup((BinaryExpression) expression);
+                        return ParseGroup((BinaryExpression)expression);
 
                     case ExpressionType.Call:
-                        return ParseCall((MethodCallExpression) expression);
+                        return ParseCall((MethodCallExpression)expression);
 
                     case ExpressionType.MemberAccess:
-                        return ParseBoolMember((MemberExpression) expression);
+                        return ParseBoolMember((MemberExpression)expression);
 
                     case ExpressionType.Add:
                     case ExpressionType.AddAssign:
@@ -480,7 +480,7 @@ namespace Dapper.Extensions.Linq.Builder
                 var memberExpression = expression.Object as MemberExpression;
 
                 var value = patternExpression.NodeType == ExpressionType.Constant
-                    ? ((ConstantExpression) patternExpression).Value
+                    ? ((ConstantExpression)patternExpression).Value
                     : InvokeExpression(patternExpression);
 
                 if (patternExpression == null)
@@ -513,7 +513,7 @@ namespace Dapper.Extensions.Linq.Builder
 
                     var propertyName = Nullable.GetUnderlyingType(memberExpression.Expression.Type) == null
                         ? memberExpression.Member.Name
-                        : ((MemberExpression) memberExpression.Expression).Member.Name;
+                        : ((MemberExpression)memberExpression.Expression).Member.Name;
 
                     return new FieldPredicate<T>
                     {
@@ -542,7 +542,7 @@ namespace Dapper.Extensions.Linq.Builder
 
                     var propertyName = Nullable.GetUnderlyingType(valueExpression.Expression.Type) == null
                         ? valueExpression.Member.Name
-                        : ((MemberExpression) valueExpression.Expression).Member.Name;
+                        : ((MemberExpression)valueExpression.Expression).Member.Name;
 
                     return new FieldPredicate<T>
                     {

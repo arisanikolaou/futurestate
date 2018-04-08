@@ -50,7 +50,8 @@ namespace FutureState
             if (DbOfEnumNamesToValues.ContainsKey(value))
                 return DbOfEnumNamesToValues[value];
 
-            throw new NotSupportedException($"The value {value} can't be converted into a {typeof(TEnum).FullName} type.");
+            throw new NotSupportedException(
+                $"The value {value} can't be converted into a {typeof(TEnum).FullName} type.");
         }
 
         /// <summary>

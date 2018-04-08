@@ -1,29 +1,22 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 
 namespace FutureState.Flow.Tests.Mock
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.Data.Entity;
-    using System.Linq;
-
     public class TestModel : DbContext
     {
         public TestModel()
             : base("name=TestModel")
         {
-            this.Database.Initialize(true);
         }
 
         public TestModel(string conString)
             : base(conString)
         {
-            this.Database.Initialize(true);
         }
 
-
         public virtual DbSet<Contact> Contacts { get; set; }
-
 
         public virtual DbSet<Address> Addresses { get; set; }
     }

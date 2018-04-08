@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Dapper;
+﻿using Dapper;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.FluentMap;
 using Dapper.FluentMap.Configuration;
 using FutureState.Data.Sql.Mappings;
 using FutureState.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace FutureState.Data.Sql
 {
     /// <summary>
     ///     Helps construct the class maps required to serializer/deserialize
-    /// entities from an underlying data store.
+    ///     entities from an underlying data store.
     /// </summary>
     public class AppClassMapProvider
     {
@@ -39,7 +39,7 @@ namespace FutureState.Data.Sql
 
         /// <summary>
         ///     Initialize all default entity mappers to support sql data queries
-        /// that can be discovered in the assemblies referenced by the current instance.
+        ///     that can be discovered in the assemblies referenced by the current instance.
         /// </summary>
         public IList<IClassMapper> GetClassMappers()
         {
@@ -66,18 +66,18 @@ namespace FutureState.Data.Sql
                     if (entityProperty == null)
                         throw new InvalidOperationException("Property 'EntityType' does not exist.");
 
-                    Type entityType = entityProperty.GetValue(newCustomEntityMap, new object[0]) as Type;
+                    var entityType = entityProperty.GetValue(newCustomEntityMap, new object[0]) as Type;
                     classMappers.Add(newCustomEntityMap);
 
                     // invoke generic method
                     // ReSharper disable once PossibleNullReferenceException
-                    MethodInfo generic = method.MakeGenericMethod(entityType);
+                    var generic = method.MakeGenericMethod(entityType);
 
-                    generic.Invoke(config, new object[] { newCustomEntityMap });
+                    generic.Invoke(config, new object[] {newCustomEntityMap});
                 }
 
                 // interogate container for entity maps and update
-                foreach (Lazy<Type> lazyEntityType in entityTypes)
+                foreach (var lazyEntityType in entityTypes)
                 {
                     var actualType = lazyEntityType.Value;
 
@@ -102,7 +102,7 @@ namespace FutureState.Data.Sql
 
                         try
                         {
-                            generic.Invoke(config, new object[] { newCustomEntityMap });
+                            generic.Invoke(config, new object[] {newCustomEntityMap});
                         }
                         catch (TargetInvocationException tex)
                         {

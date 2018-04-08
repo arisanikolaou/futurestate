@@ -1,10 +1,10 @@
 ﻿#region
 
-using System;
-using System.Linq;
 using EmitMapper;
 using EmitMapper.MappingConfiguration;
 using FutureState.ComponentModel;
+using System;
+using System.Linq;
 
 #endregion
 
@@ -80,12 +80,12 @@ namespace FutureState.Reflection
         {
             if (source != null && sources.Any())
             {
-                var dest = (T) mapper.Map(source, typeof(T), typeof(T));
+                var dest = (T)mapper.Map(source, typeof(T), typeof(T));
 
                 foreach (var src in sources.Where(s => s != null))
                 {
                     var sourceType = src.GetType();
-                    dest = (T) mapper.Map(src, sourceType, typeof(T), dest);
+                    dest = (T)mapper.Map(src, sourceType, typeof(T), dest);
                 }
 
                 return dest;
@@ -106,7 +106,7 @@ namespace FutureState.Reflection
             if (dst.HasValue)
                 actualType = dst.Value.GetType();
 
-            return (TTo) mapper.Map(source, source.GetType(), actualType, dst.HasValue ? (object) dst.Value : null);
+            return (TTo)mapper.Map(source, source.GetType(), actualType, dst.HasValue ? (object)dst.Value : null);
         }
 
         private static TTo MapToInner<TTo>(object source, TTo dst, IMapper mapper) where TTo : class
@@ -119,7 +119,7 @@ namespace FutureState.Reflection
             if (dst != null)
                 actualType = dst.GetType();
 
-            return (TTo) mapper.Map(source, source.GetType(), actualType, dst);
+            return (TTo)mapper.Map(source, source.GetType(), actualType, dst);
         }
 
         public class EmitMapperImpl : IMapper

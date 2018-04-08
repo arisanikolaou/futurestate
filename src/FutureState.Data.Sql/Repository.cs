@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using Dapper;
+﻿using Dapper;
 using Dapper.FastCrud;
 using Dapper.FluentMap;
 using Dapper.FluentMap.Dommel.Mapping;
 using Humanizer;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
 
 // ReSharper disable StaticMemberInGenericType
 
@@ -67,7 +67,7 @@ namespace FutureState.Data.Sql
 
             var dt = new DataTable(_dtTypeName);
             dt.Columns.Add("Item", typeof(TKey));
-            dt.PrimaryKey = new[] {dt.Columns[0]};
+            dt.PrimaryKey = new[] { dt.Columns[0] };
 
             _modelTvpType = dt;
         }
@@ -131,7 +131,7 @@ namespace FutureState.Data.Sql
         /// </summary>
         public void DeleteById(TKey key)
         {
-            _connection.Execute($"Delete From [{_tableName}] Where [{_idColumnName}] = @id", new {id = key},
+            _connection.Execute($"Delete From [{_tableName}] Where [{_idColumnName}] = @id", new { id = key },
                 GetCurrentTran());
         }
 

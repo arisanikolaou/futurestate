@@ -5,25 +5,12 @@ namespace FutureState.Common.Tests
 {
     public class ErrorExtTests
     {
-        readonly ITestOutputHelper _output;
-
         public ErrorExtTests(ITestOutputHelper output)
         {
             _output = output;
         }
 
-        [Fact]
-        public void ThrowsErrorsIfEnumerableIsPopulated()
-        {
-            var errors = new[]
-            {
-                new Error("Message", "Type"),
-                new Error("Message-2", "Type"),
-            };
-
-
-            Assert.Throws<RuleException>(() => { errors.ThrowIfExists("One or more errors were detected."); });
-        }
+        private readonly ITestOutputHelper _output;
 
         [Fact]
         public void DoesNotThrowErrorIfEnumerableIsPopulated()
@@ -40,10 +27,10 @@ namespace FutureState.Common.Tests
             var errors = new[]
             {
                 new Error("Message", "Type"),
-                new Error("Message-2", "Type"),
+                new Error("Message-2", "Type")
             };
 
-            string output = errors.ToListString();
+            var output = errors.ToListString();
 
             Assert.False(string.IsNullOrWhiteSpace(output));
             Assert.Contains("Message-2", output);
@@ -51,6 +38,19 @@ namespace FutureState.Common.Tests
 
             // produce output string
             _output.WriteLine(output);
+        }
+
+        [Fact]
+        public void ThrowsErrorsIfEnumerableIsPopulated()
+        {
+            var errors = new[]
+            {
+                new Error("Message", "Type"),
+                new Error("Message-2", "Type")
+            };
+
+
+            Assert.Throws<RuleException>(() => { errors.ThrowIfExists("One or more errors were detected."); });
         }
     }
 }

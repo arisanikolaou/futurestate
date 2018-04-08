@@ -1,23 +1,25 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace FutureState.Common.Tests
 {
     public class ObjectExtensionsTests
     {
+        public class DomainObject
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
         [Fact]
         public void DoesWithTest()
         {
-            bool hitLine = false;
+            var hitLine = false;
 
-            var result = new DomainObject()
+            var result = new DomainObject
                 {
                     Name = "Name"
                 }
-                .Do(m =>
-                {
-                    hitLine = true;
-                })
+                .Do(m => { hitLine = true; })
                 .With(m => m.Name)
                 .Exists();
 
@@ -28,7 +30,7 @@ namespace FutureState.Common.Tests
         [Fact]
         public void ReturnsAfterWithTests()
         {
-            var result = new DomainObject()
+            var result = new DomainObject
                 {
                     Name = "Name"
                 }
@@ -36,13 +38,6 @@ namespace FutureState.Common.Tests
                 .Return(m => m[0]);
 
             Assert.Equal('N', result);
-        }
-
-
-        public class DomainObject
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
         }
     }
 }

@@ -81,7 +81,7 @@ namespace Hyper.ComponentModel
                             MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.SpecialName |
                             MethodAttributes.RTSpecialName,
                             CallingConventions.Standard,
-                            new[] {typeof(PropertyDescriptor)});
+                            new[] { typeof(PropertyDescriptor) });
                     var il = cb.GetILGenerator();
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldarg_1);
@@ -90,7 +90,7 @@ namespace Hyper.ComponentModel
                         typeof(ChainingPropertyDescriptor).GetConstructor(
                             BindingFlags.NonPublic | BindingFlags.Instance,
                             null,
-                            new[] {typeof(PropertyDescriptor)},
+                            new[] { typeof(PropertyDescriptor) },
                             null));
                     il.Emit(OpCodes.Ret);
 
@@ -108,7 +108,7 @@ namespace Hyper.ComponentModel
                             MethodAttributes.Final,
                             baseMethod.CallingConvention,
                             baseMethod.ReturnType,
-                            new[] {typeof(object)});
+                            new[] { typeof(object) });
 
                         // start writing IL into the method
                         il = mb.GetILGenerator();
@@ -192,7 +192,7 @@ namespace Hyper.ComponentModel
                                 MethodAttributes.Final,
                                 baseMethod.CallingConvention,
                                 baseMethod.ReturnType,
-                                new[] {typeof(object), typeof(object)});
+                                new[] { typeof(object), typeof(object) });
                             il = mb.GetILGenerator();
                             il.Emit(OpCodes.Ldarg_1);
                             il.Emit(OpCodes.Castclass, property.DeclaringType);
@@ -219,7 +219,7 @@ namespace Hyper.ComponentModel
                                     MethodAttributes.Final | MethodAttributes.SpecialName,
                                     baseMethod.CallingConvention,
                                     baseMethod.ReturnType,
-                                    new[] {typeof(object), typeof(EventHandler)});
+                                    new[] { typeof(object), typeof(EventHandler) });
                                 il = mb.GetILGenerator();
                                 il.Emit(OpCodes.Ldarg_1);
                                 il.Emit(OpCodes.Castclass, property.DeclaringType);
@@ -235,7 +235,7 @@ namespace Hyper.ComponentModel
                                     MethodAttributes.Final | MethodAttributes.SpecialName,
                                     baseMethod.CallingConvention,
                                     baseMethod.ReturnType,
-                                    new[] {typeof(object), typeof(EventHandler)});
+                                    new[] { typeof(object), typeof(EventHandler) });
                                 il = mb.GetILGenerator();
                                 il.Emit(OpCodes.Ldarg_1);
                                 il.Emit(OpCodes.Castclass, property.DeclaringType);
@@ -249,8 +249,8 @@ namespace Hyper.ComponentModel
 
                     var newDesc =
                         tb.CreateType()
-                            .GetConstructor(new[] {typeof(PropertyDescriptor)})
-                            .Invoke(new object[] {descriptor}) as PropertyDescriptor;
+                            .GetConstructor(new[] { typeof(PropertyDescriptor) })
+                            .Invoke(new object[] { descriptor }) as PropertyDescriptor;
                     if (newDesc == null)
                         return false;
 

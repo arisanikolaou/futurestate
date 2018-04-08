@@ -49,7 +49,7 @@ namespace FutureState
         public static string GetParameterName(this Expression<Func<object>> property)
         {
             // get its name
-            return ((MemberExpression) property.Body).Member.Name;
+            return ((MemberExpression)property.Body).Member.Name;
         }
 
         public static string GetPropertyName<T>(this Expression<Func<T, object>> property)
@@ -60,7 +60,7 @@ namespace FutureState
                 : property.Body;
 
             // get its name
-            return ((MemberExpression) memberExpression).Member.Name;
+            return ((MemberExpression)memberExpression).Member.Name;
         }
 
         /// <summary>

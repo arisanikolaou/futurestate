@@ -42,7 +42,7 @@ namespace FutureState.Data.Tests
 
         internal void AndWhenAddingNewItems()
         {
-            subject.Insert(new TestEntity {Name = "Name2"});
+            subject.Insert(new TestEntity { Name = "Name2" });
 
             _insertedEntity = subject.Where(m => m.Name == "Name2").FirstOrDefault();
         }

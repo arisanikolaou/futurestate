@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using Dapper.Extensions.Linq.Core.Mapper;
 using FutureState.Data;
 using FutureState.Data.Sql;
@@ -11,6 +7,10 @@ using FutureState.Services;
 using FutureState.Specifications;
 using Magnum.Reflection;
 using NLog;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 
 namespace FutureState.Autofac
 {
@@ -96,7 +96,6 @@ namespace FutureState.Autofac
                     .As<IClassMapper>()
                     .PreserveExistingDefaults();
 
-
             return this;
         }
 
@@ -138,7 +137,6 @@ namespace FutureState.Autofac
         {
             return RegisterTypes<IProvideSpecifications>();
         }
-
 
         private ApplicationContainerBuilder RegisterEntityTableMaps()
         {

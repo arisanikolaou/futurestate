@@ -42,7 +42,6 @@ namespace FutureState.Data
             _entitySet = new EntitySet<TEntity, TKey>(this, getRepository);
         }
 
-
         public EntitySet<TEntity, TKey> EntitySet => _entitySet;
 
         /// <summary>

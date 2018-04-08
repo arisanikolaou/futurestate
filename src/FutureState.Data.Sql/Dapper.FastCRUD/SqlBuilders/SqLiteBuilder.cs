@@ -1,6 +1,6 @@
-﻿using System;
-using Dapper.FastCrud.EntityDescriptors;
+﻿using Dapper.FastCrud.EntityDescriptors;
 using Dapper.FastCrud.Mappings;
+using System;
 
 namespace Dapper.FastCrud.SqlBuilders
 {

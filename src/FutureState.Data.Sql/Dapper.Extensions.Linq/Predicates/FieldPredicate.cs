@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Enums;
+using Dapper.Extensions.Linq.Core.Predicates;
+using Dapper.Extensions.Linq.Core.Sql;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Dapper.Extensions.Linq.Core.Enums;
-using Dapper.Extensions.Linq.Core.Predicates;
-using Dapper.Extensions.Linq.Core.Sql;
 
 namespace Dapper.Extensions.Linq.Predicates
 {
@@ -26,7 +26,7 @@ namespace Dapper.Extensions.Linq.Predicates
                     throw new ArgumentException("Operator must be set to Eq for Enumerable types");
 
                 var @params = new List<string>();
-                foreach (var value in (IEnumerable) Value)
+                foreach (var value in (IEnumerable)Value)
                 {
                     var valueParameterName = parameters.SetParameterName(PropertyName, value,
                         sqlGenerator.Configuration.Dialect.ParameterPrefix);

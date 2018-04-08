@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Mapper;
+using Dapper.Extensions.Linq.Core.Sql;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
-using Dapper.Extensions.Linq.Core.Mapper;
-using Dapper.Extensions.Linq.Core.Sql;
 
 namespace Dapper.Extensions.Linq.Core.Configuration
 {
@@ -22,9 +22,7 @@ namespace Dapper.Extensions.Linq.Core.Configuration
 
         public IContainerCustomisations ContainerCustomisations { get; }
 
-
         public ISqlDialect Dialect { get; private set; }
-
 
         /// <summary>
         ///     Changes the <see cref="ISqlDialect" />.
@@ -36,7 +34,6 @@ namespace Dapper.Extensions.Linq.Core.Configuration
             Dialect = dialect;
             return this;
         }
-
 
         public IDapperConfiguration Build()
         {

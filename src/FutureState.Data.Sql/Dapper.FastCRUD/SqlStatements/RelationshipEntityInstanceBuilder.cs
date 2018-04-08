@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Dapper.FastCrud.Mappings;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Dapper.FastCrud.Mappings;
 
 namespace Dapper.FastCrud.SqlStatements
 {
@@ -117,7 +117,7 @@ namespace Dapper.FastCrud.SqlStatements
             }
             else if (mainEntityMapping.ParentChildRelationships.TryGetValue(childEntityType, out entityRelationship))
             {
-                var childCollectionList = (IList) entityRelationship.ReferencingEntityProperty.GetValue(mainEntity);
+                var childCollectionList = (IList)entityRelationship.ReferencingEntityProperty.GetValue(mainEntity);
                 childCollectionList.Add(childEntity);
             }
         }
@@ -127,7 +127,7 @@ namespace Dapper.FastCrud.SqlStatements
             foreach (var parentChildRelationship in entityMapping.ParentChildRelationships)
             {
                 var childCollectionList =
-                    (IList) Activator.CreateInstance(_entityListType.MakeGenericType(parentChildRelationship.Key));
+                    (IList)Activator.CreateInstance(_entityListType.MakeGenericType(parentChildRelationship.Key));
                 parentChildRelationship.Value.ReferencingEntityProperty.SetValue(entity, childCollectionList);
             }
         }

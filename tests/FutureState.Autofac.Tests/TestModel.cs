@@ -1,7 +1,7 @@
+using FutureState.Data;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
-using FutureState.Data;
 
 namespace FutureState.Autofac.Tests
 {

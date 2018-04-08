@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Autofac;
+using CsvHelper;
+using FutureState.Flow.Controllers;
+using FutureState.Specifications;
+using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Autofac;
-using CsvHelper;
-using FutureState.Flow.Controllers;
-using FutureState.Specifications;
-using Newtonsoft.Json;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -19,13 +19,14 @@ namespace FutureState.Flow.Tests.Flow
     [Story]
     public class ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofacStory
     {
-        private int CsvItemsToCreate = 25;
-
         private readonly string DataFileName = @"TestData.csv";
 
         private IContainer _container;
         private FlowConfiguration _flowConfig;
         private FlowController _flowController;
+        private FlowId _flow;
+
+        private readonly int CsvItemsToCreate = 25;
 
         [BddfyFact]
         public void ProcessorsCanBeChainedToFormAnEtlPipeLineWithAutofac()
@@ -41,13 +42,14 @@ namespace FutureState.Flow.Tests.Flow
             if (Directory.Exists(baseDirectory))
                 Directory.Delete(baseDirectory, true);
 
-            var flowConfig = new FlowConfiguration(Guid.Parse("b212aeca-130b-4a96-8d30-e3ff4e68c860"))
+            _flow = new FlowId("ConfigureFlow");
+            var flowConfig = new FlowConfiguration(_flow)
             {
-                BasePath = baseDirectory,
+                BasePath = baseDirectory
             };
 
             var def1 = flowConfig.AddController<TestCsvFlowController>("ProcessorA");
-            def1.FieldValidationRules.Add(new ValidationRule()
+            def1.FieldValidationRules.Add(new ValidationRule
             {
                 FieldName = "Value",
                 ErrorMessage = "Value must be numeric",
@@ -57,23 +59,24 @@ namespace FutureState.Flow.Tests.Flow
             // configuration path
             def1.ConfigurationDetails.Add("ValueToConfigure", "http://helplnk.etc");
 
-            flowConfig.AddController<TestProcessResultFlowFileBatchController>("ProcessorB");
+            flowConfig.AddController<TestProcessResultFlowFileController>("ProcessorB");
 
-            this._flowConfig = flowConfig;
+            _flowConfig = flowConfig;
         }
 
         protected void AndGivenAGeneratedDataSourceCsvFile()
         {
-            var baseDir = this._flowConfig.Controllers.First().Input;
+            var baseDir = _flowConfig.Controllers.First().Input;
             if (!Directory.Exists(baseDir))
                 Directory.CreateDirectory(baseDir);
 
-            string csvFilePath = $@"{baseDir}\{DataFileName}";
+            var csvFilePath = $@"{baseDir}\{DataFileName}";
 
             // always re-create
             if (File.Exists(csvFilePath))
                 File.Delete(csvFilePath);
 
+            // write data file
             using (var fs = File.OpenWrite(csvFilePath))
             {
                 using (var sw = new StreamWriter(fs))
@@ -85,7 +88,6 @@ namespace FutureState.Flow.Tests.Flow
 
                     csv.Flush();
                     csv.NextRecord();
-
 
                     for (var i = 0; i < CsvItemsToCreate; i++)
                     {
@@ -111,7 +113,7 @@ namespace FutureState.Flow.Tests.Flow
 
             // register controllers
             cb.RegisterType<TestCsvFlowController>().AsSelf().AsImplementedInterfaces();
-            cb.RegisterType<TestProcessResultFlowFileBatchController>().AsSelf().AsImplementedInterfaces();
+            cb.RegisterType<TestProcessResultFlowFileController>().AsSelf().AsImplementedInterfaces();
 
             _container = cb.Build();
         }
@@ -129,15 +131,16 @@ namespace FutureState.Flow.Tests.Flow
         protected void AndWhenSavingTheFlowConfigAndUsingControllerFriendlyNames()
         {
             // ReSharper disable once PossibleNullReferenceException
-            var lastController = _flowConfig.Controllers.LastOrDefault();
-            Assert.NotNull(lastController);
+            var lastControllerDef = _flowConfig.Controllers.LastOrDefault();
+            Assert.NotNull(lastControllerDef);
 
-            lastController
+            lastControllerDef
                 .ConfigurationDetails.Add("Item1", "Value1");
-            lastController.TypeName = "";
+            lastControllerDef.TypeName = "";
 
             // should match the display name of the controller type
-            lastController.ControllerName = "ProcessorB";
+            lastControllerDef
+                .ControllerName = "ProcessorB";
 
             _flowConfig.Save();
         }
@@ -152,10 +155,13 @@ namespace FutureState.Flow.Tests.Flow
             while (_flowController.Processed <= 20 && sw.Elapsed.TotalSeconds < 15)
                 Thread.Sleep(TimeSpan.FromSeconds(1));
 
-            foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
-                Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
-
             Assert.True(_flowController.Processed == 2);
+        }
+
+        protected void AndThenNoDuplicateFilesFromSourceShouldBeProduced()
+        {
+            foreach (var flowControllerDefinition in _flowConfig.Controllers)
+                Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }
 
         protected void ThenConfigurationSystemShouldBuildValidators()
@@ -171,10 +177,10 @@ namespace FutureState.Flow.Tests.Flow
         protected void AndThenFlowCustomConfigurationShouldBeSet()
         {
             // flow conrtroller should configure all controllers
-            IFlowFileController[] controllers = _flowController.GetControllers();
-            foreach(var controller in controllers)
+            var controllers = _flowController.GetControllers();
+            foreach (var controller in controllers)
             {
-                if(controller is TestCsvFlowController)
+                if (controller is TestCsvFlowController)
                 {
                     var testCsv = controller as TestCsvFlowController;
                     Assert.Equal("http://helplnk.etc", testCsv.ValueToConfigure);
@@ -206,24 +212,27 @@ namespace FutureState.Flow.Tests.Flow
 
             // resave
             _flowConfig.Save();
+        }
 
-            foreach (FlowControllerDefinition flowControllerDefinition in _flowConfig.Controllers)
+        protected void AndThenOutputFilesShouldNotBeDuplicated()
+        {
+            // only should produce out files once
+            foreach (var flowControllerDefinition in _flowConfig.Controllers)
                 Assert.True(Directory.GetFiles(flowControllerDefinition.Output).Length == 1);
         }
 
         public class TestCsvFlowController : CsvFlowFileController<EnitityA, EntityB>
         {
-            public string ValueToConfigure { get; set; }
-
             public TestCsvFlowController(ProcessorConfiguration<EnitityA, EntityB> config)
                 : base(config)
             {
-
             }
+
+            public string ValueToConfigure { get; set; }
 
             public override Processor<EnitityA, EntityB> GetProcessor()
             {
-                int i = 0;
+                var i = 0;
                 // preocessor service
                 return new Processor<EnitityA, EntityB>(Config)
                 {
@@ -235,7 +244,7 @@ namespace FutureState.Flow.Tests.Flow
                         dtoOut.Name = dtoIn.Name;
                         dtoOut.Id = ++i;
 
-                        if(i % 2 == 0)
+                        if (i % 2 == 0)
                             dtoOut.Value = "A"; // should not be valid
                         else
                             dtoOut.Value = "123"; // should not be valid
@@ -246,17 +255,17 @@ namespace FutureState.Flow.Tests.Flow
 
         // used in file configuration
         [DisplayName("ProcessorB")]
-        public class TestProcessResultFlowFileBatchController : ProcessResultFlowFileBatchController<EntityB, EntityC>
+        public class TestProcessResultFlowFileController : FlowSnapshotFileController<EntityB, EntityC>
         {
-            public TestProcessResultFlowFileBatchController(ProcessorConfiguration<EntityB, EntityC> config)
-       : base(config)
+            public TestProcessResultFlowFileController(ProcessorConfiguration<EntityB, EntityC> config)
+                : base(config)
             {
 
             }
 
             public override Processor<EntityB, EntityC> GetProcessor()
             {
-                int i = 0;
+                var i = 0;
                 // preocessor service
                 return new Processor<EntityB, EntityC>(Config)
                 {
@@ -292,7 +301,6 @@ namespace FutureState.Flow.Tests.Flow
             public string Name { get; set; }
 
             public int Id { get; set; }
-
 
             public DateTime DateProcessed { get; set; }
         }

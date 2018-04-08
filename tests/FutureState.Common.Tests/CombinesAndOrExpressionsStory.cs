@@ -10,8 +10,8 @@ namespace FutureState.Common.Tests
     public class CombinesAndOrExpressionsStory
     {
         private Expression<Func<TestEntity, bool>> _expression;
-        private Expression<Func<TestEntity, bool>> _expressionOr;
         private Expression<Func<TestEntity, bool>> _expressionAnd;
+        private Expression<Func<TestEntity, bool>> _expressionOr;
 
         protected void GivenAnExpression()
         {
@@ -30,19 +30,18 @@ namespace FutureState.Common.Tests
 
         protected void ThenOrExpressionShouldBeValid()
         {
-
             var ex = _expressionOr.Compile();
 
-            Assert.True(ex.Invoke(new TestEntity() { Name = "Name" }));
-            Assert.False(ex.Invoke(new TestEntity() { Name = "Name 3" }));
+            Assert.True(ex.Invoke(new TestEntity {Name = "Name"}));
+            Assert.False(ex.Invoke(new TestEntity {Name = "Name 3"}));
         }
 
         protected void ThenAndExpressionShouldBeValid()
         {
             var ex = _expressionAnd.Compile();
 
-            Assert.True(ex.Invoke(new TestEntity() { Name = "Name", Id = 1 }));
-            Assert.False(ex.Invoke(new TestEntity() { Name = "Name 3", Id = 2 }));
+            Assert.True(ex.Invoke(new TestEntity {Name = "Name", Id = 1}));
+            Assert.False(ex.Invoke(new TestEntity {Name = "Name 3", Id = 2}));
         }
 
         [BddfyFact]

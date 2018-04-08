@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Dapper.FastCrud.Configuration.DialectOptions;
+using Dapper.FastCrud.Mappings;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Dapper.FastCrud.Configuration.DialectOptions;
-using Dapper.FastCrud.Mappings;
 
 namespace Dapper.FastCrud.Configuration
 {
@@ -43,7 +43,6 @@ namespace Dapper.FastCrud.Configuration
         };
 
         private readonly List<Tuple<Regex, string>> _pluralRegexMatchesConversion = new List<Tuple<Regex, string>>();
-
 
         /// <summary>
         ///     Default constructor
@@ -113,10 +112,13 @@ namespace Dapper.FastCrud.Configuration
             {
                 case SqlDialect.MsSql:
                     return _defaultMsSqlDatabaseOptions;
+
                 case SqlDialect.PostgreSql:
                     return _defaultPostgreSqlDatabaseOptions;
+
                 case SqlDialect.MySql:
                     return _defaultMySqlDatabaseOptions;
+
                 default:
                     return _defaultGenericSqlDatabaseOptions;
             }

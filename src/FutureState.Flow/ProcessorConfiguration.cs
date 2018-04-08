@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using EmitMapper;
+﻿using EmitMapper;
 using FutureState.Specifications;
+using System;
+using System.Collections.Generic;
 
 namespace FutureState.Flow
 {
@@ -9,11 +9,13 @@ namespace FutureState.Flow
     ///     A configuration setting that can be shared across multiple different
     ///     processor types.
     /// </summary>
-    public class ProcessorConfiguration<TEntityIn, TEntityOut>
+    public class ProcessorConfiguration<TEntityIn, TEntityOut> : IProcessorConfiguration
         where TEntityOut : class, new()
     {
         private readonly IProvideSpecifications<TEntityOut> _specProviderForEntity;
         private readonly IProvideSpecifications<IEnumerable<TEntityOut>> _specProviderForEntityCollection;
+        private string _inDirectory;
+        private string _outDirectory;
 
         /// <summary>
         ///     Creates a new instance.
@@ -33,33 +35,55 @@ namespace FutureState.Flow
             _specProviderForEntityCollection = specProviderForEntityCollection;
 
             Mapper = mapper ?? ObjectMapperManager.DefaultInstance.GetMapper<TEntityIn, TEntityOut>();
+
+            // define the input and output target data  
+            _outDirectory = Environment.CurrentDirectory;
+            _inDirectory = Environment.CurrentDirectory;
         }
+
+
+        /// <summary>
+        ///     The data source directory to read data files from.
+        /// </summary>
+        public string InDirectory
+        {
+            get => _inDirectory;
+            set
+            {
+                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(InDirectory));
+
+                _inDirectory = value;
+            }
+        }
+
+        /// <summary>
+        ///     The directory to process flow files to.
+        /// </summary>
+        public string OutDirectory
+        {
+            get => _outDirectory;
+            set
+            {
+                Guard.ArgumentNotNullOrEmptyOrWhiteSpace(value, nameof(OutDirectory));
+
+                _outDirectory = value;
+            }
+        }
+
 
         /// <summary>
         ///     Gets the rules to process/validate outgoing entities.
         /// </summary>
-        public IEnumerable<ISpecification<TEntityOut>> Rules
-        {
-            get
-            {
-                return _specProviderForEntity.GetSpecifications();
-            }
-        }
+        public IEnumerable<ISpecification<TEntityOut>> Rules => _specProviderForEntity.GetSpecifications();
 
         /// <summary>
         ///     Gets the default mapper to use to map incoming entities to outgoing entities.
         /// </summary>
         public ObjectsMapper<TEntityIn, TEntityOut> Mapper { get; }
-
         /// <summary>
         ///     Gets the rules to use to validate a collection of materialized entities.
         /// </summary>
-        public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules
-        {
-            get
-            {
-                return _specProviderForEntityCollection.GetSpecifications();
-            }
-        }
+        public IEnumerable<ISpecification<IEnumerable<TEntityOut>>> CollectionRules =>
+            _specProviderForEntityCollection.GetSpecifications();
     }
 }

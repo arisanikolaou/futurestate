@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
+using Dapper.FastCrud.Mappings;
+using Dapper.FastCrud.SqlBuilders;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Dapper.FastCrud.Configuration.StatementOptions.Aggregated;
-using Dapper.FastCrud.Mappings;
-using Dapper.FastCrud.SqlBuilders;
 
 namespace Dapper.FastCrud.SqlStatements
 {
@@ -97,7 +97,7 @@ namespace Dapper.FastCrud.SqlStatements
                 keyEntity,
                 false,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds, relationshipInstanceBuilder);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds, relationshipInstanceBuilder);
             return FilterDuplicates(queriedEntityIdentities).SingleOrDefault();
         }
 
@@ -123,7 +123,7 @@ namespace Dapper.FastCrud.SqlStatements
                 keyEntity,
                 false,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds, relationshipInstanceBuilder);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds, relationshipInstanceBuilder);
 
             // a problem in the Dapper library would cause this function to fail
             // see https://github.com/StackExchange/dapper-dot-net/issues/596 for more info
@@ -149,7 +149,7 @@ namespace Dapper.FastCrud.SqlStatements
                 statement,
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace Dapper.FastCrud.SqlStatements
                 statement,
                 statementOptions.Parameters,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds);
+                (int?)statementOptions.CommandTimeout?.TotalSeconds);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Dapper.FastCrud.SqlStatements
                 statementOptions.Parameters,
                 !statementOptions.ForceStreamResults,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds,
+                (int?)statementOptions.CommandTimeout?.TotalSeconds,
                 relationshipInstanceBuilder);
             return FilterDuplicates(queriedEntityIdentities);
         }
@@ -239,7 +239,7 @@ namespace Dapper.FastCrud.SqlStatements
                 statementOptions.Parameters,
                 !statementOptions.ForceStreamResults,
                 statementOptions.Transaction,
-                (int?) statementOptions.CommandTimeout?.TotalSeconds,
+                (int?)statementOptions.CommandTimeout?.TotalSeconds,
                 relationshipInstanceBuilder);
 
             // a problem in the Dapper library would cause this function to fail

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Globalization;
-using Dapper.FastCrud.EntityDescriptors;
+﻿using Dapper.FastCrud.EntityDescriptors;
 using Dapper.FastCrud.Mappings;
+using System;
+using System.Globalization;
 
 namespace Dapper.FastCrud.Formatters
 {
@@ -91,13 +91,17 @@ namespace Dapper.FastCrud.Formatters
             {
                 case SqlParameterElementType.Column:
                     return sqlBuilder.GetColumnName(ParameterValue);
+
                 case SqlParameterElementType.Table:
                     return sqlBuilder.GetTableName();
+
                 case SqlParameterElementType.TableAndColumn:
                     return string.Format(CultureInfo.InvariantCulture, "{0}.{1}", sqlBuilder.GetTableName(),
                         sqlBuilder.GetColumnName(ParameterValue));
+
                 case SqlParameterElementType.Identifier:
                     return sqlBuilder.GetDelimitedIdentifier(ParameterValue);
+
                 default:
                     throw new InvalidOperationException($"Unknown SQL element type {ElementType}");
             }
@@ -120,7 +124,7 @@ namespace Dapper.FastCrud.Formatters
         /// </returns>
         public override string ToString()
         {
-            // this really shouldn't be called directly. 
+            // this really shouldn't be called directly.
             return ToString(null, null);
         }
     }

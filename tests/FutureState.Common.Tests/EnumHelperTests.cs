@@ -27,6 +27,5 @@ namespace FutureState.Common.Tests
             var result2 = EnumHelper.GetEnumOrNull<Numbers>("One2");
             Assert.Null(result2);
         }
-
     }
 }

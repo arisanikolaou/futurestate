@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Dapper.Extensions.Linq.Core.Enums;
+using Dapper.Extensions.Linq.Core.Mapper;
+using Dapper.FluentMap.Dommel.Mapping;
+using FutureState;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using Dapper.Extensions.Linq.Core.Enums;
-using Dapper.Extensions.Linq.Core.Mapper;
-using Dapper.FluentMap.Dommel.Mapping;
-using FutureState;
 
 namespace Dapper.Extensions.Linq.Mapper
 {
@@ -111,7 +111,7 @@ namespace Dapper.Extensions.Linq.Mapper
             if (type.FullName == LinqBinary)
                 return DbType.Binary;
             if (typeof(IEnumerable).IsAssignableFrom(type))
-                return (DbType) (-1);
+                return (DbType)(-1);
 
             return DbType.Object;
         }

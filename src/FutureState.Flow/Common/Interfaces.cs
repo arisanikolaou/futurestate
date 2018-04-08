@@ -1,26 +1,31 @@
 ﻿using FutureState.Flow.Controllers;
 using FutureState.Flow.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FutureState.Flow
 {
 
     public interface IFlowFileControllerFactory
     {
+        /// <summary>
+        ///     Creates a flow file controller from a given controller type.
+        /// </summary>
+        /// <param name="type">An instance of IFlowFileController.</param>
+        /// <returns></returns>
         IFlowFileController Create(Type type);
     }
 
     public interface IFlowFileLogRepositoryFactory
     {
-        FlowFileLogRepository Get();
+        /// <summary>
+        ///     Gets/creates the flow snapshot log repo.
+        /// </summary>
+        /// <returns></returns>
+        FlowFileLogRepo Get();
     }
 
     public interface IFlowFileControllerServiceFactory
     {
-        FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller);
+        FlowFileControllerService Get(IFlowFileLogRepo repository, IFlowFileController controller);
     }
 }

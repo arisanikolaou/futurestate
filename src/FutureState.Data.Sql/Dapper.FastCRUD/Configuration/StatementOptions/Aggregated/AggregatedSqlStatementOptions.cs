@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dapper.FastCrud.Mappings;
+using Dapper.FastCrud.SqlStatements;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using Dapper.FastCrud.Mappings;
-using Dapper.FastCrud.SqlStatements;
 
 namespace Dapper.FastCrud.Configuration.StatementOptions.Aggregated
 {

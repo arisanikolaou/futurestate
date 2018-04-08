@@ -37,7 +37,6 @@ namespace FutureState.Specifications
             ErrorMessage = $"'{_fieldName}' cannot be an empty guid: {typeName}";
 
             return new ValidationResult(ErrorMessage);
-
         }
     }
 }

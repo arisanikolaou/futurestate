@@ -6,20 +6,11 @@ namespace FutureState.Common.Tests
 {
     public class DictionaryExtensionTests
     {
-        [Fact]
-        public void CreateUniqueDictionaryFromList()
+        public class TestClass
         {
-            var list = new List<TestClass>()
-            {
-                new TestClass() {Id = 1, Name = "Name"},
-                new TestClass() {Id = 1, Name = "Name 2"}
-            };
+            public int Id { get; set; }
 
-            var dict = list.ToUniqueDictionary(m => m.Id, m => m.Name);
-
-            Assert.Single(dict);
-
-            Assert.Equal("Name", dict.Values.First());
+            public string Name { get; set; }
         }
 
 
@@ -38,7 +29,7 @@ namespace FutureState.Common.Tests
                 ["Name 3"] = 3
             };
 
-            IDictionary<string, int> merged = dict.Merge(dict2);
+            var merged = dict.Merge(dict2);
 
             Assert.Equal(3, merged.Count);
             Assert.True(merged.ContainsKey("Name 3"));
@@ -82,6 +73,22 @@ namespace FutureState.Common.Tests
         }
 
         [Fact]
+        public void CreateUniqueDictionaryFromList()
+        {
+            var list = new List<TestClass>
+            {
+                new TestClass {Id = 1, Name = "Name"},
+                new TestClass {Id = 1, Name = "Name 2"}
+            };
+
+            var dict = list.ToUniqueDictionary(m => m.Id, m => m.Name);
+
+            Assert.Single(dict);
+
+            Assert.Equal("Name", dict.Values.First());
+        }
+
+        [Fact]
         public void GetGetValueOrDefault()
         {
             var dict = new Dictionary<string, int>
@@ -92,14 +99,6 @@ namespace FutureState.Common.Tests
 
             Assert.Equal(2, dict.Get("Name 2"));
             Assert.Equal(0, dict.Get("Name 3"));
-        }
-
-
-        public class TestClass
-        {
-            public int Id { get; set; }
-
-            public string Name { get; set; }
         }
     }
 }

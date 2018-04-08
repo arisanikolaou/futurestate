@@ -1,5 +1,5 @@
-﻿using System.Data;
-using Dapper.Extensions.Linq.Core.Enums;
+﻿using Dapper.Extensions.Linq.Core.Enums;
+using System.Data;
 
 namespace Dapper.Extensions.Linq.Core.Mapper
 {

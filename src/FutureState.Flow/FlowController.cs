@@ -1,84 +1,62 @@
-﻿using System;
+﻿using FutureState.Diagnostics;
+using FutureState.Flow.Controllers;
+using FutureState.Reflection;
+using FutureState.Specifications;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using FutureState.Flow.Controllers;
-using FutureState.Flow.Data;
-using FutureState.Reflection;
-using NLog;
 
 namespace FutureState.Flow
 {
-    using FutureState.Specifications;
-
-    public interface IFlowFileControllerFactory
-    {
-        IFlowFileController Create(Type type);
-    }
-
-    public interface IFlowFileLogRepositoryFactory
-    {
-        FlowFileLogRepository Get();
-    }
-
-    public interface IFlowFileControllerServiceFactory
-    {
-        FlowFileControllerService Get(IFlowFileLogRepository repository, IFlowFileController controller);
-    }
-
     /// <summary>
     ///     Controls how flow files are processed.
     /// </summary>
     public class FlowController : IDisposable
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        ///     Gets the number of flow file processed.
-        /// </summary>
-        public long Processed { get; private set; }
+        private static readonly Dictionary<string, Type> _dictOfControllerTypes;
+        private readonly IFlowFileControllerFactory _flowControllerFactory;
+        private readonly IList<IFlowFileController> _flowControllers;
+        private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
+        private readonly IFlowFileLogRepositoryFactory _flowFileLogFactory;
+        private readonly ISpecProviderFactory _specProviderFactory;
 
         private FlowConfiguration _config;
         private FlowFileControllerService _processor;
-        private readonly List<IFlowFileController> _flowControllers;
-        private readonly IFlowFileControllerFactory _flowControllerFactory;
-        private readonly IFlowFileLogRepositoryFactory _flowFileLogFactory;
-        private readonly IFlowFileControllerServiceFactory _flowControllerServiceFactory;
-        private readonly ISpecProviderFactory _specProviderFactory;
         private bool _started;
-        private static readonly Dictionary<string, Type> _dictTypes;
 
+        /// <summary>
+        ///     Setup static dictionary of types that implement IFlowFileController
+        /// </summary>
         static FlowController()
         {
             // scan assemblies
-            AppTypeScanner appTypeScanner = AppTypeScanner.Default;
+            var appTypeScanner = AppTypeScanner.Default;
 
-            List<Lazy<Type>> controllerTypes = appTypeScanner
+            var controllerTypes = appTypeScanner
                 .GetTypes<IFlowFileController>()
                 .ToList();
 
-            _dictTypes = new Dictionary<string, Type>();
+            _dictOfControllerTypes = new Dictionary<string, Type>();
+
+            // controller types
             foreach (var controllerType in controllerTypes)
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
-                _dictTypes.Add(controllerType.Value.AssemblyQualifiedName, controllerType.Value);
+                _dictOfControllerTypes.Add(controllerType.Value.AssemblyQualifiedName, controllerType.Value);
 
                 var attribute = controllerType.Value.GetCustomAttribute<DisplayNameAttribute>();
                 if (attribute != null)
-                    _dictTypes[attribute.DisplayName] = controllerType.Value;
+                    _dictOfControllerTypes[attribute.DisplayName] = controllerType.Value;
             }
-
         }
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="flowControllerFactory"></param>
-        /// <param name="flowFileLogFactory"></param>
-        /// <param name="flowControllerServiceFactory"></param>
-        /// <param name="specProviderFactor"></param>
         public FlowController(
             IFlowFileControllerFactory flowControllerFactory,
             IFlowFileLogRepositoryFactory flowFileLogFactory,
@@ -94,28 +72,52 @@ namespace FutureState.Flow
             _flowFileLogFactory = flowFileLogFactory;
             _flowControllerServiceFactory = flowControllerServiceFactory;
             _specProviderFactory = specProviderFactor;
-
             _flowControllers = new List<IFlowFileController>();
+        }
+
+        /// <summary>
+        ///     Gets the number of flow file processed.
+        /// </summary>
+        public long Processed { get; private set; }
+
+        /// <summary>
+        ///     Gets whether the processor has started.
+        /// </summary>
+        public bool HasStarted => _started;
+
+        /// <summary>
+        ///     Disposes.
+        /// </summary>
+        public void Dispose()
+        {
+            Stop();
         }
 
         /// <summary>
         ///     Starts the flow.
         /// </summary>
-        /// <param name="config">The configuration to use.</param>
+        /// <param name="config">
+        ///     The configuration to use.
+        /// </param>
         public void Start(FlowConfiguration config)
         {
             Guard.ArgumentNotNull(config, nameof(config));
 
             _config = config;
 
+            if (_logger.IsDebugEnabled)
+                _logger.Debug($"Starting all controllers.");
+
             // start controllers in sequential order
             foreach (var flowControllerDefinitionse in _config.Controllers
                 .OrderBy(m => m.ExecutionOrder))
+            {
                 StartController(flowControllerDefinitionse);
+            }
 
             _started = true;
 
-            if(_logger.IsDebugEnabled)
+            if (_logger.IsDebugEnabled)
                 _logger.Debug($"Started all controllers.");
         }
 
@@ -135,25 +137,27 @@ namespace FutureState.Flow
         {
             Guard.ArgumentNotNull(definition, nameof(definition));
 
-            if(_logger.IsDebugEnabled)
-                _logger.Debug($"Starting controller {definition.ControllerName}");
+            if (_logger.IsDebugEnabled)
+                _logger.Debug($"Starting controller {definition.ControllerName}.");
 
             //flow controller type
             Type flowControllerType;
 
             // resolve from precompiled list of well known processors
             // or assembly resolve
-            if (_dictTypes.ContainsKey(definition.ControllerName))
-                flowControllerType = _dictTypes[definition.ControllerName];
+            if (_dictOfControllerTypes.ContainsKey(definition.ControllerName))
+                flowControllerType = _dictOfControllerTypes[definition.ControllerName];
             else
                 flowControllerType = Type.GetType(definition.TypeName);
 
             // ReSharper disable once UsePatternMatching
             IFlowFileController flowController = _flowControllerFactory
                 .Create(flowControllerType);
+
+            // flow controller
             if (flowController == null)
                 throw new InvalidOperationException(
-                    $"Controller type does not implement {typeof(IFlowFileController).Name}");
+                    $"Controller type does not implement {typeof(IFlowFileController).Name}.");
 
             // build rules that will be used to validate outgoing entitities
             var specProviderBuilder = new SpecProviderBuilder(_specProviderFactory);
@@ -161,14 +165,31 @@ namespace FutureState.Flow
             // spec providers expected to be single instance in
             // the application's scope
             if (definition.FieldValidationRules != null)
-                specProviderBuilder.Build(
-                    flowController.OutputType,
-                    definition.FieldValidationRules.ToList());
+            {
+                Type type = null;
 
-            // configure
-            flowController.InDirectory = definition.Input;
-            flowController.OutDirectory = definition.Output;
-            flowController.FlowId = _config.FlowId;
+                if (_logger.IsTraceEnabled)
+                    _logger.Trace($"Activating controller type {flowController?.TargetEntityType?.AssemblyQualifiedTypeName}.");
+
+                try
+                {
+                    type = Type.GetType(flowController.TargetEntityType.AssemblyQualifiedTypeName);
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException($"Can't load type {flowController.TargetEntityType.AssemblyQualifiedTypeName}.", ex);
+                }
+
+                specProviderBuilder.Build(
+                    type,
+                    definition.FieldValidationRules.ToList());
+            }
+
+            // configure data source log
+            flowController.Config.InDirectory = definition.Input;
+            flowController.Config.OutDirectory = definition.Output;
+
+            flowController.Flow = _config.Flow;
             flowController.ControllerName = definition.ControllerName;
 
             // apply controller configuration details
@@ -176,38 +197,32 @@ namespace FutureState.Flow
             {
                 var type = flowController.GetType();
 
+                if (_logger.IsDebugEnabled)
+                    _logger.Debug($"Configuring properties of controller type {type.Name} has been initialized.");
+
                 foreach (var configDetail in definition.ConfigurationDetails)
                 {
                     var property = type.GetProperty(configDetail.Key);
                     if (property != null)
-                    {
                         if (property.GetSetMethod() != null)
-                        {
                             property.SetValue(flowController, configDetail.Value);
-                        }
-                    }
                 }
             }
 
-            flowController.Initialize(); // complete initialization
+            // complete initialization
+            flowController.Initialize(); 
 
             if (_logger.IsDebugEnabled)
                 _logger.Debug($"Flow controller {definition.ControllerName} has been initialized.");
 
-            // resolve repository to store flow file process details
-            var logRepository = _flowFileLogFactory.Get();
-            logRepository.WorkingFolder = _config.BasePath;
 
-            FlowFileControllerService processor = _flowControllerServiceFactory.Get(logRepository, flowController);
+            FlowFileControllerService processor = GetControllerService(flowController);
 
             // configure polling internval
             processor.Interval = TimeSpan.FromSeconds(definition.PollInterval);
 
             // log how many files were processed
-            processor.FlowFileProcessed += (o, e) =>
-            {
-                Processed++;
-            };
+            processor.FlowFileProcessed += (o, e) => { Processed++; };
 
             // start reading from incoming data source
             processor.Start();
@@ -222,27 +237,38 @@ namespace FutureState.Flow
             _flowControllers.Add(flowController);
         }
 
+        FlowFileControllerService GetControllerService(IFlowFileController flowController)
+        {
+            // resolve repository to store flow file process details
+            var logRepository = _flowFileLogFactory.Get();
+
+            // set base path for the flow
+            logRepository.DataDir = _config.BasePath;
+
+            FlowFileControllerService processor = _flowControllerServiceFactory.Get(logRepository, flowController);
+
+            return processor;
+        }
+
+        /// <summary>
+        ///     Stop processing data from the incoming data store.
+        /// </summary>
         public void Stop()
         {
             if (!_started)
                 return; // already stopped
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Stopping flow {this._config.FlowId}.");
+                _logger.Debug($"Stopping flow {_config.Flow}.");
 
             _processor?.Dispose();
 
             _flowControllers.Each(m => m.Dispose());
 
             if (_logger.IsDebugEnabled)
-                _logger.Debug($"Stopped flow {this._config.FlowId}.");
+                _logger.Debug($"Stopped flow {_config.Flow}.");
 
             _started = false;
-        }
-
-        public void Dispose()
-        {
-            Stop();
         }
     }
 }

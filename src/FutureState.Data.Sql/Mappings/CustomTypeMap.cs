@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Dapper;
 
 namespace FutureState.Data.Sql.Mappings
 {

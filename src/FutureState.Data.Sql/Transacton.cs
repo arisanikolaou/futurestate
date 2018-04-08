@@ -3,7 +3,7 @@ using System.Data;
 namespace FutureState.Data.Sql
 {
     /// <summary>
-    ///     A wrapper around <see cref="IDbTransaction"/> transaction.
+    ///     A wrapper around <see cref="IDbTransaction" /> transaction.
     /// </summary>
     public class Transacton : ITransaction
     {
@@ -21,7 +21,6 @@ namespace FutureState.Data.Sql
         }
 
         /// <summary>
-        /// 
         /// </summary>
         public IDbTransaction UnderlyingTransaction { get; }
 

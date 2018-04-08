@@ -5,8 +5,8 @@ using System.Linq;
 namespace FutureState.Data
 {
     /// <summary>
-    ///     Adapts a repository to write entities via a repository 
-    /// throgh a consistent data store session.
+    ///     Adapts a repository to write entities via a repository
+    ///     throgh a consistent data store session.
     /// </summary>
     public class EntitySetWriter<TEntity, TKey> : IWriter<TEntity, TKey>
     {
@@ -33,7 +33,6 @@ namespace FutureState.Data
             ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.Delete(entity));
-            _uow._deleted.Add(entity);
         }
 
 
@@ -42,7 +41,6 @@ namespace FutureState.Data
             ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.DeleteAll());
-            _uow._deleted.Add(_repositoryFunc.Invoke(_uow.Session).GetAll());
         }
 
         public void DeleteById(TKey key)
@@ -50,7 +48,6 @@ namespace FutureState.Data
             ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.DeleteById(key));
-            _uow._deleted.Add(key); // don't add entity
         }
 
         public void Insert(TEntity entity)
@@ -58,7 +55,6 @@ namespace FutureState.Data
             ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.Insert(entity));
-            _uow._inserted.Add(entity);
         }
 
         public void Insert(IEnumerable<TEntity> entities)
@@ -70,8 +66,6 @@ namespace FutureState.Data
 
             _uow._executionQueue.Enqueue(() => Writer.Insert(local));
 
-            foreach (var entity in local)
-                _uow._inserted.Add(entity);
         }
 
         public void Update(TEntity entity)
@@ -79,7 +73,6 @@ namespace FutureState.Data
             ValidateAction();
 
             _uow._executionQueue.Enqueue(() => Writer.Update(entity));
-            _uow._modified.Add(entity);
         }
 
         public void Update(IEnumerable<TEntity> entities)
@@ -92,7 +85,6 @@ namespace FutureState.Data
             var entityList = entities.ToList();
 
             _uow._executionQueue.Enqueue(() => Writer.Update(entityList));
-            entityList.Each(entity => _uow._modified.Add(entity));
         }
 
 

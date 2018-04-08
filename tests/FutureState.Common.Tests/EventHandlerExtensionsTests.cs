@@ -7,10 +7,41 @@ namespace FutureState.Common.Tests
 {
     public class EventHandlerExtensionsTests
     {
-        event EventHandler<MyEventArgs> Event1;
-        event EventHandler Event2;
-        event EventHandler<MyEventArgs> Event3;
-        event EventHandler Event4;
+        private event EventHandler<MyEventArgs> Event1;
+        private event EventHandler Event2;
+        private event EventHandler<MyEventArgs> Event3;
+        private event EventHandler Event4;
+
+
+        private void EventHandlerExtensionsTestsEvent1(object sender, EventArgs evtArgs)
+        {
+            var args = evtArgs as MyEventArgs;
+
+            if (args.ThrowExceptionAfterHitCount == args.HitCount)
+                throw new Exception($"Exception {args.HitCount}.");
+
+            args.HitCount++;
+        }
+
+        private void EventHandlerExtensionsTestsEvent1(object sender, MyEventArgs args)
+        {
+            if (args.ThrowExceptionAfterHitCount == args.HitCount)
+                throw new Exception($"Exception {args.HitCount}.");
+
+            args.HitCount++;
+        }
+
+        private void AlwaysThrowException(object sender, EventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public class MyEventArgs : EventArgs
+        {
+            public int ThrowExceptionAfterHitCount { get; set; }
+
+            public int HitCount { get; set; }
+        }
 
         [Fact]
         public void RaisesEventsToAllSubscribersSpecialized()
@@ -19,13 +50,16 @@ namespace FutureState.Common.Tests
             Event1 += EventHandlerExtensionsTestsEvent1;
             Event1 += AlwaysThrowException;
 
-            var args = new MyEventArgs() { ThrowExceptionAfterHitCount = 1 };
+            var args = new MyEventArgs {ThrowExceptionAfterHitCount = 1};
             var errors = new List<Exception>();
 
             // ReSharper disable once ConvertToLocalFunction
-            Action<Exception> handler = exception => {
-                lock(this)
+            Action<Exception> handler = exception =>
+            {
+                lock (this)
+                {
                     errors.Add(exception);
+                }
             };
 
             // act
@@ -41,7 +75,7 @@ namespace FutureState.Common.Tests
             args.HitCount = 0;
 
             // asset
-            Event1.AsyncRaiseSafe(this, args, handler).Wait();//pass
+            Event1.AsyncRaiseSafe(this, args, handler).Wait(); //pass
 
             Assert.Equal(1, args.HitCount);
         }
@@ -53,7 +87,7 @@ namespace FutureState.Common.Tests
             Event2 += EventHandlerExtensionsTestsEvent1;
             Event2 += AlwaysThrowException;
 
-            var args = new MyEventArgs() { ThrowExceptionAfterHitCount = 1 };
+            var args = new MyEventArgs {ThrowExceptionAfterHitCount = 1};
             var errors = new List<Exception>();
 
             // ReSharper disable once ConvertToLocalFunction
@@ -64,14 +98,14 @@ namespace FutureState.Common.Tests
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
             Event2.AsyncRaiseSafe(this, args, handler).Wait(); //2 fail
 
-            Thread.Sleep(1000); //avoid race condition
+            Thread.Sleep(1500); //avoid race condition
 
             Assert.Equal(5, errors.Count);
             Assert.Equal(1, args.HitCount);
 
             args.HitCount = 0;
 
-            Event2.AsyncRaiseSafe(this, args, handler).Wait();//pass
+            Event2.AsyncRaiseSafe(this, args, handler).Wait(); //pass
 
             Assert.Equal(1, args.HitCount);
         }
@@ -84,7 +118,7 @@ namespace FutureState.Common.Tests
             Event3 += EventHandlerExtensionsTestsEvent1;
             Event3 += AlwaysThrowException;
 
-            var args = new MyEventArgs() { ThrowExceptionAfterHitCount = 1 };
+            var args = new MyEventArgs {ThrowExceptionAfterHitCount = 1};
             var errors = new List<Exception>();
 
             // ReSharper disable once ConvertToLocalFunction
@@ -100,7 +134,7 @@ namespace FutureState.Common.Tests
 
             args.HitCount = 0;
 
-            Event3.RaiseSafe(this, args, handler);//pass
+            Event3.RaiseSafe(this, args, handler); //pass
 
             Assert.Equal(1, args.HitCount);
         }
@@ -112,7 +146,7 @@ namespace FutureState.Common.Tests
             Event4 += EventHandlerExtensionsTestsEvent1;
             Event4 += AlwaysThrowException;
 
-            var args = new MyEventArgs() { ThrowExceptionAfterHitCount = 1 };
+            var args = new MyEventArgs {ThrowExceptionAfterHitCount = 1};
             var errors = new List<Exception>();
 
             // ReSharper disable once ConvertToLocalFunction
@@ -129,40 +163,9 @@ namespace FutureState.Common.Tests
             args.HitCount = 0;
 
             // act
-            Event4.RaiseSafe(this, args, handler);//pass
+            Event4.RaiseSafe(this, args, handler); //pass
 
             Assert.Equal(1, args.HitCount);
-        }
-
-
-        void EventHandlerExtensionsTestsEvent1(object sender, EventArgs evtArgs)
-        {
-            MyEventArgs args = evtArgs as MyEventArgs;
-
-            if (args.ThrowExceptionAfterHitCount == args.HitCount)
-                throw new Exception($"Exception {args.HitCount}.");
-
-            args.HitCount++;
-        }
-
-        void EventHandlerExtensionsTestsEvent1(object sender, MyEventArgs args)
-        {
-            if (args.ThrowExceptionAfterHitCount == args.HitCount)
-                throw new Exception($"Exception {args.HitCount}.");
-
-            args.HitCount++;
-        }
-
-        void AlwaysThrowException(object sender, EventArgs args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public class MyEventArgs : EventArgs
-        {
-            public int ThrowExceptionAfterHitCount { get; set; }
-
-            public int HitCount { get; set; }
         }
     }
 }

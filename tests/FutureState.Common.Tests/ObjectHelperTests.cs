@@ -21,7 +21,7 @@ namespace FutureState.Common.Tests
         [Fact]
         public void CanCompareTwoEquivalentEntities2()
         {
-            var equals = ObjectHelper.AreValuesEqual(new TestEntity {Id = 1}, new TestEntity());
+            var equals = ObjectHelper.AreValuesEqual(new TestEntity { Id = 1 }, new TestEntity());
 
             Assert.False(equals);
         }
@@ -29,7 +29,7 @@ namespace FutureState.Common.Tests
         [Fact]
         public void CanCompareTwoEquivalentEntities3()
         {
-            var equals = ObjectHelper.AreValuesEqual(new TestEntity {Id = 1}, new TestEntity {Id = 1});
+            var equals = ObjectHelper.AreValuesEqual(new TestEntity { Id = 1 }, new TestEntity { Id = 1 });
 
             Assert.True(equals);
         }

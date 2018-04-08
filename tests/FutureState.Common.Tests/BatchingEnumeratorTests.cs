@@ -9,15 +9,15 @@ namespace FutureState.Common.Tests
     [Story]
     public class BatchingEnumeratorTests
     {
-        List<TestEntity> _list;
-        int _batches;
-        int _totalItems;
+        private int _batches;
+        private List<TestEntity> _list;
+        private int _totalItems;
 
         protected void GivenAEnumeration()
         {
-            this._list = new List<TestEntity>();
-            for (int i = 0; i < 100; i++)
-                _list.Add(new TestEntity { Id = i });
+            _list = new List<TestEntity>();
+            for (var i = 0; i < 100; i++)
+                _list.Add(new TestEntity {Id = i});
         }
 
         protected void WhenRequestingBatchesOfNotMoreThanXUnits()

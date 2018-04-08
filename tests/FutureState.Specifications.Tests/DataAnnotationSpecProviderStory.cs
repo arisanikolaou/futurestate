@@ -27,11 +27,10 @@ namespace FutureState.Specifications.Tests
 
         private void AndWhenValidatingAValidEntity()
         {
-            _invalidEntity = new TestEntity {Name = "Name"};
+            _invalidEntity = new TestEntity { Name = "Name" };
 
             _errorsOnValidEntity = _subject.GetSpecifications().ToErrors(_invalidEntity).ToArray();
         }
-
 
         private void ShouldReportErrorsAsAppropriate()
         {

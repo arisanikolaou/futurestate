@@ -5,9 +5,6 @@
     /// </summary>
     public interface IProcessor
     {
-        /// <summary>
-        ///     Gets the process display name.
-        /// </summary>
-        string ProcessName { get; }
+
     }
 }

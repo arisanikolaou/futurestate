@@ -6,15 +6,13 @@ namespace FutureState.Common.Tests
 {
     public class ExpressionExtensionsTests
     {
-        [Fact]
-        public void GetsPropertyInfoFromExpression()
+        public class TestEntity
         {
-            Expression<Func<TestEntity, int>> expression = entity => entity.Id;
+            public int Id { get; set; }
 
-            var propertyInfo = expression.GetMemberInfo();
-
-            Assert.NotNull(propertyInfo);
-            Assert.Equal("Id", propertyInfo.Name);
+            public void Method1()
+            {
+            }
         }
 
         [Fact]
@@ -27,14 +25,15 @@ namespace FutureState.Common.Tests
             Assert.Equal("Id", name);
         }
 
-        public class TestEntity
+        [Fact]
+        public void GetsPropertyInfoFromExpression()
         {
-            public int Id { get; set; }
+            Expression<Func<TestEntity, int>> expression = entity => entity.Id;
 
-            public void Method1()
-            {
+            var propertyInfo = expression.GetMemberInfo();
 
-            }
+            Assert.NotNull(propertyInfo);
+            Assert.Equal("Id", propertyInfo.Name);
         }
     }
 }

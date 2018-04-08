@@ -1,58 +1,48 @@
 ﻿using System;
 using System.IO;
-using FutureState.Flow.Model;
 
 namespace FutureState.Flow.Controllers
 {
     /// <summary>
-    ///     Controls how batches of data flow into batch processors for processing (loading and/or transformation).
+    ///     Controls how batches of data flow into flow file processors.
     /// </summary>
+    /// <remarks>
+    ///     Ensures that only unique files are pulled from an incoming data source.
+    /// </remarks>
     public interface IFlowFileController : IDisposable
     {
         /// <summary>
         ///     Gets the type of entity being processed.
         /// </summary>
-        Type InputType { get; }
+        FlowEntity SourceEntityType { get; }
 
         /// <summary>
-        ///     Gets the output type.
+        ///     Gets the output entity type to produce.
         /// </summary>
-        Type OutputType { get; }
+        FlowEntity TargetEntityType { get; }
 
         /// <summary>
-        ///     Gets the display name of the processor.
+        ///     Gets the display name of the flow file controller.
         /// </summary>
         string ControllerName { get; set; }
 
         /// <summary>
-        ///     Gets the process id.
+        ///     Gets the flow.
         /// </summary>
-        Guid FlowId { get; set; }
+        FlowId Flow { get; set; }
 
         /// <summary>
-        ///     Gets the input directory or port.
+        ///     Gets the configuration used by the instance.
         /// </summary>
-        string InDirectory { get; set; }
+        IProcessorConfiguration Config { get; }
 
         /// <summary>
-        ///     Gets the output directory or port.
-        /// </summary>
-        string OutDirectory { get; set; }
-
-        /// <summary>
-        ///     Processes a batch of data from an incoming flow file within a batch process.
+        ///     Processes an incoming flow file.
         /// </summary>
         /// <param name="flowFile">The flow file to process.</param>
-        /// <param name="process">The batch processor.</param>
+        /// <param name="flowBatch">The current batch process running.</param>
         /// <returns></returns>
-        ProcessResult Process(FileInfo flowFile, BatchProcess process);
-
-        /// <summary>
-        ///     Gets the next batch to process.
-        /// </summary>
-        /// <param name="log">The log containing the list of files processed.</param>
-        /// <returns></returns>
-        FileInfo GetNextFlowFile(FlowFileLog log);
+        FlowSnapshot Process(FileInfo flowFile, FlowBatch flowBatch);
 
         /// <summary>
         ///     Initializes the controller.

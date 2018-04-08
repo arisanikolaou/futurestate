@@ -7,7 +7,7 @@ namespace FutureState.Data.Tests
         [Fact]
         public void PageResponseShouldInitializeWithValidValues()
         {
-            var col = new[] {1, 2, 3};
+            var col = new[] { 1, 2, 3 };
             var subject = new PageResponse<int>(col, 5);
 
             Assert.Equal(5, subject.TotalCount);

@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Dapper.FastCrud.Mappings;
+﻿using Dapper.FastCrud.Mappings;
+using System.Linq;
 
 namespace Dapper.FastCrud.SqlStatements
 {

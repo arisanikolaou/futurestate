@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Dapper.FluentMap.Dommel.Mapping;
+using System;
 using System.Collections.Generic;
-using Dapper.FluentMap.Dommel.Mapping;
 
 namespace Dapper.Extensions.Linq.Core.Mapper
 {

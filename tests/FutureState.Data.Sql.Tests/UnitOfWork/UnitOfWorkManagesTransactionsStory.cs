@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Dapper.Extensions.Linq.Core.Configuration;
+﻿using Dapper.Extensions.Linq.Core.Configuration;
 using Dapper.Extensions.Linq.Core.Mapper;
 using Dapper.Extensions.Linq.Sql;
 using FutureState.Data.Sql.Mappings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TestStack.BDDfy;
 using TestStack.BDDfy.Xunit;
 using Xunit;
@@ -17,8 +17,8 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         [BddfyFact]
         public void UnitOfWorkManagesTransactionsNoOpCommitPolicy()
         {
-            this._commitPolicy = new CommitPolicyNoOp(); // don't rely on sql transaction
-            this._dbName = "UnitOfWorkManagesTransactionsNoOpCommitPolicy";
+            _commitPolicy = new CommitPolicyNoOp(); // don't rely on sql transaction
+            _dbName = "UnitOfWorkManagesTransactionsNoOpCommitPolicy";
 
             this.BDDfy();
         }
@@ -30,8 +30,8 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         [BddfyFact]
         public void UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicy()
         {
-            this._commitPolicy = new CommitPolicy(); // always create sql transaction
-            this._dbName = "UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicy";
+            _commitPolicy = new CommitPolicy(); // always create sql transaction
+            _dbName = "UnitOfWorkManagesTransactionsSqlTransactionalCommitPolicy";
 
             this.BDDfy();
         }
@@ -45,7 +45,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         [BddfyFact]
         public void UnitOfWorkManagesTransactionsWithInMemRepository()
         {
-            this._dbName = "UnitOfWorkManagesTransactionsWithInMemRepository";
+            _dbName = "UnitOfWorkManagesTransactionsWithInMemRepository";
 
             this.BDDfy();
         }
@@ -54,19 +54,15 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         {
             if (_repository == null)
             {
-                int i = 1; // todo: should be auto generated from class mappers
+                var i = 1; // todo: should be auto generated from class mappers
 
-                Func<int> createKey = () =>
-                {
-                    return i++;
-                };
+                Func<int> createKey = () => { return i++; };
 
                 _repository = new InMemoryRepository<TestEntity, int>(
                     new KeyProvider<TestEntity, int>(
                         new KeyGenerator<TestEntity, int>(createKey)),
                     new KeyBinder<TestEntity, int>(m => m.Id,
                         (entity, entityId) => entity.Id = entityId),
-
                     new List<TestEntity>());
             }
 
@@ -76,18 +72,18 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
     public abstract class UnitOfWorkManagesTransactionsStoryBase
     {
-        private string _conString;
         private static readonly IDapperConfiguration _config;
-        private SessionFactory _sessionFactory;
         private readonly DateTime _referencedate = new DateTime(2011, 1, 1, 9, 30, 15);
-        protected decimal _referenceNumber = 14.12m;
+        protected ICommitPolicy _commitPolicy;
+        private string _conString;
         private UnitOfWork<TestEntity, int> _db;
+        protected string _dbName;
+        private TestEntity[] _deletedEntities;
         private TestEntity _insertedEntity;
         private TestEntity _insertedEntityNotCommited;
+        protected decimal _referenceNumber = 14.12m;
+        private SessionFactory _sessionFactory;
         private TestEntity _updatedEntity;
-        private TestEntity[] _deletedEntities;
-        protected ICommitPolicy _commitPolicy;
-        protected string _dbName;
 
         static UnitOfWorkManagesTransactionsStoryBase()
         {
@@ -99,7 +95,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             var classMapper = new CustomEntityMap<TestEntity>();
             classMapper.SetIdentityGenerated(m => m.Id);
 
-            var classMappers = new List<IClassMapper>()
+            var classMappers = new List<IClassMapper>
             {
                 classMapper
             };
@@ -109,11 +105,14 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
         protected void GivenANewTestSqlDbWithASingleEntity()
         {
-            string dbServerName = LocalDbSetup.LocalDbServerName;
+            var dbServerName = LocalDbSetup.LocalDbServerName;
             if (string.IsNullOrWhiteSpace(_dbName))
                 throw new InvalidOperationException();
 
-            this._conString = $@"data source={dbServerName};initial catalog={_dbName};integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+            _conString =
+                $@"data source={dbServerName};initial catalog={
+                        _dbName
+                    };integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
 
             // delete any existing databases
             var dbSetup = new LocalDbSetup(Environment.CurrentDirectory, _dbName);
@@ -123,7 +122,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             using (var repositoryDb = new TestModel(_conString))
             {
                 repositoryDb.MyEntities
-                    .Add(new TestEntity()
+                    .Add(new TestEntity
                     {
                         Name = "Name",
                         Date = _referencedate,
@@ -145,7 +144,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
         protected void AndGivenAValidSessionFactory()
         {
-            this._sessionFactory = new SessionFactory(_conString, _config);
+            _sessionFactory = new SessionFactory(_conString, _config);
 
             using (var session = _sessionFactory.Create())
             {
@@ -156,7 +155,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
         protected void AndGivenAUnitOfWork()
         {
-            this._db = new UnitOfWork<TestEntity, int>(
+            _db = new UnitOfWork<TestEntity, int>(
                 GetRepository,
                 _sessionFactory,
                 _commitPolicy);
@@ -171,7 +170,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         {
             using (_db.Open())
             {
-                _db.EntitySet.Writer.Insert(new TestEntity()
+                _db.EntitySet.Writer.Insert(new TestEntity
                 {
                     Id = 1,
                     Date = _referencedate,
@@ -180,7 +179,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                 });
 
                 TestEntity testEntity2;
-                _db.EntitySet.Writer.Insert(testEntity2 = new TestEntity()
+                _db.EntitySet.Writer.Insert(testEntity2 = new TestEntity
                 {
                     Id = 2,
                     Date = _referencedate,
@@ -198,9 +197,9 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
             using (_db.Open())
             {
-                this._insertedEntity = _db.EntitySet.Reader.Get(1);
+                _insertedEntity = _db.EntitySet.Reader.Get(1);
 
-                this._updatedEntity = _db.EntitySet
+                _updatedEntity = _db.EntitySet
                     .Reader.GetAll().FirstOrDefault(m => m.Name == "Name 3");
             }
         }
@@ -209,7 +208,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
         {
             using (_db.Open())
             {
-                _db.EntitySet.Writer.Insert(new TestEntity()
+                _db.EntitySet.Writer.Insert(new TestEntity
                 {
                     Id = 3,
                     Date = _referencedate,
@@ -219,7 +218,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
 
                 // don't save changes
                 // 2 would be the next entity
-                this._insertedEntityNotCommited = _db.EntitySet
+                _insertedEntityNotCommited = _db.EntitySet
                     .Reader.GetAll().FirstOrDefault(m => m.Name == "Not commited");
             }
         }
@@ -252,7 +251,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
             Assert.Throws<InvalidOperationException>(() =>
             {
                 // user has to explicitly call Open
-                this._insertedEntityNotCommited = _db.EntitySet.Reader.Get(1);
+                _insertedEntityNotCommited = _db.EntitySet.Reader.Get(1);
             });
         }
 
@@ -264,7 +263,7 @@ namespace FutureState.Data.Sql.Tests.UnitOfWork
                 {
                     using (_db.Open()) // should raise an exception
                     {
-                        this._insertedEntityNotCommited = _db.EntitySet.Reader.Get(2);
+                        _insertedEntityNotCommited = _db.EntitySet.Reader.Get(2);
                     }
                 }
             });

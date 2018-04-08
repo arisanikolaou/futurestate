@@ -2,22 +2,22 @@
 #addin "nuget:?package=Cake.SemVer"
 #addin "nuget:?package=semver&version=2.0.4"
 #addin "nuget:?package=Cake.Git"
-#addin "nuget:?package=Cake.AppVeyor"
-#addin "nuget:?package=Refit&version=3.0.0"
-#addin "nuget:?package=Newtonsoft.Json&version=9.0.1"
 #addin "Cake.XdtTransform"
 #addin "Cake.FileHelpers"
-#addin "System.Net.Http"
 
+#tool "nuget:?package=vswhere"
 #tool "xunit.runner.console"
 #tool "nuget:?package=GitVersion.CommandLine"
 #tool "nuget:?package=gitlink"
 
+// BUILD VERSION
+//////////////////////////////////////////////////////////////////////
+var defaultVersion = "0.3.0";
+//////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
-
 var target = Argument<string>("target", "Default");
 var configurationName = "Release";
 var configuration = Argument<string>("configuration", configurationName);
@@ -27,21 +27,22 @@ var distDir = Directory("./dist");
 var nugetDirname = "./nuget";
 var nugetDir = Directory(nugetDirname);
 var buildDir = Directory("./build");
-var defaultVersion = "0.3.0";
-var solutionVersion = Argument<string>("BUILD_VERSION",defaultVersion);
+var testDir = Directory("./testResults");
+var solutionVersion = Argument<string>("BUILD_VERSION", defaultVersion);
 
+//////////////////////////////////////////////////////////////////////
 // nuget get
-var nugetServer = "https://www.nuget.org";
-var apiKey = EnvironmentVariable("NUGET_APIKEY");
+//////////////////////////////////////////////////////////////////////
+var nugetServer = Argument<string>("NUGET_SERVER", "https://www.nuget.org");
+var apiKey = Argument<string>("NUGET_APIKEY", null) ?? EnvironmentVariable("NUGET_APIKEY"); // pass api key file
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
 Information("Starting build: " + solutionVersion);
-Information("Nuget Api Key: " + apiKey);
 
-Task("Clean-Outputs")
+Task("Clean")
 	.Does(() => 
 	{
 		CleanDirectory(buildDir);
@@ -49,53 +50,43 @@ Task("Clean-Outputs")
 		CleanDirectory(nugetDir);
 	});
 
-Task("Clean")
-    .IsDependentOn("Clean-Outputs")
-    .Does(() =>
-{
-        DotNetBuild(solutionFile, settings => settings
-            .SetConfiguration(configuration)
-            .WithTarget("Clean")
-            .SetVerbosity(Verbosity.Minimal));
-});
-
 Task("UpdateAssemblyInfo")
-    .Does(() =>
+	.Does(() =>
 {
-    var versionInfo = GitVersion(new GitVersionSettings {
-        UpdateAssemblyInfo = true,
-	    OutputType = GitVersionOutput.BuildServer
-    });
+	var versionInfo = GitVersion(new GitVersionSettings {
+		UpdateAssemblyInfo = true,
+		OutputType = GitVersionOutput.BuildServer
+	});
 
 	Information(versionInfo);
 });
 
 Task("SetVersion")
 	.IsDependentOn("UpdateAssemblyInfo")
-    .Does(() => {
-	   	Information("Updating assembly details.");
+	.Does(() => {
+		Information("Updating assembly details.");
 	   
-       	ReplaceRegexInFiles("./src/**/**/AssemblyInfo*.cs", 
-                           "(?<=AssemblyVersion\\(\")(.+?)(?=\"\\))", 
-                           solutionVersion);
+		ReplaceRegexInFiles("./src/**/**/AssemblyInfo*.cs", 
+						   "(?<=AssemblyVersion\\(\")(.+?)(?=\"\\))", 
+						   solutionVersion);
 
 		ReplaceRegexInFiles("./src/**/**/AssemblyInfo*.cs", 
-                           "(?<=AssemblyFileVersion\\(\")(.+?)(?=\"\\))", 
-                           solutionVersion);
+						   "(?<=AssemblyFileVersion\\(\")(.+?)(?=\"\\))", 
+						   solutionVersion);
    });
 
 Task("Restore-NuGet-Packages")
-    .IsDependentOn("Clean")
-    .Does(() =>
+	.IsDependentOn("Clean")
+	.Does(() =>
 {
 	Information("Restoring nuget packages.");
-    NuGetRestore(solutionFile, new NuGetRestoreSettings { NoCache = true });
+	NuGetRestore(solutionFile, new NuGetRestoreSettings { NoCache = true });
 });
 
 Task("Build")
 	.IsDependentOn("SetVersion")
-    .IsDependentOn("Restore-NuGet-Packages")
-    .Does(() =>
+	.IsDependentOn("Restore-NuGet-Packages")
+	.Does(() =>
 {
 	// assume git
 	var lastCommit = GitLogTip("./");
@@ -112,28 +103,42 @@ Task("Build")
 		lastCommit.Author.When,
 		lastCommit.Committer.Name,
 		lastCommit.Committer.When
-    );
+	);
 
-    if(IsRunningOnWindows())
-    {
+	if(IsRunningOnWindows())
+	{
 		Information("Building on Windows.");
 
-		// Use MSBuild
-		MSBuild(solutionFile, settings =>
-			settings
-			.SetConfiguration(configuration)
-			.SetVerbosity(Verbosity.Minimal));
-    }
-    else
-    {
-      // Use XBuild
-      XBuild(solutionFile, settings =>
-        settings.SetConfiguration(configuration)
-        .SetConfiguration(configuration)
-        .SetVerbosity(Verbosity.Minimal));
-    }
-});
+		// find latest ms build/tools
+		DirectoryPath vsLatest  = VSWhereLatest();
 
+		FilePath msBuildPathX64 = (vsLatest==null)
+									? null
+									: vsLatest.CombineWithFilePath("./MSBuild/15.0/Bin/amd64/MSBuild.exe");
+									
+		var settings = new MSBuildSettings() 
+		{
+			MaxCpuCount = 0, // use all processors
+			ToolPath = msBuildPathX64,
+			Verbosity = Verbosity.Minimal,
+			Configuration = configuration
+		};
+
+		// rebuild
+		settings.WithTarget("Rebuild");
+
+		// Use MSBuild
+		MSBuild(solutionFile, settings);
+	}
+	else
+	{
+	  // Use XBuild
+	  XBuild(solutionFile, settings =>
+		settings.SetConfiguration(configuration)
+		.SetConfiguration(configuration)
+		.SetVerbosity(Verbosity.Minimal));
+	}
+});
 
 Task("Packages")
 	.IsDependentOn("Run-Unit-Tests")
@@ -150,9 +155,9 @@ Task("Packages")
 
 			var assemblyInfo = ParseAssemblyInfo(project.GetDirectory().CombineWithFilePath("./Properties/AssemblyInfo.cs"));
 			var assemblyVersion = ParseSemVer(assemblyInfo.AssemblyVersion); 
-            var packageVersion = assemblyVersion;
+			var packageVersion = assemblyVersion;
 
-            Information("Package version: " + packageVersion.ToString());
+			Information("Package version: " + packageVersion.ToString());
 
 			NuGetPack(project, new NuGetPackSettings
 			{
@@ -226,23 +231,23 @@ Task("Consoles")
 	});
 
 Task("Run-Unit-Tests")
-    .IsDependentOn("Build")
-    .Does(() =>
+	.IsDependentOn("Build")
+	.Does(() =>
 {
-    XUnit2(string.Format("./tests/**/bin/{0}/*.Tests.dll", configuration), new XUnit2Settings {
-        XmlReport = true,
+	XUnit2(string.Format("./tests/**/bin/{0}/*.Tests.dll", configuration), new XUnit2Settings {
+		XmlReport = true,
 		UseX86 = false,
 		HtmlReport = true,
-        OutputDirectory = buildDir
-    });
+		OutputDirectory = testDir
+	});
 });
 
 //////////////////////////////////////////////////////////////////////
+
+// publish packages to nuget server
 Task("Publish-Packages")
 	.IsDependentOn("Packages")
 	.DoesForEach(GetFiles(nugetDirname + "/*.nupkg"), (package)=> {
-
-		Information("Publishing Packages Api Key: " + apiKey);
 
 		// Push the package.
 		NuGetPush(package, new NuGetPushSettings {
@@ -251,24 +256,6 @@ Task("Publish-Packages")
 		});
 
 	});
-
-  Task("Artefacts")
-	.IsDependentOn("Packages")
-	.Does(() =>
-	{
-		if (AppVeyor.IsRunningOnAppVeyor)
-		{
-			Information("Deploying artefacts on AppVeyor.");
-
-			foreach (var file in GetFiles(distDir))
-				AppVeyor.UploadArtifact(file.FullPath);
-
-			foreach (var file in GetFiles(nugetDirname + "/*.nupkg"))
-				AppVeyor.UploadArtifact(file.FullPath);
-		}
-
-	});
-
 
 
 //////////////////////////////////////////////////////////////////////

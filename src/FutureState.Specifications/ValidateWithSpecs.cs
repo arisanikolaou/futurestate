@@ -1,9 +1,9 @@
 ﻿#region
 
+using NLog;
 using System;
 using System.Linq;
 using System.Text;
-using NLog;
 
 #endregion
 
@@ -34,12 +34,10 @@ namespace FutureState.Specifications
         static ValidateWithSpecs()
         {
             if (_logger.IsDebugEnabled)
-            {
                 _logger.Debug(
                     "Activating {0} to get list of specifications for entity or service {1}.",
                     typeof(TSpecProvider).FullName,
                     typeof(TEntity).FullName);
-            }
 
             // activate only once when the assembly is loaded
             _specs = Activator.CreateInstance<TSpecProvider>()
@@ -83,7 +81,7 @@ namespace FutureState.Specifications
 
             foreach (var spec in _specs)
             {
-                var result = spec.Evaluate((TEntity) subject);
+                var result = spec.Evaluate((TEntity)subject);
 
                 if (result.IsValid)
                     continue;

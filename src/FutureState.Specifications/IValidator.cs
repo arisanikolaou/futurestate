@@ -16,7 +16,7 @@
         string Name { get; set; }
 
         /// <summary>
-        ///     Validates the subject and return true if valid and false if its not. 
+        ///     Validates the subject and return true if valid and false if its not.
         /// </summary>
         bool Validate(object subject);
     }

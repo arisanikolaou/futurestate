@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FutureState.Data
+﻿namespace FutureState.Data
 {
     /// <summary>
     ///     Something that can insert something into an underlying data store.

@@ -19,7 +19,7 @@ namespace FutureState
             var timeSpan = new TimeSpan(now.Ticks - dateTime.Ticks);
             var timeOfDay = now.TimeOfDay;
             var bytes1 = BitConverter.GetBytes(timeSpan.Days);
-            var bytes2 = BitConverter.GetBytes((long) (timeOfDay.TotalMilliseconds / 3.333333));
+            var bytes2 = BitConverter.GetBytes((long)(timeOfDay.TotalMilliseconds / 3.333333));
             Array.Reverse(bytes1);
             Array.Reverse(bytes2);
             Array.Copy(bytes1, bytes1.Length - 2, b, b.Length - 6, 2);
