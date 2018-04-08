@@ -34,4 +34,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.1.0.0")]
 [assembly: AssemblyFileVersion("0.1.0.0")]
 [assembly:
-    AssemblyInformationalVersion("0.1.0-flow-enrichment.1+187.Branch.feature/flow-enrichment.Sha.06c3a5645cf373d683f8d00bc68578199b994d38")]
+    AssemblyInformationalVersion("0.1.0-unstable.196+Branch.develop.Sha.a92a3f99a4039140aa47b8b69838b1bf47183140")]

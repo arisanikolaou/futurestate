@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7200B5EC-BD79-4C0F-BA39-F2A45B36AC17}"
 EndProject
@@ -41,6 +41,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Flow", "src\FutureState.Flow\FutureState.Flow.csproj", "{EDB233C6-0F90-46CE-B72C-F5E96D04259F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Flow.Tests", "tests\FutureState.Flow.Tests\FutureState.Flow.Tests.csproj", "{041A1BA9-AB82-4C2E-95A1-1ECFD0B6CFA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AACC2493-296C-4659-9F3D-9F47653860AB}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Index.md = docs\Index.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
