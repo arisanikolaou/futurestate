@@ -44,7 +44,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Flow.Tests", "t
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AACC2493-296C-4659-9F3D-9F47653860AB}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Index.md = docs\Index.md
+		docs\readme.md = docs\readme.md
 	EndProjectSection
 EndProject
 Global

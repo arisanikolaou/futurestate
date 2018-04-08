@@ -9,4 +9,4 @@ A collection of commponets available to accelerate the development of line of bu
 ./build.ps1 -Target Publish-Packages -ScriptArgs "-BUILD_VERSION=0.3.0"
 
 ## Technical Documentation
-http://futurestate.readthedocs.io/en/latest/
+http://futurestate.readthedocs.io/en/latest/Index/
