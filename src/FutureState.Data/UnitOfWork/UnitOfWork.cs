@@ -16,13 +16,7 @@ namespace FutureState.Data
     {
         private readonly ICommitPolicy _commitPolicy;
 
-        internal readonly HashSet<object> _deleted;
-
         internal readonly Queue<Action> _executionQueue;
-
-        internal readonly HashSet<object> _inserted;
-
-        internal readonly HashSet<object> _modified;
 
         /// <summary>
         ///     Creates a new instance.
@@ -38,28 +32,9 @@ namespace FutureState.Data
 
             _executionQueue = new Queue<Action>();
 
-            _inserted = new HashSet<object>();
-            _deleted = new HashSet<object>();
-            _modified = new HashSet<object>();
-
             // do not implement a transaction save commit policy by default
             _commitPolicy = policy ?? new CommitPolicyNoOp();
         }
-
-        /// <summary>
-        ///     The entities that will be deleted in the next Commit operation.
-        /// </summary>
-        public object[] Deleted => _deleted.ToArray();
-
-        /// <summary>
-        ///     The entities that will be inserted in the next Commit operation.
-        /// </summary>
-        public object[] Inserted => _inserted.ToArray();
-
-        /// <summary>
-        ///     The entities that will be modified in the next Commit operation.
-        /// </summary>
-        public object[] Modified => _modified.ToArray();
 
         /// <summary>
         ///     Commits any outstanding changes.
@@ -106,10 +81,6 @@ namespace FutureState.Data
                 {
                     // clear the execution stack and all inserted/updated/deleted objects
                     _executionQueue.Clear();
-
-                    _inserted.Clear();
-                    _deleted.Clear();
-                    _modified.Clear();
                 }
             }
         }

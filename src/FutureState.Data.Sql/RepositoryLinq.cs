@@ -47,7 +47,8 @@ namespace FutureState.Data.Sql
             return _queryBuilder.GetQuery(predicate).FirstOrDefault();
         }
 
-        public IEnumerable<TEntity> GetByKeys<TQueryArg>(IEnumerable<TQueryArg> queryArgs,
+        public IEnumerable<TEntity> GetByKeys<TQueryArg>(
+            IEnumerable<TQueryArg> queryArgs,
             Expression<Func<TEntity, TQueryArg, bool>> matchExpression)
         {
             throw new NotImplementedException();
