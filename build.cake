@@ -112,9 +112,11 @@ Task("Build")
 		// find latest ms build/tools
 		DirectoryPath vsLatest  = VSWhereLatest();
 
-		FilePath msBuildPathX64 = (vsLatest==null)
+		FilePath msBuildPathX64 = (vsLatest == null)
 									? null
 									: vsLatest.CombineWithFilePath("./MSBuild/15.0/Bin/amd64/MSBuild.exe");
+
+		Information("MS-Build Path:" + msBuildPathX64);
 									
 		var settings = new MSBuildSettings() 
 		{
