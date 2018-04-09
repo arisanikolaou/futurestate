@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution items", ".solutio
 		appveyor.yml = appveyor.yml
 		src\AssemblyInfoCommon.cs = src\AssemblyInfoCommon.cs
 		build.cake = build.cake
+		build.cmd = build.cmd
 		build.ps1 = build.ps1
 		main.runsettings = main.runsettings
 		README.md = README.md
@@ -43,9 +44,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FutureState.Flow.Tests", "tests\FutureState.Flow.Tests\FutureState.Flow.Tests.csproj", "{041A1BA9-AB82-4C2E-95A1-1ECFD0B6CFA0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AACC2493-296C-4659-9F3D-9F47653860AB}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Index.md = docs\Index.md
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
