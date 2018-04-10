@@ -15,12 +15,8 @@ A collection of components to accelerate the development of robust, maintainable
 
 [![Build status](https://ci.appveyor.com/api/projects/status/aqh7hjoa5rlgw518?svg=true)](https://ci.appveyor.com/project/ArisNikolaou/futurestate)
   
-
 ## Build Command Line Arguments Reference
 
     ./build.ps1 -Target Publish-Packages -ScriptArgs "-BUILD_VERSION=0.3.0"
- 
-
-## Technical Documentation
-
-[Full Technical Docs](http://futurestate.readthedocs.io/en/latest/index/)
+  
+## [Technical Docs](http://futurestate.readthedocs.io/en/latest/index/)
