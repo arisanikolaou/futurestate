@@ -1,0 +1,9 @@
+﻿FirstName,LastName,DateOfBirth
+John,Doe,2011-1-1
+Jane,Smith,2001-2-3
+,invalid,2001-2-3
+Invalid,UnmappableDate,2011-1-
+John1,Doe,2011-1-1
+Jane1,Smith,2001-2-3
+John2,Doe,2011-1-1
+Jane2,Smith,2001-2-3
