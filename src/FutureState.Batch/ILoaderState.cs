@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace FutureState.Batch
 {
@@ -31,10 +30,21 @@ namespace FutureState.Batch
         /// </summary>
         long Removed { get; set; }
 
+
         /// <summary>
-        ///     Gets the list of warnings.
+        ///     Gets the number of batches processed.
         /// </summary>
-        List<string> Warnings { get; }
+        long Batches { get; set; }
+
+        /// <summary>
+        ///     Gets the number of errors that were handled loading from a given data source.
+        /// </summary>
+        long ErrorsCount { get; set; }
+
+        /// <summary>
+        ///     Gets the number of warnings that were raised loading data from a given data source..
+        /// </summary>
+        long WarningsCount { get; set; }
 
         /// <summary>
         ///     Gets the current entity read.
@@ -45,11 +55,6 @@ namespace FutureState.Batch
         ///     Gets the date and time the loader started.
         /// </summary>
         DateTime StartTime { get; }
-
-        /// <summary>
-        ///     Gets the list of errors encountered loading the data.
-        /// </summary>
-        IList<Exception> Errors { get; }
 
         /// <summary>
         ///     Gets an optional tag to attach to the portfolio.

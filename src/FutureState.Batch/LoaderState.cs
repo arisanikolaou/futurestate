@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FutureState.Batch
 {
@@ -18,8 +17,6 @@ namespace FutureState.Batch
         {
             StartTime = DateTime.UtcNow;
             Valid = new TLoadStateData();
-            Warnings = new List<string>();
-            Errors = new List<Exception>();
         }
 
         /// <summary>
@@ -68,14 +65,23 @@ namespace FutureState.Batch
         public DateTime StartTime { get; set; }
 
         /// <summary>
-        ///     Gets the list of errors encountered loading the data.
+        ///     Gets the number of errors encountered processing data from a given data source.
         /// </summary>
-        public IList<Exception> Errors { get; }
+        public long ErrorsCount { get; set; }
+
+        /// <summary>
+        ///     Gets the number of warnings processing data from a given data source.
+        /// </summary>
+        public long WarningsCount { get; set; }
+
+        /// <summary>
+        ///     Gets the number of batches processed.
+        /// </summary>
+        public long Batches { get; set; }
 
         /// <summary>
         ///     Reports the state's added/updated and removed entities.
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             TimeSpan ts = TimeSpan.Zero;
@@ -83,27 +89,8 @@ namespace FutureState.Batch
                 ts = EndTime.Value - StartTime;
 
             // added/updated
-            string header =
-                $"Added {Added} entities. Updated {Updated}. Removed {Removed}.  Total errors {Errors.Count}. Total time; {ts.TotalSeconds:n2} seconds.";
-
-            var sb = new StringBuilder(header);
-            if (Errors.Count > 0)
-            {
-                sb.AppendLine("Errors:");
-                // display 1st 100 errors
-                for (var i = 0; i < Errors.Count && i < 100; i++)
-                    sb.AppendLine(Errors[i].Message);
-            }
-
-            if (Warnings.Count > 0)
-            {
-                sb.AppendLine("Warnings:");
-                // display 1st 100 warnings
-                for (var i = 0; i < Warnings.Count && i < 100; i++)
-                    sb.AppendLine(Warnings[i]);
-            }
-
-            return sb.ToString();
+            return
+                $"Added {Added} entities. Updated {Updated}. Removed {Removed}.  Total errors {this.ErrorsCount}. Total time; {ts.TotalSeconds:n2} seconds.";
         }
     }
 }

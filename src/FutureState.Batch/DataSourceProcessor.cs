@@ -8,10 +8,10 @@ using NLog;
 namespace FutureState.Batch
 {
     /// <summary>
-    ///     Controls how data is loaded from an incoming stream to a target data store.
+    ///     Controls how data is loaded from an incoming stream and validated.
     /// </summary>
     /// <typeparam name="TEntityDtoIn">The data type of the entity to read in.</typeparam>
-    public class LoaderProcess<TEntityDtoIn, TLoadStateData>
+    public class DataSourceProcessor<TEntityDtoIn, TLoadStateData>
         where TLoadStateData : new()
     {
         /// <summary>
@@ -19,8 +19,6 @@ namespace FutureState.Batch
         /// </summary>
         public const int DefaultMaxBatchSize = 10000;
 
-        // ReSharper disable once StaticMemberInGenericType
-        protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly IProvideSpecifications<TEntityDtoIn> _validator;
 
         private bool _isInitialized;
@@ -31,9 +29,17 @@ namespace FutureState.Batch
         /// <param name="validator">
         ///     Optional validator to use. Null will use 'SpecProvider'
         /// </param>
-        public LoaderProcess(IProvideSpecifications<TEntityDtoIn> validator = null)
+        /// <param name="log">The log to post event to.</param>
+        public DataSourceProcessor(IProvideSpecifications<TEntityDtoIn> validator = null, ILoaderLogWriter log = null)
         {
             _validator = validator ?? new SpecProvider<TEntityDtoIn>();
+
+            Log = Log ?? new LoaderLogWriter(LogManager.GetLogger(GetLogSystemName()));
+        }
+
+        public static string GetLogSystemName()
+        {
+            return $"Loader-{typeof(TEntityDtoIn).Name}";
         }
 
         /// <summary>
@@ -42,9 +48,9 @@ namespace FutureState.Batch
         public IEnumerable<TEntityDtoIn> EntitiesGet { get; set; }
 
         /// <summary>
-        ///     Gets the function to map incoming entities to outgoing entities. By default matching properties will be mapped.
+        ///     Gets the function to map and process entities to load state from the incoming datastore. 
         /// </summary>
-        public Action<LoaderState<TLoadStateData>, TEntityDtoIn> Mapper { get; set; }
+        public Action<LoaderState<TLoadStateData>, TEntityDtoIn> Processor { get; set; }
 
         /// <summary>
         ///     Gets the function to call to commit changes to the target data store.
@@ -67,13 +73,18 @@ namespace FutureState.Batch
         public int? MaxBatchSize { get; set; }
 
         /// <summary>
+        ///     Get/sets the log to write errors and warnings to.
+        /// </summary>
+        public ILoaderLogWriter Log { get; }
+
+        /// <summary>
         ///     Loads data from the incoming data stream, controls validating of incoming objects and calls commit when all valid
         ///     objects have been loaded.
         /// </summary>
         /// <returns>The load process result state.</returns>
         public ILoaderState Process()
         {
-            if (Mapper == null)
+            if (Processor == null)
                 throw new InvalidOperationException("Mapper action has not been assigned.");
 
             if (Commit == null)
@@ -85,7 +96,7 @@ namespace FutureState.Batch
             CurrentLoaderState = loaderState;
 
             // ReSharper disable once SuggestVarOrType_Elsewhere
-            var exceptions = loaderState.Errors;
+            var exceptions = loaderState.ErrorsCount;
 
             try
             {
@@ -93,7 +104,7 @@ namespace FutureState.Batch
 
                 // the rules to validate incoming data
                 // ReSharper disable once SuggestVarOrType_Elsewhere
-                var rules = _validator.GetSpecifications().ToArray();
+                ISpecification<TEntityDtoIn>[] rules = _validator.GetSpecifications().ToArray();
 
                 // initialize lookups only once
                 if (!_isInitialized)
@@ -112,22 +123,23 @@ namespace FutureState.Batch
                 int maxBatchSize = MaxBatchSize ?? DefaultMaxBatchSize;
                 if (maxBatchSize < 1)
                 {
-                    if (_logger.IsWarnEnabled)
-                        _logger.Warn(
+                    Log.Warn(
                             $"Fixing up max batch size as the supplied value is less than 1. Current value is {MaxBatchSize} which is being set to {DefaultMaxBatchSize}.");
 
                     maxBatchSize = DefaultMaxBatchSize;
                 }
 
-                if (_logger.IsDebugEnabled)
-                    _logger.Debug($"Processing {typeof(TEntityDtoIn).Name} in batches of {maxBatchSize}.");
+                Log.Info($"Processing {typeof(TEntityDtoIn).Name} in batches of {maxBatchSize}.");
 
+                // split stream into batches of 4
                 foreach (IEnumerable<TEntityDtoIn> batch in dataSource.BatchEx(maxBatchSize))
                 {
                     currentBatch++;
 
-                    if (_logger.IsDebugEnabled)
-                        _logger.Debug($"Starting to process batch {currentBatch}.");
+                    // log the number of batches to enhance testability
+                    loaderState.Batches = currentBatch;
+
+                    Log.Info($"Starting to process batch {currentBatch}.");
 
                     // create new state for each batch
                     loaderState.Valid = new TLoadStateData();
@@ -142,59 +154,58 @@ namespace FutureState.Batch
                             // ReSharper disable once SuggestVarOrType_Elsewhere
                             var errors = rules.ToErrors(dto).ToCollection();
                             if (!errors.Any())
-                                Mapper(loaderState, dto);
+                            {
+                                // map + load valid state
+                                Processor(loaderState, dto);
+                            }
                             else
-                                loaderState.Errors.Add(new RuleException(
+                            {
+                                this.Log.Error(new RuleException(
                                     $"Can't process row {loaderState.CurrentRow} due to one or more validation errors. Please see the log for more details.",
                                     errors));
+
+                                loaderState.ErrorsCount++;
+                            }
                         }
                         catch (RuleException rex)
                         {
-                            if (_logger.IsErrorEnabled)
-                                _logger.Error(
-                                    $"Can't process row {loaderState.CurrentRow} due to one or more errors. Please see the log for more details.");
+                            Log.Error(
+                                $"Can't process row {loaderState.CurrentRow} due to one or more errors. Please see the log for more details.");
 
                             foreach (Error error in rex.Errors)
-                                _logger.Error(error.Message);
+                                Log.Error(error.Message);
 
-                            exceptions.Add(rex);
+                            loaderState.ErrorsCount++;
                         }
                         catch (ApplicationException apex)
                         {
-                            if (_logger.IsErrorEnabled)
-                                _logger.Error(apex, $"Can't process row {loaderState.CurrentRow} due to error: {apex.Message}");
+                            Log.Error(apex, $"Can't process row {loaderState.CurrentRow} due to error: {apex.Message}");
 
-                            exceptions.Add(apex);
+                            loaderState.ErrorsCount++;
                         }
                         catch (Exception ex)
                         {
-                            if (_logger.IsErrorEnabled)
-                                _logger.Error(ex, $"Can't process row {loaderState.CurrentRow} due to an unexpected error.");
+                            Log.Error(ex, $"Can't process row {loaderState.CurrentRow} due to an unexpected error.");
 
-                            exceptions.Add(ex);
+                            loaderState.ErrorsCount++;
                         }
                     }
 
-                    if (_logger.IsDebugEnabled)
-                        _logger.Debug($"Batch {currentBatch} completed.");
+                    Log.Info($"Batch {currentBatch} completed.");
 
-                    if (_logger.IsDebugEnabled)
-                        _logger.Debug("Committing changes.");
+                    Log.Info("Committing changes.");
 
                     // update target
                     Commit(loaderState);
 
-                    if (_logger.IsDebugEnabled)
-                        _logger.Debug("Committed changes.");
+                    Log.Info("Committed changes.");
                 }
             }
             finally
             {
                 loaderState.EndTime = DateTime.UtcNow;
 
-                // remove progress
-                if (_logger.IsInfoEnabled)
-                    _logger.Info(loaderState);
+                Log.Info(loaderState.ToString());
             }
 
             return loaderState;

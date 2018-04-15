@@ -57,13 +57,15 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
-    <Compile Include="CsvExtractor.cs" />
+    <Compile Include="Extractors\CsvExtractor.cs" />
+    <Compile Include="Extractors\XmlAttributeEntityExtractor.cs" />
     <Compile Include="IExtractor.cs" />
     <Compile Include="ILoader.cs" />
     <Compile Include="ILoaderState.cs" />
     <Compile Include="IReader.cs" />
     <Compile Include="LoaderBase.cs" />
-    <Compile Include="LoaderProcess.cs" />
+    <Compile Include="DataSourceProcessor.cs" />
+    <Compile Include="LoaderLoggers.cs" />
     <Compile Include="LoaderState.cs" />
     <Compile Include="LoadResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +81,7 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

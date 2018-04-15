@@ -8,7 +8,7 @@
         /// <summary>
         ///     The entity type being loaded.
         /// </summary>
-        string SchemaTypeCode { get; }
+        string LoaderTypeCode { get; }
 
         /// <summary>
         ///     The underlying data store that is being read.

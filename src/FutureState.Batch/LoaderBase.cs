@@ -36,12 +36,10 @@ namespace FutureState.Batch
     /// </summary>
     public class LoaderBase
     {
-        protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         ///     Gets the unique schema type code of the data being read in.
         /// </summary>
-        public string SchemaTypeCode { get; protected set; }
+        public string LoaderTypeCode { get; protected set; }
 
         /// <summary>
         ///     Gets/sets the data source (e.g. a file to load from).
@@ -71,11 +69,21 @@ namespace FutureState.Batch
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="schemaTypeCode">The type of entity that is being loaded into the system.</param>
-        /// <param name="validator">Validates the incoming dtos.</param>
-        protected LoaderBase(string schemaTypeCode = null, IProvideSpecifications<TDtoIn> validator = null)
-            : base(schemaTypeCode, validator)
+        /// <param name="loaderTypeCode">The unique schema or loader identifier.</param>
+        /// <param name="validator">Provides the rules to validate incoming dtos.</param>
+        /// <param name="extractor">The data source reader.</param>
+        protected LoaderBase(
+            IExtractor<TDtoIn> extractor = null,
+            IProvideSpecifications<TDtoIn> validator = null,
+            string loaderTypeCode = null)
+            : base(extractor, validator, loaderTypeCode ?? GetLoaderTypeCode())
         {
+
+        }
+
+        public static string GetLoaderTypeCode()
+        {
+            return $"Loader-{typeof(TDtoIn).Name}-{typeof(TDtoOut).Name}";
         }
 
         /// <summary>
@@ -87,7 +95,7 @@ namespace FutureState.Batch
         /// </remarks>
         /// <param name="dtoIn">The source entity to map to the target entity.</param>
         /// <param name="loadState">The state to load validated target entities.</param>
-        protected override void Map(TDtoIn dtoIn, LoaderState<List<TDtoOut>> loadState)
+        protected override void Process(TDtoIn dtoIn, LoaderState<List<TDtoOut>> loadState)
         {
             var outDto = new TDtoOut();
 
@@ -102,7 +110,8 @@ namespace FutureState.Batch
                     _logger.Error(ex, $"Failed to map {dtoIn} to {outDto} due to an unexpected error.");
             }
 
-            Map(dtoIn, loadState, outDto);
+            // maps
+            Process(dtoIn, loadState, outDto);
         }
 
         /// <summary>
@@ -118,10 +127,7 @@ namespace FutureState.Batch
         ///     The pre-mapped target entity to complete mapping, validating and adding to the target
         ///     load state.
         /// </param>
-        protected virtual void Map(TDtoIn dtoIn, LoaderState<List<TDtoOut>> loadState, TDtoOut dtoOutDefaultMapped)
-        {
-            // optional
-        }
+        protected abstract void Process(TDtoIn dtoIn, LoaderState<List<TDtoOut>> loadState, TDtoOut dtoOutDefaultMapped);
     }
 
     /// <summary>
@@ -134,22 +140,41 @@ namespace FutureState.Batch
         where TLoadStateData : new()
     {
         private readonly IProvideSpecifications<TDtoIn> _validator;
+        private readonly IExtractor<TDtoIn> _extractor;
+        protected readonly Logger _logger;
 
         /// <summary>
         ///     Creates a new instance.
         /// </summary>
-        /// <param name="schemaTypeCode">The type of entity that is being loaded into the system.</param>
+        /// <param name="loaderTypeCode">The type of entity that is being loaded into the system.</param>
         /// <param name="validator">Validates the incoming dtos.</param>
-        protected LoaderBaseWithState(string schemaTypeCode = null, IProvideSpecifications<TDtoIn> validator = null)
+        /// <param name="extractor">The underlying extrator for the incoming dtos.</param>
+        protected LoaderBaseWithState(
+            IExtractor<TDtoIn> extractor = null,
+            IProvideSpecifications<TDtoIn> validator = null,
+            string loaderTypeCode = null)
         {
-            SchemaTypeCode = schemaTypeCode ?? typeof(TLoadStateData).Name;
+            LoaderTypeCode = loaderTypeCode ?? typeof(TLoadStateData).Name;
+
             _validator = validator;
+            _logger = LogManager.GetLogger(loaderTypeCode);
+
+            // create default extractor function
+            if (extractor == null)
+                extractor = new CsvExtractor<TDtoIn>();
+
+            _extractor = extractor;
         }
 
         /// <summary>
         ///     Gets the maximum batch size to read/write data sets.
         /// </summary>
-        public int MaxBatchSize { get; set; } = 1;
+        public int MaxBatchSize { get; set; } = 1000;
+
+        /// <summary>
+        ///     Get/sets the log to write errors and warnings to.
+        /// </summary>
+        public ILoaderLogWriter Log { get; set; }
 
         /// <summary>
         ///     Start the load process.
@@ -168,7 +193,10 @@ namespace FutureState.Batch
         /// <returns></returns>
         protected virtual IEnumerable<TDtoIn> GetDtos()
         {
-            return new CsvExtractor<TDtoIn>(DataSource).Read();
+            // default extractor
+            _extractor.Uri = DataSource;
+
+            return _extractor.Read();
         }
 
         /// <summary>
@@ -176,18 +204,20 @@ namespace FutureState.Batch
         /// </summary>
         public ILoaderState Load()
         {
+            ILoaderLogWriter log = Log ?? new LoaderLogWriter(_logger);
+
             try
             {
-                var p = new LoaderProcess<TDtoIn, TLoadStateData>(_validator)
+                var dataSourceProcessor = new DataSourceProcessor<TDtoIn, TLoadStateData>(_validator, log)
                 {
                     EntitiesGet = GetDtos(),
                     Initialize = Initialize,
                     MaxBatchSize = MaxBatchSize,
-                    Mapper = (loaderState, dtoIn) => Map(dtoIn, loaderState),
+                    Processor = (loaderState, dtoIn) => Process(dtoIn, loaderState),
                     Commit = Commit
                 };
 
-                ILoaderState result = p.Process();
+                ILoaderState result = dataSourceProcessor.Process();
 
                 return result;
             }
@@ -206,10 +236,7 @@ namespace FutureState.Batch
         /// </remarks>
         /// <param name="dtoIn">The source entity to map to the target entity.</param>
         /// <param name="loadState">The state to load validated target entities.</param>
-        protected virtual void Map(TDtoIn dtoIn, LoaderState<TLoadStateData> loadState)
-        {
-            throw new NotImplementedException();
-        }
+        protected abstract void Process(TDtoIn dtoIn, LoaderState<TLoadStateData> loadState);
 
         /// <summary>
         ///     Called after Load regardless of any errors processing incoming data.
