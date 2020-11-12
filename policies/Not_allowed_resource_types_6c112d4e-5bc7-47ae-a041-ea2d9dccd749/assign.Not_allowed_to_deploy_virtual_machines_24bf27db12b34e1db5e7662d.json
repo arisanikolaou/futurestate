@@ -1,0 +1,37 @@
+{
+ "sku": {
+  "name": "A0",
+  "tier": "Free"
+ },
+ "properties": {
+  "displayName": "Not allowed to deploy virtual machines",
+  "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/6c112d4e-5bc7-47ae-a041-ea2d9dccd749",
+  "scope": "/subscriptions/2c472b1b-cfa9-445b-8c99-6b566a0779e6",
+  "notScopes": [],
+  "parameters": {
+   "listOfResourceTypesNotAllowed": {
+    "value": [
+     "microsoft.classiccompute/virtualmachines",
+     "microsoft.classiccompute/virtualmachines/diagnosticsettings",
+     "microsoft.classiccompute/virtualmachines/metricdefinitions",
+     "microsoft.classiccompute/virtualmachines/metrics"
+    ]
+   }
+  },
+  "description": "",
+  "metadata": {
+   "assignedBy": "Aris Nikolaou",
+   "parameterScopes": {
+    "listOfResourceTypesNotAllowed": "/subscriptions/2c472b1b-cfa9-445b-8c99-6b566a0779e6"
+   },
+   "createdBy": "ee61b120-5c90-460d-8a3c-787dbcc7ce28",
+   "createdOn": "2020-11-12T16:20:57.9558075Z",
+   "updatedBy": "ee61b120-5c90-460d-8a3c-787dbcc7ce28",
+   "updatedOn": "2020-11-12T16:29:33.1283923Z"
+  },
+  "enforcementMode": "Default"
+ },
+ "id": "/subscriptions/2c472b1b-cfa9-445b-8c99-6b566a0779e6/providers/Microsoft.Authorization/policyAssignments/24bf27db12b34e1db5e7662d",
+ "type": "Microsoft.Authorization/policyAssignments",
+ "name": "24bf27db12b34e1db5e7662d"
+}
